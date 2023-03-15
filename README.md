@@ -6,6 +6,10 @@ With Matcha, you'll be up and running with an open source MLOPs environment in A
 
 ## Set up your environment
 
+```
+git clone git@github.com:fuzzylabs/matcha-example.git
+```
+
 First, install Matcha with PIP:
 
 ```
@@ -21,45 +25,22 @@ az login
 And provision your base environment:
 
 ```
-matcha provision experiments training deployment
+# sets up the basic env with sensible defaults
+matcha provision
 ```
 
 ## Run an example training workflow
 
-Clone the examples repository
-
 ```
-git clone git@github.com:fuzzylabs/matcha-example.git
+cd recommender
 ```
 
 ```
-cd matcha-example
+matcha run train deploy
 ```
 
-Install dependencies
+Verify that it works
 
 ```
-pip install -r requirements.txt
-```
-
-The example uses a ZenML pipeline to train a recommender model. We need to set up ZenML, and tell it about our newly-provisioned MLOps environment:
-
-```
-zenml init
-```
-
-```
-matcha export --target=zenml
-```
-
-Now, all that's left to do is run our training pipeline:
-
-```
-python run.py --train --deploy
-```
-
-Once the pipeline completes, you'll have a model endpoint which you can connect to using Curl.
-
-```
-curl https://<ENDPOINT>/recommend?user=1
+matcha verify
 ```
