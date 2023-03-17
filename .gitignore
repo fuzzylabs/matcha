@@ -314,14 +314,4 @@ pip-selfcheck.json
 .nfs*
 
 .vscode
-
-query_result.csv
-
-# open-rarity creates a folder to store cache data
-cached_data/
-
-# Folder containing csv for data
-data/
-
-# test creates a artifact
-*.faiss
+.idea
