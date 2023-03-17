@@ -5,7 +5,7 @@ description = ""
 authors = ["Your Name <you@example.com>"]
 license = "Apache-2.0 license"
 readme = "README.md"
-packages = [{include = "matcha_ml"}]
+packages = [{include = "matcha_ml", from = "src"}]
 
 [tool.poetry.dependencies]
 python = "^3.8"
