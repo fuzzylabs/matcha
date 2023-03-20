@@ -23,3 +23,8 @@ myst-parser = "^1.0.0"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.mypy]
+show_error_codes = true
+exclude = ["docs", "test"]
+strict = true
