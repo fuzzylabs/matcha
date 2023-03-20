@@ -1,0 +1,3 @@
+[darglint]
+message-template={path}:{line} {msg_id} {msg}
+docstring_style=google
