@@ -1,4 +1,4 @@
-"""Test suite to test the provision command and all it's subcommands."""
+"""Test suite to test the provision command and all its subcommands."""
 from matcha_ml import __version__
 from matcha_ml.cli.cli import app
 
