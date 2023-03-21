@@ -18,7 +18,7 @@ resource "null_resource" "download-SSL-certificate" {
 }
 
 
-# allow all IPs to access the server (required to make server Public for zenml pipelines to access)
+# allow all IPs to access the server (required to make server Public to access)
 resource "azurerm_mysql_flexible_server_firewall_rule" "allow_IPs" {
   name                = "all_traffic"
   resource_group_name = var.resource_group_name
