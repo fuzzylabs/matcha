@@ -7,8 +7,12 @@ license = "Apache-2.0 license"
 readme = "README.md"
 packages = [{include = "matcha_ml", from = "src"}]
 
+[tool.poetry.scripts]
+matcha = "matcha_ml.cli.cli:app"
+
 [tool.poetry.dependencies]
 python = "^3.8"
+typer = {extras = ["all"], version = "^0.7.0"}
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.1.1"
