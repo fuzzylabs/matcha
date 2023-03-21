@@ -4,12 +4,15 @@ from typing import Optional
 import typer
 
 from matcha_ml import __version__
-from matcha_ml.cli import provision
+from matcha_ml.cli import provision, run
 
 app = typer.Typer(no_args_is_help=True)
 
 # Create a group for all subcommands
 app.add_typer(provision.app, name="provision", help="Provision cloud resources.")
+
+# Create a group for all subcommands
+app.add_typer(run.app, name="run", help="Run command.")
 
 
 def version_callback(value: bool) -> None:
