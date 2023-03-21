@@ -20,12 +20,12 @@ variable "mlflow_namespace" {
 }
 
 # mlflow credentials
-variable "mlflow-username" {
+variable "mlflow_username" {
   type        = string
   description = "Usernmame to set to access mlflow server"
 }
 
-variable "mlflow-password" {
+variable "mlflow_password" {
   type        = string
   description = "Password to set to access mlflow server"
 }

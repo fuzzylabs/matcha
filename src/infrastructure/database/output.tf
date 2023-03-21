@@ -8,7 +8,7 @@ output "mysql_server_password" {
   sensitive = true
 }
 
-output "mysql-db-host" {
+output "mysql_db_host" {
   value = "${azurerm_mysql_flexible_server.server.name}.mysql.database.azure.com"
 }
 
