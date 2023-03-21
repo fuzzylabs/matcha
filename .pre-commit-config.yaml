@@ -62,5 +62,5 @@ repos:
     rev: v1.1.1
     hooks:
       - id: mypy
-        args: ["--config=pyproject.toml"]
+        args: ["--config-file=pyproject.toml"]
         exclude: ^tests/
