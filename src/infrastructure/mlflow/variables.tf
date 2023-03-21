@@ -1,3 +1,18 @@
+# resource group variables
+variable "resource_group_name" {
+  description = "The resource group name which is used to create the resource group"
+}
+
+variable "location" {
+  description = "The Azure Region in which this resources should be created."
+}
+
+# aks cluster variables
+variable "aks_cluster_name" {
+  type        = string
+  description = "Name of the aks cluster"
+}
+
 # mlflow namespace
 variable "mlflow_namespace" {
   type    = string
@@ -16,7 +31,7 @@ variable "mlflow-password" {
 }
 
 
-# artifact variables
+# artifact storage variables
 variable "artifact_Proxied_Access" {
   type    = bool
   default = false
@@ -44,8 +59,7 @@ variable "artifact_Azure_Access_Key" {
   description = "Access Key for Azure Blob Storage"
 }
 
-# backend variables
-
+# backend store variables
 variable "backend_Azure_Mysql_DatabaseMigration" {
   type        = bool
   default     = true
