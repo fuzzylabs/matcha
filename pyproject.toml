@@ -43,7 +43,7 @@ show_error_codes = true
 exclude = ["docs", "test"]
 strict = true
 disallow_untyped_decorators = false  # ignore functions using decorators
-ignore_missing_imports = true  # silence  all import errors related to untyped libraries
+ignore_missing_imports = true  # silence all import errors related to untyped libraries
 
 [tool.black]
 line-length = 88
