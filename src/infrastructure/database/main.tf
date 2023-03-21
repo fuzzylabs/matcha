@@ -1,6 +1,6 @@
 # create mysql database inside mysql server
 resource "azurerm_mysql_flexible_database" "db" {
-  name                = var.mysql_database_name
+  name                = "${var.prefix}db"
   resource_group_name = var.resource_group_name
   server_name         = azurerm_mysql_flexible_server.server.name
   charset             = "utf8"

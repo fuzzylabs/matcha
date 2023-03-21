@@ -6,14 +6,9 @@ variable "location" {
   description = "The Azure Region in which this resources should be created."
 }
 
-variable "mysql_server_name" {
-  description = "Name of Azure MySQL server"
+variable "prefix" {
+  description = "The prefix which should be used for naming database ({prefix}db) and server ({prefix}server)"
 }
-
-variable "mysql_database_name" {
-  description = "Name of database to be created inside Azure MySQL server"
-}
-
 variable "mysql_username" {
   description = "Username to connect to Azure MySQL server"
 }
