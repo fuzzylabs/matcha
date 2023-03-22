@@ -1,0 +1,21 @@
+site_name: matcha-ml
+site_description: matcha-ml is your one-stop-shop for efficiently provisioning MLOps tooling and for well-structured ML workflows.
+
+repo_name: fuzzylabs/matcha-ml
+repo_url: https://github.com/fuzzylabs/matcha
+
+theme:
+  name: material
+  features:
+    - content.code.copy
+  logo: img/favicon.png
+  favicon: img/favicon.png
+
+markdown_extensions:
+  - attr_list
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+
+extra_css:
+  - css/extra.css
