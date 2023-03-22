@@ -12,7 +12,11 @@ app = typer.Typer(no_args_is_help=True)
 app.add_typer(provision.app, name="provision", help="Provision cloud resources.")
 
 # Create a group for all subcommands
-app.add_typer(run.app, name="run", help="Run command. Executes run.py in the current directory by default if no command is passed.")
+app.add_typer(
+    run.app,
+    name="run",
+    help="Run command. Executes run.py in the current directory by default if no command is passed.",
+)
 
 
 def version_callback(value: bool) -> None:
@@ -40,6 +44,9 @@ def cli(
     Run 'matcha <command> --help' for more information on a specific command.
 
     For more help on how to use matcha, head to https://docs.mlops.wtf
+
+    Args:
+        version (Optional[bool]): missing docstring.
     """
     pass
 
