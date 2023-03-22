@@ -43,36 +43,6 @@ resource "helm_release" "mlflow-tracking" {
     type  = "string"
   }
 
-  # set values for Azure MySQL database
-  set {
-    name  = "backendStore.databaseMigration"
-    value = var.backend_Azure_Mysql_DatabaseMigration
-  }
-  set {
-    name  = "backendStore.mysql.enabled"
-    value = var.backend_Azure_Mysql_Enabled
-  }
-  set {
-    name  = "backendStore.mysql.host"
-    value = var.backend_Azure_Mysql_Host
-  }
-  set {
-    name  = "backendStore.mysql.port"
-    value = var.backend_Azure_Mysql_Port
-  }
-  set {
-    name  = "backendStore.mysql.database"
-    value = var.mlflow_mysql_database_name
-  }
-  set {
-    name  = "backendStore.mysql.user"
-    value = var.backend_Azure_Mysql_User
-  }
-  set_sensitive {
-    name  = "backendStore.mysql.password"
-    value = var.backend_Azure_Mysql_Password
-  }
-
   depends_on = [
     resource.kubernetes_namespace.mlflow
   ]

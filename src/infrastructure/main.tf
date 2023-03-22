@@ -17,17 +17,6 @@ module "storage" {
   location            = var.location
 }
 
-module "database" {
-  source = "./database"
-
-  resource_group_name = module.resource_group.name
-  prefix              = var.prefix
-  location            = var.location
-  mysql_username      = var.mysql_username
-  mysql_password      = var.mysql_password
-}
-
-
 module "aks" {
   source = "./aks"
 
@@ -36,7 +25,7 @@ module "aks" {
   resource_group_name = module.resource_group.name
 }
 
-module "mlflow-module" {
+module "mlflow" {
   source = "./mlflow-module"
 
   # resource group variables
@@ -59,10 +48,4 @@ module "mlflow-module" {
   storage_container_name    = module.storage.storage_container_name
   artifact_Azure_Access_Key = module.storage.primary_access_key
 
-  # database variables
-  backend_Azure_Mysql_Host     = module.database.mysql_db_host
-  backend_Azure_Mysql_Port     = module.database.mysql_server_port
-  backend_Azure_Mysql_User     = module.database.mysql_server_username
-  backend_Azure_Mysql_Password = module.database.mysql_server_password
-  mlflow_mysql_database_name   = module.database.mysql_database_name
 }

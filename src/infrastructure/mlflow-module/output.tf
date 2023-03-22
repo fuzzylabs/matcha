@@ -11,7 +11,7 @@ output "mlflow-namespace" {
 }
 
 output "mlflow-tracking-URL" {
-  value = data.kubernetes_service.mlflow_tracking.status.0.load_balancer.0.ingress.0.ip
+  value = "http://${data.kubernetes_service.mlflow_tracking.status.0.load_balancer.0.ingress.0.ip}/mlflow"
 }
 
 output "mlflow-username" {

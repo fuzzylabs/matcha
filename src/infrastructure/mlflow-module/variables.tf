@@ -77,39 +77,3 @@ variable "artifact_Azure_Access_Key" {
   default     = ""
   description = "Access Key for Azure Blob Storage"
 }
-
-# backend store variables
-variable "backend_Azure_Mysql_DatabaseMigration" {
-  type        = bool
-  default     = true
-  description = "Specifies if you want to run database migration"
-}
-
-variable "backend_Azure_Mysql_Enabled" {
-  type        = bool
-  default     = true
-  description = "Boolean to indicate if we are using Azure MySQL Database as backend for MLFlow"
-}
-
-variable "backend_Azure_Mysql_Host" {
-  type        = string
-  description = "Host name to access Azure MySQL Database (dbname.mysql.database.azure.com)"
-}
-
-variable "backend_Azure_Mysql_Port" {
-  description = "Port to access Azure MySQL Database"
-  default     = 3306
-}
-
-variable "backend_Azure_Mysql_User" {
-  description = "Username to access Azure MySQL Database"
-}
-
-variable "backend_Azure_Mysql_Password" {
-  description = "Password to access Azure MySQL Database"
-}
-
-variable "mlflow_mysql_database_name" {
-  type        = string
-  description = "Name of database to create inside Azure MySQL server to store mlflow runs"
-}
