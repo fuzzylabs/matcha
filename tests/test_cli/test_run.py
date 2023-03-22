@@ -25,3 +25,12 @@ def test_cli_train_command(runner):
 
     # Assert string is present in cli output
     assert "Run train subcommand." in result.stdout
+
+
+def test_cli_default_callback(runner):
+    """Test cli for run command."""
+    # Invoke run command with no option passed
+    result = runner.invoke(app, ["run"])
+
+    # Exit code 0 means there was no error
+    assert result.exit_code == 0
