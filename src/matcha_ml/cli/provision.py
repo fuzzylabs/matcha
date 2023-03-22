@@ -1,5 +1,6 @@
 """Provision CLI."""
 import dataclasses
+import glob
 import json
 import os
 from shutil import copy
@@ -60,12 +61,11 @@ def build_template(
     print(f"[green]Ensure template destination directory: {destination}[/green]")
     # TODO test how error for directory cannot be created is handled?
 
-    submodule_filenames = ["main.tf", "variables.tf", "output.tf"]
-
+    # Define additional non-tf files that are needed from the main module
     main_module_filenames = [
         ".gitignore",
         ".terraform.lock.hcl",
-    ] + submodule_filenames
+    ]
 
     submodule_names = ["aks", "resource_group"]
 
@@ -75,13 +75,21 @@ def build_template(
         destination_path = os.path.join(destination, filename)
         copy(source_path, destination_path)
 
+    for source_path in glob.glob(os.path.join(template_src, "*.tf")):
+        filename = os.path.basename(source_path)
+        destination_path = os.path.join(destination, filename)
+        copy(source_path, destination_path)
+
     for submodule_name in submodule_names:
         print(f"Copying {submodule_name} module configuration...")
         os.makedirs(os.path.join(destination, submodule_name), exist_ok=True)
-        for filename in submodule_filenames:
+        for source_path in glob.glob(os.path.join(template_src, "*.tf")):
+            filename = os.path.basename(source_path)
             source_path = os.path.join(template_src, submodule_name, filename)
             destination_path = os.path.join(destination, submodule_name, filename)
             copy(source_path, destination_path)
+        print("[green]{submodule_name} module configuration was copied[/green]")
+
     print("[green]Configuration was copied[/green]")
 
     print("Adding template configuration...")
