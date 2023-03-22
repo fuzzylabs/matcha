@@ -1,5 +1,6 @@
 """Provision CLI."""
 import dataclasses
+import json
 import os
 from shutil import copy
 from typing import Optional
@@ -59,7 +60,7 @@ def build_template(
     ] + submodule_filenames
 
     submodule_names = ["aks", "resource_group"]
-    # TODO copy template to destination
+
     print("Copying root module configuration...")
     for filename in main_module_filenames:
         source_path = os.path.join(template_src, filename)
@@ -75,7 +76,11 @@ def build_template(
             copy(source_path, destination_path)
     print("[green]Configuration was copied[/green]")
 
-    # TODO write template variables to destination
+    print("Adding template configuration...")
+    configuration_destination = os.path.join(destination, "terraform.tfvars.json")
+    with open(configuration_destination, "w") as f:
+        json.dump(dataclasses.asdict(config), f)
+    print("[green]Template configuration is added[/green]")
 
 
 def provision_resources(template: Optional[str] = None) -> None:
