@@ -3,9 +3,9 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-=====================================
-matcha-ml |version| documentation
-=====================================
+=============================
+matcha-ml |:tea:| - |version|
+=============================
 
 matcha-ml is your one-stop-shop for efficiently provisioning MLOps tooling and for well-structured ML workflows.
 
@@ -21,6 +21,9 @@ What does matcha-ml enable?
    :hidden:
 
    getting_started
+   azure_permissions
+   examples
+   cli
 
 
 

@@ -5,18 +5,25 @@ https://www.sphinx-doc.org/en/master/usage/configuration.html
 """
 from typing import List
 
+import matcha_ml
+
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = "matcha-ml"
 copyright = "2023, Fuzzy Labs"
 author = "Fuzzy Labs"
-release = "0.1.0"
+version = matcha_ml.__version__
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = ["myst_parser"]
+extensions = [
+    "myst_parser", 
+    'sphinx.ext.autodoc', 
+    'sphinx.ext.autosectionlabel', 
+    'sphinxemoji.sphinxemoji'
+]
 
 templates_path = ["_templates"]
 exclude_patterns: List[str] = []
