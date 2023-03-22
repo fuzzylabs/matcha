@@ -62,4 +62,5 @@ def test_cli_default_callback(runner):
 
     # Assert string is present in cli output
     assert "No commands are passed, running run.py by default." in result.stdout
+    # The temporary run.py file should contain code to print the following when executed.
     assert "This is the run.py file" in result.stdout
