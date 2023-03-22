@@ -1,12 +1,13 @@
 """Test suite to test the provision command and all its subcommands."""
-import shutil
-import os
-import pytest
 import json
-from matcha_ml import __version__
-from matcha_ml.cli.cli import app
-from src.matcha_ml.cli.provision import build_template, TemplateVariables
+import os
+import shutil
+import tempfile
 
+import pytest
+
+from matcha_ml.cli.cli import app
+from src.matcha_ml.cli.provision import TemplateVariables, build_template
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -18,24 +19,20 @@ def matcha_testing_folder():
     Yields:
         dir: a folder for temporarily storing and moving files from tests.
     """
-    temp_dir = os.path.join(BASE_DIR, ".matcha")
-    
-    # the folder for storing the test files
-    os.makedirs(temp_dir)
+    temp_dir = tempfile.TemporaryDirectory()
 
-    # tests are executed at this point 
-    yield temp_dir  
+    # tests are executed at this point
+    yield temp_dir.name
 
     # delete temp folder
-    shutil.rmtree(temp_dir)
+    temp_dir.cleanup()
 
 
 @pytest.fixture
 def template_src_path():
-    """_summary_
-    """
+    """_summary_"""
     template_dir = os.path.join(BASE_DIR, os.pardir, os.pardir, "src", "infrastructure")
-    
+
     return template_dir
 
 
@@ -46,7 +43,7 @@ def test_cli_provision_command_help(runner):
 
     # Exit code 0 means there was no error
     assert result.exit_code == 0
-    print(result.stdout)
+
     # Assert string is present in cli output
     assert "Provision cloud resources with a template." in result.stdout
 
@@ -58,35 +55,37 @@ def test_build_template(matcha_testing_folder, template_src_path):
         matcha_testing_folder (str): Temporary .matcha directory path
         template_src_path (str): Existing template directory path
     """
-    config = TemplateVariables('uksouth')
-    
+    config = TemplateVariables("uksouth")
+
     destination_path = os.path.join(matcha_testing_folder, "infrastructure")
-    
+
     build_template(config, template_src_path, destination_path)
-    
+
     module_file_names = ["main.tf", "variables.tf", "output.tf"]
-    
+
     module_names = ["aks", "resource_group"]
-    
+
     # Test that destination path is a directory
     print(destination_path)
     assert os.path.exists(destination_path)
-    
+
     for module_file_name in module_file_names:
         module_file_path = os.path.join(destination_path, module_file_name)
         assert os.path.exists(module_file_path)
 
         for module_name in module_names:
-            module_file_path = os.path.join(destination_path, module_name, module_file_name)
+            module_file_path = os.path.join(
+                destination_path, module_name, module_file_name
+            )
             assert os.path.exists(module_file_path)
-            
+
     # Check that Terraform variables file exists and content is equal/correct
     variables_file_path = os.path.join(destination_path, "terraform.tfvars.json")
     assert os.path.exists(variables_file_path)
-    
+
     expected_tf_vars = {"location": "uksouth", "prefix": "matcha"}
-    
+
     with open(variables_file_path, "r") as f:
         tf_vars = json.load(f)
-    
-    assert tf_vars == expected_tf_vars 
+
+    assert tf_vars == expected_tf_vars
