@@ -12,17 +12,18 @@ app = typer.Typer(no_args_is_help=True)
 
 @app.command()
 def provision(
-    template: Optional[str] = typer.Option(
-        None, help="Template to use for provisioning."
-    )
+    location: Optional[str] = typer.Option(
+        None, help="Azure location in which all resources will be provisioned."
+    ),
+    prefix: Optional[str] = typer.Option(None, help="Prefix used for all resources."),
 ) -> None:
     """Provision cloud resources with a template.
 
     Args:
-        template (str, optional): Path to template.
-                                Defaults to typer.Option(..., help="Template to use for provisioning.").
+        location (str, optional): Azure location in which all resources will be provisioned.
+        prefix (str, optional): Prefix used for all resources.
     """
-    provision_resources(template)
+    provision_resources(location, prefix)
 
 
 # Create a group for all subcommands

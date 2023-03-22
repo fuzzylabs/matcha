@@ -2,7 +2,7 @@
 import json
 import os
 import tempfile
-from typing import Dict, Generator
+from typing import Dict, Iterator
 
 import pytest
 
@@ -47,7 +47,7 @@ def assert_infrastructure(destination_path: str, expected_tf_vars: Dict[str, str
 
 
 @pytest.fixture
-def matcha_testing_directory() -> Generator[str]:
+def matcha_testing_directory() -> Iterator[str]:
     """A fixture for creating and removing temporary test directory for storing and moving files.
 
     Yields:
@@ -114,8 +114,34 @@ def test_cli_provision_command(runner, matcha_testing_directory):
     assert_infrastructure(destination_path, expected_tf_vars)
 
 
+def test_cli_provision_command_with_args(runner, matcha_testing_directory):
+    """Test provision command to copy the infrastructure template with command-line arguments.
+
+    Args:
+        runner (CliRunner): typer CLI runner
+        matcha_testing_directory (str): temporary working directory
+    """
+    os.chdir(matcha_testing_directory)
+
+    # Invoke provision command
+    result = runner.invoke(
+        app, ["provision", "--location", "uksouth", "--prefix", "matcha"]
+    )
+
+    # Exit code 0 means there was no error
+    assert result.exit_code == 0
+
+    destination_path = os.path.join(
+        matcha_testing_directory, ".matcha", "infrastructure"
+    )
+
+    expected_tf_vars = {"location": "uksouth", "prefix": "matcha"}
+
+    assert_infrastructure(destination_path, expected_tf_vars)
+
+
 def test_cli_provision_command_with_prefix(runner, matcha_testing_directory):
-    """Test provision command to copy the infrastructure template.
+    """Test provision command to copy the infrastructure template with different prefix.
 
     Args:
         runner (CliRunner): typer CLI runner

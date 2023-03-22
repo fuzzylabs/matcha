@@ -16,21 +16,29 @@ app = typer.Typer()
 class TemplateVariables(object):
     """Terraform template variables."""
 
-    # The Azure Region in which all resources should be provisioned
+    # Azure location in which all resources will be provisioned
     location: str
 
-    # A prefix used for all resources
+    # Prefix used for all resources
     prefix: str = "matcha"
 
 
-def build_template_configuration() -> TemplateVariables:
+def build_template_configuration(
+    location: Optional[str] = None, prefix: Optional[str] = None
+) -> TemplateVariables:
     """Ask for variables and build the configuration.
+
+    Args:
+        location (str, optional): Azure location in which all resources will be provisioned. Will be prompted for, if not provided.
+        prefix (str, optional): Prefix used for all resources. Will be prompted for, if not provided.
 
     Returns:
         TemplateVariables: Terraform variables required by a template
     """
-    prefix = typer.prompt("Resource name prefix", type=str, default="matcha")
-    location = typer.prompt("Resource location", type=str)
+    if prefix is None:
+        prefix = typer.prompt("Resource name prefix", type=str, default="matcha")
+    if location is None:
+        location = typer.prompt("Resource location", type=str)
 
     return TemplateVariables(prefix=prefix, location=location)
 
@@ -83,19 +91,21 @@ def build_template(
     print("[green]Template configuration is added[/green]")
 
 
-def provision_resources(template: Optional[str] = None) -> None:
+def provision_resources(
+    location: Optional[str] = None, prefix: Optional[str] = None
+) -> None:
     """Provision cloud resources with a template.
 
     Args:
-        template (str, optional): Path to template.
+        location (str, optional): Azure location in which all resources will be provisioned.
+        prefix (str, optional): Prefix used for all resources.
     """
     project_directory = os.getcwd()
     destination = os.path.join(project_directory, ".matcha", "infrastructure")
 
-    if template is None:
-        template = os.path.join(
-            os.path.dirname(__file__), os.pardir, os.pardir, "infrastructure"
-        )
+    template = os.path.join(
+        os.path.dirname(__file__), os.pardir, os.pardir, "infrastructure"
+    )
 
-    config = build_template_configuration()
+    config = build_template_configuration(location, prefix)
     build_template(config, template, destination)
