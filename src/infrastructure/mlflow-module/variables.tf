@@ -31,12 +31,6 @@ variable "k8_cluster_ca_certificate" {
 
 }
 
-# mlflow namespace
-variable "mlflow_namespace" {
-  type    = string
-  default = "mlflow"
-}
-
 # mlflow credentials
 variable "mlflow_username" {
   type        = string

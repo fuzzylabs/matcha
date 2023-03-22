@@ -6,12 +6,8 @@ output "ingress-controller-namespace" {
   value = kubernetes_namespace.nginx-ns.metadata[0].name
 }
 
-output "mlflow-namespace" {
-  value = kubernetes_namespace.mlflow.metadata[0].name
-}
-
 output "mlflow-tracking-URL" {
-  value = "http://${data.kubernetes_service.mlflow_tracking.status.0.load_balancer.0.ingress.0.ip}"
+  value = "http://${data.kubernetes_service.mlflow_tracking.status.0.load_balancer.0.ingress.0.ip}/mlflow"
 }
 
 output "mlflow-username" {

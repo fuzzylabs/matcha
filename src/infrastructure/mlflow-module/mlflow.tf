@@ -1,10 +1,3 @@
-# create the mlflow tracking server namespace
-resource "kubernetes_namespace" "mlflow" {
-  metadata {
-    name = var.mlflow_namespace
-  }
-}
-
 # create the mlflow tracking server deployment using mlflow helm charts
 # Reference: https://github.com/community-charts/helm-charts/blob/main/charts/mlflow/values.yaml
 resource "helm_release" "mlflow-tracking" {
@@ -12,7 +5,7 @@ resource "helm_release" "mlflow-tracking" {
   name       = "mlflow-tracking"
   repository = "https://community-charts.github.io/helm-charts"
   chart      = "mlflow"
-  namespace  = kubernetes_namespace.mlflow.metadata[0].name
+  # namespace  = kubernetes_namespace.mlflow.metadata[0].name
 
   # set proxied access to artifact storage
   set {
@@ -43,7 +36,4 @@ resource "helm_release" "mlflow-tracking" {
     type  = "string"
   }
 
-  depends_on = [
-    resource.kubernetes_namespace.mlflow
-  ]
 }
