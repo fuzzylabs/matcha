@@ -5,7 +5,6 @@ resource "helm_release" "mlflow-tracking" {
   name       = "mlflow-tracking"
   repository = "https://community-charts.github.io/helm-charts"
   chart      = "mlflow"
-  # namespace  = kubernetes_namespace.mlflow.metadata[0].name
 
   # set proxied access to artifact storage
   set {
