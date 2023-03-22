@@ -6,6 +6,11 @@ resource "helm_release" "mlflow-tracking" {
   repository = "https://community-charts.github.io/helm-charts"
   chart      = "mlflow"
 
+  # Change type from "ClusterIP" to "LoadBalancer"
+  set {
+    name  = "service.type"
+    value = "LoadBalancer"
+  }
   # set proxied access to artifact storage
   set {
     name  = "artifactRoot.proxiedArtifactStorage"

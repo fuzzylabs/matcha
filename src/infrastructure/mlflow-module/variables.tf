@@ -14,35 +14,22 @@ variable "aks_cluster_name" {
 }
 
 variable "k8_host" {
-  description = "Host name"
+  description = "Name of the aks host name"
 }
 
 variable "k8_client_certificate" {
-  description = "k8 client certifacte"
-}
-
-variable "k8_client_key" {
-  description = "k8 client key"
-
-}
-
-variable "k8_cluster_ca_certificate" {
-  description = "k8 client ca certificate"
-
-}
-
-# mlflow credentials
-variable "mlflow_username" {
-  type        = string
-  description = "Usernmame to set to access mlflow server"
-}
-
-variable "mlflow_password" {
-  type        = string
-  description = "Password to set to access mlflow server"
+  description = "aks client certifacte"
   sensitive   = true
 }
 
+variable "k8_client_key" {
+  description = "aks client key"
+}
+
+variable "k8_cluster_ca_certificate" {
+  description = "aks client ca certificate"
+  sensitive   = true
+}
 
 # artifact storage variables
 variable "artifact_Proxied_Access" {

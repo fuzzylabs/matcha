@@ -39,10 +39,6 @@ module "mlflow" {
   k8_client_key             = module.aks.client_key
   k8_cluster_ca_certificate = module.aks.cluster_ca_certificate
 
-  # mlflow variables
-  mlflow_username = var.mlflow_username
-  mlflow_password = var.mlflow_password
-
   # storage variables
   storage_account_name      = module.storage.storage_account_name
   storage_container_name    = module.storage.storage_container_name
