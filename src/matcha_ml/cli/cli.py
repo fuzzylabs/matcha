@@ -12,7 +12,7 @@ app = typer.Typer(no_args_is_help=True)
 app.add_typer(provision.app, name="provision", help="Provision cloud resources.")
 
 # Create a group for all subcommands
-app.add_typer(run.app, name="run", help="Run command.")
+app.add_typer(run.app, name="run", help="Run command. Executes run.py in the current directory by default if no command is passed.")
 
 
 def version_callback(value: bool) -> None:

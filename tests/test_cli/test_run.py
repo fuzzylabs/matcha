@@ -34,3 +34,6 @@ def test_cli_default_callback(runner):
 
     # Exit code 0 means there was no error
     assert result.exit_code == 0
+
+    # Assert string is present in cli output
+    assert "No commands are passed, running run.py by default." in result.stdout
