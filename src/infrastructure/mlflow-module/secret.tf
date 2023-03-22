@@ -9,11 +9,11 @@ resource "kubernetes_secret" "name" {
   # the key should be auth for nginx ingress to work
   # throws a 503 error if the key is not auth
   data = {
-    "auth" = "${var.mlflow-username}:${htpasswd_password.hash.apr1}"
+    "auth" = "${var.mlflow_username}:${htpasswd_password.hash.apr1}"
   }
 }
 
 # hash the password required for nginx
 resource "htpasswd_password" "hash" {
-  password = var.mlflow-password
+  password = var.mlflow_password
 }

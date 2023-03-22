@@ -13,6 +13,24 @@ variable "aks_cluster_name" {
   description = "Name of the aks cluster"
 }
 
+variable "k8_host" {
+  description = "Host name"
+}
+
+variable "k8_client_certificate" {
+  description = "k8 client certifacte"
+}
+
+variable "k8_client_key" {
+  description = "k8 client key"
+
+}
+
+variable "k8_cluster_ca_certificate" {
+  description = "k8 client ca certificate"
+
+}
+
 # mlflow namespace
 variable "mlflow_namespace" {
   type    = string
@@ -28,6 +46,7 @@ variable "mlflow_username" {
 variable "mlflow_password" {
   type        = string
   description = "Password to set to access mlflow server"
+  sensitive   = true
 }
 
 
@@ -42,7 +61,7 @@ variable "storage_account_name" {
   description = "Name of Azure Storage Container already created inside Azure Blob Storage"
 }
 
-variable "mlflow_storage_container_name" {
+variable "storage_container_name" {
   type        = string
   description = "Name of container to create inside Azure Storage Account to store artifacts"
 }

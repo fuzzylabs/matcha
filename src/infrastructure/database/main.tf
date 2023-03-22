@@ -10,14 +10,6 @@ resource "azurerm_mysql_flexible_database" "db" {
   ]
 }
 
-# download SSL certificate
-resource "null_resource" "download-SSL-certificate" {
-  provisioner "local-exec" {
-    command = "wget https://dl.cacerts.digicert.com/DigiCertGlobalRootCA.crt.pem"
-  }
-}
-
-
 # allow all IPs to access the server (required to make server Public to access)
 resource "azurerm_mysql_flexible_server_firewall_rule" "allow_IPs" {
   name                = "all_traffic"

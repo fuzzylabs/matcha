@@ -15,10 +15,10 @@ output "mlflow-tracking-URL" {
 }
 
 output "mlflow-username" {
-  value = var.mlflow-username
+  value = var.mlflow_username
 }
 
 output "mlflow-password" {
-  value     = var.mlflow-password
+  value     = var.mlflow_password
   sensitive = true
 }

@@ -34,7 +34,7 @@ resource "helm_release" "mlflow-tracking" {
   }
   set {
     name  = "artifactRoot.azureBlob.container"
-    value = var.mlflow_storage_container_name
+    value = var.storage_container_name
     type  = "string"
   }
   set_sensitive {
