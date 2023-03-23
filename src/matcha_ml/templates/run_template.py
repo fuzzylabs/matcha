@@ -8,7 +8,7 @@ from typing import Optional
 import python_terraform
 import typer
 from python_terraform import TerraformCommandError
-from rich import print
+from rich import print, print_json
 from rich.console import Console
 
 err_console = Console(stderr=True)
@@ -112,7 +112,7 @@ class TerraformService:
             )
         else:
 
-            print(f"{self.emojis.waiting_emoji} Running terraform init command...")
+            print(f"{self.emojis.waiting_emoji} Initializing Terraform...")
             ret_code, _, _ = self.terraform_client.init(capture_output=False)
 
             if ret_code != 0:
@@ -120,13 +120,13 @@ class TerraformService:
                 raise typer.Exit()
 
             print(
-                f"[green] {self.emojis.checkmark_emoji} Terraform init success. [/green]"
+                f"[green] {self.emojis.checkmark_emoji} Terraform was initialised! [/green]"
             )
 
             # Create a directory to avoid running init multiple times
             previous_temp_dir.mkdir(parents=True, exist_ok=True)
 
-        print(f"{self.emojis.waiting_emoji} Running terraform apply command...")
+        print(f"{self.emojis.waiting_emoji} Apply configuration...")
 
         # once terraform init is success, call terraform apply
         self.terraform_client.apply(
@@ -137,7 +137,7 @@ class TerraformService:
         )
 
         print(
-            f"[green] {self.emojis.checkmark_emoji} Terraform deployment complete. [/green]"
+            f"[green] {self.emojis.checkmark_emoji} Configuration was applied! [/green]"
         )
 
     def validate_config(self) -> None:
@@ -161,14 +161,15 @@ class TerraformService:
         self.check_installation()
         self.validate_config()
         self._init_and_apply()
-        self.write_outputs_state()
+        self.show_terraform_outputs()
 
     def _destroy(self) -> None:
         """Destroy the provisioned resources."""
-        print(f"{self.emojis.waiting_emoji} Running terraform destroy command...")
+        print(f"{self.emojis.waiting_emoji} Destroying terraform resources...")
 
+        # Investigate this: https://github.com/beelit94/python-terraform/issues/108
         self.terraform_client.destroy(
-            capture_output=False, raise_on_error=True, force=python_terraform.IsFlagged
+            capture_output=False, raise_on_error=True, force=python_terraform.IsNotFlagged, auto_approve=True
         )
 
     def deprovision(self, force: bool = False) -> None:
@@ -191,3 +192,9 @@ class TerraformService:
         # dump specific terraform output to state file
         with open(self.config.state_file, "w") as fp:
             json.dump(outputs, fp, indent=4)
+        return outputs
+
+    def show_terraform_outputs(self) -> None:
+        """Print the terraform outputs from state file."""
+        tf_output = self.write_outputs_state()
+        print_json(tf_output)
