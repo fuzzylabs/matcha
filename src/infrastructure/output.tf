@@ -1,3 +1,3 @@
-output "mlflow-tracking-URL" {
-  value = module.mlflow.mlflow-tracking-URL
+output "mlflow-tracking-url" {
+  value = module.mlflow.mlflow-tracking-url
 }
