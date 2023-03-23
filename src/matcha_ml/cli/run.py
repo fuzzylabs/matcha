@@ -3,9 +3,9 @@ import runpy
 from typing import Optional
 
 import typer
+from rich import print
 from rich.console import Console
 
-stdout_console = Console()
 err_console = Console(stderr=True)
 
 # create a typer app to group all run subcommands
@@ -27,7 +27,7 @@ def default_callback(context: typer.Context) -> None:
     """
     if context.invoked_subcommand is None:
         try:
-            stdout_console.print("No commands are passed, running run.py by default.")
+            print("No commands are passed, running run.py by default.")
             runpy.run_path("run.py", run_name="__main__")
 
         except FileNotFoundError:
