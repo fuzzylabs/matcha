@@ -58,10 +58,10 @@ def build_template(
         template_src (str): path of the template to use
         destination (str): destination path to write template to
     """
-    print("Building infrastructure template...")
+    print("Building configuration template...")
+
     os.makedirs(destination, exist_ok=True)
     print(f"[green]Ensure template destination directory: {destination}[/green]")
-    # TODO test how error for directory cannot be created is handled?
 
     # Define additional non-tf files that are needed from the main module
     main_module_filenames = [
@@ -69,7 +69,6 @@ def build_template(
         ".terraform.lock.hcl",
     ]
 
-    print("Copying root module configuration...")
     for filename in main_module_filenames:
         source_path = os.path.join(template_src, filename)
         destination_path = os.path.join(destination, filename)
@@ -81,7 +80,6 @@ def build_template(
         copy(source_path, destination_path)
 
     for submodule_name in SUBMODULE_NAMES:
-        print(f"Copying {submodule_name} module configuration...")
         os.makedirs(os.path.join(destination, submodule_name), exist_ok=True)
         for source_path in glob.glob(
             os.path.join(template_src, submodule_name, "*.tf")
@@ -94,11 +92,13 @@ def build_template(
 
     print("[green]Configuration was copied[/green]")
 
-    print("Adding template configuration...")
     configuration_destination = os.path.join(destination, "terraform.tfvars.json")
     with open(configuration_destination, "w") as f:
         json.dump(dataclasses.asdict(config), f)
-    print("[green]Template configuration is added[/green]")
+    print("[green]Template variables were added[/green]")
+
+    print("[green bold]Template configuration was finished![/green bold]")
+    print()
 
 
 def provision_resources(
@@ -119,3 +119,5 @@ def provision_resources(
 
     config = build_template_configuration(location, prefix)
     build_template(config, template, destination)
+
+    print("[green bold]Provisioning is complete![/green bold]")
