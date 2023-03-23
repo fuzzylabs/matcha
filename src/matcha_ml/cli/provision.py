@@ -9,6 +9,8 @@ from typing import Optional
 import typer
 from rich import print
 
+from matcha_ml.errors import MatchaPermissionError
+
 # create a typer app to group all provision subcommands
 app = typer.Typer()
 
@@ -57,45 +59,51 @@ def build_template(
         config (TemplateVariables): variables to apply to the template
         template_src (str): path of the template to use
         destination (str): destination path to write template to
+
+    Raises:
+        MatchaPermissionError: when there are no write permissions on the configuration destination
     """
-    print("Building configuration template...")
+    try:
+        print("Building configuration template...")
 
-    os.makedirs(destination, exist_ok=True)
-    print(f"[green]Ensure template destination directory: {destination}[/green]")
+        os.makedirs(destination, exist_ok=True)
+        print(f"[green]Ensure template destination directory: {destination}[/green]")
 
-    # Define additional non-tf files that are needed from the main module
-    main_module_filenames = [
-        ".gitignore",
-        ".terraform.lock.hcl",
-    ]
+        # Define additional non-tf files that are needed from the main module
+        main_module_filenames = [
+            ".gitignore",
+            ".terraform.lock.hcl",
+        ]
 
-    for filename in main_module_filenames:
-        source_path = os.path.join(template_src, filename)
-        destination_path = os.path.join(destination, filename)
-        copy(source_path, destination_path)
-
-    for source_path in glob.glob(os.path.join(template_src, "*.tf")):
-        filename = os.path.basename(source_path)
-        destination_path = os.path.join(destination, filename)
-        copy(source_path, destination_path)
-
-    for submodule_name in SUBMODULE_NAMES:
-        os.makedirs(os.path.join(destination, submodule_name), exist_ok=True)
-        for source_path in glob.glob(
-            os.path.join(template_src, submodule_name, "*.tf")
-        ):
-            filename = os.path.basename(source_path)
-            source_path = os.path.join(template_src, submodule_name, filename)
-            destination_path = os.path.join(destination, submodule_name, filename)
+        for filename in main_module_filenames:
+            source_path = os.path.join(template_src, filename)
+            destination_path = os.path.join(destination, filename)
             copy(source_path, destination_path)
-        print(f"[green]{submodule_name} module configuration was copied[/green]")
 
-    print("[green]Configuration was copied[/green]")
+        for source_path in glob.glob(os.path.join(template_src, "*.tf")):
+            filename = os.path.basename(source_path)
+            destination_path = os.path.join(destination, filename)
+            copy(source_path, destination_path)
 
-    configuration_destination = os.path.join(destination, "terraform.tfvars.json")
-    with open(configuration_destination, "w") as f:
-        json.dump(dataclasses.asdict(config), f)
-    print("[green]Template variables were added[/green]")
+        for submodule_name in SUBMODULE_NAMES:
+            os.makedirs(os.path.join(destination, submodule_name), exist_ok=True)
+            for source_path in glob.glob(
+                os.path.join(template_src, submodule_name, "*.tf")
+            ):
+                filename = os.path.basename(source_path)
+                source_path = os.path.join(template_src, submodule_name, filename)
+                destination_path = os.path.join(destination, submodule_name, filename)
+                copy(source_path, destination_path)
+            print(f"[green]{submodule_name} module configuration was copied[/green]")
+
+        print("[green]Configuration was copied[/green]")
+
+        configuration_destination = os.path.join(destination, "terraform.tfvars.json")
+        with open(configuration_destination, "w") as f:
+            json.dump(dataclasses.asdict(config), f)
+        print("[green]Template variables were added[/green]")
+    except PermissionError:
+        raise MatchaPermissionError(path=destination)
 
     print("[green bold]Template configuration was finished![/green bold]")
     print()

@@ -7,7 +7,7 @@ from matcha_ml import __version__
 from matcha_ml.cli import run
 from matcha_ml.cli.provision import provision_resources
 
-app = typer.Typer(no_args_is_help=True)
+app = typer.Typer(no_args_is_help=True, pretty_exceptions_show_locals=False)
 
 
 @app.command()
