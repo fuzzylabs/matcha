@@ -4,12 +4,10 @@ from typing import Optional
 import typer
 
 from matcha_ml import __version__
-from matcha_ml.cli import provision, run
+from matcha_ml.cli import run
+from matcha_ml.templates.run_template import TerraformService
 
 app = typer.Typer(no_args_is_help=True)
-
-# Create a group for all subcommands
-app.add_typer(provision.app, name="provision", help="Provision cloud resources.")
 
 # Create a group for all subcommands
 app.add_typer(
@@ -17,6 +15,26 @@ app.add_typer(
     name="run",
     help="Run command. Executes run.py in the current directory by default if no command is passed.",
 )
+
+
+# Create a provision command
+@app.command()
+def provision(
+    location: Optional[str] = typer.Option(
+        None, help="Azure location in which all resources will be provisioned."
+    ),
+    prefix: Optional[str] = typer.Option(None, help="Prefix used for all resources."),
+) -> None:
+    """Provision cloud resources with a template.
+
+    Args:
+        location (str, optional): Azure location in which all resources will be provisioned.
+        prefix (str, optional): Prefix used for all resources.
+    """
+    # provision_resources()
+
+    tfs = TerraformService()
+    tfs.provision()
 
 
 def version_callback(value: bool) -> None:
