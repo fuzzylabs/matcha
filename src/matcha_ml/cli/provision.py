@@ -12,6 +12,8 @@ from rich import print
 # create a typer app to group all provision subcommands
 app = typer.Typer()
 
+SUBMODULE_NAMES = ["aks", "resource_group", "mlflow-module", "storage"]
+
 
 @dataclasses.dataclass
 class TemplateVariables(object):
@@ -67,8 +69,6 @@ def build_template(
         ".terraform.lock.hcl",
     ]
 
-    submodule_names = ["aks", "resource_group"]
-
     print("Copying root module configuration...")
     for filename in main_module_filenames:
         source_path = os.path.join(template_src, filename)
@@ -80,15 +80,17 @@ def build_template(
         destination_path = os.path.join(destination, filename)
         copy(source_path, destination_path)
 
-    for submodule_name in submodule_names:
+    for submodule_name in SUBMODULE_NAMES:
         print(f"Copying {submodule_name} module configuration...")
         os.makedirs(os.path.join(destination, submodule_name), exist_ok=True)
-        for source_path in glob.glob(os.path.join(template_src, "*.tf")):
+        for source_path in glob.glob(
+            os.path.join(template_src, submodule_name, "*.tf")
+        ):
             filename = os.path.basename(source_path)
             source_path = os.path.join(template_src, submodule_name, filename)
             destination_path = os.path.join(destination, submodule_name, filename)
             copy(source_path, destination_path)
-        print("[green]{submodule_name} module configuration was copied[/green]")
+        print(f"[green]{submodule_name} module configuration was copied[/green]")
 
     print("[green]Configuration was copied[/green]")
 

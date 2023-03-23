@@ -1,4 +1,5 @@
 """Test suite to test the provision command and all its subcommands."""
+import glob
 import json
 import os
 import tempfile
@@ -7,9 +8,14 @@ from typing import Dict, Iterator
 import pytest
 
 from matcha_ml.cli.cli import app
-from src.matcha_ml.cli.provision import TemplateVariables, build_template
+from src.matcha_ml.cli.provision import (
+    SUBMODULE_NAMES,
+    TemplateVariables,
+    build_template,
+)
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+TEMPLATE_DIR = os.path.join(BASE_DIR, os.pardir, os.pardir, "src", "infrastructure")
 
 
 def assert_infrastructure(destination_path: str, expected_tf_vars: Dict[str, str]):
@@ -19,18 +25,17 @@ def assert_infrastructure(destination_path: str, expected_tf_vars: Dict[str, str
         destination_path (str): infrastructure config destination path
         expected_tf_vars (Dict[str, str]): expected Terraform variables
     """
-    module_file_names = ["main.tf", "variables.tf", "output.tf"]
-
-    module_names = ["aks", "resource_group"]
-
     # Test that destination path is a directory
     assert os.path.exists(destination_path)
 
-    for module_file_name in module_file_names:
+    for module_file_name in glob.glob(os.path.join(TEMPLATE_DIR, "*.tf")):
         module_file_path = os.path.join(destination_path, module_file_name)
         assert os.path.exists(module_file_path)
 
-        for module_name in module_names:
+    for module_name in SUBMODULE_NAMES:
+        for module_file_name in glob.glob(
+            os.path.join(TEMPLATE_DIR, module_name, "*.tf")
+        ):
             module_file_path = os.path.join(
                 destination_path, module_name, module_file_name
             )
