@@ -2,8 +2,7 @@
 import glob
 import json
 import os
-import tempfile
-from typing import Dict, Iterator
+from typing import Dict
 
 import pytest
 
@@ -49,22 +48,6 @@ def assert_infrastructure(destination_path: str, expected_tf_vars: Dict[str, str
         tf_vars = json.load(f)
 
     assert tf_vars == expected_tf_vars
-
-
-@pytest.fixture
-def matcha_testing_directory() -> Iterator[str]:
-    """A fixture for creating and removing temporary test directory for storing and moving files.
-
-    Yields:
-        str: a path to temporary directory for storing and moving files from tests.
-    """
-    temp_dir = tempfile.TemporaryDirectory()
-
-    # tests are executed at this point
-    yield temp_dir.name
-
-    # delete temp folder
-    temp_dir.cleanup()
 
 
 @pytest.fixture
