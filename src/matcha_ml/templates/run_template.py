@@ -39,8 +39,6 @@ class Emojis:
 
     waiting_emoji: str = "⏳"
 
-    neutral_emoji: str = "🤔"
-
 
 class TerraformService:
     """TerraformService class to provision and deprovision resources."""
@@ -107,9 +105,7 @@ class TerraformService:
         )
 
         if previous_temp_dir.exists():
-            print(
-                f"{self.emojis.neutral_emoji} Terraform already initialized. Skipping terraform init..."
-            )
+            print(f"Terraform already initialized. Skipping terraform init...")
         else:
 
             print(f"{self.emojis.waiting_emoji} Initializing Terraform...")
@@ -169,7 +165,10 @@ class TerraformService:
 
         # Investigate this: https://github.com/beelit94/python-terraform/issues/108
         self.terraform_client.destroy(
-            capture_output=False, raise_on_error=True, force=python_terraform.IsNotFlagged, auto_approve=True
+            capture_output=False,
+            raise_on_error=True,
+            force=python_terraform.IsNotFlagged,
+            auto_approve=True,
         )
 
     def deprovision(self, force: bool = False) -> None:
@@ -181,8 +180,12 @@ class TerraformService:
         self.check_installation()
         self._destroy()
 
-    def write_outputs_state(self) -> None:
-        """Write the outputs of the terraform deployment to the outputs.json file."""
+    def write_outputs_state(self) -> dict[str, str]:
+        """Write the outputs of the terraform deployment to the outputs.json file.
+
+        Returns:
+            dict: A dictionary containing the outputs of the terraform deployment.
+        """
         outputs = {
             MLFLOW_TRACKING_URL: self.terraform_client.output(
                 MLFLOW_TRACKING_URL, full_value=True
