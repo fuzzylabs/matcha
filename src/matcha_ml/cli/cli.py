@@ -46,7 +46,7 @@ def cli(
     For more help on how to use matcha, head to https://docs.mlops.wtf
 
     Args:
-        version (Optional[bool]): missing docstring.
+        version (Optional[bool]): an option for for displaying the version of matcha.
     """
     pass
 
