@@ -8,7 +8,6 @@ from typing import Optional
 
 import python_terraform
 import typer
-from python_terraform import TerraformCommandError
 from rich import print, print_json
 from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TimeElapsedColumn
@@ -99,7 +98,7 @@ class TerraformService:
         """
         try:
             self.terraform_client.cmd(cmd="-help")
-        except TerraformCommandError:
+        except Exception:
             return False
 
         print(
@@ -145,11 +144,10 @@ class TerraformService:
         """
         print(SUMMARY_MESSAGE)
         prompt = typer.prompt(
-            "Please type yes to approve provisioning resources", type=str
+            "Are you happy for these resources to be provisioned (y/N; yes/No)?",
+            type=str,
         )
-        if prompt.lower() == "yes":
-            return True
-        return False
+        return True if prompt.lower() == "yes" or prompt.lower() == "y" else False
 
     def _init_and_apply(self) -> None:
         """Run terraform init and apply to create resources on cloud.
@@ -171,7 +169,7 @@ class TerraformService:
             with Progress(
                 SpinnerColumn(spinner_name=random.choice(SPINNERS)),
                 TimeElapsedColumn(),
-                transient=True,
+                # transient=True,
             ) as progress:
                 progress.add_task(description="Initializing", total=None)
                 ret_code, _, _ = self.terraform_client.init(
@@ -195,7 +193,7 @@ class TerraformService:
         with Progress(
             SpinnerColumn(spinner_name=random.choice(SPINNERS)),
             TimeElapsedColumn(),
-            transient=True,
+            # transient=True,
         ) as progress:
             progress.add_task(description="Applying", total=None)
             self.terraform_client.apply(

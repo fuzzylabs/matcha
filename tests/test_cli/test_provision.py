@@ -90,9 +90,8 @@ def test_cli_provision_command(runner, matcha_testing_directory):
     # Invoke provision command
     result = runner.invoke(app, ["provision"], input="\nuksouth\nno\n")
 
-    # Exit code 1 exists because we add a prompt "no" to provision resources
-    # and this triggers a typer.Exit
-    assert result.exit_code == 1
+    # Exit code 0 means there was no error
+    assert result.exit_code == 0
 
     destination_path = os.path.join(
         matcha_testing_directory, ".matcha", "infrastructure"
@@ -117,9 +116,8 @@ def test_cli_provision_command_with_args(runner, matcha_testing_directory):
         app, ["provision", "--location", "uksouth", "--prefix", "matcha"], input="no\n"
     )
 
-    # Exit code 1 exists because we add a prompt "no" to provision resources
-    # and this triggers a typer.Exit
-    assert result.exit_code == 1
+    # Exit code 0 means there was no error
+    assert result.exit_code == 0
 
     destination_path = os.path.join(
         matcha_testing_directory, ".matcha", "infrastructure"
@@ -142,9 +140,8 @@ def test_cli_provision_command_with_prefix(runner, matcha_testing_directory):
     # Invoke provision command
     result = runner.invoke(app, ["provision"], input="coffee\nukwest\nno\n")
 
-    # Exit code 1 exists because we add a prompt "no" to provision resources
-    # and this triggers a typer.Exit
-    assert result.exit_code == 1
+    # Exit code 0 means there was no error
+    assert result.exit_code == 0
 
     destination_path = os.path.join(
         matcha_testing_directory, ".matcha", "infrastructure"

@@ -13,7 +13,7 @@ app = typer.Typer(no_args_is_help=True, pretty_exceptions_show_locals=False)
 app.add_typer(
     run.app,
     name="run",
-    help="Run command. Executes run.py in the current directory by default if no command is passed.",
+    help="The run command. Default: finds and executes the pipelines run.py in the current directory if no command is passed.",
 )
 
 
