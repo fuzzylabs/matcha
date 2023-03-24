@@ -23,7 +23,7 @@ The following resources will be provisioned:
 
 Provisioning the resources will take around 10 minutes. May we suggest you to grab a cup of 🍵?
 """
-spinners = [
+SPINNERS = [
     "bouncingBall",
     "dots",
     "aesthetic",
@@ -48,14 +48,14 @@ class TerrformConfig:
     # variables file
     var_file: str = os.path.join(working_dir, "terraform.tfvars.json")
 
-    # if False terraform output will be printed to stdout/stderr
-    # else no output will be printed and only the return code will be returned
+    # if set to False terraform output will be printed to stdout/stderr
+    # else no output will be printed and (ret_code, out, err) tuple will be returned
     capture_output: bool = True
 
 
 @dataclasses.dataclass
 class Emojis:
-    """Emojis class."""
+    """Emojis class for displaying emojis."""
 
     checkmark_emoji: str = "✔"
 
@@ -72,8 +72,10 @@ class TerraformService:
     # configuration required for terraform
     config: TerrformConfig = TerrformConfig()
 
+    # terraform client
     _terraform_client: Optional[python_terraform.Terraform] = None
 
+    # emoji instance to display emojis
     emojis: Emojis = Emojis()
 
     @property
@@ -167,7 +169,7 @@ class TerraformService:
 
             # run terraform init
             with Progress(
-                SpinnerColumn(spinner_name=random.choice(spinners)),
+                SpinnerColumn(spinner_name=random.choice(SPINNERS)),
                 TimeElapsedColumn(),
                 transient=True,
             ) as progress:
@@ -191,7 +193,7 @@ class TerraformService:
 
         # once terraform init is success, call terraform apply
         with Progress(
-            SpinnerColumn(spinner_name=random.choice(spinners)),
+            SpinnerColumn(spinner_name=random.choice(SPINNERS)),
             TimeElapsedColumn(),
             transient=True,
         ) as progress:
@@ -233,13 +235,13 @@ class TerraformService:
         print(f"{self.emojis.waiting_emoji} Destroying terraform resources...")
 
         with Progress(
-            SpinnerColumn(spinner_name=random.choice(spinners)),
+            SpinnerColumn(spinner_name=random.choice(SPINNERS)),
             TimeElapsedColumn(),
             transient=True,
         ) as progress:
             progress.add_task(description="Destroying", total=None)
 
-            # Investigate this: https://github.com/beelit94/python-terraform/issues/108
+            # Reference: https://github.com/beelit94/python-terraform/issues/108
             self.terraform_client.destroy(
                 capture_output=self.config.capture_output,
                 raise_on_error=True,
@@ -247,11 +249,8 @@ class TerraformService:
                 auto_approve=True,
             )
 
-    def deprovision(self, force: bool = False) -> None:
+    def deprovision(self) -> None:
         """Deprovision the resources.
-
-        Args:
-            force: if True, all resources will be forced destroyed.
 
         Raises:
             Exit: if approval is not given by user.

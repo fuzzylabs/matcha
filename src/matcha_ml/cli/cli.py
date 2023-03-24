@@ -6,7 +6,6 @@ import typer
 from matcha_ml import __version__
 from matcha_ml.cli import run
 from matcha_ml.cli.provision import provision_resources
-from matcha_ml.templates.run_template import TerraformService
 
 app = typer.Typer(no_args_is_help=True, pretty_exceptions_show_locals=False)
 
@@ -32,9 +31,6 @@ def provision(
         prefix (str, optional): Prefix used for all resources.
     """
     provision_resources(location, prefix)
-
-    tfs = TerraformService()
-    tfs.provision()
 
 
 def version_callback(value: bool) -> None:

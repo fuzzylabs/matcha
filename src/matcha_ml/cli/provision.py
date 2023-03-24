@@ -10,6 +10,7 @@ import typer
 from rich import print
 
 from matcha_ml.errors import MatchaPermissionError
+from matcha_ml.templates.run_template import TerraformService
 
 # create a typer app to group all provision subcommands
 app = typer.Typer()
@@ -127,5 +128,11 @@ def provision_resources(
 
     config = build_template_configuration(location, prefix)
     build_template(config, template, destination)
+
+    # create a terraform service to provision resources
+    tfs = TerraformService()
+
+    # provision resources by running the template
+    tfs.provision()
 
     print("[green bold]Provisioning is complete![/green bold]")
