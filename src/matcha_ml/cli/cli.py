@@ -9,6 +9,13 @@ from matcha_ml.cli.provision import provision_resources
 
 app = typer.Typer(no_args_is_help=True, pretty_exceptions_show_locals=False)
 
+# Create a group for all subcommands
+app.add_typer(
+    run.app,
+    name="run",
+    help="The run command. Default: finds and executes the pipelines run.py in the current directory if no command is passed.",
+)
+
 
 @app.command()
 def provision(
@@ -20,22 +27,8 @@ def provision(
         False, help="Get more detailed information from matcha provision!"
     ),
 ) -> None:
-    """Provision cloud resources with a template.
-
-    Args:
-        location (str, optional): Azure location in which all resources will be provisioned.
-        prefix (str, optional): Prefix used for all resources.
-        verbose (bool, optional): Display more information on the termainal when provision is running.
-    """
+    """Provision cloud resources with a template."""
     provision_resources(location, prefix, verbose)
-
-
-# Create a group for all subcommands
-app.add_typer(
-    run.app,
-    name="run",
-    help="Run command. Executes run.py in the current directory by default if no command is passed.",
-)
 
 
 def version_callback(value: bool) -> None:

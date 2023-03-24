@@ -40,10 +40,10 @@ def test_cli_run_command(runner):
     assert result.exit_code == 0
 
     # Assert string is present in cli output
-    assert "Run command." in result.stdout
+    assert "The run command." in result.stdout
 
 
-def test_cli_train_command(runner, matcha_testing_directory):
+def test_cli_train_command(runner):
     """Test cli for run command."""
     # Invoke run command
     result = runner.invoke(app, ["run", "train", "--help"])

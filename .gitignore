@@ -317,3 +317,6 @@ pip-selfcheck.json
 
 .vscode
 .idea
+
+# ignore infrastructure code
+.matcha
