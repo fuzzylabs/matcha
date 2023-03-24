@@ -16,13 +16,16 @@ def provision(
         None, help="Azure location in which all resources will be provisioned."
     ),
     prefix: Optional[str] = typer.Option(None, help="Prefix used for all resources."),
-    verbose: Optional[bool] = typer.Option(False, help="Get more detailed information from matcha provision!")
+    verbose: Optional[bool] = typer.Option(
+        False, help="Get more detailed information from matcha provision!"
+    ),
 ) -> None:
     """Provision cloud resources with a template.
 
     Args:
         location (str, optional): Azure location in which all resources will be provisioned.
         prefix (str, optional): Prefix used for all resources.
+        verbose (bool, optional): Display more information on the termainal when provision is running.
     """
     provision_resources(location, prefix, verbose)
 

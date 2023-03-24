@@ -63,7 +63,7 @@ def build_template(
         verbose (bool, optional): additional output is shown when True. Defaults to False.
 
     Raises:
-        MatchaPermissionError: _description_
+        MatchaPermissionError: when there are no write permissions on the configuration destination
     """
     try:
         print("Building configuration template...")
