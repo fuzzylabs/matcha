@@ -14,14 +14,7 @@ from rich.progress import Progress, SpinnerColumn, TimeElapsedColumn
 
 err_console = Console(stderr=True)
 MLFLOW_TRACKING_URL = "mlflow-tracking-url"
-SUMMARY_MESSAGE = """
-The following resources will be provisioned:
-1. [yellow] Resource group [/yellow]: A resource group
-2. [yellow] Azure Kubernetes Service (AKS) [/yellow]: A kubernetes cluster
-3. [yellow] Azure Storage Container [/yellow]: A storage container
 
-Provisioning the resources will take around 10 minutes. May we suggest you to grab a cup of 🍵?
-"""
 SPINNERS = [
     "bouncingBall",
     "dots",
@@ -133,15 +126,27 @@ class TerraformService:
             )
             raise typer.Exit()
 
-    def is_approved(self) -> bool:
-        """Get approval from user to create resources on cloud.
+    def is_approved(self, verb: str) -> bool:
+        """Get approval from user to modify resources on cloud.
+
+        Args:
+            verb: The verb to use in the approval message.
 
         Returns:
             bool: True if user approves, False otherwise.
         """
+        SUMMARY_MESSAGE = f"""The following resources will be {verb}ed:
+1. [yellow] Resource group [/yellow]: A resource group
+2. [yellow] Azure Kubernetes Service (AKS) [/yellow]: A kubernetes cluster
+3. [yellow] Azure Storage Container [/yellow]: A storage container
+
+{verb.capitalize()}ing the resources will take around 10 minutes. May we suggest you to grab a cup of 🍵?
+"""
+
+        print()
         print(SUMMARY_MESSAGE)
         prompt = typer.prompt(
-            "Are you happy for these resources to be provisioned (y/N; yes/No)?",
+            f"Are you happy for these resources to be {verb} (y/N; yes/No)?",
             type=str,
         )
         return True if prompt.lower() == "yes" or prompt.lower() == "y" else False
@@ -221,7 +226,7 @@ class TerraformService:
 
         self.validate_config()
 
-        if self.is_approved():
+        if self.is_approved(verb="provision"):
             self._init_and_apply()
             self.show_terraform_outputs()
 
@@ -233,12 +238,13 @@ class TerraformService:
 
     def _destroy(self) -> None:
         """Destroy the provisioned resources."""
-        print(f"{self.emojis.waiting_emoji} Destroying terraform resources...")
+        print()
+        print(f"{self.emojis.waiting_emoji} Destroying your resources...")
+        print()
 
         with Progress(
             SpinnerColumn(spinner_name=random.choice(SPINNERS)),
             TimeElapsedColumn(),
-            transient=True,
         ) as progress:
             progress.add_task(description="Destroying", total=None)
 
@@ -258,7 +264,7 @@ class TerraformService:
         """
         self.check_installation()
 
-        if self.is_approved():
+        if self.is_approved(verb="destroy"):
             self._destroy()
 
         else:

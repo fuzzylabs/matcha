@@ -5,6 +5,7 @@ import typer
 
 from matcha_ml import __version__
 from matcha_ml.cli import run
+from matcha_ml.cli.destroy import destroy_resources
 from matcha_ml.cli.provision import provision_resources
 
 app = typer.Typer(no_args_is_help=True, pretty_exceptions_show_locals=False)
@@ -29,6 +30,12 @@ def provision(
 ) -> None:
     """Provision cloud resources with a template."""
     provision_resources(location, prefix, verbose)
+
+
+@app.command()
+def destroy() -> None:
+    """Destroy the provisioned cloud resources."""
+    destroy_resources()
 
 
 def version_callback(value: bool) -> None:
@@ -56,9 +63,6 @@ def cli(
     Run 'matcha <command> --help' for more information on a specific command.
 
     For more help on how to use matcha, head to https://docs.mlops.wtf
-
-    Args:
-        version (bool, optional): matcha version flag
     """
     pass
 
