@@ -1,6 +1,5 @@
-# `matcha` :tea:
 
-`matcha` is your one-stop-shop for efficiently provisioning MLOps tooling and for well-structured ML workflows.
+`matcha` :tea: is your one-stop-shop for efficiently provisioning MLOps tooling and for well-structured ML workflows.
 
 # Introduction
 

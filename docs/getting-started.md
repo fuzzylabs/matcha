@@ -1,6 +1,6 @@
-# Getting Started with `matcha` :tea:
+# Getting Started
 
-Getting started with `matcha` couldn't be simpler, we'll have you up and running with a fully provision cloud environment in less than 10 minutes. We have a number of examples, see [here](https://github.com/fuzzylabs/matcha-examples) for our examples respository.
+Getting started with `matcha` :tea: couldn't be simpler, we'll have you up and running with a fully provision cloud environment in less than 10 minutes. We have a number of examples, see [here](https://github.com/fuzzylabs/matcha-examples) for our examples respository.
 
 
 ## A movie recommender with experiment tracking
@@ -55,7 +55,7 @@ Matcha version: 0.1.0
 
 ### Provisioning your Azure environment with `matcha`
 
-Now you have your virtual environment configured and `matcha` installed, it's now time to provision your Azure environment. For this example, we'll deploy an experimental tracker ([MLflow](https://mlflow.org/)) to Azure. There are other components deployed as part of this, see *HERE (TODO)* for a detailed explanation of what `matcha` is doing.
+Now you have your virtual environment configured and `matcha` installed, it's time to provision your Azure environment. For this example, we'll deploy an experimental tracker ([MLflow](https://mlflow.org/)) to Azure. There are other components deployed as part of this, see *HERE (TODO)* for a detailed explanation of what `matcha` is doing.
 
 To start, you need to authenticate with Azure (see [pre-requisties](#pre-requisties)):
 
@@ -64,3 +64,31 @@ az login
 ```
 
 `matcha` has a set of sensible defaults for the infrastructure that it'll provision for you - see *HERE (TODO)* for more details.  
+
+To provision an experiment tracker using `matcha` run the following command (you'll be asked a series of questions which helps `matcha` personalised the environment to you):
+
+```bash
+matcha provision
+```
+
+*TODO* Once `provision` has finished doing it's thing, you can run the following command to inspect what has been provisioned on Azure for you:
+
+```bash
+matcha provision inspect
+```
+
+You should have some output which is similar to the following:
+
+```bash
+OUTPUT
+```
+
+### Running your recommender
+
+The environment is provisioned, you've got a movie recommender, and you're hyped and ready to go - we hope.
+
+Running the following command will run the recommendation pipeline locally, but the metadata associated with it (e.g., the RMSE performance metric) will be stored in your deployed experiment tracker:
+
+```bash
+matcha run
+```
