@@ -245,7 +245,6 @@ class TerraformService:
         with Progress(
             SpinnerColumn(spinner_name=random.choice(SPINNERS)),
             TimeElapsedColumn(),
-            transient=True,
         ) as progress:
             progress.add_task(description="Destroying", total=None)
 
