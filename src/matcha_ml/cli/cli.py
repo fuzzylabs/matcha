@@ -5,6 +5,7 @@ import typer
 
 from matcha_ml import __version__
 from matcha_ml.cli import run
+from matcha_ml.cli.destroy import destroy_resources
 from matcha_ml.cli.provision import provision_resources
 
 app = typer.Typer(no_args_is_help=True, pretty_exceptions_show_locals=False)
@@ -27,14 +28,14 @@ def provision(
         False, help="Get more detailed information from matcha provision!"
     ),
 ) -> None:
-    """Provision cloud resources with a template.
-
-    Args:
-        location (str, optional): Azure location in which all resources will be provisioned.
-        prefix (str, optional): Prefix used for all resources.
-        verbose (bool, optional): Display more information on the termainal when provision is running.
-    """
+    """Provision cloud resources with a template."""
     provision_resources(location, prefix, verbose)
+
+
+@app.command()
+def destroy() -> None:
+    """Destroy the provisioned cloud resources."""
+    destroy_resources()
 
 
 def version_callback(value: bool) -> None:
