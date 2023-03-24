@@ -2,6 +2,7 @@
 import dataclasses
 import json
 import os
+import random
 from pathlib import Path
 from typing import Optional
 
@@ -10,9 +11,28 @@ import typer
 from python_terraform import TerraformCommandError
 from rich import print, print_json
 from rich.console import Console
+from rich.progress import Progress, SpinnerColumn, TimeElapsedColumn
 
 err_console = Console(stderr=True)
 MLFLOW_TRACKING_URL = "mlflow-tracking-url"
+SUMMARY_MESSAGE = """
+The following resources will be provisioned:
+1. [yellow] Resource group [/yellow]: A resource group
+2. [yellow] Azure Kubernetes Service (AKS) [/yellow]: A kubernetes cluster
+3. [yellow] Azure Storage Container [/yellow]: A storage container
+
+Provisioning the resources will take around 10 minutes. May we suggest you to grab a cup of 🍵?
+"""
+spinners = [
+    "bouncingBall",
+    "dots",
+    "aesthetic",
+    "monkey",
+    "pong",
+    "runner",
+    "arrow3",
+    "shark",
+]
 
 
 @dataclasses.dataclass
@@ -28,6 +48,10 @@ class TerrformConfig:
     # variables file
     var_file: str = os.path.join(working_dir, "terraform.tfvars.json")
 
+    # if False terraform output will be printed to stdout/stderr
+    # else no output will be printed and only the return code will be returned
+    capture_output: bool = True
+
 
 @dataclasses.dataclass
 class Emojis:
@@ -38,6 +62,8 @@ class Emojis:
     cross_emoji: str = "❌"
 
     waiting_emoji: str = "⏳"
+
+    matcha_emoji: str = "🍵"
 
 
 class TerraformService:
@@ -93,49 +119,6 @@ class TerraformService:
             )
             raise typer.Exit()
 
-    def _init_and_apply(self) -> None:
-        """Run terraform init and apply to create resources on cloud.
-
-        Raises:
-            Exit: if terraform is not installed.
-        """
-        # this directory gets created after a successful init command
-        previous_temp_dir = Path(
-            os.path.join(self.terraform_client.working_dir, ".temp")
-        )
-
-        if previous_temp_dir.exists():
-            print(f"Terraform already initialized. Skipping terraform init...")
-        else:
-
-            print(f"{self.emojis.waiting_emoji} Initializing Terraform...")
-            ret_code, _, _ = self.terraform_client.init(capture_output=False)
-
-            if ret_code != 0:
-                err_console.print_exception("The command 'terraform init' failed.")
-                raise typer.Exit()
-
-            print(
-                f"[green] {self.emojis.checkmark_emoji} Terraform was initialised! [/green]"
-            )
-
-            # Create a directory to avoid running init multiple times
-            previous_temp_dir.mkdir(parents=True, exist_ok=True)
-
-        print(f"{self.emojis.waiting_emoji} Apply configuration...")
-
-        # once terraform init is success, call terraform apply
-        self.terraform_client.apply(
-            # var=vars,
-            input=False,
-            capture_output=False,
-            raise_on_error=True,
-        )
-
-        print(
-            f"[green] {self.emojis.checkmark_emoji} Configuration was applied! [/green]"
-        )
-
     def validate_config(self) -> None:
         """Validate the configuration used for creating resources.
 
@@ -152,40 +135,140 @@ class TerraformService:
             )
             raise typer.Exit()
 
+    def is_approved(self) -> bool:
+        """Get approval from user to create resources on cloud.
+
+        Returns:
+            bool: True if user approves, False otherwise.
+        """
+        print(SUMMARY_MESSAGE)
+        prompt = typer.prompt(
+            "Please type yes to approve provisioning resources", type=str
+        )
+        if prompt.lower() == "yes":
+            return True
+        return False
+
+    def _init_and_apply(self) -> None:
+        """Run terraform init and apply to create resources on cloud.
+
+        Raises:
+            Exit: if terraform is not installed.
+        """
+        # this directory gets created after a successful init command
+        previous_temp_dir = Path(
+            os.path.join(self.terraform_client.working_dir, ".temp")
+        )
+        if previous_temp_dir.exists():
+            print(f"Terraform already initialized. Skipping terraform init...")
+
+        else:
+            print(f"{self.emojis.waiting_emoji} Initializing Terraform...")
+
+            # run terraform init
+            with Progress(
+                SpinnerColumn(spinner_name=random.choice(spinners)),
+                TimeElapsedColumn(),
+                transient=True,
+            ) as progress:
+                progress.add_task(description="Initializing", total=None)
+                ret_code, _, _ = self.terraform_client.init(
+                    capture_output=self.config.capture_output
+                )
+
+                if ret_code != 0:
+                    err_console.print_exception("The command 'terraform init' failed.")
+                    raise typer.Exit()
+
+                print(
+                    f"[green] {self.emojis.checkmark_emoji} Terraform was initialised! [/green]"
+                )
+
+                # Create a directory to avoid running init multiple times
+                previous_temp_dir.mkdir(parents=True, exist_ok=True)
+
+        print(f"{self.emojis.waiting_emoji} Apply configuration...")
+
+        # once terraform init is success, call terraform apply
+        with Progress(
+            SpinnerColumn(spinner_name=random.choice(spinners)),
+            TimeElapsedColumn(),
+            transient=True,
+        ) as progress:
+            progress.add_task(description="Applying", total=None)
+            self.terraform_client.apply(
+                input=False,
+                capture_output=self.config.capture_output,
+                raise_on_error=True,
+                skip_plan=True,
+                auto_approve=True,
+            )
+
+        print(
+            f"[green] {self.emojis.checkmark_emoji} Configuration was applied! [/green]"
+        )
+
     def provision(self) -> None:
-        """Provision resources required for the deployment."""
+        """Provision resources required for the deployment.
+
+        Raises:
+            Exit: if approval is not given by user.
+        """
         self.check_installation()
+
         self.validate_config()
-        self._init_and_apply()
-        self.show_terraform_outputs()
+
+        if self.is_approved():
+            self._init_and_apply()
+            self.show_terraform_outputs()
+
+        else:
+            print(
+                "We were expecting a yes response to provision resources. Aborting..."
+            )
+            raise typer.Exit()
 
     def _destroy(self) -> None:
         """Destroy the provisioned resources."""
         print(f"{self.emojis.waiting_emoji} Destroying terraform resources...")
 
-        # Investigate this: https://github.com/beelit94/python-terraform/issues/108
-        self.terraform_client.destroy(
-            capture_output=False,
-            raise_on_error=True,
-            force=python_terraform.IsNotFlagged,
-            auto_approve=True,
-        )
+        with Progress(
+            SpinnerColumn(spinner_name=random.choice(spinners)),
+            TimeElapsedColumn(),
+            transient=True,
+        ) as progress:
+            progress.add_task(description="Destroying", total=None)
+
+            # Investigate this: https://github.com/beelit94/python-terraform/issues/108
+            self.terraform_client.destroy(
+                capture_output=self.config.capture_output,
+                raise_on_error=True,
+                force=python_terraform.IsNotFlagged,
+                auto_approve=True,
+            )
 
     def deprovision(self, force: bool = False) -> None:
         """Deprovision the resources.
 
         Args:
             force: if True, all resources will be forced destroyed.
+
+        Raises:
+            Exit: if approval is not given by user.
         """
         self.check_installation()
-        self._destroy()
 
-    def write_outputs_state(self) -> dict[str, str]:
-        """Write the outputs of the terraform deployment to the outputs.json file.
+        if self.is_approved():
+            self._destroy()
 
-        Returns:
-            dict: A dictionary containing the outputs of the terraform deployment.
-        """
+        else:
+            print(
+                "We were expecting a yes response to deprovision resources. Aborting..."
+            )
+            raise typer.Exit()
+
+    def write_outputs_state(self) -> None:
+        """Write the outputs of the terraform deployment to the state json file."""
         outputs = {
             MLFLOW_TRACKING_URL: self.terraform_client.output(
                 MLFLOW_TRACKING_URL, full_value=True
@@ -195,9 +278,12 @@ class TerraformService:
         # dump specific terraform output to state file
         with open(self.config.state_file, "w") as fp:
             json.dump(outputs, fp, indent=4)
-        return outputs
 
     def show_terraform_outputs(self) -> None:
         """Print the terraform outputs from state file."""
-        tf_output = self.write_outputs_state()
-        print_json(tf_output)
+        # copy terraform output to state file
+        self.write_outputs_state()
+
+        # print terraform output from state file
+        with open(self.config.state_file, "r") as fp:
+            print_json(fp.read())
