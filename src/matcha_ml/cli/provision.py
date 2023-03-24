@@ -10,6 +10,7 @@ import typer
 from rich import print
 
 from matcha_ml.errors import MatchaPermissionError
+from matcha_ml.templates.run_template import TerraformService
 
 # create a typer app to group all provision subcommands
 app = typer.Typer()
@@ -120,9 +121,7 @@ def build_template(
     if verbose:
         print("[green bold]Template configuration has finished![/green bold]")
 
-    print(
-        f"The configuration template was written to {os.path.dirname(__file__)}/{destination}"
-    )
+    print(f"The configuration template was written to {destination}")
 
 
 def provision_resources(
@@ -146,5 +145,11 @@ def provision_resources(
 
     config = build_template_configuration(location, prefix)
     build_template(config, template, destination, verbose)
+
+    # create a terraform service to provision resources
+    tfs = TerraformService()
+
+    # provision resources by running the template
+    tfs.provision()
 
     print("[green bold]Provisioning is complete![/green bold]")

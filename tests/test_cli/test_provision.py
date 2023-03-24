@@ -88,7 +88,7 @@ def test_cli_provision_command(runner, matcha_testing_directory):
     os.chdir(matcha_testing_directory)
 
     # Invoke provision command
-    result = runner.invoke(app, ["provision"], input="\nuksouth\n")
+    result = runner.invoke(app, ["provision"], input="\nuksouth\nno\n")
 
     # Exit code 0 means there was no error
     assert result.exit_code == 0
@@ -113,7 +113,7 @@ def test_cli_provision_command_with_args(runner, matcha_testing_directory):
 
     # Invoke provision command
     result = runner.invoke(
-        app, ["provision", "--location", "uksouth", "--prefix", "matcha"]
+        app, ["provision", "--location", "uksouth", "--prefix", "matcha"], input="no\n"
     )
 
     # Exit code 0 means there was no error
@@ -138,7 +138,7 @@ def test_cli_provision_command_with_prefix(runner, matcha_testing_directory):
     os.chdir(matcha_testing_directory)
 
     # Invoke provision command
-    result = runner.invoke(app, ["provision"], input="coffee\nukwest\n")
+    result = runner.invoke(app, ["provision"], input="coffee\nukwest\nno\n")
 
     # Exit code 0 means there was no error
     assert result.exit_code == 0
