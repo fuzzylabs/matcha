@@ -52,13 +52,15 @@ def build_template(
     config: TemplateVariables,
     template_src: str,
     destination: str = ".matcha/infrastructure",
+    verbose: Optional[bool] = False,
 ) -> None:
     """Build and copy the template to the project directory.
 
     Args:
         config (TemplateVariables): variables to apply to the template
         template_src (str): path of the template to use
-        destination (str): destination path to write template to
+        destination (str): destination path to write template to. Defaults to ".matcha/infrastructure".
+        verbose (bool, optional): additional output is shown when True. Defaults to False.
 
     Raises:
         MatchaPermissionError: when there are no write permissions on the configuration destination
@@ -67,7 +69,10 @@ def build_template(
         print("Building configuration template...")
 
         os.makedirs(destination, exist_ok=True)
-        print(f"[green]Ensure template destination directory: {destination}[/green]")
+        if verbose:
+            print(
+                f"[green]Ensure template destination directory: {destination}[/green]"
+            )
 
         # Define additional non-tf files that are needed from the main module
         main_module_filenames = [
@@ -94,29 +99,43 @@ def build_template(
                 source_path = os.path.join(template_src, submodule_name, filename)
                 destination_path = os.path.join(destination, submodule_name, filename)
                 copy(source_path, destination_path)
-            print(f"[green]{submodule_name} module configuration was copied[/green]")
 
-        print("[green]Configuration was copied[/green]")
+            if verbose:
+                print(
+                    f"[green]{submodule_name} module configuration was copied[/green]"
+                )
+
+        if verbose:
+            print("[green]Configuration was copied[/green]")
 
         configuration_destination = os.path.join(destination, "terraform.tfvars.json")
         with open(configuration_destination, "w") as f:
             json.dump(dataclasses.asdict(config), f)
-        print("[green]Template variables were added[/green]")
+
+        if verbose:
+            print("[green]Template variables were added[/green]")
     except PermissionError:
         raise MatchaPermissionError(path=destination)
 
-    print("[green bold]Template configuration was finished![/green bold]")
-    print()
+    if verbose:
+        print("[green bold]Template configuration has finished![/green bold]")
+
+    print(
+        f"The configuration template was written to {os.path.dirname(__file__)}/{destination}"
+    )
 
 
 def provision_resources(
-    location: Optional[str] = None, prefix: Optional[str] = None
+    location: Optional[str] = None,
+    prefix: Optional[str] = None,
+    verbose: Optional[bool] = False,
 ) -> None:
-    """Provision cloud resources with a template.
+    """Provision cloud resources within a template.
 
     Args:
         location (str, optional): Azure location in which all resources will be provisioned.
         prefix (str, optional): Prefix used for all resources.
+        verbose (bool optional): additional output is show when True. Defaults to False.
     """
     project_directory = os.getcwd()
     destination = os.path.join(project_directory, ".matcha", "infrastructure")
@@ -126,6 +145,6 @@ def provision_resources(
     )
 
     config = build_template_configuration(location, prefix)
-    build_template(config, template, destination)
+    build_template(config, template, destination, verbose)
 
     print("[green bold]Provisioning is complete![/green bold]")
