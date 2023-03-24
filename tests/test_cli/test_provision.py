@@ -168,3 +168,22 @@ def test_build_template(matcha_testing_directory, template_src_path):
     expected_tf_vars = {"location": "uksouth", "prefix": "matcha"}
 
     assert_infrastructure(destination_path, expected_tf_vars)
+
+def test_cli_provision_command_with_verbose_arg(runner, matcha_testing_directory):
+    os.chdir(matcha_testing_directory)
+
+    result = runner.invoke(
+        app, ['provision', '--verbose'], input="\nuksouth\nno"
+    )
+
+    print(result)
+
+    assert result.exit_code == 0
+
+    for verbose_output in [
+        "module configuration was copied",
+        "Configuration was copied",
+        "Template variables were added",
+        "Template configuration has finished!"
+    ]:
+        assert verbose_output in result.stdout
