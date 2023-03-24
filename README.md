@@ -1,46 +1,12 @@
-# Introduction
+# `matcha` :tea:
 
-With Matcha, you'll be up and running with an open source MLOPs environment in Azure, in 10 minutes.
+_Brief intro into matcha_
 
-# Getting started
+Please see the following for more information, including install instructions and documentation:
 
-## Set up your environment
+* Getting Started
+* Documentation
 
-```
-git clone git@github.com:fuzzylabs/matcha-example.git
-```
+## Licence
 
-First, install Matcha with PIP:
-
-```
-pip install matcha
-```
-
-Then, authenticate with Azure:
-
-```
-az login
-```
-
-And provision your base environment:
-
-```
-# sets up the basic env with sensible defaults
-matcha provision
-```
-
-## Run an example training workflow
-
-```
-cd recommender
-```
-
-```
-matcha run train deploy
-```
-
-Verify that it works
-
-```
-matcha verify
-```
+This library is released under the Apache License. See [LICENSE](LICENSE).

@@ -1,6 +1,8 @@
 .zen/
 *.csv
 
+test-docs/
+
 # General
 .DS_Store
 .AppleDouble
