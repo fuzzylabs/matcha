@@ -135,15 +135,15 @@ class TerraformService:
         Returns:
             bool: True if user approves, False otherwise.
         """
-        SUMMARY_MESSAGE = f"""
-        The following resources will be {verb}ed:
-        1. [yellow] Resource group [/yellow]: A resource group
-        2. [yellow] Azure Kubernetes Service (AKS) [/yellow]: A kubernetes cluster
-        3. [yellow] Azure Storage Container [/yellow]: A storage container
+        SUMMARY_MESSAGE = f"""The following resources will be {verb}ed:
+1. [yellow] Resource group [/yellow]: A resource group
+2. [yellow] Azure Kubernetes Service (AKS) [/yellow]: A kubernetes cluster
+3. [yellow] Azure Storage Container [/yellow]: A storage container
 
-        {verb.capitalize()}ing the resources will take around 10 minutes. May we suggest you to grab a cup of 🍵?
-        """
+{verb.capitalize()}ing the resources will take around 10 minutes. May we suggest you to grab a cup of 🍵?
+"""
 
+        print()
         print(SUMMARY_MESSAGE)
         prompt = typer.prompt(
             f"Are you happy for these resources to be {verb} (y/N; yes/No)?",
@@ -226,7 +226,7 @@ class TerraformService:
 
         self.validate_config()
 
-        if self.is_approved("provision"):
+        if self.is_approved(verb="provision"):
             self._init_and_apply()
             self.show_terraform_outputs()
 
@@ -263,7 +263,7 @@ class TerraformService:
         """
         self.check_installation()
 
-        if self.is_approved("destroy"):
+        if self.is_approved(verb="destroy"):
             self._destroy()
 
         else:
