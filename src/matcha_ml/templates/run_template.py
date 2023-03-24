@@ -188,6 +188,7 @@ class TerraformService:
                 # Create a directory to avoid running init multiple times
                 previous_temp_dir.mkdir(parents=True, exist_ok=True)
 
+        print()
         print(f"{self.emojis.waiting_emoji} Provisioning your resources...")
         print()
 
@@ -288,3 +289,4 @@ class TerraformService:
         # print terraform output from state file
         with open(self.config.state_file, "r") as fp:
             print_json(fp.read())
+        print()

@@ -32,12 +32,6 @@ def provision(
     provision_resources(location, prefix, verbose)
 
 
-@app.command()
-def destroy() -> None:
-    """Destroy the provisioned cloud resources."""
-    destroy_resources()
-
-
 def version_callback(value: bool) -> None:
     """Print version for matcha cli.
 
