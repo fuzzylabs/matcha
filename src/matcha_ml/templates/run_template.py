@@ -160,6 +160,7 @@ class TerraformService:
             print(f"Terraform already initialized. Skipping terraform init...")
 
         else:
+            print()
             print(
                 f"{self.emojis.waiting_emoji} Brewing matcha {self.emojis.matcha_emoji}..."
             )
@@ -169,7 +170,6 @@ class TerraformService:
             with Progress(
                 SpinnerColumn(spinner_name=random.choice(SPINNERS)),
                 TimeElapsedColumn(),
-                # transient=True,
             ) as progress:
                 progress.add_task(description="Initializing", total=None)
                 ret_code, _, _ = self.terraform_client.init(
@@ -180,10 +180,10 @@ class TerraformService:
                     err_console.print_exception("The command 'terraform init' failed.")
                     raise typer.Exit()
 
-                print()
                 print(
                     f"[green] {self.emojis.checkmark_emoji} Matcha {self.emojis.matcha_emoji} initialised! [/green]"
                 )
+                print()
 
                 # Create a directory to avoid running init multiple times
                 previous_temp_dir.mkdir(parents=True, exist_ok=True)
@@ -195,7 +195,6 @@ class TerraformService:
         with Progress(
             SpinnerColumn(spinner_name=random.choice(SPINNERS)),
             TimeElapsedColumn(),
-            # transient=True,
         ) as progress:
             progress.add_task(description="Applying", total=None)
             self.terraform_client.apply(
