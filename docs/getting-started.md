@@ -63,7 +63,7 @@ To start, you need to authenticate with Azure (see [pre-requisties](#pre-requist
 az login
 ```
 
-`matcha` has a set of sensible defaults for the infrastructure that it'll provision for you - see *HERE (TODO)* for more details.  
+`matcha` has a set of sensible defaults for the infrastructure that it'll provision for you - see *HERE (TODO)* for more details.
 
 To provision an experiment tracker using `matcha` run the following command (you'll be asked a series of questions which helps `matcha` personalised the environment to you):
 
@@ -91,4 +91,16 @@ Running the following command will run the recommendation pipeline locally, but 
 
 ```bash
 matcha run
+```
+
+From here, you'll be able to visit your experiment tracker and see the runs stored there - cool, right?
+
+### Releasing Resources
+
+Even though we've chosen sensible a default configuration for you, leaving the resources you've provisioned in this example running in the cloud is going to run up a bill.
+
+To release the resources that you've provisioned in this example, run the following command:
+
+```bash
+matcha destroy
 ```

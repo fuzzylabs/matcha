@@ -11,6 +11,7 @@ nav:
   - Usage:
     - Getting Started: 'getting-started.md'
     - Azure Permissions: 'azure-permissions.md'
+  - Workflows: 'workflows.md'
   - MLOps Principles: 'mlops-principles.md'
 
 theme:
@@ -26,8 +27,8 @@ theme:
 markdown_extensions:
   - attr_list
   - pymdownx.emoji:
-      emoji_index: !!python/name:materialx.emoji.twemoji
-      emoji_generator: !!python/name:materialx.emoji.to_svg
+      emoji_index: python/name:materialx.emoji.twemoji
+      emoji_generator: python/name:materialx.emoji.to_svg
 
 
 extra:
@@ -39,4 +40,4 @@ extra:
 extra_css:
   - css/extra.css
 
-copyright: Copyright &copy; Fuzzy Labs Ltd  
+copyright: Copyright &copy; Fuzzy Labs Ltd

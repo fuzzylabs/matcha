@@ -1,11 +1,16 @@
 
 `matcha` :tea: is your one-stop-shop for efficiently provisioning MLOps tooling and for well-structured ML workflows.
 
-# Introduction
+---
 
-With Matcha, you'll be up and running with an open source MLOPs environment in Azure, in 10 minutes.
+With `matcha`, you'll be up and running with an open source MLOPs environment in Azure, in 10 minutes.
 
-# Getting started
+What are the key features?
+
+* Quickly get up and running with an MLOps environment where you can train and deploy models in the cloud, using only open-source tech
+* Build your own ML workflow to run in this environment with good MLOps templates to get you started.
+
+<!-- # Getting started
 
 ## Set up your environment
 
@@ -45,7 +50,7 @@ matcha run train deploy
 Verify that it works
 
 ```
-matcha verify
+matcha verify -->
 ```
 <!-- # Welcome to MkDocs
 
