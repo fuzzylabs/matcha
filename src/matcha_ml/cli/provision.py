@@ -121,9 +121,7 @@ def build_template(
     if verbose:
         print("[green bold]Template configuration has finished![/green bold]")
 
-    print(
-        f"The configuration template was written to {os.path.dirname(__file__)}/{destination}"
-    )
+    print(f"The configuration template was written to {destination}")
 
 
 def provision_resources(
