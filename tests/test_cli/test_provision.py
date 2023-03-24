@@ -169,14 +169,17 @@ def test_build_template(matcha_testing_directory, template_src_path):
 
     assert_infrastructure(destination_path, expected_tf_vars)
 
+
 def test_cli_provision_command_with_verbose_arg(runner, matcha_testing_directory):
+    """Test that the verbose argument works and provision shows more output.
+
+    Args:
+        runner (CliRunner): type CLI runner
+        matcha_testing_directory (str): temporary working directory
+    """
     os.chdir(matcha_testing_directory)
 
-    result = runner.invoke(
-        app, ['provision', '--verbose'], input="\nuksouth\nno"
-    )
-
-    print(result)
+    result = runner.invoke(app, ["provision", "--verbose"], input="\nuksouth\nno")
 
     assert result.exit_code == 0
 
@@ -184,6 +187,6 @@ def test_cli_provision_command_with_verbose_arg(runner, matcha_testing_directory
         "module configuration was copied",
         "Configuration was copied",
         "Template variables were added",
-        "Template configuration has finished!"
+        "Template configuration has finished!",
     ]:
         assert verbose_output in result.stdout
