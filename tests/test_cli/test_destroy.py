@@ -1,6 +1,4 @@
 """Test suite to test the destroy command and all its subcommands."""
-import pytest
-
 from matcha_ml.cli.cli import app
 
 
