@@ -27,13 +27,7 @@ def provision(
         False, help="Get more detailed information from matcha provision!"
     ),
 ) -> None:
-    """Provision cloud resources with a template.
-
-    Args:
-        location (str, optional): Azure location in which all resources will be provisioned.
-        prefix (str, optional): Prefix used for all resources.
-        verbose (bool, optional): Display more information on the termainal when provision is running.
-    """
+    """Provision cloud resources with a template."""
     provision_resources(location, prefix, verbose)
 
 
