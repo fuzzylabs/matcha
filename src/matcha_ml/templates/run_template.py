@@ -238,7 +238,9 @@ class TerraformService:
 
     def _destroy(self) -> None:
         """Destroy the provisioned resources."""
+        print()
         print(f"{self.emojis.waiting_emoji} Destroying your resources...")
+        print()
 
         with Progress(
             SpinnerColumn(spinner_name=random.choice(SPINNERS)),
