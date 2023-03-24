@@ -101,9 +101,6 @@ class TerraformService:
         except Exception:
             return False
 
-        print(
-            f"[green] {self.emojis.checkmark_emoji} Terraform is installed on host system. [/green]"
-        )
         return True
 
     def check_installation(self) -> None:
@@ -163,7 +160,9 @@ class TerraformService:
             print(f"Terraform already initialized. Skipping terraform init...")
 
         else:
-            print(f"{self.emojis.waiting_emoji} Initializing Terraform...")
+            print(
+                f"{self.emojis.waiting_emoji} Brewing matcha {self.emojis.matcha_emoji}..."
+            )
 
             # run terraform init
             with Progress(
@@ -181,13 +180,13 @@ class TerraformService:
                     raise typer.Exit()
 
                 print(
-                    f"[green] {self.emojis.checkmark_emoji} Terraform was initialised! [/green]"
+                    f"[green] {self.emojis.checkmark_emoji} Matcha {self.emojis.matcha_emoji} initialised! [/green]"
                 )
 
                 # Create a directory to avoid running init multiple times
                 previous_temp_dir.mkdir(parents=True, exist_ok=True)
 
-        print(f"{self.emojis.waiting_emoji} Apply configuration...")
+        print(f"{self.emojis.waiting_emoji} Provisioning your resources...")
 
         # once terraform init is success, call terraform apply
         with Progress(
@@ -205,7 +204,7 @@ class TerraformService:
             )
 
         print(
-            f"[green] {self.emojis.checkmark_emoji} Configuration was applied! [/green]"
+            f"[green] {self.emojis.checkmark_emoji} Your environment has been provisioned! [/green]"
         )
 
     def provision(self) -> None:
@@ -281,6 +280,7 @@ class TerraformService:
         # copy terraform output to state file
         self.write_outputs_state()
 
+        print("Here are the endpoints for what's been provisioned")
         # print terraform output from state file
         with open(self.config.state_file, "r") as fp:
             print_json(fp.read())
