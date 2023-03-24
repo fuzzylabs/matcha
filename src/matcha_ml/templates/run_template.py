@@ -163,6 +163,7 @@ class TerraformService:
             print(
                 f"{self.emojis.waiting_emoji} Brewing matcha {self.emojis.matcha_emoji}..."
             )
+            print()
 
             # run terraform init
             with Progress(
@@ -179,6 +180,7 @@ class TerraformService:
                     err_console.print_exception("The command 'terraform init' failed.")
                     raise typer.Exit()
 
+                print()
                 print(
                     f"[green] {self.emojis.checkmark_emoji} Matcha {self.emojis.matcha_emoji} initialised! [/green]"
                 )
@@ -187,6 +189,7 @@ class TerraformService:
                 previous_temp_dir.mkdir(parents=True, exist_ok=True)
 
         print(f"{self.emojis.waiting_emoji} Provisioning your resources...")
+        print()
 
         # once terraform init is success, call terraform apply
         with Progress(
@@ -203,6 +206,7 @@ class TerraformService:
                 auto_approve=True,
             )
 
+        print()
         print(
             f"[green] {self.emojis.checkmark_emoji} Your environment has been provisioned! [/green]"
         )
@@ -280,6 +284,7 @@ class TerraformService:
         # copy terraform output to state file
         self.write_outputs_state()
 
+        print()
         print("Here are the endpoints for what's been provisioned")
         # print terraform output from state file
         with open(self.config.state_file, "r") as fp:
