@@ -1,4 +1,6 @@
 """Destroy CLI."""
+from rich import print
+
 from matcha_ml.templates.run_template import TerraformService
 
 
@@ -9,3 +11,5 @@ def destroy_resources() -> None:
 
     # deprovision the resources
     tfs.deprovision()
+
+    print("[green bold]Destroying resources is complete![/green bold]")
