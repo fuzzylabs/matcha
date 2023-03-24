@@ -32,6 +32,12 @@ def provision(
     provision_resources(location, prefix, verbose)
 
 
+@app.command()
+def destroy() -> None:
+    """Destroy the provisioned cloud resources."""
+    destroy_resources()
+
+
 def version_callback(value: bool) -> None:
     """Print version for matcha cli.
 
@@ -57,9 +63,6 @@ def cli(
     Run 'matcha <command> --help' for more information on a specific command.
 
     For more help on how to use matcha, head to https://docs.mlops.wtf
-
-    Args:
-        version (bool, optional): matcha version flag
     """
     pass
 
