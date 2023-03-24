@@ -127,7 +127,7 @@ class TerraformService:
             raise typer.Exit()
 
     def is_approved(self, verb: str) -> bool:
-        """Get approval from user to create resources on cloud.
+        """Get approval from user to modify resources on cloud.
 
         Args:
             verb: The verb to use in the approval message.
