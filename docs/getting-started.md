@@ -49,7 +49,7 @@ pip install matcha-ml
 Test that your installation is working by running:
 
 ```bash
-$ match --version
+$ matcha --version
 Matcha version: 0.1.0
 ```
 
