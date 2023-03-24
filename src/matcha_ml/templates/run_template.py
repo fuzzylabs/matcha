@@ -133,15 +133,18 @@ class TerraformService:
             )
             raise typer.Exit()
 
-    def is_approved(self) -> bool:
+    def is_approved(self, verb: str) -> bool:
         """Get approval from user to create resources on cloud.
+
+        Args:
+            verb: The verb to use in the approval message.
 
         Returns:
             bool: True if user approves, False otherwise.
         """
         print(SUMMARY_MESSAGE)
         prompt = typer.prompt(
-            "Are you happy for these resources to be provisioned (y/N; yes/No)?",
+            f"Are you happy for these resources to be {verb} (y/N; yes/No)?",
             type=str,
         )
         return True if prompt.lower() == "yes" or prompt.lower() == "y" else False
@@ -221,7 +224,7 @@ class TerraformService:
 
         self.validate_config()
 
-        if self.is_approved():
+        if self.is_approved("provisioned"):
             self._init_and_apply()
             self.show_terraform_outputs()
 
@@ -258,7 +261,7 @@ class TerraformService:
         """
         self.check_installation()
 
-        if self.is_approved():
+        if self.is_approved("destroyed"):
             self._destroy()
 
         else:
