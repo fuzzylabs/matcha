@@ -16,14 +16,7 @@ err_console = Console(stderr=True)
 MLFLOW_TRACKING_URL = "mlflow-tracking-url"
 
 SPINNERS = [
-    "bouncingBall",
     "dots",
-    "aesthetic",
-    "monkey",
-    "pong",
-    "runner",
-    "arrow3",
-    "shark",
 ]
 
 
