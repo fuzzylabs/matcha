@@ -269,7 +269,7 @@ class TerraformService:
 
         else:
             print(
-                "We were expecting a yes response to deprovision resources. Aborting..."
+                "You decided to cancel - your resources will remain active! If you change your mind, then run 'matcha destory' again."
             )
             raise typer.Exit()
 
