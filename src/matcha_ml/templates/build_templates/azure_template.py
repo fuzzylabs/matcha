@@ -70,6 +70,17 @@ def build_template(
                 f"[green]Ensure template destination directory: {destination}[/green]"
             )
 
+        # Define additional non-tf files that are needed from the main module
+        main_module_filenames = [
+            ".gitignore",
+            ".terraform.lock.hcl",
+        ]
+
+        for filename in main_module_filenames:
+            source_path = os.path.join(template_src, filename)
+            destination_path = os.path.join(destination, filename)
+            copy(source_path, destination_path)
+
         for source_path in glob.glob(os.path.join(template_src, "*.tf")):
             filename = os.path.basename(source_path)
             destination_path = os.path.join(destination, filename)
