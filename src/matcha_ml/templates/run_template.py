@@ -59,6 +59,7 @@ class TerraformService:
     # emoji instance to display emojis
     emojis: Emojis = Emojis()
 
+    # the spinner to display for progress bar
     spinner: str = "dots"
 
     @property
