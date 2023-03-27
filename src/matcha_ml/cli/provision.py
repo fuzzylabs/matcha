@@ -12,6 +12,11 @@ from rich import print
 from matcha_ml.errors import MatchaPermissionError
 from matcha_ml.templates.run_template import TerraformService
 
+from azure.mgmt.resource import SubscriptionClient
+from azure.identity import AzureCliCredential
+from azure.identity import CredentialUnavailableError
+
+
 # create a typer app to group all provision subcommands
 app = typer.Typer()
 
@@ -29,6 +34,34 @@ class TemplateVariables(object):
     prefix: str = "matcha"
 
 
+def verify_azure_location(location_name: str) -> bool:
+    """Verifies whether the provided resource location name exists in Azure.
+
+    Args:
+        location_name (str): User inputted location.
+
+    Returns:
+        bool: _description_
+    """
+    print("ADKAWDLANWAWAAAAA")
+    try:
+        credential = AzureCliCredential()
+        subscription_client = SubscriptionClient(credential)
+        sub_list = subscription_client.subscriptions.list()
+        for group in list(sub_list):
+            # Get all locations for a subscription
+            locations = [location.name for location in subscription_client.subscriptions.list_locations(group.subscription_id)]
+            
+    except CredentialUnavailableError as e:
+        print("Error, please run 'az login' to authenticate your account.")
+        raise typer.Exit(code=1)
+
+    if location_name in locations:
+        return True
+    else:
+        print(f"[red]Error[/red], location '{location_name}' does not exist. Please use one of the following Azure locations:\n{locations}.")
+
+
 def build_template_configuration(
     location: Optional[str] = None, prefix: Optional[str] = None
 ) -> TemplateVariables:
@@ -40,11 +73,14 @@ def build_template_configuration(
 
     Returns:
         TemplateVariables: Terraform variables required by a template
-    """
+    """    
     if prefix is None:
         prefix = typer.prompt("Resource name prefix", type=str, default="matcha")
     if location is None:
         location = typer.prompt("Resource location", type=str)
+    
+    if not verify_azure_location(location):
+        raise typer.Exit(code=1)
 
     return TemplateVariables(prefix=prefix, location=location)
 
