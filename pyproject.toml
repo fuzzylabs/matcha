@@ -15,7 +15,7 @@ exclude = [
 ]
 include = [
     "src/matcha_ml",
-    "*.tf"
+    "src/matcha_ml/infrastructure/**",
 ]
 
 [tool.poetry.scripts]
