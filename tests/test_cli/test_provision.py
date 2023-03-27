@@ -8,7 +8,9 @@ from matcha_ml.cli.cli import app
 from matcha_ml.templates.build_templates.azure_template import SUBMODULE_NAMES
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-TEMPLATE_DIR = os.path.join(BASE_DIR, os.pardir, os.pardir, "src", "infrastructure")
+TEMPLATE_DIR = os.path.join(
+    BASE_DIR, os.pardir, os.pardir, "src", "matcha_ml", "infrastructure"
+)
 
 
 def assert_infrastructure(destination_path: str, expected_tf_vars: Dict[str, str]):
