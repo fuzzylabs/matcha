@@ -162,7 +162,9 @@ class TerraformService:
             os.path.join(self.terraform_client.working_dir, ".temp")
         )
         if previous_temp_dir.exists():
-            print(f"Terraform already initialized. Skipping terraform init...")
+            print(
+                "matcha {self.emojis.matcha_emoji} has already been initialised. Skipping this step..."
+            )
 
         else:
             print()

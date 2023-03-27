@@ -139,9 +139,7 @@ def provision_resources(
     project_directory = os.getcwd()
     destination = os.path.join(project_directory, ".matcha", "infrastructure")
 
-    template = os.path.join(
-        os.path.dirname(__file__), os.pardir, os.pardir, "infrastructure"
-    )
+    template = os.path.join(os.path.dirname(__file__), os.pardir, "infrastructure")
 
     config = build_template_configuration(location, prefix)
     build_template(config, template, destination, verbose)
