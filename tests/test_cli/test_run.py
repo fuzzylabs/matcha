@@ -23,7 +23,6 @@ def run_testing_directory(matcha_testing_directory: str):
     """
 
     with open(os.path.join(matcha_testing_directory, "run.py"), "w") as f:
-        # f.write("print('This is the run.py file')")
         f.write("import sys\nsys.stdout.write('This is the run.py file')")
 
     yield matcha_testing_directory  # tests are executed at this point
