@@ -3,7 +3,7 @@ import dataclasses
 import glob
 import json
 import os
-from shutil import copy
+from shutil import copy, rmtree
 from typing import Optional
 
 import typer
@@ -27,6 +27,30 @@ class TemplateVariables(object):
 
     # Prefix used for all resources
     prefix: str = "matcha"
+
+
+def reuse_configuration(path: str) -> bool:
+    """Check if a configuration already a use, and prompt user to override or reuse it.
+
+    Args:
+        path (str): path to the infrastructure configuration
+
+    Returns:
+        bool: decision to reuse the existing configuration
+    """
+    if os.path.exists(path):
+        summary_message = """The following resources are already configured for provisioning:
+1. [yellow] Resource group [/yellow]: A resource group
+2. [yellow] Azure Kubernetes Service (AKS) [/yellow]: A kubernetes cluster
+3. [yellow] Azure Storage Container [/yellow]: A storage container
+"""
+        print(summary_message)
+
+        return not typer.confirm(
+            "Do you want to override the configuration? Otherwise, the existing configuration will be reused"
+        )
+    else:
+        return False
 
 
 def build_template_configuration(
@@ -68,6 +92,10 @@ def build_template(
     """
     try:
         print("Building configuration template...")
+
+        # Override configuration if it already exists
+        if os.path.exists(destination):
+            rmtree(destination)
 
         os.makedirs(destination, exist_ok=True)
         if verbose:
@@ -141,8 +169,9 @@ def provision_resources(
 
     template = os.path.join(os.path.dirname(__file__), os.pardir, "infrastructure")
 
-    config = build_template_configuration(location, prefix)
-    build_template(config, template, destination, verbose)
+    if not reuse_configuration(destination):
+        config = build_template_configuration(location, prefix)
+        build_template(config, template, destination, verbose)
 
     # create a terraform service to provision resources
     tfs = TerraformService()
