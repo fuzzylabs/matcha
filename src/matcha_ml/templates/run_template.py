@@ -162,7 +162,7 @@ class TerraformService:
             os.path.join(self.terraform_client.working_dir, ".temp")
         )
         if previous_temp_dir.exists():
-            print(f"Terraform already initialized. Skipping terraform init...")
+            print("Terraform already initialized. Skipping terraform init...")
 
         else:
             print()
