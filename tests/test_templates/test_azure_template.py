@@ -6,7 +6,7 @@ from typing import Dict
 
 import pytest
 
-from matcha_ml.templates.build_template.azure_template import (
+from matcha_ml.templates.build_templates.azure_template import (
     SUBMODULE_NAMES,
     TemplateVariables,
     build_template,

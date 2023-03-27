@@ -5,7 +5,7 @@ from typing import Optional
 import typer
 from rich import print
 
-from matcha_ml.templates.build_template.azure_template import (
+from matcha_ml.templates.build_templates.azure_template import (
     build_template,
     build_template_configuration,
 )
