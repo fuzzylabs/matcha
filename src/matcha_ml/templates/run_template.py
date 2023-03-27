@@ -140,7 +140,7 @@ class TerraformService:
 2. [yellow] Azure Kubernetes Service (AKS) [/yellow]: A kubernetes cluster
 3. [yellow] Azure Storage Container [/yellow]: A storage container
 
-{verb.capitalize()}ing the resources will take around 10 minutes. May we suggest you to grab a cup of 🍵?
+{verb.capitalize()}ing the resources may take up to 10 minutes. May we suggest you to grab a cup of 🍵?
 """
 
         print()
@@ -148,8 +148,8 @@ class TerraformService:
         prompt = typer.prompt(
             f"Are you happy for these resources to be {verb} (y/N; yes/No)?",
             type=str,
-        )
-        return True if prompt.lower() == "yes" or prompt.lower() == "y" else False
+        ).lower()
+        return True if prompt == "yes" or prompt == "y" else False
 
     def _init_and_apply(self) -> None:
         """Run terraform init and apply to create resources on cloud.
@@ -232,7 +232,7 @@ class TerraformService:
 
         else:
             print(
-                "We were expecting a yes response to provision resources. Aborting..."
+                "You decided to cancel - if you change your mind, then run 'matcha provision' again."
             )
             raise typer.Exit()
 
