@@ -26,7 +26,7 @@ class TemplateVariables(object):
     location: str
 
     # Prefix used for all resources
-    prefix: str
+    prefix: Optional[str] = 'matcha'
 
 
 def build_template_configuration(

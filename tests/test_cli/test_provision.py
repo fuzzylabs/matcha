@@ -159,7 +159,7 @@ def test_build_template(matcha_testing_directory, template_src_path):
         matcha_testing_directory (str): Temporary .matcha directory path
         template_src_path (str): Existing template directory path
     """
-    config = TemplateVariables("uksouth")
+    config = TemplateVariables(location="uksouth")
 
     destination_path = os.path.join(matcha_testing_directory, "infrastructure")
 
