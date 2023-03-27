@@ -33,7 +33,6 @@ class TemplateVariables(object):
     # Prefix used for all resources
     prefix: str = "matcha"
 
-
 def verify_azure_location(location_name: str) -> bool:
     """Verifies whether the provided resource location name exists in Azure.
 
@@ -43,7 +42,6 @@ def verify_azure_location(location_name: str) -> bool:
     Returns:
         bool: _description_
     """
-    print("ADKAWDLANWAWAAAAA")
     try:
         credential = AzureCliCredential()
         subscription_client = SubscriptionClient(credential)
