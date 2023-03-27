@@ -5,7 +5,7 @@ import os
 from typing import Dict
 
 from matcha_ml.cli.cli import app
-from matcha_ml.templates.build_template.azure_template import SUBMODULE_NAMES
+from matcha_ml.templates.build_templates.azure_template import SUBMODULE_NAMES
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 TEMPLATE_DIR = os.path.join(BASE_DIR, os.pardir, os.pardir, "src", "infrastructure")
