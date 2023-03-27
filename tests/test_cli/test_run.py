@@ -23,7 +23,8 @@ def run_testing_directory(matcha_testing_directory: str):
     """
 
     with open(os.path.join(matcha_testing_directory, "run.py"), "w") as f:
-        f.write("print('This is the run.py file')")
+        # f.write("print('This is the run.py file')")
+        f.write("import sys\nsys.stdout.write('This is the run.py file')")
 
     yield matcha_testing_directory  # tests are executed at this point
 
@@ -55,11 +56,14 @@ def test_cli_train_command(runner):
     assert "Run train subcommand." in result.stdout
 
 
-def test_cli_default_callback(runner, run_testing_directory: str):
+def test_cli_default_callback(runner, run_testing_directory: str, capfd):
     """Test cli for run command."""
     # Invoke run command with no option passed
     os.chdir(run_testing_directory)
     result = runner.invoke(app, ["run"])
+
+    # capfd for file descriptor level
+    captured = capfd.readouterr()
 
     # Exit code 0 means there was no error
     assert result.exit_code == 0
@@ -67,4 +71,4 @@ def test_cli_default_callback(runner, run_testing_directory: str):
     # Assert string is present in cli output
     assert "No commands are passed, running run.py by default." in result.stdout
     # The temporary run.py file should contain code to print the following when executed.
-    # assert "This is the run.py file" in result.stdout
+    assert "This is the run.py file" in captured.out
