@@ -2,6 +2,8 @@
 import os
 
 import pytest
+from pytest import CaptureFixture
+from typer.testing import CliRunner
 
 from matcha_ml import __version__
 from matcha_ml.cli.cli import app
@@ -23,7 +25,7 @@ def run_testing_directory(matcha_testing_directory: str):
     """
 
     with open(os.path.join(matcha_testing_directory, "run.py"), "w") as f:
-        f.write("import sys\nsys.stdout.write('This is the run.py file')")
+        f.write("print('This is the run.py file')")
 
     yield matcha_testing_directory  # tests are executed at this point
 
@@ -31,8 +33,12 @@ def run_testing_directory(matcha_testing_directory: str):
     os.remove("run.py")
 
 
-def test_cli_run_command(runner):
-    """Test cli for run command."""
+def test_cli_run_command(runner: CliRunner):
+    """Test cli for run command.
+
+    Args:
+        runner (CliRunner): runner is what will "invoke" a command line application
+    """
     # Invoke run command
     result = runner.invoke(app, ["run", "--help"])
 
@@ -43,8 +49,12 @@ def test_cli_run_command(runner):
     assert "The run command." in result.stdout
 
 
-def test_cli_train_command(runner):
-    """Test cli for run command."""
+def test_cli_train_command(runner: CliRunner):
+    """Test cli for run command.
+
+    Args:
+        runner (CliRunner): runner is what will "invoke" a command line application
+    """
     # Invoke run command
     result = runner.invoke(app, ["run", "train", "--help"])
 
@@ -55,8 +65,16 @@ def test_cli_train_command(runner):
     assert "Run train subcommand." in result.stdout
 
 
-def test_cli_default_callback(runner, run_testing_directory: str, capfd):
-    """Test cli for run command."""
+def test_cli_default_callback(
+    runner: CliRunner, run_testing_directory: str, capfd: CaptureFixture
+):
+    """Test cli for run command.
+
+    Args:
+        runner (CliRunner): runner is what will "invoke" a command line application
+        run_testing_directory (str): directory of the temp run.py created
+        capfd (CaptureFixture): capture any output sent to stdout and stderr
+    """
     # Invoke run command with no option passed
     os.chdir(run_testing_directory)
     result = runner.invoke(app, ["run"])
