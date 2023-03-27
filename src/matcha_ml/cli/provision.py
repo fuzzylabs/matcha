@@ -26,11 +26,11 @@ class TemplateVariables(object):
     location: str
 
     # Prefix used for all resources
-    prefix: Optional[str] = 'matcha'
+    prefix: Optional[str] = "matcha"
 
 
 def build_template_configuration(
-    location: Optional[str] = None, prefix: Optional[str] = None
+    location: Optional[str] = None, prefix: Optional[str] = "matcha"
 ) -> TemplateVariables:
     """Ask for variables and build the configuration.
 
@@ -41,9 +41,9 @@ def build_template_configuration(
     Returns:
         TemplateVariables: Terraform variables required by a template
     """
-    if prefix is None:
+    if prefix == "matcha":
         prefix = typer.prompt(
-            "Your resources need a name (a prefix), what should matcha call them?",
+            "Your resources need a name (a lowercase prefix; 3-24 character limit), what should matcha call them?",
             type=str,
             default="matcha",
         )
@@ -52,7 +52,6 @@ def build_template_configuration(
             "What region should your resources be provisioned in (e.g., 'ukwest')?",
             type=str,
         )
-
     return TemplateVariables(prefix=prefix, location=location)
 
 
