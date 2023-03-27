@@ -190,3 +190,71 @@ def test_cli_provision_command_with_verbose_arg(runner, matcha_testing_directory
         "Template configuration has finished!",
     ]:
         assert verbose_output in result.stdout
+
+
+def test_cli_provision_command_override(runner, matcha_testing_directory):
+    """Test provision command to override the configuration
+
+    Args:
+        runner (CliRunner): typer CLI runner
+        matcha_testing_directory (str): temporary working directory
+    """
+    os.chdir(matcha_testing_directory)
+
+    # Invoke provision command
+    runner.invoke(
+        app, ["provision", "--location", "uksouth", "--prefix", "matcha"], input="no\n"
+    )
+
+    destination_path = os.path.join(
+        matcha_testing_directory, ".matcha", "infrastructure"
+    )
+
+    # Touch a file in the infrastructure configuration directory
+    open(os.path.join(destination_path, "dummy.tf"), "a").close()
+
+    runner.invoke(
+        app,
+        ["provision", "--location", "uksouth", "--prefix", "matcha"],
+        input="y\nno\n",
+    )
+
+    assert not os.path.exists(os.path.join(destination_path, "dummy.tf"))
+
+    expected_tf_vars = {"location": "uksouth", "prefix": "matcha"}
+
+    assert_infrastructure(destination_path, expected_tf_vars)
+
+
+def test_cli_provision_command_reuse(runner, matcha_testing_directory):
+    """Test provision command to reuse the configuration
+
+    Args:
+        runner (CliRunner): typer CLI runner
+        matcha_testing_directory (str): temporary working directory
+    """
+    os.chdir(matcha_testing_directory)
+
+    # Invoke provision command
+    runner.invoke(
+        app, ["provision", "--location", "uksouth", "--prefix", "matcha"], input="no\n"
+    )
+
+    destination_path = os.path.join(
+        matcha_testing_directory, ".matcha", "infrastructure"
+    )
+
+    # Touch a file in the infrastructure configuration directory
+    open(os.path.join(destination_path, "dummy.tf"), "a").close()
+
+    runner.invoke(
+        app,
+        ["provision", "--location", "uksouth", "--prefix", "matcha"],
+        input="n\nno\n",
+    )
+
+    assert os.path.exists(os.path.join(destination_path, "dummy.tf"))
+
+    expected_tf_vars = {"location": "uksouth", "prefix": "matcha"}
+
+    assert_infrastructure(destination_path, expected_tf_vars)
