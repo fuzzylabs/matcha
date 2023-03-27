@@ -15,6 +15,8 @@ from rich.progress import Progress, SpinnerColumn, TimeElapsedColumn
 err_console = Console(stderr=True)
 MLFLOW_TRACKING_URL = "mlflow-tracking-url"
 
+SPINNER = "dots"
+
 
 @dataclasses.dataclass
 class TerrformConfig:
@@ -58,9 +60,6 @@ class TerraformService:
 
     # emoji instance to display emojis
     emojis: Emojis = Emojis()
-
-    # the spinner to display for progress bar
-    spinner: str = "dots"
 
     @property
     def terraform_client(self) -> python_terraform.Terraform:
@@ -167,7 +166,7 @@ class TerraformService:
 
             # run terraform init
             with Progress(
-                SpinnerColumn(spinner_name=self.spinner),
+                SpinnerColumn(spinner_name=SPINNER),
                 TimeElapsedColumn(),
             ) as progress:
                 progress.add_task(description="Initializing", total=None)
@@ -193,7 +192,7 @@ class TerraformService:
 
         # once terraform init is success, call terraform apply
         with Progress(
-            SpinnerColumn(spinner_name=self.spinner),
+            SpinnerColumn(spinner_name=SPINNER),
             TimeElapsedColumn(),
         ) as progress:
             progress.add_task(description="Applying", total=None)
@@ -237,7 +236,7 @@ class TerraformService:
         print()
 
         with Progress(
-            SpinnerColumn(spinner_name=self.spinner),
+            SpinnerColumn(spinner_name=SPINNER),
             TimeElapsedColumn(),
         ) as progress:
             progress.add_task(description="Destroying", total=None)
