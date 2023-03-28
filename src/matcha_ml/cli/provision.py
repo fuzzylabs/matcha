@@ -64,9 +64,8 @@ def verify_azure_location(location_name: str) -> bool:
     """
     try:
         locations = get_azure_locations()
-    except CredentialUnavailableError as e:
+    except CredentialUnavailableError:
         print("Error, please run 'az login' to authenticate your account.")
-        print(e)
         return False
 
     if location_name in locations:
