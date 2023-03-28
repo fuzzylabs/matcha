@@ -242,7 +242,19 @@ def test_cli_provision_command_with_verbose_arg(
         assert verbose_output in result.stdout
 
 
-def test_verify_azure_location(monkeypatch):
+@pytest.mark.parametrize(
+    "location_name, expectation",
+    [
+        (
+            "ukwest",
+            True,
+        ),  # Valid location
+        ("mordorwest", False),  # Invalid location
+    ],
+)
+def test_verify_azure_location(
+    location_name: str, expectation: pytest.raises, monkeypatch
+):
     """Test that Azure location is being correctly verified.
 
     Args:
@@ -261,6 +273,4 @@ def test_verify_azure_location(monkeypatch):
         "src.matcha_ml.cli.provision.get_azure_locations", mock_get_azure_locations
     )
 
-    result = verify_azure_location("ukwest")
-
-    assert result is True
+    assert verify_azure_location(location_name) is expectation
