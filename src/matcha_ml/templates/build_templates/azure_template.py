@@ -4,6 +4,8 @@ import difflib
 import glob
 import json
 import os
+import sys
+from io import StringIO
 from shutil import copy
 from typing import Optional
 
@@ -36,11 +38,25 @@ def authenticate_azure() -> SubscriptionClient:
     credential = AzureCliCredential()
     subscription_client = SubscriptionClient(credential)
 
-    # Check authentication
+    output = StringIO()
+    # redirect stdout and stderr to the StringIO object
+    sys.stdout = output
+    sys.stderr = output
+
     try:
+        # Check authentication
         credential.get_token("https://management.azure.com/.default")
     except CredentialUnavailableError:
+        sys.stdout = sys.__stdout__
+        sys.stderr = sys.__stderr__
+        print(
+            "Error, Matcha couldn't authenticate you with Azure! Make sure to run 'az login' before trying to provision resources."
+        )
         raise typer.Exit(code=1)
+
+    # restore stdout and stderr to their original values
+    sys.stdout = sys.__stdout__
+    sys.stderr = sys.__stderr__
 
     return subscription_client
 
