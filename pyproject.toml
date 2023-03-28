@@ -63,7 +63,9 @@ select = [
     "PL",   # pylint rules from categories "Convention", "Error", and "Warning"
     "PLE",  # ruff currently implements only a subset of pylint's rules
     "PLW",  # pylint warning
+    "PLR",  # pylint refactor
     "UP",   # pyupgrade
+    "C",    # Complexity (mccabe+) & comprehensions
 ]
 
 # Match black. Note that this also checks comment line length, but black does not format comments.
@@ -79,6 +81,9 @@ ignore-init-module-imports = true
 
 # Allow imports relative to the "src" and "test" directories.
 src = ["src", "test"]
+
+[tool.ruff.mccabe]
+max-complexity = 15
 
 [tool.ruff.pyupgrade]
 keep-runtime-typing = true
