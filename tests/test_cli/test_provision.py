@@ -14,7 +14,7 @@ TEMPLATE_DIR = os.path.join(
 
 
 def assert_infrastructure(destination_path: str, expected_tf_vars: Dict[str, str]):
-    """Assert if the infrastructure configuration is valid
+    """Assert if the infrastructure configuration is valid.
 
     Args:
         destination_path (str): infrastructure config destination path
@@ -159,7 +159,7 @@ def test_cli_provision_command_with_verbose_arg(runner, matcha_testing_directory
 
 
 def test_cli_provision_command_override(runner, matcha_testing_directory):
-    """Test provision command to override the configuration
+    """Test provision command to override the configuration.
 
     Args:
         runner (CliRunner): typer CLI runner
@@ -193,7 +193,7 @@ def test_cli_provision_command_override(runner, matcha_testing_directory):
 
 
 def test_cli_provision_command_reuse(runner, matcha_testing_directory):
-    """Test provision command to reuse the configuration
+    """Test provision command to reuse the configuration.
 
     Args:
         runner (CliRunner): typer CLI runner

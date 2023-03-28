@@ -7,6 +7,7 @@ from shutil import copy, rmtree
 from typing import Optional
 
 import typer
+from rich import print
 
 from matcha_ml.errors import MatchaPermissionError
 
@@ -25,7 +26,7 @@ class TemplateVariables(object):
 
 
 def reuse_configuration(path: str) -> bool:
-    """Check if a configuration already a use, and prompt user to override or reuse it.
+    """Check if a configuration already exists, and prompt user to override or reuse it.
 
     Args:
         path (str): path to the infrastructure configuration
