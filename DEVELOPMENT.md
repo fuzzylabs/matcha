@@ -34,6 +34,20 @@ Now, you can enter the Poetry shell:
 poetry shell
 ```
 
+**Testing**
+
+With the poetry shell active (see above), you can run all the tests using:
+
+```bash
+python -m pytest tests
+```
+
+Or specific tests:
+
+```bash
+python -m pytest tests/test_cli/test_cli.py
+```
+
 **Build Python package**
 
 This will build the Python package and place it into the `dist/` directory.
