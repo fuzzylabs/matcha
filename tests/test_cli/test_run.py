@@ -50,7 +50,7 @@ def test_cli_run_command(runner: CliRunner):
 
 
 def test_cli_train_command(runner: CliRunner):
-    """Test cli for run command.
+    """Test cli for train command.
 
     Args:
         runner (CliRunner): runner is what will "invoke" a command line application
@@ -68,7 +68,7 @@ def test_cli_train_command(runner: CliRunner):
 def test_cli_default_callback(
     runner: CliRunner, run_testing_directory: str, capfd: CaptureFixture
 ):
-    """Test cli for run command.
+    """Test cli default run command.
 
     Args:
         runner (CliRunner): runner is what will "invoke" a command line application
@@ -84,7 +84,6 @@ def test_cli_default_callback(
 
     # Exit code 0 means there was no error
     assert result.exit_code == 0
-
     # Assert string is present in cli output
     assert "No commands are passed, running run.py by default." in result.stdout
     # The temporary run.py file should contain code to print the following when executed.
