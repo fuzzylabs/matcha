@@ -37,9 +37,16 @@ def build_template_configuration(
         TemplateVariables: Terraform variables required by a template
     """
     if prefix is None:
-        prefix = typer.prompt("Resource name prefix", type=str, default="matcha")
+        prefix = typer.prompt(
+            "Your resources need a name (a lowercase prefix; 3-24 character limit), what should matcha call them?", 
+            type=str, 
+            default="matcha"
+        )
     if location is None:
-        location = typer.prompt("Resource location", type=str)
+        location = typer.prompt(
+            "What region should your resources be provisioned in (e.g., 'ukwest')?", 
+            type=str
+        )
 
     return TemplateVariables(prefix=prefix, location=location)
 
