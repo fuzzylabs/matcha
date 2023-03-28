@@ -11,7 +11,7 @@ from src.matcha_ml.cli.provision import (
     SUBMODULE_NAMES,
     TemplateVariables,
     build_template,
-    verify_azure_location
+    verify_azure_location,
 )
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -85,11 +85,15 @@ def test_cli_provision_command(runner, matcha_testing_directory, monkeypatch):
     Args:
         runner (CliRunner): typer CLI runner
         matcha_testing_directory (str): temporary working directory
+        monkeypatch (pytest.monkeypatch.MonkeyPatch): Pytest monkeypatch for patching a function
     """
+
     def mock_verify_azure_location(location):
         return True
-    
-    monkeypatch.setattr('matcha_ml.cli.provision.verify_azure_location', mock_verify_azure_location)
+
+    monkeypatch.setattr(
+        "matcha_ml.cli.provision.verify_azure_location", mock_verify_azure_location
+    )
 
     os.chdir(matcha_testing_directory)
 
@@ -114,12 +118,17 @@ def test_cli_provision_command_with_args(runner, matcha_testing_directory, monke
     Args:
         runner (CliRunner): typer CLI runner
         matcha_testing_directory (str): temporary working directory
+        monkeypatch (pytest.monkeypatch.MonkeyPatch): Pytest monkeypatch for patching a function
+
     """
+
     def mock_verify_azure_location(location):
         return True
-    
-    monkeypatch.setattr('matcha_ml.cli.provision.verify_azure_location', mock_verify_azure_location)
-    
+
+    monkeypatch.setattr(
+        "matcha_ml.cli.provision.verify_azure_location", mock_verify_azure_location
+    )
+
     os.chdir(matcha_testing_directory)
 
     # Invoke provision command
@@ -139,17 +148,23 @@ def test_cli_provision_command_with_args(runner, matcha_testing_directory, monke
     assert_infrastructure(destination_path, expected_tf_vars)
 
 
-def test_cli_provision_command_with_prefix(runner, matcha_testing_directory, monkeypatch):
+def test_cli_provision_command_with_prefix(
+    runner, matcha_testing_directory, monkeypatch
+):
     """Test provision command to copy the infrastructure template with different prefix.
 
     Args:
         runner (CliRunner): typer CLI runner
         matcha_testing_directory (str): temporary working directory
+        monkeypatch (pytest.monkeypatch.MonkeyPatch): Pytest monkeypatch for patching a function
     """
+
     def mock_verify_azure_location(location):
         return True
-    
-    monkeypatch.setattr('matcha_ml.cli.provision.verify_azure_location', mock_verify_azure_location)
+
+    monkeypatch.setattr(
+        "matcha_ml.cli.provision.verify_azure_location", mock_verify_azure_location
+    )
 
     os.chdir(matcha_testing_directory)
 
@@ -186,17 +201,31 @@ def test_build_template(matcha_testing_directory, template_src_path):
     assert_infrastructure(destination_path, expected_tf_vars)
 
 
-def test_cli_provision_command_with_verbose_arg(runner, matcha_testing_directory, monkeypatch):
+def test_cli_provision_command_with_verbose_arg(
+    runner, matcha_testing_directory, monkeypatch
+):
     """Test that the verbose argument works and provision shows more output.
 
     Args:
         runner (CliRunner): type CLI runner
         matcha_testing_directory (str): temporary working directory
+        monkeypatch (pytest.monkeypatch.MonkeyPatch): Pytest monkeypatch for patching a function
     """
+
     def mock_verify_azure_location(location):
+        """Mock verify Azure location function
+
+        Args:
+            location (str): Location string to check
+
+        Returns:
+            bool: Mock verificaiton bool always set to True
+        """
         return True
-    
-    monkeypatch.setattr('matcha_ml.cli.provision.verify_azure_location', mock_verify_azure_location)
+
+    monkeypatch.setattr(
+        "matcha_ml.cli.provision.verify_azure_location", mock_verify_azure_location
+    )
 
     os.chdir(matcha_testing_directory)
 
@@ -211,3 +240,27 @@ def test_cli_provision_command_with_verbose_arg(runner, matcha_testing_directory
         "Template configuration has finished!",
     ]:
         assert verbose_output in result.stdout
+
+
+def test_verify_azure_location(monkeypatch):
+    """Test that Azure location is being correctly verified.
+
+    Args:
+        monkeypatch (pytest.monkeypatch.MonkeyPatch): Pytest monkeypatch for patching a function
+    """
+
+    def mock_get_azure_locations() -> list:
+        """Mock function for getting a list of Azure locations.
+
+        Returns:
+            list: Mock list of locations
+        """
+        return ["ukwest", "uksouth"]
+
+    monkeypatch.setattr(
+        "src.matcha_ml.cli.provision.get_azure_locations", mock_get_azure_locations
+    )
+
+    result = verify_azure_location("ukwest")
+
+    assert result is True
