@@ -83,18 +83,25 @@ def test_build_template(matcha_testing_directory, template_src_path):
 
 
 @pytest.mark.parametrize(
-    "location_name, expectation",
+    "location_name, bool_expectation, closest_match_expectation",
     [
-        ("ukwest", True),  # Valid location
-        ("mordorwest", False),  # Invalid location
+        ("ukwest", True, "ukwest"),  # Valid location
+        ("ukweest", False, "ukwest"),  # Mispelled location
+        ("mordorwest", False, ""),  # Invalid location
     ],
 )
 def test_verify_azure_location(
-    location_name: str, expectation: pytest.raises, monkeypatch
+    location_name: str,
+    bool_expectation: bool,
+    closest_match_expectation: str,
+    monkeypatch,
 ):
     """Test that Azure location is being correctly verified.
 
     Args:
+        location_name (str): Input location name
+        bool_expectation (bool): expected bool validation response
+        closest_match_expectation (str): expected closest string value
         monkeypatch (pytest.monkeypatch.MonkeyPatch): Pytest monkeypatch for patching a function
     """
 
@@ -124,4 +131,7 @@ def test_verify_azure_location(
         mock_authenticate_azure,
     )
 
-    assert verify_azure_location(location_name) is expectation
+    bool_result, closest_match_result = verify_azure_location(location_name)
+
+    assert bool_result is bool_expectation
+    assert closest_match_result == closest_match_expectation

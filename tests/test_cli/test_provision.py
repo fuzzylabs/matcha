@@ -71,7 +71,7 @@ def test_cli_provision_command(runner, matcha_testing_directory, monkeypatch):
         monkeypatch (pytest.monkeypatch.MonkeyPatch): Pytest monkeypatch for patching a function
     """
 
-    def mock_verify_azure_location(location) -> bool:
+    def mock_verify_azure_location(location) -> tuple[bool, str]:
         """Mock verify Azure location function.
 
         Args:
@@ -79,8 +79,9 @@ def test_cli_provision_command(runner, matcha_testing_directory, monkeypatch):
 
         Returns:
             bool: Mock verificaiton bool always set to True
+            str: Closest string value
         """
-        return True
+        return True, ""
 
     monkeypatch.setattr(
         "matcha_ml.templates.build_templates.azure_template.verify_azure_location",
@@ -113,7 +114,7 @@ def test_cli_provision_command_with_args(runner, matcha_testing_directory, monke
         monkeypatch (pytest.monkeypatch.MonkeyPatch): Pytest monkeypatch for patching a function
     """
 
-    def mock_verify_azure_location(location) -> bool:
+    def mock_verify_azure_location(location) -> tuple[bool, str]:
         """Mock verify Azure location function.
 
         Args:
@@ -121,8 +122,9 @@ def test_cli_provision_command_with_args(runner, matcha_testing_directory, monke
 
         Returns:
             bool: Mock verificaiton bool always set to True
+            str: Closest string value
         """
-        return True
+        return True, ""
 
     monkeypatch.setattr(
         "matcha_ml.templates.build_templates.azure_template.verify_azure_location",
@@ -159,7 +161,7 @@ def test_cli_provision_command_with_prefix(
         monkeypatch (pytest.monkeypatch.MonkeyPatch): Pytest monkeypatch for patching a function
     """
 
-    def mock_verify_azure_location(location) -> bool:
+    def mock_verify_azure_location(location) -> tuple[bool, str]:
         """Mock verify Azure location function.
 
         Args:
@@ -167,8 +169,9 @@ def test_cli_provision_command_with_prefix(
 
         Returns:
             bool: Mock verificaiton bool always set to True
+            str: Closest string value
         """
-        return True
+        return True, ""
 
     monkeypatch.setattr(
         "matcha_ml.templates.build_templates.azure_template.verify_azure_location",
@@ -203,7 +206,7 @@ def test_cli_provision_command_with_verbose_arg(
         monkeypatch (pytest.monkeypatch.MonkeyPatch): Pytest monkeypatch for patching a function
     """
 
-    def mock_verify_azure_location(location) -> bool:
+    def mock_verify_azure_location(location) -> tuple[bool, str]:
         """Mock verify Azure location function.
 
         Args:
@@ -211,8 +214,9 @@ def test_cli_provision_command_with_verbose_arg(
 
         Returns:
             bool: Mock verificaiton bool always set to True
+            str: Closest string value
         """
-        return True
+        return True, ""
 
     monkeypatch.setattr(
         "matcha_ml.templates.build_templates.azure_template.verify_azure_location",

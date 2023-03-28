@@ -1,5 +1,6 @@
 """Build a template for provisioning resources on Azure using terraform files."""
 import dataclasses
+import difflib
 import glob
 import json
 import os
@@ -69,7 +70,7 @@ def get_azure_locations(subscription_client: SubscriptionClient) -> set[str]:
     return locations
 
 
-def verify_azure_location(location_name: str) -> bool:
+def verify_azure_location(location_name: str) -> tuple[bool, str]:
     """Verifies whether the provided resource location name exists in Azure.
 
     Args:
@@ -77,11 +78,17 @@ def verify_azure_location(location_name: str) -> bool:
 
     Returns:
         bool: Returns True if location name is valid
+        str: Closest valid location name
     """
     subscription_client = authenticate_azure()
     locations = get_azure_locations(subscription_client)
 
-    return location_name in locations
+    closest_match = difflib.get_close_matches(location_name, locations, n=1)
+
+    if not closest_match:
+        return location_name in locations, ""
+    else:
+        return location_name in locations, closest_match[0]
 
 
 def build_template_configuration(
@@ -108,10 +115,16 @@ def build_template_configuration(
             type=str,
         )
 
-    while not verify_azure_location(location):
-        print(
-            f"Error, location '{location}' does not exist. See https://azure.microsoft.com/en-us/explore/global-infrastructure/geographies for all available locations."
-        )
+    while True:
+        is_valid, closest_match = verify_azure_location(location)
+        if is_valid:
+            break
+        else:
+            if closest_match:
+                print(f"Did you mean '{closest_match}'?")
+            print(
+                f"Error, location '{location}' does not exist. See https://azure.microsoft.com/en-us/explore/global-infrastructure/geographies for all available locations."
+            )
 
         location = typer.prompt(
             "What region should your resources be provisioned in (e.g., 'ukwest')?",
