@@ -7,6 +7,8 @@ from shutil import copy
 from typing import Optional
 
 import typer
+from azure.identity import AzureCliCredential, CredentialUnavailableError
+from azure.mgmt.resource import SubscriptionClient
 
 from matcha_ml.errors import MatchaPermissionError
 
@@ -24,6 +26,52 @@ class TemplateVariables(object):
     prefix: str = "matcha"
 
 
+def get_azure_locations() -> list[str]:
+    """Gets a list of valid Azure location strings.
+
+    Returns:
+        list[str]: List of Azure location strings
+    """
+    credential = AzureCliCredential()
+    subscription_client = SubscriptionClient(credential)
+    sub_list = subscription_client.subscriptions.list()
+
+    for group in list(sub_list):
+        # Get all locations for a subscription
+        locations = [
+            location.name
+            for location in subscription_client.subscriptions.list_locations(
+                group.subscription_id
+            )
+        ]
+
+    return locations
+
+
+def verify_azure_location(location_name: str) -> bool:
+    """Verifies whether the provided resource location name exists in Azure.
+
+    Args:
+        location_name (str): User inputted location.
+
+    Returns:
+        bool: Returns True if location name is valid
+    """
+    try:
+        locations = get_azure_locations()
+    except CredentialUnavailableError:
+        print("Error, please run 'az login' to authenticate your account.")
+        return False
+
+    if location_name in locations:
+        return True
+    else:
+        print(
+            f"[red]Error[/red], location '{location_name}' does not exist. Please use one of the following Azure locations:\n{locations}."
+        )
+        return False
+
+
 def build_template_configuration(
     location: Optional[str] = None, prefix: Optional[str] = None
 ) -> TemplateVariables:
@@ -38,15 +86,18 @@ def build_template_configuration(
     """
     if prefix is None:
         prefix = typer.prompt(
-            "Your resources need a name (a lowercase prefix; 3-24 character limit), what should matcha call them?", 
-            type=str, 
-            default="matcha"
+            "Your resources need a name (a lowercase prefix; 3-24 character limit), what should matcha call them?",
+            type=str,
+            default="matcha",
         )
     if location is None:
         location = typer.prompt(
-            "What region should your resources be provisioned in (e.g., 'ukwest')?", 
-            type=str
+            "What region should your resources be provisioned in (e.g., 'ukwest')?",
+            type=str,
         )
+
+    if not verify_azure_location(location):
+        raise typer.Exit(code=1)
 
     return TemplateVariables(prefix=prefix, location=location)
 

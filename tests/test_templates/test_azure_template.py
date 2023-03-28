@@ -10,6 +10,7 @@ from matcha_ml.templates.build_templates.azure_template import (
     SUBMODULE_NAMES,
     TemplateVariables,
     build_template,
+    verify_azure_location,
 )
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -77,3 +78,35 @@ def test_build_template(matcha_testing_directory, template_src_path):
     expected_tf_vars = {"location": "uksouth", "prefix": "matcha"}
 
     assert_infrastructure(destination_path, expected_tf_vars)
+
+
+@pytest.mark.parametrize(
+    "location_name, expectation",
+    [
+        ("ukwest", True),  # Valid location
+        ("mordorwest", False),  # Invalid location
+    ],
+)
+def test_verify_azure_location(
+    location_name: str, expectation: pytest.raises, monkeypatch
+):
+    """Test that Azure location is being correctly verified.
+
+    Args:
+        monkeypatch (pytest.monkeypatch.MonkeyPatch): Pytest monkeypatch for patching a function
+    """
+
+    def mock_get_azure_locations() -> list:
+        """Mock function for getting a list of Azure locations.
+
+        Returns:
+            list: Mock list of locations
+        """
+        return ["ukwest", "uksouth"]
+
+    monkeypatch.setattr(
+        "matcha_ml.templates.build_templates.azure_template.get_azure_locations",
+        mock_get_azure_locations,
+    )
+
+    assert verify_azure_location(location_name) is expectation
