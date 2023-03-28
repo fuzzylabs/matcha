@@ -25,13 +25,13 @@ class TemplateVariables(object):
 
 
 def build_template_configuration(
-    location: Optional[str] = None, prefix: Optional[str] = None
+    location: Optional[str] = None, prefix: Optional[str] = "matcha"
 ) -> TemplateVariables:
     """Ask for variables and build the configuration.
 
     Args:
         location (str, optional): Azure location in which all resources will be provisioned. Will be prompted for, if not provided.
-        prefix (str, optional): Prefix used for all resources. Will be prompted for, if not provided.
+        prefix (str, optional): Prefix used for all resources. Will be prompted for, if not provided. Default to "matcha".
 
     Returns:
         TemplateVariables: Terraform variables required by a template
