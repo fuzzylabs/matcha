@@ -9,10 +9,8 @@ from typing import Optional
 import python_terraform
 import typer
 from rich import print, print_json
-from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TimeElapsedColumn
 
-err_console = Console(stderr=True)
 MLFLOW_TRACKING_URL = "mlflow-tracking-url"
 
 SPINNERS = [
@@ -119,7 +117,7 @@ class TerraformService:
         var_file = Path(self.config.var_file)
 
         if not var_file.exists():
-            err_console.print_exception(
+            print(
                 "The file terraform.tfvars.json was not found in the "
                 f"current directory at {self.config.var_file}. Please "
                 "verify if it exists."
@@ -180,7 +178,7 @@ class TerraformService:
                 )
 
                 if ret_code != 0:
-                    err_console.print_exception("The command 'terraform init' failed.")
+                    print("The command 'terraform init' failed.")
                     raise typer.Exit()
 
                 print(
