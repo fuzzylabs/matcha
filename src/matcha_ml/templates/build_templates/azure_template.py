@@ -67,7 +67,7 @@ def verify_azure_location(location_name: str) -> bool:
         return True
     else:
         print(
-            f"[red]Error[/red], location '{location_name}' does not exist. Please use one of the following Azure locations:\n{locations}."
+            f"Error, location '{location_name}' does not exist. Please use one of the following Azure locations:\n{locations}."
         )
         return False
 
