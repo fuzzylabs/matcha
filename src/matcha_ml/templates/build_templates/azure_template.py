@@ -52,7 +52,7 @@ def get_azure_locations(subscription_client: SubscriptionClient) -> set[str]:
         subscription_client (SubscriptionClient): An object containing the subscriptions for the authenticated user
 
     Returns:
-        list[str]: List of Azure location strings
+        set[str]: Set of Azure location strings
     """
     sub_list = subscription_client.subscriptions.list()
 
