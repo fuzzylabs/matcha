@@ -6,8 +6,6 @@ import os
 from shutil import copy
 from typing import Optional
 
-import typer
-
 from matcha_ml.errors import MatchaPermissionError
 
 SUBMODULE_NAMES = ["aks", "resource_group", "mlflow-module", "storage"]
@@ -25,23 +23,19 @@ class TemplateVariables(object):
 
 
 def build_template_configuration(
-    location: Optional[str] = None, prefix: Optional[str] = None
+    location: str,
+    prefix: str,
 ) -> TemplateVariables:
     """Ask for variables and build the configuration.
 
     Args:
-        location (str, optional): Azure location in which all resources will be provisioned. Will be prompted for, if not provided.
-        prefix (str, optional): Prefix used for all resources. Will be prompted for, if not provided.
+        location (str): Azure location in which all resources will be provisioned. Will be prompted for, if not provided.
+        prefix (str): Prefix used for all resources. Will be prompted for, if not provided.
 
     Returns:
         TemplateVariables: Terraform variables required by a template
     """
-    if prefix is None:
-        prefix = typer.prompt("Resource name prefix", type=str, default="matcha")
-    if location is None:
-        location = typer.prompt("Resource location", type=str)
-
-    return TemplateVariables(prefix=prefix, location=location)
+    return TemplateVariables(location=location, prefix=prefix)
 
 
 def build_template(

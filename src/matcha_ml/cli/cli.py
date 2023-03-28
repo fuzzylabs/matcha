@@ -6,6 +6,7 @@ import typer
 from matcha_ml import __version__
 from matcha_ml.cli import run
 from matcha_ml.cli.destroy import destroy_resources
+from matcha_ml.cli.prefix_validation import validate_prefix
 from matcha_ml.cli.provision import provision_resources
 
 app = typer.Typer(no_args_is_help=True, pretty_exceptions_show_locals=False)
@@ -20,10 +21,17 @@ app.add_typer(
 
 @app.command()
 def provision(
-    location: Optional[str] = typer.Option(
-        None, help="Azure location in which all resources will be provisioned."
+    location: str = typer.Option(
+        None,
+        prompt="Resource location",
+        help="Azure location in which all resources will be provisioned.",
     ),
-    prefix: Optional[str] = typer.Option(None, help="Prefix used for all resources."),
+    prefix: Optional[str] = typer.Option(
+        prompt="Resource name prefix",
+        callback=validate_prefix,
+        default="matcha",
+        help="Prefix used for all resources.",
+    ),
     verbose: Optional[bool] = typer.Option(
         False, help="Get more detailed information from matcha provision!"
     ),
