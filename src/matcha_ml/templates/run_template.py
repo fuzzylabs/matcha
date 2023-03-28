@@ -148,8 +148,8 @@ class TerraformService:
         prompt = typer.prompt(
             f"Are you happy for these resources to be {verb} (y/N; yes/No)?",
             type=str,
-        )
-        return bool(prompt.lower() == "yes" or prompt.lower() == "y")
+        ).lower()
+        return bool(prompt == "yes" or prompt == "y")
 
     def _init_and_apply(self) -> None:
         """Run terraform init and apply to create resources on cloud.
