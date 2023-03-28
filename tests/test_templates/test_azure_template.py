@@ -5,6 +5,7 @@ import os
 from typing import Dict
 
 import pytest
+from azure.mgmt.resource import SubscriptionClient
 
 from matcha_ml.templates.build_templates.azure_template import (
     SUBMODULE_NAMES,
@@ -96,7 +97,7 @@ def test_verify_azure_location(
         monkeypatch (pytest.monkeypatch.MonkeyPatch): Pytest monkeypatch for patching a function
     """
 
-    def mock_get_azure_locations() -> list:
+    def mock_get_azure_locations(subscription_client: SubscriptionClient) -> list:
         """Mock function for getting a list of Azure locations.
 
         Returns:

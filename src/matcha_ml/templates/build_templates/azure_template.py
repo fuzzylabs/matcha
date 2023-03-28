@@ -26,24 +26,46 @@ class TemplateVariables(object):
     prefix: str = "matcha"
 
 
-def get_azure_locations() -> list[str]:
+def authenticate_azure() -> SubscriptionClient:
+    """Checks if Azure has been authenticated already and returns a SubscriptionClient for the current user.
+
+    Returns:
+        SubscriptionClient: An object containing the subscriptions for the authenticated user.
+
+    Raises:
+        CredentialUnavailableError: Exception thrown when a user has not authenticated with Azure.
+    """
+    try:
+        credential = AzureCliCredential()
+        subscription_client = SubscriptionClient(credential)
+    except CredentialUnavailableError:
+        print("Error, please run 'az login' to authenticate your account.")
+        raise CredentialUnavailableError
+
+    return subscription_client
+
+
+def get_azure_locations(subscription_client: SubscriptionClient) -> set[str]:
     """Gets a list of valid Azure location strings.
+
+    Args:
+        subscription_client (SubscriptionClient): An object containing the subscriptions for the authenticated user
 
     Returns:
         list[str]: List of Azure location strings
     """
-    credential = AzureCliCredential()
-    subscription_client = SubscriptionClient(credential)
     sub_list = subscription_client.subscriptions.list()
 
     for group in list(sub_list):
         # Get all locations for a subscription
-        locations = [
-            location.name
-            for location in subscription_client.subscriptions.list_locations(
-                group.subscription_id
-            )
-        ]
+        locations = set(
+            [
+                location.name
+                for location in subscription_client.subscriptions.list_locations(
+                    group.subscription_id
+                )
+            ]
+        )
 
     return locations
 
@@ -57,19 +79,10 @@ def verify_azure_location(location_name: str) -> bool:
     Returns:
         bool: Returns True if location name is valid
     """
-    try:
-        locations = get_azure_locations()
-    except CredentialUnavailableError:
-        print("Error, please run 'az login' to authenticate your account.")
-        return False
+    subscription_client = authenticate_azure()
+    locations = get_azure_locations(subscription_client)
 
-    if location_name in locations:
-        return True
-    else:
-        print(
-            f"Error, location '{location_name}' does not exist. Please use one of the following Azure locations:\n{locations}."
-        )
-        return False
+    return location_name in locations
 
 
 def build_template_configuration(
@@ -96,8 +109,15 @@ def build_template_configuration(
             type=str,
         )
 
-    if not verify_azure_location(location):
-        raise typer.Exit(code=1)
+    while not verify_azure_location(location):
+        print(
+            f"Error, location '{location}' does not exist. See https://azure.microsoft.com/en-us/explore/global-infrastructure/geographies for all available locations."
+        )
+
+        location = typer.prompt(
+            "What region should your resources be provisioned in (e.g., 'ukwest')?",
+            type=str,
+        )
 
     return TemplateVariables(prefix=prefix, location=location)
 
