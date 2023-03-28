@@ -68,6 +68,9 @@ select = [
     "C",    # Complexity (mccabe+) & comprehensions
 ]
 
+# In addition to the standard set of exclusions, plus a specific file.
+extend-exclude = ["mkdocs.yml"]
+
 # Match black. Note that this also checks comment line length, but black does not format comments.
 line-length = 88
 
