@@ -24,13 +24,13 @@ def provision(
     location: str = typer.Option(
         None,
         prompt="Resource location",
-        help="Azure location in which all resources will be provisioned.",
+        help="The region where your resources will be provisioned, e.g., 'ukwest'",
     ),
     prefix: Optional[str] = typer.Option(
         prompt="Resource name prefix",
         callback=validate_prefix,
         default="matcha",
-        help="Prefix used for all resources.",
+        help="A unique prefix for your resources.",
     ),
     verbose: Optional[bool] = typer.Option(
         False, help="Get more detailed information from matcha provision!"
