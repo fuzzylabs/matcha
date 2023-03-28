@@ -3,7 +3,7 @@ import dataclasses
 import glob
 import json
 import os
-from shutil import copy
+from shutil import copy, rmtree
 from typing import Optional
 
 import typer
@@ -87,6 +87,10 @@ def build_template(
     """
     try:
         print("Building configuration template...")
+
+        # Override configuration if it already exists
+        if os.path.exists(destination):
+            rmtree(destination)
 
         os.makedirs(destination, exist_ok=True)
         if verbose:
