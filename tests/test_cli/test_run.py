@@ -2,6 +2,8 @@
 import os
 
 import pytest
+from pytest import CaptureFixture
+from typer.testing import CliRunner
 
 from matcha_ml.cli.cli import app
 
@@ -29,8 +31,12 @@ def run_testing_directory(matcha_testing_directory: str):
     os.remove("run.py")
 
 
-def test_cli_run_command(runner):
-    """Test cli for run command."""
+def test_cli_run_command(runner: CliRunner):
+    """Test cli for run command.
+
+    Args:
+        runner (CliRunner): runner is what will "invoke" a command line application
+    """
     # Invoke run command
     result = runner.invoke(app, ["run", "--help"])
 
@@ -41,8 +47,12 @@ def test_cli_run_command(runner):
     assert "The run command." in result.stdout
 
 
-def test_cli_train_command(runner):
-    """Test cli for run command."""
+def test_cli_train_command(runner: CliRunner):
+    """Test cli for train command.
+
+    Args:
+        runner (CliRunner): runner is what will "invoke" a command line application
+    """
     # Invoke run command
     result = runner.invoke(app, ["run", "train", "--help"])
 
@@ -53,16 +63,26 @@ def test_cli_train_command(runner):
     assert "Run train subcommand." in result.stdout
 
 
-def test_cli_default_callback(runner, run_testing_directory: str):
-    """Test cli for run command."""
+def test_cli_default_callback(
+    runner: CliRunner, run_testing_directory: str, capfd: CaptureFixture
+):
+    """Test cli default run command.
+
+    Args:
+        runner (CliRunner): runner is what will "invoke" a command line application
+        run_testing_directory (str): directory of the temp run.py created
+        capfd (CaptureFixture): capture any output sent to stdout and stderr
+    """
     # Invoke run command with no option passed
     os.chdir(run_testing_directory)
     result = runner.invoke(app, ["run"])
 
+    # capfd for file descriptor level
+    captured = capfd.readouterr()
+
     # Exit code 0 means there was no error
     assert result.exit_code == 0
-
     # Assert string is present in cli output
     assert "No commands are passed, running run.py by default." in result.stdout
     # The temporary run.py file should contain code to print the following when executed.
-    assert "This is the run.py file" in result.stdout
+    assert "This is the run.py file" in captured.out
