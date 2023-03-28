@@ -3,6 +3,7 @@ import glob
 import json
 import os
 from typing import Dict
+from unittest.mock import patch
 
 import pytest
 from typer.testing import CliRunner
@@ -14,6 +15,20 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 TEMPLATE_DIR = os.path.join(
     BASE_DIR, os.pardir, os.pardir, "src", "matcha_ml", "infrastructure"
 )
+
+
+@pytest.fixture(scope="session", autouse=True)
+def resource_group_name_mock():
+    """Mock the return result of get_existing_resource_group_names.
+
+    Yields:
+        str: the mock existing resource group name.
+    """
+    with patch(
+        "matcha_ml.cli.prefix_validation.get_existing_resource_group_names"
+    ) as mock:
+        mock.return_value = "repeated-prefix-resources"
+        yield mock
 
 
 def assert_infrastructure(destination_path: str, expected_tf_vars: Dict[str, str]):
@@ -149,7 +164,7 @@ def test_cli_provision_command_with_verbose_arg(
     """Test that the verbose argument works and provision shows more output.
 
     Args:
-        runner (CliRunner): type CLI runner
+        runner (CliRunner): typer CLI runner
         matcha_testing_directory (str): temporary working directory
     """
     os.chdir(matcha_testing_directory)
@@ -171,15 +186,15 @@ def test_cli_provision_command_with_verbose_arg(
     "user_input, expected_output",
     [
         (
-            """uksouth\n-1-\nvalid-prefix\nno\n""",
+            "uksouth\n-1-\nvalid-prefix\nno\n",
             "Error: Prefix cannot start or end with a hyphen.",
         ),
         (
-            """uksouth\n12\nvalid-prefix\nno\n""",
+            "uksouth\n12\nvalid-prefix\nno\n",
             "Error: Prefix must be between 3 and 24 characters long.",
         ),
         (
-            """uksouth\ngood$prefix#\nvalid-prefix\nno\n""",
+            "uksouth\ngood$prefix#\nvalid-prefix\nno\n",
             "Error: Prefix must contain only alphanumeric characters and hyphens.",
         ),
     ],
@@ -193,7 +208,7 @@ def test_cli_provision_command_prefix_rule(
     """Test whether the prefix validation function prompt an error message when user entered an invalid prefix.
 
     Args:
-        runner (CliRunner): type CLI runner
+        runner (CliRunner): typer CLI runner
         matcha_testing_directory (str): temporary working directory
         user_input (str): prefix entered by user
         expected_output (str): the expected error message
@@ -202,3 +217,27 @@ def test_cli_provision_command_prefix_rule(
 
     result = runner.invoke(app, ["provision"], input=user_input)
     assert expected_output in result.stdout
+
+
+def test_cli_provision_command_with_existing_prefix_name(
+    runner: CliRunner,
+    matcha_testing_directory: str,
+):
+    """Test whether the expected error message is prompt when user entered an existing prefix.
+
+    Args:
+        runner (CliRunner): typer CLI runner
+        matcha_testing_directory (str): temporary working directory
+    """
+    expected_error_message = (
+        "Error: You entered a prefix that have been used before, prefix must be unique."
+    )
+    os.chdir(matcha_testing_directory)
+
+    result = runner.invoke(
+        app,
+        ["provision"],
+        input="uksouth\nrepeated-prefix\nvalid-prefix\nno\n",
+    )
+
+    assert expected_error_message in result.stdout
