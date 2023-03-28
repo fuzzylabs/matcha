@@ -72,7 +72,7 @@ def test_cli_provision_command(runner, matcha_testing_directory):
     os.chdir(matcha_testing_directory)
 
     # Invoke provision command
-    result = runner.invoke(app, ["provision"], input="\nuksouth\nno\n")
+    result = runner.invoke(app, ["provision"], input="\nuksouth\nmatcha\nno\n")
 
     # Exit code 0 means there was no error
     assert result.exit_code == 0
@@ -122,7 +122,7 @@ def test_cli_provision_command_with_prefix(runner, matcha_testing_directory):
     os.chdir(matcha_testing_directory)
 
     # Invoke provision command
-    result = runner.invoke(app, ["provision"], input="coffee\nukwest\nno\n")
+    result = runner.invoke(app, ["provision"], input="ukwest\ncoffee\nno\n")
 
     # Exit code 0 means there was no error
     assert result.exit_code == 0
