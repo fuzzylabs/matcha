@@ -123,7 +123,7 @@ def build_template_configuration(
             if closest_match:
                 print(f"Did you mean '{closest_match}'?")
             print(
-                f"Error, location '{location}' does not exist. See https://azure.microsoft.com/en-us/explore/global-infrastructure/geographies for all available locations."
+                f"Error, region '{location}' does not exist. See https://azure.microsoft.com/en-us/explore/global-infrastructure/geographies for all available regions."
             )
 
         location = typer.prompt(
