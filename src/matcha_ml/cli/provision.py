@@ -30,7 +30,7 @@ class TemplateVariables(object):
 
 
 def build_template_configuration(
-    location: Optional[str] = None, prefix: Optional[str] = "matcha"
+    location: Optional[str] = None, prefix: Optional[str] = None
 ) -> TemplateVariables:
     """Ask for variables and build the configuration.
 
@@ -41,7 +41,7 @@ def build_template_configuration(
     Returns:
         TemplateVariables: Terraform variables required by a template
     """
-    if prefix == "matcha":
+    if prefix is None:
         prefix = typer.prompt(
             "Your resources need a name (a lowercase prefix; 3-24 character limit), what should matcha call them?",
             type=str,

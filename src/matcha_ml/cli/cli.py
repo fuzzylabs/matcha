@@ -24,7 +24,7 @@ def provision(
         None, help="The region where your resources will be provisioned, e.g., 'ukwest'"
     ),
     prefix: Optional[str] = typer.Option(
-        "matcha", help="A unique prefix for your resources."
+        None, help="A unique prefix for your resources."
     ),
     verbose: Optional[bool] = typer.Option(
         False, help="Get more detailed information from matcha provision!"
