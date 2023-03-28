@@ -27,20 +27,19 @@ class TemplateVariables(object):
 
 
 def authenticate_azure() -> SubscriptionClient:
-    """Checks if Azure has been authenticated already and returns a SubscriptionClient for the current user.
+    """Checks Azure authentication and gets the Azure subscriptions within a SubscriptionClient for the current user.
 
     Returns:
         SubscriptionClient: An object containing the subscriptions for the authenticated user.
-
-    Raises:
-        CredentialUnavailableError: Exception thrown when a user has not authenticated with Azure.
     """
+    credential = AzureCliCredential()
+    subscription_client = SubscriptionClient(credential)
+
+    # Check authentication
     try:
-        credential = AzureCliCredential()
-        subscription_client = SubscriptionClient(credential)
+        credential.get_token("https://management.azure.com/.default")
     except CredentialUnavailableError:
-        print("Error, please run 'az login' to authenticate your account.")
-        raise CredentialUnavailableError
+        raise typer.Exit(code=1)
 
     return subscription_client
 
