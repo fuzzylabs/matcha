@@ -1,5 +1,5 @@
 """Run CLI for matcha."""
-import runpy
+import subprocess
 from typing import Optional
 
 import typer
@@ -28,7 +28,7 @@ def default_callback(context: typer.Context) -> None:
     if context.invoked_subcommand is None:
         try:
             print("No commands are passed, running run.py by default.")
-            runpy.run_path("run.py", run_name="__main__")
+            subprocess.run(["python3", "run.py"])
 
         except FileNotFoundError:
             err_console.print(

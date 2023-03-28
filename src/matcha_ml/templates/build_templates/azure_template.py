@@ -1,21 +1,14 @@
-"""Provision CLI."""
+"""Build a template for provisioning resources on Azure using terraform files."""
+import dataclasses
+import glob
+import json
 import os
+from shutil import copy
 from typing import Optional
 
 import typer
-from azure.identity import AzureCliCredential, CredentialUnavailableError
-from azure.mgmt.resource import SubscriptionClient
-from rich import print
 
-from matcha_ml.templates.build_templates.azure_template import (
-    build_template,
-    build_template_configuration,
-)
-from matcha_ml.templates.run_template import TerraformService
-
-# create a typer app to group all provision subcommands
-app = typer.Typer()
-
+from matcha_ml.errors import MatchaPermissionError
 
 SUBMODULE_NAMES = ["aks", "resource_group", "mlflow-module", "storage"]
 
@@ -31,52 +24,6 @@ class TemplateVariables(object):
     prefix: str = "matcha"
 
 
-def get_azure_locations() -> list[str]:
-    """Gets a list of valid Azure location strings.
-
-    Returns:
-        list[str]: List of Azure location strings
-    """
-    credential = AzureCliCredential()
-    subscription_client = SubscriptionClient(credential)
-    sub_list = subscription_client.subscriptions.list()
-
-    for group in list(sub_list):
-        # Get all locations for a subscription
-        locations = [
-            location.name
-            for location in subscription_client.subscriptions.list_locations(
-                group.subscription_id
-            )
-        ]
-
-    return locations
-
-
-def verify_azure_location(location_name: str) -> bool:
-    """Verifies whether the provided resource location name exists in Azure.
-
-    Args:
-        location_name (str): User inputted location.
-
-    Returns:
-        bool: Returns True if location name is valid
-    """
-    try:
-        locations = get_azure_locations()
-    except CredentialUnavailableError:
-        print("Error, please run 'az login' to authenticate your account.")
-        return False
-
-    if location_name in locations:
-        return True
-    else:
-        print(
-            f"[red]Error[/red], location '{location_name}' does not exist. Please use one of the following Azure locations:\n{locations}."
-        )
-        return False
-
-
 def build_template_configuration(
     location: Optional[str] = None, prefix: Optional[str] = None
 ) -> TemplateVariables:
@@ -90,12 +37,16 @@ def build_template_configuration(
         TemplateVariables: Terraform variables required by a template
     """
     if prefix is None:
-        prefix = typer.prompt("Resource name prefix", type=str, default="matcha")
+        prefix = typer.prompt(
+            "Your resources need a name (a lowercase prefix; 3-24 character limit), what should matcha call them?", 
+            type=str, 
+            default="matcha"
+        )
     if location is None:
-        location = typer.prompt("Resource location", type=str)
-
-    if not verify_azure_location(location):
-        raise typer.Exit(code=1)
+        location = typer.prompt(
+            "What region should your resources be provisioned in (e.g., 'ukwest')?", 
+            type=str
+        )
 
     return TemplateVariables(prefix=prefix, location=location)
 
@@ -173,31 +124,3 @@ def build_template(
         print("[green bold]Template configuration has finished![/green bold]")
 
     print(f"The configuration template was written to {destination}")
-
-def provision_resources(
-    location: Optional[str] = None,
-    prefix: Optional[str] = None,
-    verbose: Optional[bool] = False,
-) -> None:
-    """Provision cloud resources using templates.
-
-    Args:
-        location (str, optional): Azure location in which all resources will be provisioned.
-        prefix (str, optional): Prefix used for all resources.
-        verbose (bool optional): additional output is show when True. Defaults to False.
-    """
-    project_directory = os.getcwd()
-    destination = os.path.join(project_directory, ".matcha", "infrastructure")
-
-    template = os.path.join(os.path.dirname(__file__), os.pardir, "infrastructure")
-
-    config = build_template_configuration(location, prefix)
-    build_template(config, template, destination, verbose)
-
-    # create a terraform service to provision resources
-    tfs = TerraformService()
-
-    # provision resources by running the template
-    tfs.provision()
-
-    print("[green bold]Provisioning is complete![/green bold]")

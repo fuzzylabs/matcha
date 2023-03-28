@@ -4,8 +4,6 @@ import json
 import os
 from typing import Dict
 
-import pytest
-
 from matcha_ml.cli.cli import app
 from src.matcha_ml.cli.provision import (
     SUBMODULE_NAMES,
@@ -14,8 +12,12 @@ from src.matcha_ml.cli.provision import (
     verify_azure_location,
 )
 
+from matcha_ml.templates.build_templates.azure_template import SUBMODULE_NAMES
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-TEMPLATE_DIR = os.path.join(BASE_DIR, os.pardir, os.pardir, "src", "infrastructure")
+TEMPLATE_DIR = os.path.join(
+    BASE_DIR, os.pardir, os.pardir, "src", "matcha_ml", "infrastructure"
+)
 
 
 def assert_infrastructure(destination_path: str, expected_tf_vars: Dict[str, str]):
@@ -49,18 +51,6 @@ def assert_infrastructure(destination_path: str, expected_tf_vars: Dict[str, str
         tf_vars = json.load(f)
 
     assert tf_vars == expected_tf_vars
-
-
-@pytest.fixture
-def template_src_path() -> str:
-    """Fixture for the test infrastructure template path.
-
-    Returns:
-        str: template path
-    """
-    template_dir = os.path.join(BASE_DIR, os.pardir, os.pardir, "src", "infrastructure")
-
-    return template_dir
 
 
 def test_cli_provision_command_help(runner):
