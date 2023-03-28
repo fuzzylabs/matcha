@@ -22,41 +22,12 @@ repos:
       - id: black
         args: [--config=pyproject.toml]
 
-  - repo: https://github.com/pycqa/isort
-    rev: 5.12.0
+  - repo: https://github.com/charliermarsh/ruff-pre-commit
+    # Ruff version.
+    rev: "v0.0.257"
     hooks:
-      - id: isort
-        name: isort (python)
-        args: [--settings-path=pyproject.toml]
-
-  - repo: https://github.com/pycqa/flake8
-    rev: 3.7.9
-    hooks:
-      - id: flake8
-        additional_dependencies: [pep8-naming]
-
-  - repo: https://github.com/econchick/interrogate
-    rev: 1.5.0
-    hooks:
-      - id: interrogate
-        args: ["--config=pyproject.toml"]
-        exclude: ^tests/
-
-  - repo: https://github.com/pycqa/pydocstyle
-    rev: 6.1.1 # pick a git hash / tag to point to
-    hooks:
-      - id: pydocstyle
-        exclude: (^tests)
-        args:
-          - --convention=google
-          - --add-ignore=D403
-        additional_dependencies: ["toml"]
-
-  - repo: https://github.com/terrencepreilly/darglint
-    rev: v1.5.8
-    hooks:
-      - id: darglint
-        exclude: ^tests/
+      - id: ruff
+        args: [--fix, --exit-non-zero-on-fix] # enable autofix
 
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.1.1

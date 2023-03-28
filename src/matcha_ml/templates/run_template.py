@@ -135,7 +135,7 @@ class TerraformService:
         Returns:
             bool: True if user approves, False otherwise.
         """
-        SUMMARY_MESSAGE = f"""The following resources will be {verb}ed:
+        summary_message = f"""The following resources will be {verb}ed:
 1. [yellow] Resource group [/yellow]: A resource group
 2. [yellow] Azure Kubernetes Service (AKS) [/yellow]: A kubernetes cluster
 3. [yellow] Azure Storage Container [/yellow]: A storage container
@@ -144,12 +144,12 @@ class TerraformService:
 """
 
         print()
-        print(SUMMARY_MESSAGE)
+        print(summary_message)
         prompt = typer.prompt(
             f"Are you happy for these resources to be {verb} (y/N; yes/No)?",
             type=str,
         )
-        return True if prompt.lower() == "yes" or prompt.lower() == "y" else False
+        return bool(prompt.lower() == "yes" or prompt.lower() == "y")
 
     def _init_and_apply(self) -> None:
         """Run terraform init and apply to create resources on cloud.
@@ -295,6 +295,6 @@ class TerraformService:
         print()
         print("Here are the endpoints for what's been provisioned")
         # print terraform output from state file
-        with open(self.config.state_file, "r") as fp:
+        with open(self.config.state_file) as fp:
             print_json(fp.read())
         print()

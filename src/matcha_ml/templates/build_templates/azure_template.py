@@ -14,7 +14,7 @@ SUBMODULE_NAMES = ["aks", "resource_group", "mlflow-module", "storage"]
 
 
 @dataclasses.dataclass
-class TemplateVariables(object):
+class TemplateVariables:
     """Terraform template variables."""
 
     # Azure location in which all resources will be provisioned
@@ -92,9 +92,9 @@ def build_template(
                 os.path.join(template_src, submodule_name, "*.tf")
             ):
                 filename = os.path.basename(source_path)
-                source_path = os.path.join(template_src, submodule_name, filename)
+                src_path = os.path.join(template_src, submodule_name, filename)
                 destination_path = os.path.join(destination, submodule_name, filename)
-                copy(source_path, destination_path)
+                copy(src_path, destination_path)
 
             if verbose:
                 print(
