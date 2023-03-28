@@ -136,27 +136,6 @@ def test_cli_provision_command_with_prefix(runner, matcha_testing_directory):
     assert_infrastructure(destination_path, expected_tf_vars)
 
 
-<<<<<<< HEAD
-def test_build_template(matcha_testing_directory, template_src_path):
-    """Test that the template is built and copied to correct locations.
-
-    Args:
-        matcha_testing_directory (str): Temporary .matcha directory path
-        template_src_path (str): Existing template directory path
-    """
-    config = TemplateVariables(location="uksouth")
-
-    destination_path = os.path.join(matcha_testing_directory, "infrastructure")
-
-    build_template(config, template_src_path, destination_path)
-
-    expected_tf_vars = {"location": "uksouth", "prefix": "matcha"}
-
-    assert_infrastructure(destination_path, expected_tf_vars)
-
-
-=======
->>>>>>> main
 def test_cli_provision_command_with_verbose_arg(runner, matcha_testing_directory):
     """Test that the verbose argument works and provision shows more output.
 
