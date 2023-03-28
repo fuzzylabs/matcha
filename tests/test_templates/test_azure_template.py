@@ -5,6 +5,7 @@ import os
 from typing import Dict
 
 import pytest
+from azure.identity import AzureCliCredential
 from azure.mgmt.resource import SubscriptionClient
 
 from matcha_ml.templates.build_templates.azure_template import (
@@ -105,9 +106,22 @@ def test_verify_azure_location(
         """
         return ["ukwest", "uksouth"]
 
+    def mock_authenticate_azure() -> SubscriptionClient:
+        """Mock function for checking Azure authentication.
+
+        Returns:
+            SubscriptionClient: Mock Azure subscription client
+        """
+        return SubscriptionClient(AzureCliCredential())
+
     monkeypatch.setattr(
         "matcha_ml.templates.build_templates.azure_template.get_azure_locations",
         mock_get_azure_locations,
+    )
+
+    monkeypatch.setattr(
+        "matcha_ml.templates.build_templates.azure_template.authenticate_azure",
+        mock_authenticate_azure,
     )
 
     assert verify_azure_location(location_name) is expectation
