@@ -5,7 +5,6 @@ import pytest
 from pytest import CaptureFixture
 from typer.testing import CliRunner
 
-from matcha_ml import __version__
 from matcha_ml.cli.cli import app
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -23,7 +22,6 @@ def run_testing_directory(matcha_testing_directory: str):
     Yields:
         run.py: a run.py temporarily containing 1 line of python code which prints "This is the run.py file".
     """
-
     with open(os.path.join(matcha_testing_directory, "run.py"), "w") as f:
         f.write("print('This is the run.py file')")
 

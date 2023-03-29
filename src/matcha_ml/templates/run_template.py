@@ -2,17 +2,14 @@
 import dataclasses
 import json
 import os
-import random
 from pathlib import Path
 from typing import Optional
 
 import python_terraform
 import typer
 from rich import print, print_json
-from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TimeElapsedColumn
 
-err_console = Console(stderr=True)
 MLFLOW_TRACKING_URL = "mlflow-tracking-url"
 
 SPINNER = "dots"
@@ -110,7 +107,7 @@ class TerraformService:
         var_file = Path(self.config.var_file)
 
         if not var_file.exists():
-            err_console.print_exception(
+            print(
                 "The file terraform.tfvars.json was not found in the "
                 f"current directory at {self.config.var_file}. Please "
                 "verify if it exists."
@@ -126,7 +123,7 @@ class TerraformService:
         Returns:
             bool: True if user approves, False otherwise.
         """
-        SUMMARY_MESSAGE = f"""The following resources will be {verb}ed:
+        summary_message = f"""The following resources will be {verb}ed:
 1. [yellow] Resource group [/yellow]: A resource group
 2. [yellow] Azure Kubernetes Service (AKS) [/yellow]: A kubernetes cluster
 3. [yellow] Azure Storage Container [/yellow]: A storage container
@@ -135,8 +132,7 @@ class TerraformService:
 """
 
         print()
-        print(SUMMARY_MESSAGE)
-
+        print(summary_message)
         return typer.confirm(f"Are you happy for '{verb}' to run?")
 
     def _init_and_apply(self) -> None:
@@ -172,7 +168,7 @@ class TerraformService:
                 )
 
                 if ret_code != 0:
-                    err_console.print_exception("The command 'terraform init' failed.")
+                    print("The command 'terraform init' failed.")
                     raise typer.Exit()
 
                 print(
@@ -283,6 +279,6 @@ class TerraformService:
         print()
         print("Here are the endpoints for what's been provisioned")
         # print terraform output from state file
-        with open(self.config.state_file, "r") as fp:
+        with open(self.config.state_file) as fp:
             print_json(fp.read())
         print()

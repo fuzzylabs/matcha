@@ -14,7 +14,7 @@ TEMPLATE_DIR = os.path.join(
 
 
 def assert_infrastructure(destination_path: str, expected_tf_vars: Dict[str, str]):
-    """Assert if the infrastructure configuration is valid
+    """Assert if the infrastructure configuration is valid.
 
     Args:
         destination_path (str): infrastructure config destination path
@@ -40,7 +40,7 @@ def assert_infrastructure(destination_path: str, expected_tf_vars: Dict[str, str
     variables_file_path = os.path.join(destination_path, "terraform.tfvars.json")
     assert os.path.exists(variables_file_path)
 
-    with open(variables_file_path, "r") as f:
+    with open(variables_file_path) as f:
         tf_vars = json.load(f)
 
     assert tf_vars == expected_tf_vars
