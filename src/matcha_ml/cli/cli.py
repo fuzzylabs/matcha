@@ -6,6 +6,7 @@ import typer
 from matcha_ml import __version__
 from matcha_ml.cli import run
 from matcha_ml.cli.destroy import destroy_resources
+from matcha_ml.cli.prefix_validation import validate_prefix
 from matcha_ml.cli.provision import provision_resources
 
 app = typer.Typer(no_args_is_help=True, pretty_exceptions_show_locals=False)
@@ -20,11 +21,16 @@ app.add_typer(
 
 @app.command()
 def provision(
-    location: Optional[str] = typer.Option(
-        None, help="The region where your resources will be provisioned, e.g., 'ukwest'"
+    location: str = typer.Option(
+        None,
+        prompt="What region should your resources be provisioned in (e.g., 'ukwest')?",
+        help="The region where your resources will be provisioned, e.g., 'ukwest'",
     ),
-    prefix: Optional[str] = typer.Option(
-        None, help="A unique prefix for your resources."
+    prefix: str = typer.Option(
+        prompt="Your resources need a name (a alphanumerical prefix; 3-24 character limit), what should matcha call them?",
+        callback=validate_prefix,
+        default="matcha",
+        help="A unique prefix for your resources.",
     ),
     verbose: Optional[bool] = typer.Option(
         False, help="Get more detailed information from matcha provision!"

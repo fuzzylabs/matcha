@@ -3,6 +3,10 @@ import glob
 import json
 import os
 from typing import Dict
+from unittest.mock import patch
+
+import pytest
+from typer.testing import CliRunner
 
 import pytest
 
@@ -68,6 +72,19 @@ def monkeypatch_verify_azure_authentication(monkeypatch):
 
     yield monkeypatch
 
+@pytest.fixture(scope="session", autouse=True)
+def resource_group_name_mock():
+    """Mock the return result of get_existing_resource_group_names.
+
+    Yields:
+        str: the mock existing resource group name.
+    """
+    with patch(
+        "matcha_ml.cli.prefix_validation.get_existing_resource_group_names"
+    ) as mock:
+        mock.return_value = "repeated-prefix-resources"
+        yield mock
+
 
 def assert_infrastructure(destination_path: str, expected_tf_vars: Dict[str, str]):
     """Assert if the infrastructure configuration is valid.
@@ -96,13 +113,13 @@ def assert_infrastructure(destination_path: str, expected_tf_vars: Dict[str, str
     variables_file_path = os.path.join(destination_path, "terraform.tfvars.json")
     assert os.path.exists(variables_file_path)
 
-    with open(variables_file_path, "r") as f:
+    with open(variables_file_path) as f:
         tf_vars = json.load(f)
 
     assert tf_vars == expected_tf_vars
 
 
-def test_cli_provision_command_help(runner):
+def test_cli_provision_command_help(runner: CliRunner):
     """Test cli for provision command help.
 
     Args:
@@ -135,7 +152,7 @@ def test_cli_provision_command(
     os.chdir(matcha_testing_directory)
 
     # Invoke provision command
-    result = runner.invoke(app, ["provision"], input="\nuksouth\nno\n")
+    result = runner.invoke(app, ["provision"], input="\nuksouth\nmatcha\nno\n")
 
     # Exit code 0 means there was no error
     assert result.exit_code == 0
@@ -199,7 +216,7 @@ def test_cli_provision_command_with_prefix(
     os.chdir(matcha_testing_directory)
 
     # Invoke provision command
-    result = runner.invoke(app, ["provision"], input="coffee\nukwest\nno\n")
+    result = runner.invoke(app, ["provision"], input="ukwest\ncoffee\nno\n")
 
     # Exit code 0 means there was no error
     assert result.exit_code == 0
@@ -213,6 +230,31 @@ def test_cli_provision_command_with_prefix(
     assert_infrastructure(destination_path, expected_tf_vars)
 
 
+
+def test_cli_provision_command_with_default_prefix(runner, matcha_testing_directory):
+    """Test provision command to copy the infrastructure template with no prefix.
+
+    Args:
+        runner (CliRunner): typer CLI runner
+        matcha_testing_directory (str): temporary working directory
+    """
+    os.chdir(matcha_testing_directory)
+
+    # Invoke provision command
+    result = runner.invoke(app, ["provision"], input="ukwest\n\nno\n")
+
+    # Exit code 0 means there was no error
+    assert result.exit_code == 0
+
+    destination_path = os.path.join(
+        matcha_testing_directory, ".matcha", "infrastructure"
+    )
+
+    expected_tf_vars = {"location": "ukwest", "prefix": "matcha"}
+
+    assert_infrastructure(destination_path, expected_tf_vars)
+
+
 def test_cli_provision_command_with_verbose_arg(
     runner,
     matcha_testing_directory,
@@ -222,14 +264,14 @@ def test_cli_provision_command_with_verbose_arg(
     """Test that the verbose argument works and provision shows more output.
 
     Args:
-        runner (CliRunner): type CLI runner
+        runner (CliRunner): typer CLI runner
         matcha_testing_directory (str): temporary working directory
         monkeypatch_verify_azure_location (pytest.monkeypatch.MonkeyPatch): Pytest monkeypatch for patching a function
         monkeypatch_verify_azure_authentication (pytest.monkeypatch.MonkeyPatch): Pytest monkeypatch for patching Azure authentication check
     """
     os.chdir(matcha_testing_directory)
 
-    result = runner.invoke(app, ["provision", "--verbose"], input="\nuksouth\nno")
+    result = runner.invoke(app, ["provision", "--verbose"], input="uksouth\n\nno\n")
 
     assert result.exit_code == 0
 
@@ -240,3 +282,132 @@ def test_cli_provision_command_with_verbose_arg(
         "Template configuration has finished!",
     ]:
         assert verbose_output in result.stdout
+
+
+@pytest.mark.parametrize(
+    "user_input, expected_output",
+    [
+        (
+            "uksouth\n-1-\nvalid-prefix\nno\n",
+            "Error: Resource group name prefix cannot start or end with a hyphen.",
+        ),
+        (
+            "uksouth\n12\nvalid-prefix\nno\n",
+            "Error: Resource group name prefix must be between 3 and 24 characters long.",
+        ),
+        (
+            "uksouth\ngood$prefix#\nvalid-prefix\nno\n",
+            "Error: Resource group name prefix must contain only alphanumeric characters and hyphens.",
+        ),
+    ],
+)
+def test_cli_provision_command_prefix_rule(
+    runner: CliRunner,
+    matcha_testing_directory: str,
+    user_input: str,
+    expected_output: str,
+):
+    """Test whether the prefix validation function prompt an error message when user entered an invalid prefix.
+
+    Args:
+        runner (CliRunner): typer CLI runner
+        matcha_testing_directory (str): temporary working directory
+        user_input (str): prefix entered by user
+        expected_output (str): the expected error message
+    """
+    os.chdir(matcha_testing_directory)
+
+    result = runner.invoke(app, ["provision"], input=user_input)
+    assert expected_output in result.stdout
+
+
+def test_cli_provision_command_with_existing_prefix_name(
+    runner: CliRunner,
+    matcha_testing_directory: str,
+):
+    """Test whether the expected error message is prompt when user entered an existing prefix.
+
+    Args:
+        runner (CliRunner): typer CLI runner
+        matcha_testing_directory (str): temporary working directory
+    """
+    expected_error_message = "Error: You entered a resource group name prefix that have been used before, prefix must be unique."
+    os.chdir(matcha_testing_directory)
+
+    result = runner.invoke(
+        app,
+        ["provision"],
+        input="uksouth\nrepeated-prefix\nvalid-prefix\nno\n",
+    )
+
+    assert expected_error_message in result.stdout
+
+
+def test_cli_provision_command_override(runner, matcha_testing_directory):
+    """Test provision command to override the configuration.
+
+    Args:
+        runner (CliRunner): typer CLI runner
+        matcha_testing_directory (str): temporary working directory.
+    """
+    os.chdir(matcha_testing_directory)
+
+    # Invoke provision command
+    runner.invoke(
+        app, ["provision", "--location", "uksouth", "--prefix", "matcha"], input="no\n"
+    )
+
+    destination_path = os.path.join(
+        matcha_testing_directory, ".matcha", "infrastructure"
+    )
+
+    # Touch a file in the infrastructure configuration directory
+    with open(os.path.join(destination_path, "dummy.tf"), "a"):
+        ...
+
+    runner.invoke(
+        app,
+        ["provision", "--location", "uksouth", "--prefix", "matcha"],
+        input="y\nno\n",
+    )
+
+    assert not os.path.exists(os.path.join(destination_path, "dummy.tf"))
+
+    expected_tf_vars = {"location": "uksouth", "prefix": "matcha"}
+
+    assert_infrastructure(destination_path, expected_tf_vars)
+
+
+def test_cli_provision_command_reuse(runner, matcha_testing_directory):
+    """Test provision command to reuse the configuration.
+
+    Args:
+        runner (CliRunner): typer CLI runner
+        matcha_testing_directory (str): temporary working directory.
+    """
+    os.chdir(matcha_testing_directory)
+
+    # Invoke provision command
+    runner.invoke(
+        app, ["provision", "--location", "uksouth", "--prefix", "matcha"], input="no\n"
+    )
+
+    destination_path = os.path.join(
+        matcha_testing_directory, ".matcha", "infrastructure"
+    )
+
+    # Touch a file in the infrastructure configuration directory
+    with open(os.path.join(destination_path, "dummy.tf"), "a"):
+        ...
+
+    runner.invoke(
+        app,
+        ["provision", "--location", "uksouth", "--prefix", "matcha"],
+        input="n\nno\n",
+    )
+
+    assert os.path.exists(os.path.join(destination_path, "dummy.tf"))
+
+    expected_tf_vars = {"location": "uksouth", "prefix": "matcha"}
+
+    assert_infrastructure(destination_path, expected_tf_vars)

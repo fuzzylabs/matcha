@@ -6,12 +6,14 @@ import json
 import os
 import sys
 from io import StringIO
-from shutil import copy
+
+from azure.identity import AzureCliCredential, CredentialUnavailableError
+from azure.mgmt.resource import SubscriptionClient
+from shutil import copy, rmtree
 from typing import Optional
 
 import typer
-from azure.identity import AzureCliCredential, CredentialUnavailableError
-from azure.mgmt.resource import SubscriptionClient
+from rich import print
 
 from matcha_ml.errors import MatchaPermissionError
 
@@ -19,14 +21,14 @@ SUBMODULE_NAMES = ["aks", "resource_group", "mlflow-module", "storage"]
 
 
 @dataclasses.dataclass
-class TemplateVariables(object):
+class TemplateVariables:
     """Terraform template variables."""
 
     # Azure location in which all resources will be provisioned
     location: str
 
     # Prefix used for all resources
-    prefix: str = "matcha"
+    prefix: str
 
 
 def check_azure_is_authenticated() -> None:
@@ -116,49 +118,41 @@ def verify_azure_location(location_name: str) -> tuple[bool, str]:
         return location_name in locations, closest_match[0]
 
 
-def build_template_configuration(
-    location: Optional[str] = None, prefix: Optional[str] = None
-) -> TemplateVariables:
+def reuse_configuration(path: str) -> bool:
+    """Check if a configuration already exists, and prompt user to override or reuse it.
+
+    Args:
+        path (str): path to the infrastructure configuration
+
+    Returns:
+        bool: decision to reuse the existing configuration
+    """
+    if os.path.exists(path):
+        summary_message = """The following resources are already configured for provisioning:
+1. [yellow] Resource group [/yellow]: A resource group
+2. [yellow] Azure Kubernetes Service (AKS) [/yellow]: A kubernetes cluster
+3. [yellow] Azure Storage Container [/yellow]: A storage container
+"""
+        print(summary_message)
+
+        return not typer.confirm(
+            "Do you want to override the configuration? Otherwise, the existing configuration will be reused"
+        )
+    else:
+        return False
+
+
+def build_template_configuration(location: str, prefix: str) -> TemplateVariables:
     """Ask for variables and build the configuration.
 
     Args:
-        location (str, optional): Azure location in which all resources will be provisioned. Will be prompted for, if not provided.
-        prefix (str, optional): Prefix used for all resources. Will be prompted for, if not provided.
+        location (str): Azure location in which all resources will be provisioned.
+        prefix (str): Prefix used for all resources.
 
     Returns:
         TemplateVariables: Terraform variables required by a template
     """
-    if prefix is None:
-        prefix = typer.prompt(
-            "Your resources need a name (a lowercase prefix; 3-24 character limit), what should matcha call them?",
-            type=str,
-            default="matcha",
-        )
-    if location is None:
-        location = typer.prompt(
-            "What region should your resources be provisioned in (e.g., 'ukwest')?",
-            type=str,
-        )
-
-    check_azure_is_authenticated()
-
-    while True:
-        is_valid, closest_match = verify_azure_location(location)
-        if is_valid:
-            break
-        else:
-            if closest_match:
-                print(f"Did you mean '{closest_match}'?")
-            print(
-                f"Error, a region named '{location}' does not exist. See https://azure.microsoft.com/en-us/explore/global-infrastructure/geographies for all available regions."
-            )
-
-        location = typer.prompt(
-            "What region should your resources be provisioned in (e.g., 'ukwest')?",
-            type=str,
-        )
-
-    return TemplateVariables(prefix=prefix, location=location)
+    return TemplateVariables(location=location, prefix=prefix)
 
 
 def build_template(
@@ -180,6 +174,10 @@ def build_template(
     """
     try:
         print("Building configuration template...")
+
+        # Override configuration if it already exists
+        if os.path.exists(destination):
+            rmtree(destination)
 
         os.makedirs(destination, exist_ok=True)
         if verbose:
@@ -209,9 +207,9 @@ def build_template(
                 os.path.join(template_src, submodule_name, "*.tf")
             ):
                 filename = os.path.basename(source_path)
-                source_path = os.path.join(template_src, submodule_name, filename)
+                src_path = os.path.join(template_src, submodule_name, filename)
                 destination_path = os.path.join(destination, submodule_name, filename)
-                copy(source_path, destination_path)
+                copy(src_path, destination_path)
 
             if verbose:
                 print(
