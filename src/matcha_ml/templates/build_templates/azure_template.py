@@ -22,10 +22,7 @@ class TemplateVariables:
     prefix: str
 
 
-def build_template_configuration(
-    location: str,
-    prefix: str,
-) -> TemplateVariables:
+def build_template_configuration(location: str, prefix: str) -> TemplateVariables:
     """Ask for variables and build the configuration.
 
     Args:
