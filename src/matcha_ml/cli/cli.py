@@ -23,11 +23,11 @@ app.add_typer(
 def provision(
     location: str = typer.Option(
         None,
-        prompt="Resource location",
+        prompt="What region should your resources be provisioned in (e.g., 'ukwest')?",
         help="The region where your resources will be provisioned, e.g., 'ukwest'",
     ),
-    prefix: Optional[str] = typer.Option(
-        prompt="Resource name prefix",
+    prefix: str = typer.Option(
+        prompt="Your resources need a name (a alphanumerical prefix; 3-24 character limit), what should matcha call them?",
         callback=validate_prefix,
         default="matcha",
         help="A unique prefix for your resources.",

@@ -90,7 +90,7 @@ def test_cli_provision_command(runner: CliRunner, matcha_testing_directory: str)
     os.chdir(matcha_testing_directory)
 
     # Invoke provision command
-    result = runner.invoke(app, ["provision"], input="uksouth\n\nno\n")
+    result = runner.invoke(app, ["provision"], input="\nuksouth\nmatcha\nno\n")
 
     # Exit code 0 means there was no error
     assert result.exit_code == 0
@@ -158,9 +158,31 @@ def test_cli_provision_command_with_prefix(
     assert_infrastructure(destination_path, expected_tf_vars)
 
 
-def test_cli_provision_command_with_verbose_arg(
-    runner: CliRunner, matcha_testing_directory: str
-):
+def test_cli_provision_command_with_default_prefix(runner, matcha_testing_directory):
+    """Test provision command to copy the infrastructure template with no prefix.
+
+    Args:
+        runner (CliRunner): typer CLI runner
+        matcha_testing_directory (str): temporary working directory
+    """
+    os.chdir(matcha_testing_directory)
+
+    # Invoke provision command
+    result = runner.invoke(app, ["provision"], input="ukwest\n\nno\n")
+
+    # Exit code 0 means there was no error
+    assert result.exit_code == 0
+
+    destination_path = os.path.join(
+        matcha_testing_directory, ".matcha", "infrastructure"
+    )
+
+    expected_tf_vars = {"location": "ukwest", "prefix": "matcha"}
+
+    assert_infrastructure(destination_path, expected_tf_vars)
+
+
+def test_cli_provision_command_with_verbose_arg(runner, matcha_testing_directory):
     """Test that the verbose argument works and provision shows more output.
 
     Args:
