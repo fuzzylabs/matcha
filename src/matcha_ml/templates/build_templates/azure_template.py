@@ -34,6 +34,9 @@ def authenticate_azure() -> SubscriptionClient:
 
     Returns:
         SubscriptionClient: An object containing the subscriptions for the authenticated user.
+
+    Raises:
+        Exit: Exit after printing version.
     """
     credential = AzureCliCredential()
     subscription_client = SubscriptionClient(credential)
