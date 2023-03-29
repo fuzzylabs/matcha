@@ -1,5 +1,8 @@
 """Azure Client service definition file."""
+import codecs
 import difflib
+import json
+import os
 
 import typer
 from azure.identity import AzureCliCredential, CredentialUnavailableError
@@ -21,10 +24,23 @@ class AzureClient:
         Raises:
             MatchaAuthenticationError: When the user is not authenticated with Azure.
         """
-        try:
-            self.credential.get_token("https://management.azure.com/.default")
-        except CredentialUnavailableError:
+        home_directory = os.path.expanduser("~")
+        azure_dir_path = os.path.join(home_directory, ".azure", "azureProfile.json")
+
+        if not os.path.exists(azure_dir_path):
+            # Raise error as Azure authentication directory does not exist
             raise MatchaAuthenticationError(service_name="Azure")
+
+        data = json.load(codecs.open(azure_dir_path, "r", "utf-8-sig"))
+        if not data["subscriptions"]:
+            # Raise error as user is not authenticated using `az login`
+            raise MatchaAuthenticationError(service_name="Azure")
+
+        # Method 2, this prints an extra line from Azures subprocesses
+        # try:
+        #     self.credential.get_token("https://management.azure.com/.default")
+        # except CredentialUnavailableError:
+        #     raise MatchaAuthenticationError(service_name="Azure")
 
     @property
     def credential(self) -> AzureCliCredential:
