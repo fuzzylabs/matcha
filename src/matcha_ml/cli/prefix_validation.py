@@ -14,7 +14,9 @@ def check_prefix_naming_rules(value: str) -> bool:
         value (str): the prefix entered by user.
 
     Raises:
-        BadParameter: raise when the user has provided an invalid prefix value
+        BadParameter: raise when the user has provided a prefix containing non-alphanumeric characters or hyphens
+        BadParameter: raise when the user has provided a prefix starts or ends with a hyphen
+        BadParameter: raise when the user has provided a prefix shorter or longer than the required prefix length
 
     Returns:
         bool: True if prefix is valid.
