@@ -1,0 +1,47 @@
+name: Bug Report
+description: File a bug report
+title: "[BUG]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: Oh dear, a bug! Thanks for taking the time to report this!
+
+  - type: input
+    id: contact
+    attributes:
+      label: Contact details [optional]
+      description: What's the best way to contact you for more information?
+      placeholder: email@email.com
+    validations:
+      required: false
+      
+  - type: textarea
+    id: bug-description
+    attributes:
+      label: Tell us about the bug in plenty of detail
+      description: Don't forget to include what you expected to happen
+      placeholder: A description of the bug (clear and concise, please)
+    validations:
+      required: true
+  
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce the bug
+      description: How did you trigger this bug? Guide us step-by-step.
+      value: |
+        1.
+        2.
+        3.
+        ...
+    validations:
+      required: false
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Any relevant log output
+      description: Please include any relevant log output (this will automatically render into code).
+      render: shell
+  
