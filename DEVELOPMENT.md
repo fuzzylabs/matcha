@@ -34,6 +34,22 @@ Now, you can enter the Poetry shell:
 poetry shell
 ```
 
+**Pre-commit checks**
+
+Install the git hook scripts
+
+```bash
+pre-commit install
+```
+
+> The pre-commit checks will run automatically on the changed files after commiting files using `git commit` command.
+
+Optionally, to run the hooks against all of the files, run the following command.
+
+```bash
+pre-commit run --all-files
+```
+
 **Testing**
 
 With the poetry shell active (see above), you can run all the tests using:
@@ -69,20 +85,24 @@ The default Terraform module in `src/infrastructure` configures default resource
 ### Modules
 
 This module contains submodules for all the resources necessary for matcha
+
 * Azure Resource Group
 * Azure Kubernetes Cluster
 
 ### Configuration
+
 * `prefix` -- prefix to use for resources, default: matcha
 * `location` -- Azure location to provision in
 
 ### Getting started
 
-The module is not intended to be run on its own, but by the matcha CLI tool. However, it is possible to run it without matcha
+The module is not intended to be run on its own, but by the matcha CLI tool. However, it is possible to run it without matcha.
+
+Pre-requisite: [Terraform](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli#install-terraform)
 
 Initialise terraform module:
 
-```
+```bash
 cd src/infrastructure
 terraform init
 ```
@@ -91,18 +111,18 @@ terraform init
 
 To see what resources will be provisioned:
 
-```
+```bash
 terraform plan
 ```
 
 To provision:
 
-```
+```bash
 terraform apply
 ```
 
 To destroy:
 
-```
+```bash
 terraform destroy
 ```
