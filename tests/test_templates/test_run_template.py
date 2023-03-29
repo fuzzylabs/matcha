@@ -34,33 +34,21 @@ def terraform_test_config(matcha_testing_directory: str) -> TerraformConfig:
     )
 
 
-@pytest.mark.parametrize("user_input", ["y", "yes", "Y", "Yes"])
-def test_is_approved_confirmed(user_input: str):
-    """Test the user can accept a terraform action.
-
-    Args:
-        user_input (str): user input
-    """
+def test_is_approved_confirmed():
+    """Test the user can accept a terraform action."""
     tfs = TerraformService()
 
-    # When y, Y, yes, or Yes in any case are given -- approved
-    with mock.patch("typer.prompt") as mock_prompt:
-        mock_prompt.return_value = user_input
+    with mock.patch("typer.confirm") as mock_confirm:
+        mock_confirm.return_value = True
         assert tfs.is_approved("do")
 
 
-@pytest.mark.parametrize("user_input", ["n", "N", "No", "no", "qwer"])
-def test_is_approved_rejected(user_input: str):
-    """Test the user can reject a terraform action.
-
-    Args:
-        user_input (str): user input
-    """
+def test_is_approved_rejected():
+    """Test the user can reject a terraform action."""
     tfs = TerraformService()
 
-    # When n, N, No or no in any case; or any other input are given -- rejected
-    with mock.patch("typer.prompt") as mock_prompt:
-        mock_prompt.return_value = user_input
+    with mock.patch("typer.confirm") as mock_confirm:
+        mock_confirm.return_value = False
         assert not tfs.is_approved("do")
 
 
