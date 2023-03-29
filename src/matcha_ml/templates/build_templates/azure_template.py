@@ -6,8 +6,6 @@ import os
 from shutil import copy
 from typing import Optional
 
-import typer
-
 from matcha_ml.errors import MatchaPermissionError
 
 SUBMODULE_NAMES = ["aks", "resource_group", "mlflow-module", "storage"]
