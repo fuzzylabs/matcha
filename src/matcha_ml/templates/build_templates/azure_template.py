@@ -59,7 +59,7 @@ def build_template_configuration(location: str, prefix: str) -> TemplateVariable
     Returns:
         TemplateVariables: Terraform variables required by a template
     """
-    return TemplateVariables(prefix=prefix, location=location)
+    return TemplateVariables(location=location, prefix=prefix)
 
 
 def build_template(

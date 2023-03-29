@@ -25,6 +25,8 @@ matcha = "matcha_ml.cli.cli:app"
 python = "^3.8"
 typer = {extras = ["all"], version = "^0.7.0"}
 python-terraform = "^0.10.1"
+azure-mgmt-resource = "^18.0.0"
+azure-identity = "^1.5.0"
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.1.1"
