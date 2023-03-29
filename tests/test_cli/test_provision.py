@@ -187,15 +187,15 @@ def test_cli_provision_command_with_verbose_arg(
     [
         (
             "uksouth\n-1-\nvalid-prefix\nno\n",
-            "Error: Prefix cannot start or end with a hyphen.",
+            "Error: Resource group name prefix cannot start or end with a hyphen.",
         ),
         (
             "uksouth\n12\nvalid-prefix\nno\n",
-            "Error: Prefix must be between 3 and 24 characters long.",
+            "Error: Resource group name prefix must be between 3 and 24 characters long.",
         ),
         (
             "uksouth\ngood$prefix#\nvalid-prefix\nno\n",
-            "Error: Prefix must contain only alphanumeric characters and hyphens.",
+            "Error: Resource group name prefix must contain only alphanumeric characters and hyphens.",
         ),
     ],
 )
@@ -229,9 +229,7 @@ def test_cli_provision_command_with_existing_prefix_name(
         runner (CliRunner): typer CLI runner
         matcha_testing_directory (str): temporary working directory
     """
-    expected_error_message = (
-        "Error: You entered a prefix that have been used before, prefix must be unique."
-    )
+    expected_error_message = "Error: You entered a resource group name prefix that have been used before, prefix must be unique."
     os.chdir(matcha_testing_directory)
 
     result = runner.invoke(

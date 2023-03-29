@@ -1,6 +1,6 @@
 """Validation functions for resource name prefix."""
 import re
-from typing import Set
+from typing import Set, Tuple
 
 import typer
 from azure.identity import AzureCliCredential
@@ -25,23 +25,27 @@ def check_prefix_naming_rules(value: str) -> bool:
 
     if not re.match(alphanumeric_pattern, value):
         raise typer.BadParameter(
-            "Prefix must contain only alphanumeric characters and hyphens."
+            "Resource group name prefix must contain only alphanumeric characters and hyphens."
         )
 
     if not re.match(hyphen_start_end_pattern, value):
-        raise typer.BadParameter("Prefix cannot start or end with a hyphen.")
+        raise typer.BadParameter(
+            "Resource group name prefix cannot start or end with a hyphen."
+        )
 
     if not re.match(length_pattern, value):
-        raise typer.BadParameter("Prefix must be between 3 and 24 characters long.")
+        raise typer.BadParameter(
+            "Resource group name prefix must be between 3 and 24 characters long."
+        )
 
     return True
 
 
-def get_existing_resource_group_names() -> Set[str]:
-    """Get the names of existing resource groups.
+def get_credential_and_subscription_id() -> Tuple[AzureCliCredential, str]:
+    """Get ser's azure credential and subscription id.
 
     Returns:
-        set: Set of existing resource group names.
+        Tuple[AzureCliCredential, str]: user's azure credential and subscription id
     """
     credential = AzureCliCredential()
 
@@ -50,6 +54,17 @@ def get_existing_resource_group_names() -> Set[str]:
 
     # Get default Subscription ID
     subscription_id = next(subscription_client.subscriptions.list()).subscription_id
+
+    return credential, subscription_id
+
+
+def get_existing_resource_group_names() -> Set[str]:
+    """Get the names of existing resource groups.
+
+    Returns:
+        Set[str]: Set of existing resource group names.
+    """
+    credential, subscription_id = get_credential_and_subscription_id()
 
     # Initialize the ResourceManagementClient object
     resource_client = ResourceManagementClient(credential, subscription_id)
@@ -80,7 +95,7 @@ def validate_prefix(value: str) -> str:
 
         if f"{value}-resources" in existing_resource_group_names:
             raise typer.BadParameter(
-                "You entered a prefix that have been used before, prefix must be unique."
+                "You entered a resource group name prefix that have been used before, prefix must be unique."
             )
 
         return value
