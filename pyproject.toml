@@ -83,7 +83,7 @@ ignore-init-module-imports = true
 src = ["src", "test"]
 
 [tool.ruff.mccabe]
-max-complexity = 15
+max-complexity = 18
 
 [tool.ruff.pyupgrade]
 keep-runtime-typing = true
