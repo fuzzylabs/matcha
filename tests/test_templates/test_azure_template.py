@@ -113,7 +113,7 @@ def test_verify_azure_location(
         """
         return ["ukwest", "uksouth"]
 
-    def mock_authenticate_azure() -> SubscriptionClient:
+    def mock_get_azure_subscription_client() -> SubscriptionClient:
         """Mock function for checking Azure authentication.
 
         Returns:
@@ -127,8 +127,8 @@ def test_verify_azure_location(
     )
 
     monkeypatch.setattr(
-        "matcha_ml.templates.build_templates.azure_template.authenticate_azure",
-        mock_authenticate_azure,
+        "matcha_ml.templates.build_templates.azure_template.get_azure_subscription_client",
+        mock_get_azure_subscription_client,
     )
 
     bool_result, closest_match_result = verify_azure_location(location_name)

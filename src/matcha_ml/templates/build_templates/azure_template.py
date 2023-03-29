@@ -29,37 +29,14 @@ class TemplateVariables(object):
     prefix: str = "matcha"
 
 
-def authenticate_azure() -> SubscriptionClient:
-    """Checks Azure authentication and gets the Azure subscriptions within a SubscriptionClient for the current user.
+def get_azure_subscription_client() -> SubscriptionClient:
+    """Gets the Azure subscriptions within a SubscriptionClient for the current user.
 
     Returns:
         SubscriptionClient: An object containing the subscriptions for the authenticated user.
-
-    Raises:
-        Exit: Exit after printing version.
     """
     credential = AzureCliCredential()
     subscription_client = SubscriptionClient(credential)
-
-    output = StringIO()
-    # redirect stdout and stderr to the StringIO object
-    sys.stdout = output
-    sys.stderr = output
-
-    try:
-        # Check authentication
-        credential.get_token("https://management.azure.com/.default")
-    except CredentialUnavailableError:
-        sys.stdout = sys.__stdout__
-        sys.stderr = sys.__stderr__
-        print(
-            "Error, Matcha couldn't authenticate you with Azure! Make sure to run 'az login' before trying to provision resources."
-        )
-        raise typer.Exit(code=1)
-
-    # restore stdout and stderr to their original values
-    sys.stdout = sys.__stdout__
-    sys.stderr = sys.__stderr__
 
     return subscription_client
 
@@ -99,7 +76,7 @@ def verify_azure_location(location_name: str) -> tuple[bool, str]:
         bool: Returns True if location name is valid
         str: Closest valid location name
     """
-    subscription_client = authenticate_azure()
+    subscription_client = get_azure_subscription_client()
     locations = get_azure_locations(subscription_client)
 
     closest_match = difflib.get_close_matches(location_name, locations, n=1)
