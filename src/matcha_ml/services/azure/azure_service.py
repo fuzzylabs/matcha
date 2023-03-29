@@ -1,4 +1,6 @@
 """Azure Client service definition file."""
+from __future__ import annotations
+
 import difflib
 import sys
 from io import StringIO
@@ -7,74 +9,44 @@ import typer
 from azure.identity import AzureCliCredential, CredentialUnavailableError
 from azure.mgmt.resource import SubscriptionClient
 
+from matcha_ml.errors import MatchaAuthenticationError
+
 
 class AzureClient:
     """Azure client object to handle authentication checks and other Azure related functionality."""
 
     def __init__(self) -> None:
         """AzureClient constructor."""
-        is_authenticated = self.check_authentication()
-        if is_authenticated:
-            print("User is authenticated with Azure.")
-        else:
-            print("Error, user is not authentciated with Azure.")
-            return
-        self.set_cli_credential()
-        self.set_subscription_client()
+        self.check_authentication()
 
-    def check_authentication(self) -> bool:
+    def check_authentication(self) -> None:
         """Checks Azure authentication.
 
-        Returns:
-            bool: True if user is authenticated
+        Raises:
+            MatchaAuthenticationError: When the user is not authenticated with Azure.
         """
-        credential = AzureCliCredential()
-
-        output = StringIO()
-        # Redirect stdout and stderr to the StringIO object
-        sys.stdout = output
-        sys.stderr = output
-
         try:
-            # Check authentication
-            credential.get_token("https://management.azure.com/.default")
+            self.credential.get_token("https://management.azure.com/.default")
         except CredentialUnavailableError:
-            sys.stdout = sys.__stdout__
-            sys.stderr = sys.__stderr__
-            print(
-                "Error, Matcha couldn't authenticate you with Azure! Make sure to run 'az login' before trying to provision resources."
-            )
-            return False
+            raise MatchaAuthenticationError(service_name="Azure")
 
-        # Restore stdout and stderr to their original values
-        sys.stdout = sys.__stdout__
-        sys.stderr = sys.__stderr__
-
-        return True
-
-    def set_cli_credential(self) -> None:
-        """Sets the CLI credential for an authenticated user."""
-        self.credential = AzureCliCredential()
-
-    def get_cli_credential(self) -> AzureCliCredential:
-        """Gets the the CLI credential for an authenticated user.
+    @property
+    def credential(self) -> AzureCliCredential:
+        """The CLI credential property for an authenticated user.
 
         Returns:
             AzureCliCredential: AzureCliCredential belonging to the authenticated user.
         """
-        return self.credential
+        return AzureCliCredential()
 
-    def set_subscription_client(self) -> None:
-        """Sets the subscription client for an authenticated user."""
-        self.subscription_client = SubscriptionClient(self.credential)
-
-    def get_subscription_client(self) -> SubscriptionClient:
-        """Gets the subscription client for an authenticated user.
+    @property
+    def subscription_client(self) -> SubscriptionClient:
+        """The subscription client for an authenticated user.
 
         Returns:
-            SubscriptionClient: SubscriptionClient belonging to the authenticated user.
+            SubscriptionClient: An object containing the subscriptions for the authenticated user.
         """
-        return self.subscription_client
+        return SubscriptionClient(self.credential)
 
     def get_available_regions(self) -> set[str]:
         """Gets a list of available regions.
@@ -94,6 +66,7 @@ class AzureClient:
                     )
                 ]
             )
+            break
 
         return locations
 
