@@ -36,7 +36,7 @@ poetry shell
 
 **Pre-commit checks**
 
-Install pre-commit
+Install the git hook scripts
 
 ```bash
 pre-commit install
