@@ -1,9 +1,5 @@
 """Azure Client service definition file."""
-from __future__ import annotations
-
 import difflib
-import sys
-from io import StringIO
 
 import typer
 from azure.identity import AzureCliCredential, CredentialUnavailableError
