@@ -21,6 +21,9 @@ def monkeypatch_verify_azure_location(monkeypatch):
 
     Args:
         monkeypatch (pytest.monkeypatch.MonkeyPatch): Pytest monkeypatch for patching a function
+
+    Yields:
+        monkeypatch (pytest.monkeypatch.MonkeyPatch): Pytest monkeypatch for patching a function
     """
 
     def mock_verify_azure_location(location) -> tuple[bool, str]:
@@ -38,6 +41,29 @@ def monkeypatch_verify_azure_location(monkeypatch):
     monkeypatch.setattr(
         "matcha_ml.templates.build_templates.azure_template.verify_azure_location",
         mock_verify_azure_location,
+    )
+
+    yield monkeypatch
+
+
+@pytest.fixture
+def monkeypatch_verify_azure_authentication(monkeypatch):
+    """Fixture for check_azure_is_authenticated function monkeypatch.
+
+    Args:
+        monkeypatch (pytest.monkeypatch.MonkeyPatch): Pytest monkeypatch for patching a function
+
+    Yields:
+        monkeypatch (pytest.monkeypatch.MonkeyPatch): Pytest monkeypatch for patching a function
+    """
+
+    def mock_check_azure_is_authenticated() -> None:
+        """Mock verify Azure is authenticated function."""
+        return None
+
+    monkeypatch.setattr(
+        "matcha_ml.templates.build_templates.azure_template.check_azure_is_authenticated",
+        mock_check_azure_is_authenticated,
     )
 
     yield monkeypatch
@@ -93,7 +119,10 @@ def test_cli_provision_command_help(runner):
 
 
 def test_cli_provision_command(
-    runner, matcha_testing_directory, monkeypatch_verify_azure_location
+    runner,
+    matcha_testing_directory,
+    monkeypatch_verify_azure_location,
+    monkeypatch_verify_azure_authentication,
 ):
     """Test provision command to copy the infrastructure template.
 
@@ -101,6 +130,7 @@ def test_cli_provision_command(
         runner (CliRunner): typer CLI runner
         matcha_testing_directory (str): temporary working directory
         monkeypatch_verify_azure_location (pytest.monkeypatch.MonkeyPatch): Pytest monkeypatch for patching a function
+        monkeypatch_verify_azure_authentication (pytest.monkeypatch.MonkeyPatch): Pytest monkeypatch for patching Azure authentication check
     """
     os.chdir(matcha_testing_directory)
 
@@ -120,7 +150,10 @@ def test_cli_provision_command(
 
 
 def test_cli_provision_command_with_args(
-    runner, matcha_testing_directory, monkeypatch_verify_azure_location
+    runner,
+    matcha_testing_directory,
+    monkeypatch_verify_azure_location,
+    monkeypatch_verify_azure_authentication,
 ):
     """Test provision command to copy the infrastructure template with command-line arguments.
 
@@ -128,6 +161,7 @@ def test_cli_provision_command_with_args(
         runner (CliRunner): typer CLI runner
         matcha_testing_directory (str): temporary working directory
         monkeypatch_verify_azure_location (pytest.monkeypatch.MonkeyPatch): Pytest monkeypatch for patching a function
+        monkeypatch_verify_azure_authentication (pytest.monkeypatch.MonkeyPatch): Pytest monkeypatch for patching Azure authentication check
     """
     os.chdir(matcha_testing_directory)
 
@@ -149,7 +183,10 @@ def test_cli_provision_command_with_args(
 
 
 def test_cli_provision_command_with_prefix(
-    runner, matcha_testing_directory, monkeypatch_verify_azure_location
+    runner,
+    matcha_testing_directory,
+    monkeypatch_verify_azure_location,
+    monkeypatch_verify_azure_authentication,
 ):
     """Test provision command to copy the infrastructure template with different prefix.
 
@@ -157,6 +194,7 @@ def test_cli_provision_command_with_prefix(
         runner (CliRunner): typer CLI runner
         matcha_testing_directory (str): temporary working directory
         monkeypatch_verify_azure_location (pytest.monkeypatch.MonkeyPatch): Pytest monkeypatch for patching a function
+        monkeypatch_verify_azure_authentication (pytest.monkeypatch.MonkeyPatch): Pytest monkeypatch for patching Azure authentication check
     """
     os.chdir(matcha_testing_directory)
 
@@ -176,7 +214,10 @@ def test_cli_provision_command_with_prefix(
 
 
 def test_cli_provision_command_with_verbose_arg(
-    runner, matcha_testing_directory, monkeypatch_verify_azure_location
+    runner,
+    matcha_testing_directory,
+    monkeypatch_verify_azure_location,
+    monkeypatch_verify_azure_authentication,
 ):
     """Test that the verbose argument works and provision shows more output.
 
@@ -184,6 +225,7 @@ def test_cli_provision_command_with_verbose_arg(
         runner (CliRunner): type CLI runner
         matcha_testing_directory (str): temporary working directory
         monkeypatch_verify_azure_location (pytest.monkeypatch.MonkeyPatch): Pytest monkeypatch for patching a function
+        monkeypatch_verify_azure_authentication (pytest.monkeypatch.MonkeyPatch): Pytest monkeypatch for patching Azure authentication check
     """
     os.chdir(matcha_testing_directory)
 

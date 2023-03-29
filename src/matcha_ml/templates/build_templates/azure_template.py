@@ -29,6 +29,35 @@ class TemplateVariables(object):
     prefix: str = "matcha"
 
 
+def check_azure_is_authenticated() -> None:
+    """Checks if Azure is authenticated.
+
+    Raises:
+        Exit: Exits CLI if Azure is not authenticated
+    """
+    credential = AzureCliCredential()
+
+    output = StringIO()
+    # redirect stdout and stderr to the StringIO object
+    sys.stdout = output
+    sys.stderr = output
+
+    try:
+        # Check authentication
+        credential.get_token("https://management.azure.com/.default")
+    except CredentialUnavailableError:
+        sys.stdout = sys.__stdout__
+        sys.stderr = sys.__stderr__
+        print(
+            "Error, Matcha couldn't authenticate you with Azure! Make sure to run 'az login' before trying to provision resources."
+        )
+        raise typer.Exit(code=1)
+
+    # restore stdout and stderr to their original values
+    sys.stdout = sys.__stdout__
+    sys.stderr = sys.__stderr__
+
+
 def get_azure_subscription_client() -> SubscriptionClient:
     """Gets the Azure subscriptions within a SubscriptionClient for the current user.
 
@@ -110,6 +139,8 @@ def build_template_configuration(
             "What region should your resources be provisioned in (e.g., 'ukwest')?",
             type=str,
         )
+
+    check_azure_is_authenticated()
 
     while True:
         is_valid, closest_match = verify_azure_location(location)
