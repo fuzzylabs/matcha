@@ -55,7 +55,7 @@ def get_credential_and_subscription_id() -> Tuple[AzureCliCredential, str]:
     subscription_client = SubscriptionClient(credential)
 
     # Get default Subscription ID
-    subscription_id = next(subscription_client.subscriptions.list()).subscription_id
+    subscription_id = list(subscription_client.subscriptions.list())[0].subscription_id
 
     return credential, subscription_id
 
