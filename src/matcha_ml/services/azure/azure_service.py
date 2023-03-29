@@ -82,7 +82,11 @@ class AzureClient:
 
         is_valid = location_name in locations
 
-        if not closest_match:
-            return is_valid, ""
+        if is_valid:
+            return is_valid, location_name
         else:
-            return is_valid, closest_match[0]
+            closest_match = difflib.get_close_matches(location_name, locations, n=1)
+            if closest_match:
+                return is_valid, closest_match[0]
+            else:
+                return is_valid, ""
