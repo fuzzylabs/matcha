@@ -89,4 +89,14 @@ git push -u origin <your_feature>
 
 #### 🤔 Making a pull request
 
+Before a PR can be merged, two core developers need to approve it. It may be the case that you have an incomplete contribution, where you're expecting to do more work before receiving a full review, and these should have the prefix `[WIP]` - this will indicate to everyone that it is a work in progress ticket and will avoid duplicatd work. These types of PRs often benefit from including a task list in the PR description.
+
+It's important to do the following, and the PR template that you'll see will ask you explictly:
+
+* Give your pull request a helpful title which summarises what your contribution does.
+
+* Make sure your code passes the tests. At the moment, running the whole test suite doesn't take a long time so we advice doing that with `pytest` (see the [DEVELOPMENT](https://github.com/fuzzylabs/matcha/blob/main/DEVELOPMENT.md) guide).
+
+* Ensure that your code is documented and commented, and that the documentation renders properly.
+
 
