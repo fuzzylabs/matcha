@@ -16,7 +16,7 @@ SPINNER = "dots"
 
 
 @dataclasses.dataclass
-class TerrformConfig:
+class TerraformConfig:
     """Configuration required for terraform."""
 
     # Path to terraform template are stored
@@ -50,7 +50,7 @@ class TerraformService:
     """TerraformService class to provision and deprovision resources."""
 
     # configuration required for terraform
-    config: TerrformConfig = TerrformConfig()
+    config: TerraformConfig = TerraformConfig()
 
     # terraform client
     _terraform_client: Optional[python_terraform.Terraform] = None
