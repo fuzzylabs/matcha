@@ -6,48 +6,32 @@ import os
 from shutil import copy
 from typing import Optional
 
-import typer
-
 from matcha_ml.errors import MatchaPermissionError
 
 SUBMODULE_NAMES = ["aks", "resource_group", "mlflow-module", "storage"]
 
 
 @dataclasses.dataclass
-class TemplateVariables(object):
+class TemplateVariables:
     """Terraform template variables."""
 
     # Azure location in which all resources will be provisioned
     location: str
 
     # Prefix used for all resources
-    prefix: str = "matcha"
+    prefix: str
 
 
-def build_template_configuration(
-    location: Optional[str] = None, prefix: Optional[str] = None
-) -> TemplateVariables:
+def build_template_configuration(location: str, prefix: str) -> TemplateVariables:
     """Ask for variables and build the configuration.
 
     Args:
-        location (str, optional): Azure location in which all resources will be provisioned. Will be prompted for, if not provided.
-        prefix (str, optional): Prefix used for all resources. Will be prompted for, if not provided.
+        location (str): Azure location in which all resources will be provisioned.
+        prefix (str): Prefix used for all resources.
 
     Returns:
         TemplateVariables: Terraform variables required by a template
     """
-    if prefix is None:
-        prefix = typer.prompt(
-            "Your resources need a name (a lowercase prefix; 3-24 character limit), what should matcha call them?", 
-            type=str, 
-            default="matcha"
-        )
-    if location is None:
-        location = typer.prompt(
-            "What region should your resources be provisioned in (e.g., 'ukwest')?", 
-            type=str
-        )
-
     return TemplateVariables(prefix=prefix, location=location)
 
 
@@ -99,9 +83,9 @@ def build_template(
                 os.path.join(template_src, submodule_name, "*.tf")
             ):
                 filename = os.path.basename(source_path)
-                source_path = os.path.join(template_src, submodule_name, filename)
+                src_path = os.path.join(template_src, submodule_name, filename)
                 destination_path = os.path.join(destination, submodule_name, filename)
-                copy(source_path, destination_path)
+                copy(src_path, destination_path)
 
             if verbose:
                 print(
