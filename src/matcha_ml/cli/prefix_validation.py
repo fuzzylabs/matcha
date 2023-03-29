@@ -44,7 +44,7 @@ def check_prefix_naming_rules(value: str) -> bool:
 
 
 def get_credential_and_subscription_id() -> Tuple[AzureCliCredential, str]:
-    """Get ser's azure credential and subscription id.
+    """Get user's azure credential and subscription id.
 
     Returns:
         Tuple[AzureCliCredential, str]: user's azure credential and subscription id
