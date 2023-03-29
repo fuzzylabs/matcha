@@ -13,16 +13,7 @@ from rich.progress import Progress, SpinnerColumn, TimeElapsedColumn
 
 MLFLOW_TRACKING_URL = "mlflow-tracking-url"
 
-SPINNERS = [
-    "bouncingBall",
-    "dots",
-    "aesthetic",
-    "monkey",
-    "pong",
-    "runner",
-    "arrow3",
-    "shark",
-]
+SPINNER = "dots"
 
 
 @dataclasses.dataclass
@@ -169,7 +160,7 @@ class TerraformService:
 
             # run terraform init
             with Progress(
-                SpinnerColumn(spinner_name=random.choice(SPINNERS)),
+                SpinnerColumn(spinner_name=SPINNER),
                 TimeElapsedColumn(),
             ) as progress:
                 progress.add_task(description="Initializing", total=None)
@@ -195,7 +186,7 @@ class TerraformService:
 
         # once terraform init is success, call terraform apply
         with Progress(
-            SpinnerColumn(spinner_name=random.choice(SPINNERS)),
+            SpinnerColumn(spinner_name=SPINNER),
             TimeElapsedColumn(),
         ) as progress:
             progress.add_task(description="Applying", total=None)
@@ -239,7 +230,7 @@ class TerraformService:
         print()
 
         with Progress(
-            SpinnerColumn(spinner_name=random.choice(SPINNERS)),
+            SpinnerColumn(spinner_name=SPINNER),
             TimeElapsedColumn(),
         ) as progress:
             progress.add_task(description="Destroying", total=None)
