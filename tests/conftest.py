@@ -8,6 +8,7 @@ from typer.testing import CliRunner
 
 @pytest.fixture
 def runner():
+    """A fixture for cli runner."""
     return CliRunner()
 
 

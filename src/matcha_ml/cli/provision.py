@@ -17,15 +17,15 @@ app = typer.Typer()
 
 
 def provision_resources(
-    location: Optional[str] = None,
-    prefix: Optional[str] = None,
+    location: str,
+    prefix: str,
     verbose: Optional[bool] = False,
 ) -> None:
     """Provision cloud resources using templates.
 
     Args:
-        location (str, optional): Azure location in which all resources will be provisioned.
-        prefix (str, optional): Prefix used for all resources.
+        location (str): Azure location in which all resources will be provisioned.
+        prefix (str): Prefix used for all resources.
         verbose (bool optional): additional output is show when True. Defaults to False.
     """
     project_directory = os.getcwd()

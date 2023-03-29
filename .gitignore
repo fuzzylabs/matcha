@@ -320,3 +320,6 @@ pip-selfcheck.json
 
 # ignore infrastructure code
 .matcha
+
+# ruff cache
+.ruff_cache

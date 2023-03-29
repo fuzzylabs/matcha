@@ -20,10 +20,16 @@ app.add_typer(
 
 @app.command()
 def provision(
-    location: Optional[str] = typer.Option(
-        None, help="Azure location in which all resources will be provisioned."
+    location: str = typer.Option(
+        None,
+        help="The region where your resources will be provisioned, e.g., 'ukwest'",
+        prompt="What region should your resources be provisioned in (e.g., 'ukwest')?",
     ),
-    prefix: Optional[str] = typer.Option(None, help="Prefix used for all resources."),
+    prefix: str = typer.Option(
+        "matcha",
+        help="A unique prefix for your resources.",
+        prompt="Your resources need a name (a lowercase prefix; 3-24 character limit), what should matcha call them?",
+    ),
     verbose: Optional[bool] = typer.Option(
         False, help="Get more detailed information from matcha provision!"
     ),
