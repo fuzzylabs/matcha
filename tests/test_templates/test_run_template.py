@@ -249,8 +249,9 @@ def test_terraform_exception(
     """
     tfs = TerraformService()
     tfs.config = terraform_test_config
-    src_path = template_src_path
 
+    # copy tf files to run provision
+    src_path = template_src_path
     dest_path = terraform_test_config.working_dir
     copy_tree(src_path, dest_path)
     config = TemplateVariables("uksouth", "matcha")
