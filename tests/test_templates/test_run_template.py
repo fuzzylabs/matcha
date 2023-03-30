@@ -295,3 +295,4 @@ def test_terraform_deprovision_config_does_not_exist_exception(
 
     with pytest.raises(MatchaTerraformError):
         tfs.deprovision()
+        tfs.terraform_client.destroy.assert_called()
