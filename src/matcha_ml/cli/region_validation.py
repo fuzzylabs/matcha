@@ -91,7 +91,7 @@ def verify_azure_location(location_name: str) -> str:
         return location_name
     else:
         closest_match = difflib.get_close_matches(location_name, locations, n=1)
-        if closest_match[0]:
+        if closest_match:
             raise typer.BadParameter(
                 f"A region named '{location_name}' does not exist.\nDid you mean '{closest_match[0]}'?"
             )

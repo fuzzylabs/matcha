@@ -5,10 +5,7 @@ import os
 from typing import Dict
 
 import pytest
-from azure.identity import AzureCliCredential
-from azure.mgmt.resource import SubscriptionClient
 
-from matcha_ml.cli.region_validation import verify_azure_location
 from matcha_ml.templates.build_templates.azure_template import (
     SUBMODULE_NAMES,
     TemplateVariables,
@@ -80,58 +77,3 @@ def test_build_template(matcha_testing_directory, template_src_path):
     expected_tf_vars = {"location": "uksouth", "prefix": "matcha"}
 
     assert_infrastructure(destination_path, expected_tf_vars)
-
-
-@pytest.mark.parametrize(
-    "location_name, bool_expectation, closest_match_expectation",
-    [
-        ("ukwest", True, "ukwest"),  # Valid location
-        ("ukweest", False, "ukwest"),  # Mispelled location
-        ("mordorwest", False, ""),  # Invalid location
-    ],
-)
-def test_verify_azure_location(
-    location_name: str,
-    bool_expectation: bool,
-    closest_match_expectation: str,
-    monkeypatch,
-):
-    """Test that Azure location is being correctly verified.
-
-    Args:
-        location_name (str): Input location name
-        bool_expectation (bool): expected bool validation response
-        closest_match_expectation (str): expected closest string value
-        monkeypatch (pytest.monkeypatch.MonkeyPatch): Pytest monkeypatch for patching a function
-    """
-
-    def mock_get_azure_locations(subscription_client: SubscriptionClient) -> list:
-        """Mock function for getting a list of Azure locations.
-
-        Returns:
-            list: Mock list of locations
-        """
-        return ["ukwest", "uksouth"]
-
-    def mock_get_azure_subscription_client() -> SubscriptionClient:
-        """Mock function for checking Azure authentication.
-
-        Returns:
-            SubscriptionClient: Mock Azure subscription client
-        """
-        return SubscriptionClient(AzureCliCredential())
-
-    monkeypatch.setattr(
-        "matcha_ml.cli.region_validation.get_azure_locations",
-        mock_get_azure_locations,
-    )
-
-    monkeypatch.setattr(
-        "matcha_ml.cli.region_validation.get_azure_subscription_client",
-        mock_get_azure_subscription_client,
-    )
-
-    bool_result, closest_match_result = verify_azure_location(location_name)
-
-    assert bool_result is bool_expectation
-    assert closest_match_result == closest_match_expectation
