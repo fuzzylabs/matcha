@@ -18,6 +18,42 @@ TEMPLATE_DIR = os.path.join(
 
 
 @pytest.fixture(scope="session", autouse=True)
+def check_azure_is_authenticated_mock():
+    """Mock the return result of check_azure_is_authenticated.
+
+    Yields:
+        str: the mock authentication result.
+    """
+    with patch("matcha_ml.cli.region_validation.check_azure_is_authenticated") as mock:
+        mock.return_value = None
+        yield mock
+
+
+@pytest.fixture(scope="session", autouse=True)
+def get_azure_subscription_client_mock():
+    """Mock the return result of get_azure_subscription_client.
+
+    Yields:
+        str: the mock Azure subscription client.
+    """
+    with patch("matcha_ml.cli.region_validation.get_azure_subscription_client") as mock:
+        mock.return_value = None
+        yield mock
+
+
+@pytest.fixture(scope="session", autouse=True)
+def get_azure_locations_mock():
+    """Mock the return result of get_azure_locations.
+
+    Yields:
+        str: the mock Azure regions/locations.
+    """
+    with patch("matcha_ml.cli.region_validation.get_azure_locations") as mock:
+        mock.return_value = ["uksouth", "ukwest"]
+        yield mock
+
+
+@pytest.fixture(scope="session", autouse=True)
 def resource_group_name_mock():
     """Mock the return result of get_existing_resource_group_names.
 
@@ -80,7 +116,10 @@ def test_cli_provision_command_help(runner: CliRunner):
     assert "Provision cloud resources with a template." in result.stdout
 
 
-def test_cli_provision_command(runner: CliRunner, matcha_testing_directory: str):
+def test_cli_provision_command(
+    runner,
+    matcha_testing_directory,
+):
     """Test provision command to copy the infrastructure template.
 
     Args:
@@ -105,7 +144,8 @@ def test_cli_provision_command(runner: CliRunner, matcha_testing_directory: str)
 
 
 def test_cli_provision_command_with_args(
-    runner: CliRunner, matcha_testing_directory: str
+    runner,
+    matcha_testing_directory,
 ):
     """Test provision command to copy the infrastructure template with command-line arguments.
 
@@ -132,9 +172,7 @@ def test_cli_provision_command_with_args(
     assert_infrastructure(destination_path, expected_tf_vars)
 
 
-def test_cli_provision_command_with_prefix(
-    runner: CliRunner, matcha_testing_directory: str
-):
+def test_cli_provision_command_with_prefix(runner, matcha_testing_directory):
     """Test provision command to copy the infrastructure template with different prefix.
 
     Args:
@@ -144,7 +182,7 @@ def test_cli_provision_command_with_prefix(
     os.chdir(matcha_testing_directory)
 
     # Invoke provision command
-    result = runner.invoke(app, ["provision"], input="ukwest\ncoffee\nno\n")
+    result = runner.invoke(app, ["provision"], input="ukwest\ncoffee\nno\nno\n")
 
     # Exit code 0 means there was no error
     assert result.exit_code == 0
@@ -168,7 +206,7 @@ def test_cli_provision_command_with_default_prefix(runner, matcha_testing_direct
     os.chdir(matcha_testing_directory)
 
     # Invoke provision command
-    result = runner.invoke(app, ["provision"], input="ukwest\n\nno\n")
+    result = runner.invoke(app, ["provision"], input="ukwest\n\nno\nno\n")
 
     # Exit code 0 means there was no error
     assert result.exit_code == 0
@@ -182,7 +220,10 @@ def test_cli_provision_command_with_default_prefix(runner, matcha_testing_direct
     assert_infrastructure(destination_path, expected_tf_vars)
 
 
-def test_cli_provision_command_with_verbose_arg(runner, matcha_testing_directory):
+def test_cli_provision_command_with_verbose_arg(
+    runner,
+    matcha_testing_directory,
+):
     """Test that the verbose argument works and provision shows more output.
 
     Args:
@@ -238,6 +279,7 @@ def test_cli_provision_command_prefix_rule(
     os.chdir(matcha_testing_directory)
 
     result = runner.invoke(app, ["provision"], input=user_input)
+    
     assert expected_output in result.stdout
 
 
