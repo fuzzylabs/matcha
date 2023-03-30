@@ -13,7 +13,7 @@ from matcha_ml.cli.ui_primitives.ui_functions import build_resource_confirmation
             "Header",
             [("Resource Name 1", "Description 1")],
             None,
-            "Header:\n" "1. [yellow]Resource Name 1[/yellow]: Description 1\n",
+            "Header:\n1. [yellow]Resource Name 1[/yellow]: Description 1\n",
         ),
         (
             "Header",
