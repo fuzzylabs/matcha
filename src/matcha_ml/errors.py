@@ -26,17 +26,13 @@ class MatchaAuthenticationError(Exception):
     Raised when the user is not authenticated with an external service.
     """
 
-    def __init__(self, service_name: str, *args: Any, **kwargs: Any):
-        """Initialise Matcha Authentication Error.
+    def __init__(self, auth_error: str, *args: Any, **kwargs: Any):
+        """The initialiser for the Authentication error.
 
         Args:
-            service_name (str): Service in which the user is not authenticated
-            *args: args
-            **kwargs: kwargs
+            auth_error (str): the error to propagate to the user.
+            *args: additional arguments to pass to Exception base class.
+            **kwargs: additional key word arguments to pass to Exception base class.
         """
-        message = f"Error, Matcha couldn't authenticate you with {service_name}!"
-        if service_name == "Azure":
-            message += (
-                " Make sure to run 'az login' before trying to provision resources."
-            )
+        message = f"Error - Matcha couldn't authenticate you with Azure: {auth_error}, make sure you've run 'az login'!"
         super().__init__(message, *args, **kwargs)
