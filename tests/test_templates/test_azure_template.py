@@ -8,11 +8,11 @@ import pytest
 from azure.identity import AzureCliCredential
 from azure.mgmt.resource import SubscriptionClient
 
+from matcha_ml.cli.region_validation import verify_azure_location
 from matcha_ml.templates.build_templates.azure_template import (
     SUBMODULE_NAMES,
     TemplateVariables,
     build_template,
-    verify_azure_location,
 )
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -122,12 +122,12 @@ def test_verify_azure_location(
         return SubscriptionClient(AzureCliCredential())
 
     monkeypatch.setattr(
-        "matcha_ml.templates.build_templates.azure_template.get_azure_locations",
+        "matcha_ml.cli.region_validation.get_azure_locations",
         mock_get_azure_locations,
     )
 
     monkeypatch.setattr(
-        "matcha_ml.templates.build_templates.azure_template.get_azure_subscription_client",
+        "matcha_ml.cli.region_validation.get_azure_subscription_client",
         mock_get_azure_subscription_client,
     )
 

@@ -8,8 +8,6 @@ from unittest.mock import patch
 import pytest
 from typer.testing import CliRunner
 
-import pytest
-
 from matcha_ml.cli.cli import app
 from matcha_ml.templates.build_templates.azure_template import SUBMODULE_NAMES
 
@@ -43,7 +41,7 @@ def monkeypatch_verify_azure_location(monkeypatch):
         return True, ""
 
     monkeypatch.setattr(
-        "matcha_ml.templates.build_templates.azure_template.verify_azure_location",
+        "matcha_ml.cli.region_validation.verify_azure_location",
         mock_verify_azure_location,
     )
 
@@ -71,6 +69,7 @@ def monkeypatch_verify_azure_authentication(monkeypatch):
     )
 
     yield monkeypatch
+
 
 @pytest.fixture(scope="session", autouse=True)
 def resource_group_name_mock():
@@ -228,7 +227,6 @@ def test_cli_provision_command_with_prefix(
     expected_tf_vars = {"location": "ukwest", "prefix": "coffee"}
 
     assert_infrastructure(destination_path, expected_tf_vars)
-
 
 
 def test_cli_provision_command_with_default_prefix(runner, matcha_testing_directory):

@@ -1,14 +1,8 @@
 """Build a template for provisioning resources on Azure using terraform files."""
 import dataclasses
-import difflib
 import glob
 import json
 import os
-import sys
-from io import StringIO
-
-from azure.identity import AzureCliCredential, CredentialUnavailableError
-from azure.mgmt.resource import SubscriptionClient
 from shutil import copy, rmtree
 from typing import Optional
 
@@ -29,93 +23,6 @@ class TemplateVariables:
 
     # Prefix used for all resources
     prefix: str
-
-
-def check_azure_is_authenticated() -> None:
-    """Checks if Azure is authenticated.
-
-    Raises:
-        Exit: Exits CLI if Azure is not authenticated
-    """
-    credential = AzureCliCredential()
-
-    output = StringIO()
-    # redirect stdout and stderr to the StringIO object
-    sys.stdout = output
-    sys.stderr = output
-
-    try:
-        # Check authentication
-        credential.get_token("https://management.azure.com/.default")
-    except CredentialUnavailableError:
-        sys.stdout = sys.__stdout__
-        sys.stderr = sys.__stderr__
-        print(
-            "Error, Matcha couldn't authenticate you with Azure! Make sure to run 'az login' before trying to provision resources."
-        )
-        raise typer.Exit(code=1)
-
-    # restore stdout and stderr to their original values
-    sys.stdout = sys.__stdout__
-    sys.stderr = sys.__stderr__
-
-
-def get_azure_subscription_client() -> SubscriptionClient:
-    """Gets the Azure subscriptions within a SubscriptionClient for the current user.
-
-    Returns:
-        SubscriptionClient: An object containing the subscriptions for the authenticated user.
-    """
-    credential = AzureCliCredential()
-    subscription_client = SubscriptionClient(credential)
-
-    return subscription_client
-
-
-def get_azure_locations(subscription_client: SubscriptionClient) -> set[str]:
-    """Gets a list of valid Azure location strings.
-
-    Args:
-        subscription_client (SubscriptionClient): An object containing the subscriptions for the authenticated user
-
-    Returns:
-        set[str]: Set of Azure location strings
-    """
-    sub_list = subscription_client.subscriptions.list()
-
-    for group in list(sub_list):
-        # Get all locations for a subscription
-        locations = set(
-            [
-                location.name
-                for location in subscription_client.subscriptions.list_locations(
-                    group.subscription_id
-                )
-            ]
-        )
-
-    return locations
-
-
-def verify_azure_location(location_name: str) -> tuple[bool, str]:
-    """Verifies whether the provided resource location name exists in Azure.
-
-    Args:
-        location_name (str): User inputted location.
-
-    Returns:
-        bool: Returns True if location name is valid
-        str: Closest valid location name
-    """
-    subscription_client = get_azure_subscription_client()
-    locations = get_azure_locations(subscription_client)
-
-    closest_match = difflib.get_close_matches(location_name, locations, n=1)
-
-    if not closest_match:
-        return location_name in locations, ""
-    else:
-        return location_name in locations, closest_match[0]
 
 
 def reuse_configuration(path: str) -> bool:
