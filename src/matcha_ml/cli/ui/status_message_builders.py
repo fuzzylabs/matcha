@@ -43,7 +43,7 @@ def build_status(status: str) -> str:
     return f"[white]{status}[/white]"
 
 
-def build_step_success(status: str) -> str:
+def build_step_success_status(status: str) -> str:
     """Build step success status message.
 
     Use green colour and bold font for formatting
@@ -57,7 +57,7 @@ def build_step_success(status: str) -> str:
     return f"[green bold]{status}[/green bold]"
 
 
-def build_substep_success(status: str) -> str:
+def build_substep_success_status(status: str) -> str:
     """Build sub-step success status message.
 
     Use green colour for formatting

@@ -24,3 +24,12 @@ def print_error(error: str) -> None:
         error,
         style="blink",
     )
+
+
+def print_json(json: str) -> None:
+    """Pretty print a JSON string.
+
+    Args:
+        json (str): JSON string to print
+    """
+    rich.print_json(json)

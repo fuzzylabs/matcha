@@ -1,7 +1,7 @@
 """Tests for print functions."""
 from unittest import mock
 
-from matcha_ml.cli.ui.print_messages import print_error, print_status
+from matcha_ml.cli.ui.print_messages import print_error, print_json, print_status
 
 
 def test_print_status():
@@ -16,3 +16,10 @@ def test_print_error():
     with mock.patch("matcha_ml.cli.ui.print_messages.err_console") as mock_console:
         print_error("Some error")
         mock_console.print.assert_called_with("Some error", style="blink")
+
+
+def test_print_json():
+    """Test print_json calls correct rich methods."""
+    with mock.patch("rich.print_json") as mock_print_json:
+        print_json("{}")
+        mock_print_json.assert_called_with("{}")

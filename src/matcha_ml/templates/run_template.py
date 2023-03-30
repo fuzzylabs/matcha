@@ -7,11 +7,15 @@ from typing import Optional
 
 import python_terraform
 import typer
-from rich import print, print_json
-from rich.progress import Progress, SpinnerColumn, TimeElapsedColumn
 
 from matcha_ml.cli.ui import emojis
+from matcha_ml.cli.ui.print_messages import print_error, print_json, print_status
 from matcha_ml.cli.ui.spinner import Spinner
+from matcha_ml.cli.ui.status_message_builders import (
+    build_resource_confirmation,
+    build_status,
+    build_substep_success_status,
+)
 
 MLFLOW_TRACKING_URL = "mlflow-tracking-url"
 
@@ -78,8 +82,8 @@ class TerraformService:
             Exit: if terraform is not installed.
         """
         if not self._is_terraform_installed():
-            print(f"[red] {emojis.cross_emoji} Terraform is not installed. [/red]")
-            print(
+            print_error(f"{emojis.cross_emoji} Terraform is not installed")
+            print_error(
                 "Terraform is required for to run and was not found installed on your machine."
                 "Please visit https://learn.hashicorp.com/tutorials/terraform/install-cli to install it."
             )
@@ -94,7 +98,7 @@ class TerraformService:
         var_file = Path(self.config.var_file)
 
         if not var_file.exists():
-            print(
+            print_error(
                 "The file terraform.tfvars.json was not found in the "
                 f"current directory at {self.config.var_file}. Please "
                 "verify if it exists."
@@ -110,16 +114,17 @@ class TerraformService:
         Returns:
             bool: True if user approves, False otherwise.
         """
-        summary_message = f"""The following resources will be {verb}ed:
-1. [yellow] Resource group [/yellow]: A resource group
-2. [yellow] Azure Kubernetes Service (AKS) [/yellow]: A kubernetes cluster
-3. [yellow] Azure Storage Container [/yellow]: A storage container
+        summary_message = build_resource_confirmation(
+            header=f"The following resources will be {verb}ed",
+            resources=[
+                ("Resource group", "A resource group"),
+                ("Azure Kubernetes Service (AKS)", "A kubernetes cluster"),
+                ("Azure Storage Container", "A storage container"),
+            ],
+            footer=f"{verb.capitalize()}ing the resources may take up to 10 minutes. May we suggest you to grab a cup of 🍵?",
+        )
 
-{verb.capitalize()}ing the resources may take up to 10 minutes. May we suggest you to grab a cup of 🍵?
-"""
-
-        print()
-        print(summary_message)
+        print_status(summary_message)
         return typer.confirm(f"Are you happy for '{verb}' to run?")
 
     def _init_and_apply(self) -> None:
@@ -133,14 +138,18 @@ class TerraformService:
             os.path.join(self.terraform_client.working_dir, ".temp")
         )
         if previous_temp_dir.exists():
-            print(
-                "matcha {emojis.matcha_emoji} has already been initialised. Skipping this step..."
+            print_status(
+                build_status(
+                    "matcha {emojis.matcha_emoji} has already been initialised. Skipping this step..."
+                )
             )
 
         else:
-            print()
-            print(f"{emojis.waiting_emoji} Brewing matcha {emojis.matcha_emoji}...")
-            print()
+            print_status(
+                build_status(
+                    f"\n{emojis.waiting_emoji} Brewing matcha {emojis.matcha_emoji}...\n"
+                )
+            )
 
             # run terraform init
             with Spinner("Initializing"):
@@ -149,20 +158,21 @@ class TerraformService:
                 )
 
                 if ret_code != 0:
-                    print("The command 'terraform init' failed.")
+                    print_error("The command 'terraform init' failed.")
                     raise typer.Exit()
 
-                print(
-                    f"[green] {emojis.checkmark_emoji} Matcha {emojis.matcha_emoji} initialised! [/green]"
+                print_status(
+                    build_substep_success_status(
+                        f"{emojis.checkmark_emoji} Matcha {emojis.matcha_emoji} initialised!\n"
+                    )
                 )
-                print()
 
                 # Create a directory to avoid running init multiple times
                 previous_temp_dir.mkdir(parents=True, exist_ok=True)
 
-        print()
-        print(f"{emojis.waiting_emoji} Provisioning your resources...")
-        print()
+        print_status(
+            build_status(f"\n{emojis.waiting_emoji} Provisioning your resources...\n")
+        )
 
         # once terraform init is success, call terraform apply
         with Spinner("Applying"):
@@ -174,9 +184,10 @@ class TerraformService:
                 auto_approve=True,
             )
 
-        print()
-        print(
-            f"[green] {emojis.checkmark_emoji} Your environment has been provisioned! [/green]"
+        print_status(
+            build_substep_success_status(
+                f"{emojis.checkmark_emoji} Your environment has been provisioned!"
+            )
         )
 
     def provision(self) -> None:
@@ -194,8 +205,10 @@ class TerraformService:
             self.show_terraform_outputs()
 
         else:
-            print(
-                "You decided to cancel - if you change your mind, then run 'matcha provision' again."
+            print_status(
+                build_status(
+                    "You decided to cancel - if you change your mind, then run 'matcha provision' again."
+                )
             )
             raise typer.Exit()
 
@@ -205,12 +218,7 @@ class TerraformService:
         print(f"{emojis.waiting_emoji} Destroying your resources...")
         print()
 
-        with Progress(
-            SpinnerColumn(spinner_name=SPINNER),
-            TimeElapsedColumn(),
-        ) as progress:
-            progress.add_task(description="Destroying", total=None)
-
+        with Spinner("Destroying"):
             # Reference: https://github.com/beelit94/python-terraform/issues/108
             self.terraform_client.destroy(
                 capture_output=self.config.capture_output,
@@ -231,8 +239,10 @@ class TerraformService:
             self._destroy()
 
         else:
-            print(
-                "You decided to cancel - your resources will remain active! If you change your mind, then run 'matcha destory' again."
+            print_status(
+                build_status(
+                    "You decided to cancel - your resources will remain active! If you change your mind, then run 'matcha destory' again."
+                )
             )
             raise typer.Exit()
 
@@ -253,9 +263,7 @@ class TerraformService:
         # copy terraform output to state file
         self.write_outputs_state()
 
-        print()
-        print("Here are the endpoints for what's been provisioned")
+        print_status(build_status("Here are the endpoints for what's been provisioned"))
         # print terraform output from state file
         with open(self.config.state_file) as fp:
             print_json(fp.read())
-        print()

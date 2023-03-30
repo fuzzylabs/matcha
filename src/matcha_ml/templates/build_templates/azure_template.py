@@ -11,8 +11,8 @@ import typer
 from matcha_ml.cli.ui.print_messages import print_status
 from matcha_ml.cli.ui.status_message_builders import (
     build_resource_confirmation,
-    build_step_success,
-    build_substep_success,
+    build_step_success_status,
+    build_substep_success_status,
 )
 from matcha_ml.errors import MatchaPermissionError
 
@@ -98,7 +98,7 @@ def build_template(
         os.makedirs(destination, exist_ok=True)
         if verbose:
             print_status(
-                build_substep_success(
+                build_substep_success_status(
                     f"Ensure template destination directory: {destination}"
                 )
             )
@@ -131,26 +131,30 @@ def build_template(
 
             if verbose:
                 print_status(
-                    build_substep_success(
+                    build_substep_success_status(
                         f"{submodule_name} module configuration was copied"
                     )
                 )
 
         if verbose:
-            print_status(build_substep_success("Configuration was copied"))
+            print_status(build_substep_success_status("Configuration was copied"))
 
         configuration_destination = os.path.join(destination, "terraform.tfvars.json")
         with open(configuration_destination, "w") as f:
             json.dump(dataclasses.asdict(config), f)
 
         if verbose:
-            print_status(build_substep_success("Template variables were added."))
+            print_status(build_substep_success_status("Template variables were added."))
     except PermissionError:
         raise MatchaPermissionError(path=destination)
 
     if verbose:
-        print_status(build_substep_success("Template configuration has finished!"))
+        print_status(
+            build_substep_success_status("Template configuration has finished!")
+        )
 
     print_status(
-        build_step_success(f"The configuration template was written to {destination}")
+        build_step_success_status(
+            f"The configuration template was written to {destination}"
+        )
     )

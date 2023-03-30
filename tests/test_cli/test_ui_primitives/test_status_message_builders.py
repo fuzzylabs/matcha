@@ -6,8 +6,8 @@ import pytest
 from matcha_ml.cli.ui.status_message_builders import (
     build_resource_confirmation,
     build_status,
-    build_step_success,
-    build_substep_success,
+    build_step_success_status,
+    build_substep_success_status,
 )
 
 
@@ -61,15 +61,18 @@ def test_build_resource_confirmation_expected_output(
 
 
 def test_build_status():
+    """Test build status formats status message correctly."""
     expected = "[white]Some status[/white]"
     assert build_status("Some status") == expected
 
 
-def test_build_step_success():
+def test_build_step_success_status():
+    """Test build step success status formats status message correctly."""
     expected = "[green bold]Step finished![/green bold]"
-    assert build_step_success("Step finished!") == expected
+    assert build_step_success_status("Step finished!") == expected
 
 
-def test_build_substep_success():
+def test_build_substep_success_status():
+    """Test build substep success status formats status message correctly."""
     expected = "[green]Step finished![/green]"
-    assert build_substep_success("Step finished!") == expected
+    assert build_substep_success_status("Step finished!") == expected
