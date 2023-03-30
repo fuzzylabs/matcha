@@ -34,12 +34,6 @@ class TerraformConfig:
     # else no output will be printed and (ret_code, out, err) tuple will be returned
     capture_output: bool = True
 
-    # log level for terraform
-    log_level: str = "ERROR"
-
-    # path to log terraform
-    log_file: str = os.path.join(working_dir, "terraform.log")
-
 
 @dataclasses.dataclass
 class Emojis:
