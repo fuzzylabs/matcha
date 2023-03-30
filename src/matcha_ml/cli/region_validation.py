@@ -2,6 +2,7 @@
 import difflib
 import sys
 from io import StringIO
+from typing import Set
 
 import typer
 from azure.identity import AzureCliCredential, CredentialUnavailableError
@@ -49,14 +50,14 @@ def get_azure_subscription_client() -> SubscriptionClient:
     return subscription_client
 
 
-def get_azure_locations(subscription_client: SubscriptionClient) -> set[str]:
+def get_azure_locations(subscription_client: SubscriptionClient) -> Set[str]:
     """Gets a list of valid Azure location strings.
 
     Args:
         subscription_client (SubscriptionClient): An object containing the subscriptions for the authenticated user
 
     Returns:
-        set[str]: Set of Azure location strings
+        Set[str]: Set of Azure location strings
     """
     sub_list = subscription_client.subscriptions.list()
 
