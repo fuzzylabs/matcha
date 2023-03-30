@@ -8,6 +8,7 @@ from rich import print
 from matcha_ml.templates.build_templates.azure_template import (
     build_template,
     build_template_configuration,
+    reuse_configuration,
 )
 from matcha_ml.templates.run_template import TerraformService
 
@@ -32,8 +33,9 @@ def provision_resources(
 
     template = os.path.join(os.path.dirname(__file__), os.pardir, "infrastructure")
 
-    config = build_template_configuration(location, prefix)
-    build_template(config, template, destination, verbose)
+    if not reuse_configuration(destination):
+        config = build_template_configuration(location, prefix)
+        build_template(config, template, destination, verbose)
 
     # create a terraform service to provision resources
     tfs = TerraformService()

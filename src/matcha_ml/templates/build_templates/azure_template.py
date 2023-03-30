@@ -3,10 +3,11 @@ import dataclasses
 import glob
 import json
 import os
-from shutil import copy
+from shutil import copy, rmtree
 from typing import Optional
 
 import typer
+from rich import print
 
 from matcha_ml.errors import MatchaPermissionError
 
@@ -14,7 +15,7 @@ SUBMODULE_NAMES = ["aks", "resource_group", "mlflow-module", "storage"]
 
 
 @dataclasses.dataclass
-class TemplateVariables(object):
+class TemplateVariables:
     """Terraform template variables."""
 
     # Azure location in which all resources will be provisioned
@@ -22,6 +23,30 @@ class TemplateVariables(object):
 
     # Prefix used for all resources
     prefix: str
+
+
+def reuse_configuration(path: str) -> bool:
+    """Check if a configuration already exists, and prompt user to override or reuse it.
+
+    Args:
+        path (str): path to the infrastructure configuration
+
+    Returns:
+        bool: decision to reuse the existing configuration
+    """
+    if os.path.exists(path):
+        summary_message = """The following resources are already configured for provisioning:
+1. [yellow] Resource group [/yellow]: A resource group
+2. [yellow] Azure Kubernetes Service (AKS) [/yellow]: A kubernetes cluster
+3. [yellow] Azure Storage Container [/yellow]: A storage container
+"""
+        print(summary_message)
+
+        return not typer.confirm(
+            "Do you want to override the configuration? Otherwise, the existing configuration will be reused"
+        )
+    else:
+        return False
 
 
 def build_template_configuration(location: str, prefix: str) -> TemplateVariables:
@@ -34,7 +59,7 @@ def build_template_configuration(location: str, prefix: str) -> TemplateVariable
     Returns:
         TemplateVariables: Terraform variables required by a template
     """
-    return TemplateVariables(prefix=prefix, location=location)
+    return TemplateVariables(location=location, prefix=prefix)
 
 
 def build_template(
@@ -56,6 +81,10 @@ def build_template(
     """
     try:
         print("Building configuration template...")
+
+        # Override configuration if it already exists
+        if os.path.exists(destination):
+            rmtree(destination)
 
         os.makedirs(destination, exist_ok=True)
         if verbose:
@@ -85,9 +114,9 @@ def build_template(
                 os.path.join(template_src, submodule_name, "*.tf")
             ):
                 filename = os.path.basename(source_path)
-                source_path = os.path.join(template_src, submodule_name, filename)
+                src_path = os.path.join(template_src, submodule_name, filename)
                 destination_path = os.path.join(destination, submodule_name, filename)
-                copy(source_path, destination_path)
+                copy(src_path, destination_path)
 
             if verbose:
                 print(
