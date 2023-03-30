@@ -135,11 +135,15 @@ class TerraformService:
         """
         with open(self.config.log_file) as file:
             tf_error = [line.rstrip("\n") for line in file]
-
-        last_error = tf_error[-1]
-        error_string = "[ERROR] "
-        index = last_error.find(error_string)
-        return last_error if index == -1 else last_error[index + len(error_string) :]
+        if len(tf_error) > 0:
+            last_error = tf_error[-1]
+            error_string = "[ERROR] "
+            index = last_error.find(error_string)
+            return (
+                last_error if index == -1 else last_error[index + len(error_string) :]
+            )
+        else:
+            return f"No error found in {self.config.log_file} file"
 
     def is_approved(self, verb: str) -> bool:
         """Get approval from user to modify resources on cloud.

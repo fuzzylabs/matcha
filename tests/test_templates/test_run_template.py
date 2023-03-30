@@ -2,6 +2,7 @@
 import json
 import os
 from contextlib import nullcontext as does_not_raise
+from distutils.dir_util import copy_tree
 from unittest import mock
 from unittest.mock import MagicMock
 
@@ -11,7 +12,26 @@ from _pytest.capture import SysCapture
 from python_terraform import TerraformCommandError
 
 from matcha_ml.errors import MatchaTerraformError
+from matcha_ml.templates.build_templates.azure_template import (
+    TemplateVariables,
+    build_template,
+)
 from matcha_ml.templates.run_template import TerraformConfig, TerraformService
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+TEMPLATE_DIR = os.path.join(
+    BASE_DIR, os.pardir, os.pardir, "src", "matcha_ml", "infrastructure"
+)
+
+
+@pytest.fixture
+def template_src_path() -> str:
+    """Fixture for the test infrastructure template path.
+
+    Returns:
+        str: template path
+    """
+    return TEMPLATE_DIR
 
 
 @pytest.fixture
@@ -28,10 +48,13 @@ def terraform_test_config(matcha_testing_directory: str) -> TerraformConfig:
         matcha_testing_directory, ".matcha", "infrastructure"
     )
     os.makedirs(infrastructure_directory, exist_ok=True)
+    # open(os.path.join(terraform_test_config.working_dir, "terraform.log"), "a").close()
     return TerraformConfig(
         working_dir=infrastructure_directory,
         state_file=os.path.join(infrastructure_directory, "matcha.state"),
         var_file=os.path.join(infrastructure_directory, "terraform.tfvars.json"),
+        log_file=os.path.join(infrastructure_directory, "terraform.log"),
+        log_level="ERROR",
     )
 
 
@@ -215,19 +238,26 @@ def test_show_terraform_outputs(
         assert '"mlflow-tracking-url": "mlflow-test-url"' in captured.out
 
 
-def test_terraform_exception(terraform_test_config: TerraformConfig):
+def test_terraform_exception(
+    terraform_test_config: TerraformConfig, template_src_path: str
+):
     """Test if terraform exception is handled correctly.
 
     Args:
         terraform_test_config (TerraformConfig): _description_
+        template_src_path (str): pass
     """
     tfs = TerraformService()
     tfs.config = terraform_test_config
+    src_path = template_src_path
 
-    with open(
-        os.path.join(terraform_test_config.working_dir, "terraform.tfvars.json"), "w"
-    ) as f:
-        f.write("{}")
+    dest_path = terraform_test_config.working_dir
+    copy_tree(src_path, dest_path)
+    config = TemplateVariables("uksouth", "matcha")
+    build_template(config, template_src_path, dest_path)
+
+    # delete a file to simulate exception
+    os.remove(os.path.join(dest_path, "resource_group/main.tf"))
 
     tfs.is_approved = MagicMock(
         return_value=True
