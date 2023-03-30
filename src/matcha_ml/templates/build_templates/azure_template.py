@@ -8,7 +8,7 @@ from typing import Optional
 
 import typer
 
-from matcha_ml.cli.common_ui_primitives.ui_functions import (
+from matcha_ml.cli.ui_primitives.ui_functions import (
     print_confirm_message,
     print_status,
     print_step_success,

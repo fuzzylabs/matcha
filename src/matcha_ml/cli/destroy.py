@@ -1,5 +1,5 @@
 """Destroy CLI."""
-from matcha_ml.cli.common_ui_primitives.ui_functions import print_step_success
+from matcha_ml.cli.ui_primitives.ui_functions import print_step_success
 from matcha_ml.templates.run_template import TerraformService
 
 
