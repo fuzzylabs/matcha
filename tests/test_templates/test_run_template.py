@@ -48,7 +48,6 @@ def terraform_test_config(matcha_testing_directory: str) -> TerraformConfig:
         matcha_testing_directory, ".matcha", "infrastructure"
     )
     os.makedirs(infrastructure_directory, exist_ok=True)
-    # open(os.path.join(terraform_test_config.working_dir, "terraform.log"), "a").close()
     return TerraformConfig(
         working_dir=infrastructure_directory,
         state_file=os.path.join(infrastructure_directory, "matcha.state"),
