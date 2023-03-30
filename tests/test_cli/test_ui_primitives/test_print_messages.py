@@ -15,7 +15,7 @@ def test_print_error():
     """Test print_error calls correct rich methods."""
     with mock.patch("matcha_ml.cli.ui.print_messages.err_console") as mock_console:
         print_error("Some error")
-        mock_console.print.assert_called_with("Some error", style="blink")
+        mock_console.print.assert_called_with("Some error")
 
 
 def test_print_json():

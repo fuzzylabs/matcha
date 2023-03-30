@@ -20,10 +20,7 @@ def print_error(error: str) -> None:
     Args:
         error (str): formatted error string to print
     """
-    err_console.print(
-        error,
-        style="blink",
-    )
+    err_console.print(error)
 
 
 def print_json(json: str) -> None:
