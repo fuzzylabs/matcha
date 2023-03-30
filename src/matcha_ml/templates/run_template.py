@@ -10,6 +10,8 @@ import typer
 from rich import print, print_json
 from rich.progress import Progress, SpinnerColumn, TimeElapsedColumn
 
+from matcha_ml.cli.ui.spinner import Spinner
+
 MLFLOW_TRACKING_URL = "mlflow-tracking-url"
 
 SPINNER = "dots"
@@ -158,11 +160,7 @@ class TerraformService:
             print()
 
             # run terraform init
-            with Progress(
-                SpinnerColumn(spinner_name=SPINNER),
-                TimeElapsedColumn(),
-            ) as progress:
-                progress.add_task(description="Initializing", total=None)
+            with Spinner("Initializing"):
                 ret_code, _, _ = self.terraform_client.init(
                     capture_output=self.config.capture_output
                 )
@@ -184,11 +182,7 @@ class TerraformService:
         print()
 
         # once terraform init is success, call terraform apply
-        with Progress(
-            SpinnerColumn(spinner_name=SPINNER),
-            TimeElapsedColumn(),
-        ) as progress:
-            progress.add_task(description="Applying", total=None)
+        with Spinner("Applying"):
             self.terraform_client.apply(
                 input=False,
                 capture_output=self.config.capture_output,

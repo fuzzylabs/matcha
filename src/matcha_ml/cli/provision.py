@@ -4,7 +4,8 @@ from typing import Optional
 
 import typer
 
-from matcha_ml.cli.ui_primitives.ui_functions import print_step_success
+from matcha_ml.cli.ui.print_messages import print_status
+from matcha_ml.cli.ui.status_message_builders import build_step_success
 from matcha_ml.templates.build_templates.azure_template import (
     build_template,
     build_template_configuration,
@@ -43,4 +44,4 @@ def provision_resources(
     # provision resources by running the template
     tfs.provision()
 
-    print_step_success("Provisioning is complete!")
+    print_status(build_step_success("Provisioning is complete!"))

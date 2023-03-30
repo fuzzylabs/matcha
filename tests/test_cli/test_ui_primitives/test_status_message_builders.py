@@ -3,7 +3,12 @@ from typing import List, Optional, Tuple
 
 import pytest
 
-from matcha_ml.cli.ui_primitives.ui_functions import build_resource_confirmation
+from matcha_ml.cli.ui.status_message_builders import (
+    build_resource_confirmation,
+    build_status,
+    build_step_success,
+    build_substep_success,
+)
 
 
 @pytest.mark.parametrize(
@@ -53,3 +58,18 @@ def test_build_resource_confirmation_expected_output(
         expected (str): the expected confirmation message
     """
     assert build_resource_confirmation(header, resources, footer) == expected
+
+
+def test_build_status():
+    expected = "[white]Some status[/white]"
+    assert build_status("Some status") == expected
+
+
+def test_build_step_success():
+    expected = "[green bold]Step finished![/green bold]"
+    assert build_step_success("Step finished!") == expected
+
+
+def test_build_substep_success():
+    expected = "[green]Step finished![/green]"
+    assert build_substep_success("Step finished!") == expected

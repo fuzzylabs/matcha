@@ -7,13 +7,12 @@ from shutil import copy, rmtree
 from typing import Optional
 
 import typer
-from rich import print
 
-from matcha_ml.cli.ui_primitives.ui_functions import (
+from matcha_ml.cli.ui.print_messages import print_status
+from matcha_ml.cli.ui.status_message_builders import (
     build_resource_confirmation,
-    print_status,
-    print_step_success,
-    print_substep_success,
+    build_step_success,
+    build_substep_success,
 )
 from matcha_ml.errors import MatchaPermissionError
 
@@ -50,7 +49,7 @@ def reuse_configuration(path: str) -> bool:
             ],
         )
 
-        print(confirmation_message)
+        print_status(confirmation_message)
 
         return not typer.confirm(
             "Do you want to override the configuration? Otherwise, the existing configuration will be reused"
@@ -98,8 +97,10 @@ def build_template(
 
         os.makedirs(destination, exist_ok=True)
         if verbose:
-            print_substep_success(
-                f"Ensure template destination directory: {destination}"
+            print_status(
+                build_substep_success(
+                    f"Ensure template destination directory: {destination}"
+                )
             )
 
         # Define additional non-tf files that are needed from the main module
@@ -129,23 +130,27 @@ def build_template(
                 copy(src_path, destination_path)
 
             if verbose:
-                print_substep_success(
-                    f"{submodule_name} module configuration was copied"
+                print_status(
+                    build_substep_success(
+                        f"{submodule_name} module configuration was copied"
+                    )
                 )
 
         if verbose:
-            print_substep_success("Configuration was copied")
+            print_status(build_substep_success("Configuration was copied"))
 
         configuration_destination = os.path.join(destination, "terraform.tfvars.json")
         with open(configuration_destination, "w") as f:
             json.dump(dataclasses.asdict(config), f)
 
         if verbose:
-            print_substep_success("Template variables were added.")
+            print_status(build_substep_success("Template variables were added."))
     except PermissionError:
         raise MatchaPermissionError(path=destination)
 
     if verbose:
-        print_step_success("Template configuration has finished!")
+        print_status(build_substep_success("Template configuration has finished!"))
 
-    print_status(f"The configuration template was written to {destination}")
+    print_status(
+        build_step_success(f"The configuration template was written to {destination}")
+    )
