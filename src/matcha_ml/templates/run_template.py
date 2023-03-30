@@ -10,6 +10,7 @@ import typer
 from rich import print, print_json
 from rich.progress import Progress, SpinnerColumn, TimeElapsedColumn
 
+from matcha_ml.cli.ui import emojis
 from matcha_ml.cli.ui.spinner import Spinner
 
 MLFLOW_TRACKING_URL = "mlflow-tracking-url"
@@ -35,19 +36,6 @@ class TerraformConfig:
     capture_output: bool = True
 
 
-@dataclasses.dataclass
-class Emojis:
-    """Emojis class for displaying emojis."""
-
-    checkmark_emoji: str = "✔"
-
-    cross_emoji: str = "❌"
-
-    waiting_emoji: str = "⏳"
-
-    matcha_emoji: str = "🍵"
-
-
 class TerraformService:
     """TerraformService class to provision and deprovision resources."""
 
@@ -56,9 +44,6 @@ class TerraformService:
 
     # terraform client
     _terraform_client: Optional[python_terraform.Terraform] = None
-
-    # emoji instance to display emojis
-    emojis: Emojis = Emojis()
 
     @property
     def terraform_client(self) -> python_terraform.Terraform:
@@ -93,7 +78,7 @@ class TerraformService:
             Exit: if terraform is not installed.
         """
         if not self._is_terraform_installed():
-            print(f"[red] {self.emojis.cross_emoji} Terraform is not installed. [/red]")
+            print(f"[red] {emojis.cross_emoji} Terraform is not installed. [/red]")
             print(
                 "Terraform is required for to run and was not found installed on your machine."
                 "Please visit https://learn.hashicorp.com/tutorials/terraform/install-cli to install it."
@@ -149,14 +134,12 @@ class TerraformService:
         )
         if previous_temp_dir.exists():
             print(
-                "matcha {self.emojis.matcha_emoji} has already been initialised. Skipping this step..."
+                "matcha {emojis.matcha_emoji} has already been initialised. Skipping this step..."
             )
 
         else:
             print()
-            print(
-                f"{self.emojis.waiting_emoji} Brewing matcha {self.emojis.matcha_emoji}..."
-            )
+            print(f"{emojis.waiting_emoji} Brewing matcha {emojis.matcha_emoji}...")
             print()
 
             # run terraform init
@@ -170,7 +153,7 @@ class TerraformService:
                     raise typer.Exit()
 
                 print(
-                    f"[green] {self.emojis.checkmark_emoji} Matcha {self.emojis.matcha_emoji} initialised! [/green]"
+                    f"[green] {emojis.checkmark_emoji} Matcha {emojis.matcha_emoji} initialised! [/green]"
                 )
                 print()
 
@@ -178,7 +161,7 @@ class TerraformService:
                 previous_temp_dir.mkdir(parents=True, exist_ok=True)
 
         print()
-        print(f"{self.emojis.waiting_emoji} Provisioning your resources...")
+        print(f"{emojis.waiting_emoji} Provisioning your resources...")
         print()
 
         # once terraform init is success, call terraform apply
@@ -193,7 +176,7 @@ class TerraformService:
 
         print()
         print(
-            f"[green] {self.emojis.checkmark_emoji} Your environment has been provisioned! [/green]"
+            f"[green] {emojis.checkmark_emoji} Your environment has been provisioned! [/green]"
         )
 
     def provision(self) -> None:
@@ -219,7 +202,7 @@ class TerraformService:
     def _destroy(self) -> None:
         """Destroy the provisioned resources."""
         print()
-        print(f"{self.emojis.waiting_emoji} Destroying your resources...")
+        print(f"{emojis.waiting_emoji} Destroying your resources...")
         print()
 
         with Progress(

@@ -1,0 +1,5 @@
+"""Common emojis."""
+checkmark_emoji: str = "✔"
+cross_emoji: str = "❌"
+waiting_emoji: str = "⏳"
+matcha_emoji: str = "🍵"
