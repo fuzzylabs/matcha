@@ -51,9 +51,7 @@ def terraform_test_config(matcha_testing_directory: str) -> TerraformConfig:
     return TerraformConfig(
         working_dir=infrastructure_directory,
         state_file=os.path.join(infrastructure_directory, "matcha.state"),
-        var_file=os.path.join(infrastructure_directory, "terraform.tfvars.json"),
-        log_file=os.path.join(infrastructure_directory, "terraform.log"),
-        log_level="ERROR",
+        var_file=os.path.join(infrastructure_directory, "terraform.tfvars.json")
     )
 
 
