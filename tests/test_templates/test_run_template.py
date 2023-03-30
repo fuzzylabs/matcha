@@ -10,6 +10,7 @@ import typer
 from _pytest.capture import SysCapture
 from python_terraform import TerraformCommandError
 
+from matcha_ml.errors import MatchaTerraformError
 from matcha_ml.templates.run_template import TerraformConfig, TerraformService
 
 
@@ -212,3 +213,28 @@ def test_show_terraform_outputs(
         tfs.show_terraform_outputs()
         captured = capsys.readouterr()
         assert '"mlflow-tracking-url": "mlflow-test-url"' in captured.out
+
+
+def test_terraform_exception(terraform_test_config: TerraformConfig):
+    """Test if terraform exception is handled correctly.
+
+    Args:
+        terraform_test_config (TerraformConfig): _description_
+    """
+    tfs = TerraformService()
+    tfs.config = terraform_test_config
+
+    with open(
+        os.path.join(terraform_test_config.working_dir, "terraform.tfvars.json"), "w"
+    ) as f:
+        f.write("{}")
+
+    tfs.is_approved = MagicMock(
+        return_value=True
+    )  # the user approves, should provision
+
+    with pytest.raises(MatchaTerraformError):
+        tfs.provision()
+        tfs.terraform_client.init.assert_called()
+        tfs.terraform_client.apply.assert_called()
+        tfs.show_terraform_outputs.assert_not_called()
