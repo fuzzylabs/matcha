@@ -79,11 +79,6 @@ class TerraformService:
             )
         return self._terraform_client
 
-    def enable_tf_logging(self) -> None:
-        """Set environment variable TF_LOG and TF_LOG_PATH to enable logging."""
-        os.environ["TF_LOG"] = self.config.log_level
-        os.environ["TF_LOG_PATH"] = self.config.log_file
-
     def _is_terraform_installed(self) -> bool:
         """Check if terraform is installed on host machine.
 
@@ -126,24 +121,6 @@ class TerraformService:
                 "verify if it exists."
             )
             raise typer.Exit()
-
-    def parse_tf_log_file(self) -> str:
-        """Parse the terraform log file to get the error message.
-
-        Returns:
-            str: Extracted error message.
-        """
-        with open(self.config.log_file) as file:
-            tf_error = [line.rstrip("\n") for line in file]
-        if len(tf_error) > 0:
-            last_error = tf_error[-1]
-            error_string = "[ERROR] "
-            index = last_error.find(error_string)
-            return (
-                last_error if index == -1 else last_error[index + len(error_string) :]
-            )
-        else:
-            return f"No error found in {self.config.log_file} file"
 
     def is_approved(self, verb: str) -> bool:
         """Get approval from user to modify resources on cloud.
@@ -195,12 +172,12 @@ class TerraformService:
             ) as progress:
                 progress.add_task(description="Initializing", total=None)
 
-                ret_code, _, _ = self.terraform_client.init(
+                ret_code, _, err = self.terraform_client.init(
                     capture_output=self.config.capture_output,
                     raise_on_error=False,
                 )
                 if ret_code != 0:
-                    raise MatchaTerraformError(tf_error=self.parse_tf_log_file())
+                    raise MatchaTerraformError(tf_error=err)
 
                 print(
                     f"[green] {self.emojis.checkmark_emoji} Matcha {self.emojis.matcha_emoji} initialised! [/green]"
@@ -221,7 +198,7 @@ class TerraformService:
         ) as progress:
             progress.add_task(description="Applying", total=None)
 
-            ret_code, _, _ = self.terraform_client.apply(
+            ret_code, _, err = self.terraform_client.apply(
                 input=False,
                 capture_output=self.config.capture_output,
                 raise_on_error=False,
@@ -229,7 +206,7 @@ class TerraformService:
                 auto_approve=True,
             )
             if ret_code != 0:
-                raise MatchaTerraformError(tf_error=self.parse_tf_log_file())
+                raise MatchaTerraformError(tf_error=err)
 
         print()
         print(
@@ -245,8 +222,6 @@ class TerraformService:
         self.check_installation()
 
         self.validate_config()
-
-        self.enable_tf_logging()
 
         if self.is_approved(verb="provision"):
             self._init_and_apply()
@@ -271,14 +246,14 @@ class TerraformService:
             progress.add_task(description="Destroying", total=None)
 
             # Reference: https://github.com/beelit94/python-terraform/issues/108
-            ret_code, _, _ = self.terraform_client.destroy(
+            ret_code, _, err = self.terraform_client.destroy(
                 capture_output=self.config.capture_output,
                 raise_on_error=False,
                 force=python_terraform.IsNotFlagged,
                 auto_approve=True,
             )
             if ret_code != 0:
-                raise MatchaTerraformError(tf_error=self.parse_tf_log_file())
+                raise MatchaTerraformError(tf_error=err)
 
     def deprovision(self) -> None:
         """Deprovision the resources.
@@ -287,8 +262,6 @@ class TerraformService:
             Exit: if approval is not given by user.
         """
         self.check_installation()
-
-        self.enable_tf_logging()
 
         if self.is_approved(verb="destroy"):
             self._destroy()
