@@ -7,9 +7,10 @@ from shutil import copy, rmtree
 from typing import Optional
 
 import typer
+from rich import print
 
 from matcha_ml.cli.ui_primitives.ui_functions import (
-    print_confirm_message,
+    build_resource_confirmation,
     print_status,
     print_step_success,
     print_substep_success,
@@ -40,13 +41,16 @@ def reuse_configuration(path: str) -> bool:
         bool: decision to reuse the existing configuration
     """
     if os.path.exists(path):
-        summary_message = """The following resources are already configured for provisioning:
-1. Resource group : A resource group
-2. Azure Kubernetes Service (AKS) : A kubernetes cluster
-3. Azure Storage Container : A storage container
-"""
+        confirmation_message = build_resource_confirmation(
+            "The following resources are already configured for provisioning",
+            [
+                ("Resource group", "A resource group"),
+                ("Azure Kubernetes Service (AKS)", "A kubernetes cluster"),
+                ("Azure Storage Container", "A storage container"),
+            ],
+        )
 
-        print_confirm_message(summary_message, is_list=True)
+        print(confirmation_message)
 
         return not typer.confirm(
             "Do you want to override the configuration? Otherwise, the existing configuration will be reused"

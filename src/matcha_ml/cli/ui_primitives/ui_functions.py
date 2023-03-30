@@ -1,4 +1,4 @@
-""""""
+"""UI primitives functions."""
 from typing import List, Optional, Tuple
 
 from rich import print
@@ -46,23 +46,6 @@ def print_step_success(status: str):
 def print_substep_success(status: str):
     # green status message when substep was completed.
     print(f"[green]{status}[/green]")
-
-
-def print_confirm_message(status: str, is_list: bool):
-    # yellow message for confirmation.
-    if is_list:
-        lines = status.split("\n")
-        for i, line in enumerate(lines):
-            if ":" in line:
-                parts = line.split(":")
-                if len(parts) > 1:
-                    name = parts[0].strip()
-                    value = parts[1].strip()
-                    lines[i] = f"{name}: [yellow]{value}[/yellow]"
-        output = "\n".join(lines)
-        print(output)
-    else:
-        print(f"[yellow]{status}[/yellow]")
 
 
 def print_error_message(status: str):
