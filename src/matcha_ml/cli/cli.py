@@ -8,6 +8,7 @@ from matcha_ml.cli import run
 from matcha_ml.cli.destroy import destroy_resources
 from matcha_ml.cli.prefix_validation import validate_prefix
 from matcha_ml.cli.provision import provision_resources
+from matcha_ml.cli.ui.print_messages import print_status
 
 app = typer.Typer(no_args_is_help=True, pretty_exceptions_show_locals=False)
 
@@ -56,7 +57,7 @@ def version_callback(value: bool) -> None:
         Exit: Exit after printing version.
     """
     if value:
-        typer.secho(f"Matcha version: {__version__}", bold=True)
+        print_status(f"Matcha version: {__version__}")
         raise typer.Exit()
 
 

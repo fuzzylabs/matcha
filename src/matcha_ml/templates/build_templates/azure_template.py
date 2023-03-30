@@ -11,6 +11,7 @@ import typer
 from matcha_ml.cli.ui.print_messages import print_status
 from matcha_ml.cli.ui.status_message_builders import (
     build_resource_confirmation,
+    build_status,
     build_step_success_status,
     build_substep_success_status,
 )
@@ -89,7 +90,7 @@ def build_template(
         MatchaPermissionError: when there are no write permissions on the configuration destination
     """
     try:
-        print_status("Building configuration template...")
+        print_status(build_status("Building configuration template..."))
 
         # Override configuration if it already exists
         if os.path.exists(destination):

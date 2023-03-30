@@ -40,7 +40,7 @@ def build_status(status: str) -> str:
     Returns:
         str: formatted message
     """
-    return f"[white]{status}[/white]"
+    return f"[bright_white]{status}[/bright_white]"
 
 
 def build_step_success_status(status: str) -> str:
