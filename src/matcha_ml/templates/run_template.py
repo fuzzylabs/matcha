@@ -127,6 +127,20 @@ class TerraformService:
             )
             raise typer.Exit()
 
+    def parse_tf_log_file(self) -> str:
+        """Parse the terraform log file to get the error message.
+
+        Returns:
+            str: Extracted error message.
+        """
+        with open(self.config.log_file) as file:
+            tf_error = [line.rstrip("\n") for line in file]
+
+        last_error = tf_error[-1]
+        error_string = "[ERROR] "
+        index = last_error.find(error_string)
+        return last_error if index == -1 else last_error[index + len(error_string) :]
+
     def is_approved(self, verb: str) -> bool:
         """Get approval from user to modify resources on cloud.
 
@@ -205,8 +219,8 @@ class TerraformService:
 
             ret_code, _, _ = self.terraform_client.apply(
                 input=False,
-                raise_on_error=False,
                 capture_output=self.config.capture_output,
+                raise_on_error=False,
                 skip_plan=True,
                 auto_approve=True,
             )
@@ -217,20 +231,6 @@ class TerraformService:
         print(
             f"[green] {self.emojis.checkmark_emoji} Your environment has been provisioned! [/green]"
         )
-
-    def parse_tf_log_file(self) -> str:
-        """Parse the terraform log file to get the error message.
-
-        Returns:
-            str: Extracted error message.
-        """
-        with open(self.config.log_file) as file:
-            tf_error = [line.rstrip("\n") for line in file]
-
-        last_error = tf_error[-1]
-        error_string = "[ERROR] "
-        index = last_error.find(error_string)
-        return last_error if index == -1 else last_error[index + len(error_string) :]
 
     def provision(self) -> None:
         """Provision resources required for the deployment.
