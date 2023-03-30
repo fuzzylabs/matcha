@@ -62,7 +62,7 @@ def test_build_resource_confirmation_expected_output(
 
 def test_build_status():
     """Test build status formats status message correctly."""
-    expected = "[white]Some status[/white]"
+    expected = "[bright_white]Some status[/bright_white]"
     assert build_status("Some status") == expected
 
 

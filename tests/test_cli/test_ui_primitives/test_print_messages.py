@@ -7,8 +7,8 @@ from matcha_ml.cli.ui.print_messages import print_error, print_json, print_statu
 def test_print_status():
     """Test print_status calls correct rich methods."""
     with mock.patch("rich.print") as mock_print:
-        print_status("[white]Some status[/white]")
-        mock_print.assert_called_with("[white]Some status[/white]")
+        print_status("[bright_white]Some status[/bright_white]")
+        mock_print.assert_called_with("[bright_white]Some status[/bright_white]")
 
 
 def test_print_error():
