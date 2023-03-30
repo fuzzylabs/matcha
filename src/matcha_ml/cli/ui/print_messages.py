@@ -1,5 +1,5 @@
 """UI print functions."""
-from rich import print
+import rich
 from rich.console import Console
 
 err_console = Console(stderr=True)
@@ -11,7 +11,7 @@ def print_status(status: str) -> None:
     Args:
         status (str): formatted status string to print
     """
-    print(status)
+    rich.print(status)
 
 
 def print_error(error: str) -> None:
