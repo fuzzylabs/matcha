@@ -279,9 +279,7 @@ def test_cli_provision_command_prefix_rule(
     os.chdir(matcha_testing_directory)
 
     result = runner.invoke(app, ["provision"], input=user_input)
-    print("AAAAAAA")
-    print(result.stdout)
-    print(result)
+    
     assert expected_output in result.stdout
 
 
