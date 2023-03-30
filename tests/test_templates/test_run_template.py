@@ -238,14 +238,14 @@ def test_show_terraform_outputs(
         assert '"mlflow-tracking-url": "mlflow-test-url"' in captured.out
 
 
-def test_terraform_exception(
+def test_terraform_exception_provision_when_missing_config(
     terraform_test_config: TerraformConfig, template_src_path: str
 ):
-    """Test if terraform exception is handled correctly.
+    """Test if terraform exception is handled correctly during apply when the main.tf file does not exist.
 
     Args:
-        terraform_test_config (TerraformConfig): _description_
-        template_src_path (str): pass
+        terraform_test_config (TerraformConfig): terraform test service config
+        template_src_path (str): existing template directory path
     """
     tfs = TerraformService()
     tfs.config = terraform_test_config
@@ -269,3 +269,32 @@ def test_terraform_exception(
         tfs.terraform_client.init.assert_called()
         tfs.terraform_client.apply.assert_called()
         tfs.show_terraform_outputs.assert_not_called()
+
+
+def test_terraform_deprovision_config_does_not_exist_exception(
+    terraform_test_config: TerraformConfig, template_src_path: str
+):
+    """Test if terraform exception is captured when performing deprovision on a config that does not exist.
+
+    Args:
+        terraform_test_config (TerraformConfig): terraform test service config
+        template_src_path (str): existing template directory path
+    """
+    tfs = TerraformService()
+    tfs.config = terraform_test_config
+
+    # copy tf files to run provision
+    src_path = template_src_path
+    dest_path = terraform_test_config.working_dir
+    copy_tree(src_path, dest_path)
+
+    # Create a config with a resource group name that does not exist
+    config = TemplateVariables("uksouth", "KGFUSQXGNZKJPMUAIIAZ")
+    build_template(config, template_src_path, dest_path)
+
+    tfs.is_approved = MagicMock(
+        return_value=True
+    )  # the user approves, should provision
+
+    with pytest.raises(MatchaTerraformError):
+        tfs.deprovision()
