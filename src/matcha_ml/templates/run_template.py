@@ -10,6 +10,8 @@ import typer
 from rich import print, print_json
 from rich.progress import Progress, SpinnerColumn, TimeElapsedColumn
 
+from matcha_ml.errors import MatchaTerraformError
+
 MLFLOW_TRACKING_URL = "mlflow-tracking-url"
 
 SPINNER = "dots"
@@ -31,6 +33,12 @@ class TerraformConfig:
     # if set to False terraform output will be printed to stdout/stderr
     # else no output will be printed and (ret_code, out, err) tuple will be returned
     capture_output: bool = True
+
+    # log level for terraform
+    log_level: str = "ERROR"
+
+    # path to log terraform
+    log_file: str = os.path.join(working_dir, "terraform.log")
 
 
 @dataclasses.dataclass
@@ -70,6 +78,11 @@ class TerraformService:
                 working_dir=self.config.working_dir, var_file=self.config.var_file
             )
         return self._terraform_client
+
+    def enable_tf_logging(self) -> None:
+        """Set environment variable TF_LOG and TF_LOG_PATH to enable logging."""
+        os.environ["TF_LOG"] = self.config.log_level
+        os.environ["TF_LOG_PATH"] = self.config.log_file
 
     def _is_terraform_installed(self) -> bool:
         """Check if terraform is installed on host machine.
@@ -163,13 +176,13 @@ class TerraformService:
                 TimeElapsedColumn(),
             ) as progress:
                 progress.add_task(description="Initializing", total=None)
-                ret_code, _, _ = self.terraform_client.init(
-                    capture_output=self.config.capture_output
-                )
 
+                ret_code, _, _ = self.terraform_client.init(
+                    capture_output=self.config.capture_output,
+                    raise_on_error=False,
+                )
                 if ret_code != 0:
-                    print("The command 'terraform init' failed.")
-                    raise typer.Exit()
+                    raise MatchaTerraformError(tf_error=self.parse_tf_log_file())
 
                 print(
                     f"[green] {self.emojis.checkmark_emoji} Matcha {self.emojis.matcha_emoji} initialised! [/green]"
@@ -189,18 +202,35 @@ class TerraformService:
             TimeElapsedColumn(),
         ) as progress:
             progress.add_task(description="Applying", total=None)
-            self.terraform_client.apply(
+
+            ret_code, _, _ = self.terraform_client.apply(
                 input=False,
+                raise_on_error=False,
                 capture_output=self.config.capture_output,
-                raise_on_error=True,
                 skip_plan=True,
                 auto_approve=True,
             )
+            if ret_code != 0:
+                raise MatchaTerraformError(tf_error=self.parse_tf_log_file())
 
         print()
         print(
             f"[green] {self.emojis.checkmark_emoji} Your environment has been provisioned! [/green]"
         )
+
+    def parse_tf_log_file(self) -> str:
+        """Parse the terraform log file to get the error message.
+
+        Returns:
+            str: Extracted error message.
+        """
+        with open(self.config.log_file) as file:
+            tf_error = [line.rstrip("\n") for line in file]
+
+        last_error = tf_error[-1]
+        error_string = "[ERROR] "
+        index = last_error.find(error_string)
+        return last_error if index == -1 else last_error[index + len(error_string) :]
 
     def provision(self) -> None:
         """Provision resources required for the deployment.
@@ -211,6 +241,8 @@ class TerraformService:
         self.check_installation()
 
         self.validate_config()
+
+        self.enable_tf_logging()
 
         if self.is_approved(verb="provision"):
             self._init_and_apply()
@@ -235,12 +267,14 @@ class TerraformService:
             progress.add_task(description="Destroying", total=None)
 
             # Reference: https://github.com/beelit94/python-terraform/issues/108
-            self.terraform_client.destroy(
+            ret_code, _, _ = self.terraform_client.destroy(
                 capture_output=self.config.capture_output,
-                raise_on_error=True,
+                raise_on_error=False,
                 force=python_terraform.IsNotFlagged,
                 auto_approve=True,
             )
+            if ret_code != 0:
+                raise MatchaTerraformError(tf_error=self.parse_tf_log_file())
 
     def deprovision(self) -> None:
         """Deprovision the resources.
@@ -249,6 +283,8 @@ class TerraformService:
             Exit: if approval is not given by user.
         """
         self.check_installation()
+
+        self.enable_tf_logging()
 
         if self.is_approved(verb="destroy"):
             self._destroy()
