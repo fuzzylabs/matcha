@@ -11,7 +11,7 @@ from rich import print
 
 from matcha_ml.errors import MatchaPermissionError
 
-SUBMODULE_NAMES = ["aks", "resource_group", "mlflow-module", "storage"]
+SUBMODULE_NAMES = ["aks", "resource_group", "mlflow_module", "storage", "zenml_storage"]
 
 
 @dataclasses.dataclass
@@ -38,7 +38,7 @@ def reuse_configuration(path: str) -> bool:
         summary_message = """The following resources are already configured for provisioning:
 1. [yellow] Resource group [/yellow]: A resource group
 2. [yellow] Azure Kubernetes Service (AKS) [/yellow]: A kubernetes cluster
-3. [yellow] Azure Storage Container [/yellow]: A storage container
+3. [yellow] Two Azure Storage Container [/yellow]: A storage container for storing mlflow artifacts and second container for zenml artifacts
 """
         print(summary_message)
 

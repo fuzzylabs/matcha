@@ -126,7 +126,7 @@ class TerraformService:
         summary_message = f"""The following resources will be {verb}ed:
 1. [yellow] Resource group [/yellow]: A resource group
 2. [yellow] Azure Kubernetes Service (AKS) [/yellow]: A kubernetes cluster
-3. [yellow] Azure Storage Container [/yellow]: A storage container
+3. [yellow] Two Azure Storage Container [/yellow]: A storage container for storing mlflow artifacts and second container for zenml artifacts
 
 {verb.capitalize()}ing the resources may take up to 10 minutes. May we suggest you to grab a cup of 🍵?
 """
