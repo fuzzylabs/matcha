@@ -18,9 +18,3 @@ resource "azurerm_kubernetes_cluster" "matcha_kubernetes_cluster" {
     type = "SystemAssigned"
   }
 }
-
-resource "kubernetes_namespace" "k8s-ns" {
-  metadata {
-    name = "zenml"
-  }
-}
