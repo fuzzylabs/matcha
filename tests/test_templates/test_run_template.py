@@ -216,7 +216,7 @@ def test_show_terraform_outputs(
 
 
 def test_terraform_raise_exception_provision_init(
-    terraform_test_config: TerraformConfig
+    terraform_test_config: TerraformConfig,
 ):
     """Test if terraform exception is handled correctly during init when provisioning resources.
 
@@ -243,7 +243,7 @@ def test_terraform_raise_exception_provision_init(
 
 
 def test_terraform_raise_exception_provision_apply(
-    terraform_test_config: TerraformConfig
+    terraform_test_config: TerraformConfig,
 ):
     """Test if terraform exception is handled correctly during apply when provisioning resources.
 
@@ -270,7 +270,7 @@ def test_terraform_raise_exception_provision_apply(
 
 
 def test_terraform_raise_exception_deprovision_destroy(
-    terraform_test_config: TerraformConfig
+    terraform_test_config: TerraformConfig,
 ):
     """Test if terraform exception is captured when performing deprovision.
 
