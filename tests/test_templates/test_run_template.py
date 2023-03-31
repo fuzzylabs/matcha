@@ -227,14 +227,18 @@ def test_terraform_raise_exception_provision_init(
     tfs.config = terraform_test_config
     tfs.check_installation = MagicMock()
     tfs.validate_config = MagicMock()
-    tfs.terraform_client.init = MagicMock(return_value=(1, "", ""))
+    tfs.terraform_client.init = MagicMock(return_value=(1, "", "Init failed"))
 
     tfs.is_approved = MagicMock(
         return_value=True
     )  # the user approves, should provision
 
-    with pytest.raises(MatchaTerraformError):
+    with pytest.raises(MatchaTerraformError) as exc_info:
         tfs.provision()
+    assert (
+        str(exc_info.value)
+        == "Terraform failed because of the following error: 'Init failed'."
+    )
 
 
 def test_terraform_raise_exception_provision_apply(
@@ -250,16 +254,20 @@ def test_terraform_raise_exception_provision_apply(
     tfs.check_installation = MagicMock()
     tfs.validate_config = MagicMock()
     tfs.terraform_client.init = MagicMock(return_value=(0, "", ""))
-    tfs.terraform_client.apply = MagicMock(return_value=(1, "", ""))
+    tfs.terraform_client.apply = MagicMock(return_value=(1, "", "Apply failed"))
     tfs.show_terraform_outputs = MagicMock()
 
     tfs.is_approved = MagicMock(
         return_value=True
     )  # the user approves, should provision
 
-    with pytest.raises(MatchaTerraformError):
+    with pytest.raises(MatchaTerraformError) as exc_info:
         tfs.provision()
         tfs.terraform_client.init.assert_called()
+    assert (
+        str(exc_info.value)
+        == "Terraform failed because of the following error: 'Apply failed'."
+    )
 
 
 def test_terraform_raise_exception_deprovision_destroy(
@@ -274,11 +282,15 @@ def test_terraform_raise_exception_deprovision_destroy(
     tfs.config = terraform_test_config
 
     tfs.check_installation = MagicMock()
-    tfs.terraform_client.destroy = MagicMock(return_value=(1, "", ""))
+    tfs.terraform_client.destroy = MagicMock(return_value=(1, "", "Destroy failed"))
 
     tfs.is_approved = MagicMock(
         return_value=True
     )  # the user approves, should deprovision
 
-    with pytest.raises(MatchaTerraformError):
+    with pytest.raises(MatchaTerraformError) as exc_info:
         tfs.deprovision()
+    assert (
+        str(exc_info.value)
+        == "Terraform failed because of the following error: 'Destroy failed'."
+    )
