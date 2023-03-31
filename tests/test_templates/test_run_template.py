@@ -285,4 +285,4 @@ def test_terraform_raise_exception_deprovision_destroy(
 
     with pytest.raises(MatchaTerraformError):
         tfs.deprovision()
-        tfs.terraform_client.destroy.assert_called()
+        tfs.terraform_client.destroy.assert_not_called()
