@@ -177,13 +177,23 @@ def test_write_outputs_state(terraform_test_config: TerraformConfig):
     def mock_output(name: str, full_value: bool):
         if name == "mlflow-tracking-url" and full_value:
             return "mlflow-test-url"
+
+        if name == "zenml-storage-path" and full_value:
+            return "zenml-test-storage-path"
+
+        if name == "zenml-connection-string" and full_value:
+            return "zenml-test-connection-string"
         else:
             raise ValueError("Unexpected input")
 
     tfs.terraform_client.output = MagicMock(wraps=mock_output)
 
     with does_not_raise():
-        expected_output = {"mlflow-tracking-url": "mlflow-test-url"}
+        expected_output = {
+            "mlflow-tracking-url": "mlflow-test-url",
+            "zenml-storage-path": "zenml-test-storage-path",
+            "zenml-connection-string": "zenml-test-connection-string",
+        }
         tfs.write_outputs_state()
         with open(terraform_test_config.state_file) as f:
             assert json.load(f) == expected_output
@@ -204,6 +214,13 @@ def test_show_terraform_outputs(
     def mock_output(name: str, full_value: bool):
         if name == "mlflow-tracking-url" and full_value:
             return "mlflow-test-url"
+
+        if name == "zenml-storage-path" and full_value:
+            return "zenml-test-storage-path"
+
+        if name == "zenml-connection-string" and full_value:
+            return "zenml-test-connection-string"
+
         else:
             raise ValueError("Unexpected input")
 
@@ -212,3 +229,7 @@ def test_show_terraform_outputs(
         tfs.show_terraform_outputs()
         captured = capsys.readouterr()
         assert '"mlflow-tracking-url": "mlflow-test-url"' in captured.out
+        assert '"zenml-storage-path": "zenml-test-storage-path"' in captured.out
+        assert (
+            '"zenml-connection-string": "zenml-test-connection-string"' in captured.out
+        )
