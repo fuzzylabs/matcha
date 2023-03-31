@@ -2,7 +2,6 @@
 import json
 import os
 from contextlib import nullcontext as does_not_raise
-from distutils.dir_util import copy_tree
 from unittest import mock
 from unittest.mock import MagicMock
 
@@ -12,26 +11,7 @@ from _pytest.capture import SysCapture
 from python_terraform import TerraformCommandError
 
 from matcha_ml.errors import MatchaTerraformError
-from matcha_ml.templates.build_templates.azure_template import (
-    TemplateVariables,
-    build_template,
-)
 from matcha_ml.templates.run_template import TerraformConfig, TerraformService
-
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-TEMPLATE_DIR = os.path.join(
-    BASE_DIR, os.pardir, os.pardir, "src", "matcha_ml", "infrastructure"
-)
-
-
-@pytest.fixture
-def template_src_path() -> str:
-    """Fixture for the test infrastructure template path.
-
-    Returns:
-        str: template path
-    """
-    return TEMPLATE_DIR
 
 
 @pytest.fixture
@@ -235,27 +215,48 @@ def test_show_terraform_outputs(
         assert '"mlflow-tracking-url": "mlflow-test-url"' in captured.out
 
 
-def test_terraform_exception_provision_when_missing_config(
-    terraform_test_config: TerraformConfig, template_src_path: str
+def test_terraform_raise_exception_provision_init(
+    terraform_test_config: TerraformConfig
 ):
-    """Test if terraform exception is handled correctly during apply when the main.tf file does not exist.
+    """Test if terraform exception is handled correctly during init when provisioning resources.
 
     Args:
         terraform_test_config (TerraformConfig): terraform test service config
-        template_src_path (str): existing template directory path
     """
     tfs = TerraformService()
     tfs.config = terraform_test_config
+    tfs.check_installation = MagicMock()
+    tfs.validate_config = MagicMock()
+    tfs.terraform_client.init = MagicMock(return_value=(1, "", ""))
+    tfs.terraform_client.apply = MagicMock(return_value=(0, "", ""))
+    tfs.show_terraform_outputs = MagicMock()
 
-    # copy tf files to run provision
-    src_path = template_src_path
-    dest_path = terraform_test_config.working_dir
-    copy_tree(src_path, dest_path)
-    config = TemplateVariables("uksouth", "matcha")
-    build_template(config, template_src_path, dest_path)
+    tfs.is_approved = MagicMock(
+        return_value=True
+    )  # the user approves, should provision
 
-    # delete a file to simulate exception
-    os.remove(os.path.join(dest_path, "resource_group/main.tf"))
+    with pytest.raises(MatchaTerraformError):
+        tfs.provision()
+        tfs.terraform_client.init.assert_called()
+        tfs.terraform_client.apply.assert_not_called()
+        tfs.show_terraform_outputs.assert_not_called()
+
+
+def test_terraform_raise_exception_provision_apply(
+    terraform_test_config: TerraformConfig
+):
+    """Test if terraform exception is handled correctly during apply when provisioning resources.
+
+    Args:
+        terraform_test_config (TerraformConfig): terraform test service config
+    """
+    tfs = TerraformService()
+    tfs.config = terraform_test_config
+    tfs.check_installation = MagicMock()
+    tfs.validate_config = MagicMock()
+    tfs.terraform_client.init = MagicMock(return_value=(0, "", ""))
+    tfs.terraform_client.apply = MagicMock(return_value=(1, "", ""))
+    tfs.show_terraform_outputs = MagicMock()
 
     tfs.is_approved = MagicMock(
         return_value=True
@@ -268,30 +269,23 @@ def test_terraform_exception_provision_when_missing_config(
         tfs.show_terraform_outputs.assert_not_called()
 
 
-def test_terraform_deprovision_config_does_not_exist_exception(
-    terraform_test_config: TerraformConfig, template_src_path: str
+def test_terraform_raise_exception_deprovision_destroy(
+    terraform_test_config: TerraformConfig
 ):
-    """Test if terraform exception is captured when performing deprovision on a config that does not exist.
+    """Test if terraform exception is captured when performing deprovision.
 
     Args:
         terraform_test_config (TerraformConfig): terraform test service config
-        template_src_path (str): existing template directory path
     """
     tfs = TerraformService()
     tfs.config = terraform_test_config
 
-    # copy tf files to run provision
-    src_path = template_src_path
-    dest_path = terraform_test_config.working_dir
-    copy_tree(src_path, dest_path)
-
-    # Create a config with a resource group name that does not exist
-    config = TemplateVariables("uksouth", "KGFUSQXGNZKJPMUAIIAZ")
-    build_template(config, template_src_path, dest_path)
+    tfs.check_installation = MagicMock()
+    tfs.terraform_client.destroy = MagicMock(return_value=(1, "", ""))
 
     tfs.is_approved = MagicMock(
         return_value=True
-    )  # the user approves, should provision
+    )  # the user approves, should deprovision
 
     with pytest.raises(MatchaTerraformError):
         tfs.deprovision()
