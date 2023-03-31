@@ -1,25 +1,21 @@
 """Tests for the Azure Service."""
 from unittest.mock import patch
 
-import pytest
-
-from matcha_ml.services import AzureClient
-
 INTERNAL_FUNCTION_STUB = "matcha_ml.services.AzureClient"
 
 
-@pytest.fixture
-def mocked_azure_client() -> AzureClient:
-    """The Azure Client with mocked variables.
+# @pytest.fixture
+# def mocked_azure_client() -> AzureClient:
+#     """The Azure Client with mocked variables.
 
-    Returns:
-        AzureClient: the mocked AzureClient.
-    """
-    with (
-        patch(f"{INTERNAL_FUNCTION_STUB}._authenticate", return_value=True),
-        patch(f"{INTERNAL_FUNCTION_STUB}._subscription_id", return_value="id"),
-    ):
-        return AzureClient()
+#     Returns:
+#         AzureClient: the mocked AzureClient.
+#     """
+#     with (
+#         patch(f"{INTERNAL_FUNCTION_STUB}._authenticate", return_value=True),
+#         patch(f"{INTERNAL_FUNCTION_STUB}._subscription_id", return_value="id"),
+#     ):
+#         return AzureClient()
 
 
 # def test_fetch_regions(mocked_azure_client):

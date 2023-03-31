@@ -3,7 +3,8 @@ from subprocess import DEVNULL
 
 from azure.core.exceptions import ClientAuthenticationError
 from azure.identity import AzureCliCredential, CredentialUnavailableError
-from azure.mgmt.resource import (  # type: ignore
+from azure.mgmt.resource import (
+    ResourceManagementClient,
     SubscriptionClient,
 )
 
@@ -58,7 +59,17 @@ class AzureClient:
         Returns:
             Set[str]: the set of resource groups the user has provisioned.
         """
-        return {"random-resources", "other-random-resources"}
+        if hasattr(self, "resource_group_names"):
+            return self.resource_group_names  # type: ignore
+        else:
+            self._resource_client = ResourceManagementClient(
+                self._credential, str(self._subscription_id)
+            )
+            self.resource_group_names = {
+                resource_group.name
+                for resource_group in self._resource_client.resource_groups.list()
+            }
+            return self.resource_group_names
 
     def fetch_regions(self) -> set[str]:
         """Fetch the Azure regions.
@@ -66,7 +77,16 @@ class AzureClient:
         Returns:
             set[str]: the set of all Azure regions.
         """
-        return {"ukwest", "uksouth"}
+        if hasattr(self, "regions"):
+            return self.regions  # type: ignore
+        else:
+            self.regions = {
+                region.name
+                for region in self._client.subscriptions.list_locations(
+                    self.subscription_id
+                )
+            }
+            return self.regions
 
     def is_valid_region(self, region: str) -> bool:
         """Check whether the user inputted region is valid.

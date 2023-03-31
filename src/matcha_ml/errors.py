@@ -31,8 +31,24 @@ class MatchaAuthenticationError(Exception):
 
         Args:
             auth_error (str): the error to propagate to the user.
-            *args: additional arguments to pass to Exception base class.
-            **kwargs: additional key word arguments to pass to Exception base class.
+            *args: additional arguments to pass to the Exception base class.
+            **kwargs: additional key word arguments to pass to the Exception base class.
         """
         message = f"Error - Matcha couldn't authenticate you with Azure: {auth_error}, make sure you've run 'az login'!"
         super().__init__(message, *args, **kwargs)
+
+
+class MatchaInputError(Exception):
+    """Matcha Input Error.
+
+    Raised when the user inputs a bad value.
+    """
+
+    def __init__(self, *args: Any, **kwargs: Any):
+        """The initialiser for Input error.
+
+        Args:
+            *args: additional arguments to pass to the Exception base class.
+            **kwargs: additional key word arguments to pass to the Exception base class.
+        """
+        super().__init__(*args, **kwargs)

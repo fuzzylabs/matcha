@@ -5,10 +5,10 @@ import typer
 
 from matcha_ml import __version__
 from matcha_ml.cli import run
+from matcha_ml.cli._validation import region_typer_callback
 from matcha_ml.cli.destroy import destroy_resources
 from matcha_ml.cli.prefix_validation import validate_prefix
 from matcha_ml.cli.provision import provision_resources
-from matcha_ml.cli.region_validation import verify_azure_location
 
 app = typer.Typer(no_args_is_help=True, pretty_exceptions_show_locals=False)
 
@@ -25,7 +25,7 @@ def provision(
     location: str = typer.Option(
         None,
         prompt="What region should your resources be provisioned in (e.g., 'ukwest')?",
-        callback=verify_azure_location,
+        callback=region_typer_callback,
         help="The region where your resources will be provisioned, e.g., 'ukwest'",
     ),
     prefix: str = typer.Option(
