@@ -22,7 +22,7 @@ module "zenml_storage" {
 
   resource_group_name = module.resource_group.name
   location            = var.location
-  aks_principal_id = 
+  aks_principal_id    = module.aks.aks_principal_id
 }
 
 module "aks" {
