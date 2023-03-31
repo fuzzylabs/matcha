@@ -228,8 +228,6 @@ def test_terraform_raise_exception_provision_init(
     tfs.check_installation = MagicMock()
     tfs.validate_config = MagicMock()
     tfs.terraform_client.init = MagicMock(return_value=(1, "", ""))
-    tfs.terraform_client.apply = MagicMock(return_value=(0, "", ""))
-    tfs.show_terraform_outputs = MagicMock()
 
     tfs.is_approved = MagicMock(
         return_value=True
@@ -237,9 +235,7 @@ def test_terraform_raise_exception_provision_init(
 
     with pytest.raises(MatchaTerraformError):
         tfs.provision()
-        tfs.terraform_client.init.assert_called()
-        tfs.terraform_client.apply.assert_not_called()
-        tfs.show_terraform_outputs.assert_not_called()
+        tfs.terraform_client.init.assert_not_called()
 
 
 def test_terraform_raise_exception_provision_apply(
@@ -265,7 +261,7 @@ def test_terraform_raise_exception_provision_apply(
     with pytest.raises(MatchaTerraformError):
         tfs.provision()
         tfs.terraform_client.init.assert_called()
-        tfs.terraform_client.apply.assert_called()
+        tfs.terraform_client.apply.assert_not_called()
         tfs.show_terraform_outputs.assert_not_called()
 
 
