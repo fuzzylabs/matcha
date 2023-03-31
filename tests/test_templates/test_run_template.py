@@ -235,7 +235,6 @@ def test_terraform_raise_exception_provision_init(
 
     with pytest.raises(MatchaTerraformError):
         tfs.provision()
-        tfs.terraform_client.init.assert_not_called()
 
 
 def test_terraform_raise_exception_provision_apply(
@@ -261,8 +260,6 @@ def test_terraform_raise_exception_provision_apply(
     with pytest.raises(MatchaTerraformError):
         tfs.provision()
         tfs.terraform_client.init.assert_called()
-        tfs.terraform_client.apply.assert_not_called()
-        tfs.show_terraform_outputs.assert_not_called()
 
 
 def test_terraform_raise_exception_deprovision_destroy(
@@ -285,4 +282,3 @@ def test_terraform_raise_exception_deprovision_destroy(
 
     with pytest.raises(MatchaTerraformError):
         tfs.deprovision()
-        tfs.terraform_client.destroy.assert_not_called()
