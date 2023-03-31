@@ -7,7 +7,7 @@ output "zenml-storage-path" {
 }
 
 output "zenml-connection-string" {
-  value     = module.zenml_storage.primary_connection_string
+  value     = module.zenml_storage.zenml_primary_connection_string
   sensitive = true
 }
 
