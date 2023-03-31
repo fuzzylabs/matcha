@@ -2,6 +2,7 @@
 import json
 import os
 from contextlib import nullcontext as does_not_raise
+from typing import Callable, Dict, Union
 from unittest import mock
 from unittest.mock import MagicMock
 
@@ -32,6 +33,31 @@ def terraform_test_config(matcha_testing_directory: str) -> TerraformConfig:
         state_file=os.path.join(infrastructure_directory, "matcha.state"),
         var_file=os.path.join(infrastructure_directory, "terraform.tfvars.json"),
     )
+
+
+@pytest.fixture
+def mock_output() -> Callable[[str, bool], Union[str, Dict[str, str]]]:
+    """Fixture for mocking the terraform output.
+
+    Returns:
+        Callable[[str, bool], Union[str, Dict[str, str]]]: the expected value based on the key
+    """
+
+    def output(name: str, full_value: bool) -> str:
+        expected_outputs = {
+            "mlflow-tracking-url": "mlflow-test-url",
+            "zenml-storage-path": "zenml-test-storage-path",
+            "zenml-connection-string": "zenml-test-connection-string",
+            "k8s-context": "k8s-test-context",
+        }
+        if name not in expected_outputs:
+            raise ValueError("Unexpected input")
+        if full_value:
+            return expected_outputs[name]
+        else:
+            return {"value": expected_outputs[name]}
+
+    return output
 
 
 def test_is_approved_confirmed():
@@ -165,26 +191,20 @@ def test_deprovision(terraform_test_config: TerraformConfig):
         tfs.terraform_client.destroy.assert_called()
 
 
-def test_write_outputs_state(terraform_test_config: TerraformConfig):
+def test_write_outputs_state(
+    terraform_test_config: TerraformConfig,
+    mock_output: Callable[[str, bool], Union[str, Dict[str, str]]],
+):
     """Test service writes the state file correctly.
 
     Args:
         terraform_test_config (TerraformConfig): test terraform service config
+        mock_output (Callable[[str, bool], Union[str, Dict[str, str]]]): the mock output
     """
     tfs = TerraformService()
     tfs.config = terraform_test_config
 
-    def mock_output(name: str, full_value: bool):
-        if name == "mlflow-tracking-url" and full_value:
-            return "mlflow-test-url"
-
-        if name == "zenml-storage-path" and full_value:
-            return "zenml-test-storage-path"
-
-        if name == "zenml-connection-string" and full_value:
-            return "zenml-test-connection-string"
-        else:
-            raise ValueError("Unexpected input")
+    print(type(mock_output))
 
     tfs.terraform_client.output = MagicMock(wraps=mock_output)
 
@@ -193,6 +213,7 @@ def test_write_outputs_state(terraform_test_config: TerraformConfig):
             "mlflow-tracking-url": "mlflow-test-url",
             "zenml-storage-path": "zenml-test-storage-path",
             "zenml-connection-string": "zenml-test-connection-string",
+            "k8s-context": "k8s-test-context",
         }
         tfs.write_outputs_state()
         with open(terraform_test_config.state_file) as f:
@@ -200,29 +221,19 @@ def test_write_outputs_state(terraform_test_config: TerraformConfig):
 
 
 def test_show_terraform_outputs(
-    terraform_test_config: TerraformConfig, capsys: SysCapture
+    terraform_test_config: TerraformConfig,
+    capsys: SysCapture,
+    mock_output: Callable[[str, bool], Union[str, Dict[str, str]]],
 ):
     """Test service shows the correct terraform output.
 
     Args:
         terraform_test_config (TerraformConfig): test terraform service config
         capsys (SysCapture): fixture to capture stdout and stderr
+        mock_output (Callable[[str, bool], Union[str, Dict[str, str]]]): the mock output
     """
     tfs = TerraformService()
     tfs.config = terraform_test_config
-
-    def mock_output(name: str, full_value: bool):
-        if name == "mlflow-tracking-url" and full_value:
-            return "mlflow-test-url"
-
-        if name == "zenml-storage-path" and full_value:
-            return "zenml-test-storage-path"
-
-        if name == "zenml-connection-string" and full_value:
-            return "zenml-test-connection-string"
-
-        else:
-            raise ValueError("Unexpected input")
 
     tfs.terraform_client.output = MagicMock(wraps=mock_output)
     with does_not_raise():
@@ -233,3 +244,4 @@ def test_show_terraform_outputs(
         assert (
             '"zenml-connection-string": "zenml-test-connection-string"' in captured.out
         )
+        assert '"k8s-context": "k8s-test-context"' in captured.out

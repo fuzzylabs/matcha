@@ -13,6 +13,7 @@ from rich.progress import Progress, SpinnerColumn, TimeElapsedColumn
 MLFLOW_TRACKING_URL = "mlflow-tracking-url"
 ZENML_STORAGE_PATH = "zenml-storage-path"
 ZENML_CONNECTION_STRING = "zenml-connection-string"
+K8S_CONTEXT = "k8s-context"
 
 
 SPINNER = "dots"
@@ -274,6 +275,7 @@ class TerraformService:
             ZENML_CONNECTION_STRING: self.terraform_client.output(
                 ZENML_CONNECTION_STRING, full_value=True
             ),
+            K8S_CONTEXT: self.terraform_client.output(K8S_CONTEXT, full_value=True),
         }
 
         # dump specific terraform output to state file
