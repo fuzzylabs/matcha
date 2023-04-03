@@ -138,7 +138,6 @@ def prefix_typer_callback(prefix: str) -> str:
 
     azure_client = get_azure_client()
 
-    print("RESOURCES", azure_client.fetch_resource_group_names())
     if not azure_client.is_valid_resource_group(prefix):
         raise BadParameter(
             "You entered a resource group name prefix that have been used before, prefix must be unique."
