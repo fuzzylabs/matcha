@@ -47,6 +47,10 @@ def reuse_configuration(path: str) -> bool:
                 ("Resource group", "A resource group"),
                 ("Azure Kubernetes Service (AKS)", "A kubernetes cluster"),
                 ("Azure Storage Container", "A storage container"),
+                (
+                    "Seldon Core",
+                    "A framework for model deployment on top of a kubernetes cluster",
+                ),
             ],
         )
 
