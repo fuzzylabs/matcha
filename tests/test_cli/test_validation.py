@@ -35,7 +35,7 @@ def mocked_components_validation(mocked_azure_client):
         patch(
             f"{INTERNAL_FUNCTION_STUB}.fetch_resource_group_names",
             return_value={"random-resources"},
-        ),
+        )
     ):
         yield
 
