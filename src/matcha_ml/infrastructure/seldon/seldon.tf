@@ -24,3 +24,21 @@ resource "helm_release" "seldon" {
     value = "true"
   }
 }
+
+resource "kubernetes_namespace" "seldon-workloads" {
+  metadata {
+    name = "matcha-seldon-workloads"
+  }
+}
+
+# get the ingress host URL for the seldon model deployer
+data "kubernetes_service" "seldon_ingress" {
+  metadata {
+    name      = "istio-ingressgateway"
+    namespace = "istio-system"
+  }
+
+  depends_on = [
+    helm_release.seldon
+  ]
+}

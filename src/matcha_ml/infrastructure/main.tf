@@ -25,33 +25,10 @@ module "aks" {
   resource_group_name = module.resource_group.name
 }
 
-//module "kubernetes-config" {
-//  source = "./kubernetes_config"
-//
-//  # resource group variables
-//  resource_group_name = module.resource_group.name
-//  location            = var.location
-//
-//  # aks variables
-//  aks_cluster_name          = module.aks.aks_cluster_name
-//
-//  k8_host                   = module.aks.host
-//  k8_client_certificate     = module.aks.client_certificate
-//  k8_client_key             = module.aks.client_key
-//  k8_cluster_ca_certificate = module.aks.cluster_ca_certificate
-//}
-
 module "mlflow" {
   source = "./mlflow-module"
 
   depends_on = [null_resource.configure-local-kubectl]
-
-  # resource group variables
-  resource_group_name = module.resource_group.name
-  location            = var.location
-
-  # aks variables
-  aks_cluster_name          = module.aks.aks_cluster_name
 
   # storage variables
   storage_account_name      = module.storage.storage_account_name
@@ -68,52 +45,4 @@ module "seldon" {
   # details about the seldon deployment
   seldon_name      = var.seldon_name
   seldon_namespace = var.seldon_namespace
-
-  # aks variables
-  cluster_ca_certificate = ""
-  cluster_endpoint = ""
-  cluster_token = ""
-}
-
-resource "kubernetes_namespace" "seldon-workloads" {
-  metadata {
-    name = "matcha-seldon-workloads"
-  }
-}
-
-
-# add role to allow kubeflow to access kserve
-resource "kubernetes_cluster_role_v1" "seldon" {
-  metadata {
-    name = "seldon-permission"
-    labels = {
-      app = "matcha"
-    }
-  }
-
-  rule {
-    api_groups = ["*"]
-    resources  = ["*"]
-    verbs      = ["*"]
-  }
-
-  depends_on = [
-    module.seldon,
-  ]
-}
-
-# assign role to kubeflow pipeline runner
-resource "kubernetes_cluster_role_binding_v1" "binding" {
-  metadata {
-    name = "seldon-permission-binding"
-  }
-  role_ref {
-    api_group = "rbac.authorization.k8s.io"
-    kind      = "ClusterRole"
-    name      = kubernetes_cluster_role_v1.seldon.metadata[0].name
-  }
-  subject {
-    kind = "User"
-    name = "system:serviceaccount:kubeflow:pipeline-runner"
-  }
 }

@@ -2,11 +2,12 @@
 # by the calling module
 
 # seldon variables
-variable "seldon_name" {}
-variable "seldon_namespace" {}
+variable "seldon_name" {
+  type = string
+  description = "Seldon Helm deployment name"
+}
 
-# eks cluster variables for setting up 
-# the kubernetes and kubectl providers
-variable "cluster_endpoint" {}
-variable "cluster_ca_certificate" {}
-variable "cluster_token" {}
+variable "seldon_namespace" {
+  type = string
+  description = "Seldon system namespace"
+}
