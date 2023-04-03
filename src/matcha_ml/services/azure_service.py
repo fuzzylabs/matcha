@@ -1,5 +1,6 @@
 """The Azure Service interface."""
 from subprocess import DEVNULL
+from typing import Set
 
 from azure.core.exceptions import ClientAuthenticationError
 from azure.identity import AzureCliCredential, CredentialUnavailableError
@@ -51,7 +52,7 @@ class AzureClient:
         """
         return str(list(self._client.subscriptions.list())[0].subscription_id)
 
-    def fetch_resource_group_names(self) -> set[str]:
+    def fetch_resource_group_names(self) -> Set[str]:
         """Fetch the resource group names for the current subscription_id.
 
         Needed to check for duplication.
@@ -71,7 +72,7 @@ class AzureClient:
             }
             return self.resource_group_names
 
-    def fetch_regions(self) -> set[str]:
+    def fetch_regions(self) -> Set[str]:
         """Fetch the Azure regions.
 
         Returns:
