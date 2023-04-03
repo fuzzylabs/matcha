@@ -82,7 +82,7 @@ class TerraformService:
             Exit: if terraform is not installed.
         """
         if not self._is_terraform_installed():
-            print_error(f"{Emojis.cross_emoji} Terraform is not installed")
+            print_error(f"{Emojis.CROSS} Terraform is not installed")
             print_error(
                 "Terraform is required for to run and was not found installed on your machine."
                 "Please visit https://learn.hashicorp.com/tutorials/terraform/install-cli to install it."
@@ -140,15 +140,13 @@ class TerraformService:
         if previous_temp_dir.exists():
             print_status(
                 build_status(
-                    f"matcha {Emojis.matcha_emoji} has already been initialised. Skipping this step..."
+                    f"matcha {Emojis.MATCHA} has already been initialised. Skipping this step..."
                 )
             )
 
         else:
             print_status(
-                build_status(
-                    f"\n{Emojis.waiting_emoji} Brewing matcha {Emojis.matcha_emoji}...\n"
-                )
+                build_status(f"\n{Emojis.WAITING} Brewing matcha {Emojis.MATCHA}...\n")
             )
 
             # run terraform init
@@ -163,7 +161,7 @@ class TerraformService:
 
                 print_status(
                     build_substep_success_status(
-                        f"{Emojis.checkmark_emoji} Matcha {Emojis.matcha_emoji} initialised!\n"
+                        f"{Emojis.CHECKMARK} Matcha {Emojis.MATCHA} initialised!\n"
                     )
                 )
 
@@ -171,7 +169,7 @@ class TerraformService:
                 previous_temp_dir.mkdir(parents=True, exist_ok=True)
 
         print_status(
-            build_status(f"\n{Emojis.waiting_emoji} Provisioning your resources...\n")
+            build_status(f"\n{Emojis.WAITING} Provisioning your resources...\n")
         )
 
         # once terraform init is success, call terraform apply
@@ -186,7 +184,7 @@ class TerraformService:
 
         print_status(
             build_substep_success_status(
-                f"{Emojis.checkmark_emoji} Your environment has been provisioned!"
+                f"{Emojis.CHECKMARK} Your environment has been provisioned!"
             )
         )
 
@@ -215,7 +213,7 @@ class TerraformService:
     def _destroy(self) -> None:
         """Destroy the provisioned resources."""
         print()
-        print(f"{Emojis.waiting_emoji} Destroying your resources...")
+        print(f"{Emojis.WAITING} Destroying your resources...")
         print()
 
         with Spinner("Destroying"):
