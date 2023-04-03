@@ -1,7 +1,7 @@
 """Validation for user inputs."""
 from difflib import get_close_matches
 from re import match
-from typing import Optional, Union
+from typing import Optional, Union, Set, List
 
 from typer import BadParameter
 
@@ -34,13 +34,13 @@ def get_azure_client() -> AzureClient:
 
 
 def find_closest_matches(
-    pattern: str, possibilities: Union[set[str], list[str]], number_to_find: int = 1
-) -> Optional[list[str]]:
+    pattern: str, possibilities: Union[Set[str], List[str]], number_to_find: int = 1
+) -> Optional[List[str]]:
     """Find the closest matches to an input.
 
     Args:
         pattern (str): the user input.
-        possibilities (Union[set[str], list[str]]): the search space.
+        possibilities (Union[Set[str], List[str]]): the search space.
         number_to_find (int, optional): the number of matches to find. Defaults to 1.
 
     Returns:
