@@ -7,8 +7,14 @@ from shutil import copy, rmtree
 from typing import Optional
 
 import typer
-from rich import print
 
+from matcha_ml.cli.ui.print_messages import print_status
+from matcha_ml.cli.ui.status_message_builders import (
+    build_resource_confirmation,
+    build_status,
+    build_step_success_status,
+    build_substep_success_status,
+)
 from matcha_ml.errors import MatchaPermissionError
 
 SUBMODULE_NAMES = ["aks", "resource_group", "mlflow-module", "storage"]
@@ -35,12 +41,16 @@ def reuse_configuration(path: str) -> bool:
         bool: decision to reuse the existing configuration
     """
     if os.path.exists(path):
-        summary_message = """The following resources are already configured for provisioning:
-1. [yellow] Resource group [/yellow]: A resource group
-2. [yellow] Azure Kubernetes Service (AKS) [/yellow]: A kubernetes cluster
-3. [yellow] Azure Storage Container [/yellow]: A storage container
-"""
-        print(summary_message)
+        confirmation_message = build_resource_confirmation(
+            "The following resources are already configured for provisioning",
+            [
+                ("Resource group", "A resource group"),
+                ("Azure Kubernetes Service (AKS)", "A kubernetes cluster"),
+                ("Azure Storage Container", "A storage container"),
+            ],
+        )
+
+        print_status(confirmation_message)
 
         return not typer.confirm(
             "Do you want to override the configuration? Otherwise, the existing configuration will be reused"
@@ -80,7 +90,7 @@ def build_template(
         MatchaPermissionError: when there are no write permissions on the configuration destination
     """
     try:
-        print("Building configuration template...")
+        print_status(build_status("\nBuilding configuration template..."))
 
         # Override configuration if it already exists
         if os.path.exists(destination):
@@ -88,8 +98,10 @@ def build_template(
 
         os.makedirs(destination, exist_ok=True)
         if verbose:
-            print(
-                f"[green]Ensure template destination directory: {destination}[/green]"
+            print_status(
+                build_substep_success_status(
+                    f"Ensure template destination directory: {destination}"
+                )
             )
 
         # Define additional non-tf files that are needed from the main module
@@ -119,23 +131,31 @@ def build_template(
                 copy(src_path, destination_path)
 
             if verbose:
-                print(
-                    f"[green]{submodule_name} module configuration was copied[/green]"
+                print_status(
+                    build_substep_success_status(
+                        f"{submodule_name} module configuration was copied"
+                    )
                 )
 
         if verbose:
-            print("[green]Configuration was copied[/green]")
+            print_status(build_substep_success_status("Configuration was copied"))
 
         configuration_destination = os.path.join(destination, "terraform.tfvars.json")
         with open(configuration_destination, "w") as f:
             json.dump(dataclasses.asdict(config), f)
 
         if verbose:
-            print("[green]Template variables were added[/green]")
+            print_status(build_substep_success_status("Template variables were added."))
     except PermissionError:
         raise MatchaPermissionError(path=destination)
 
     if verbose:
-        print("[green bold]Template configuration has finished![/green bold]")
+        print_status(
+            build_substep_success_status("Template configuration has finished!")
+        )
 
-    print(f"The configuration template was written to {destination}")
+    print_status(
+        build_step_success_status(
+            f"The configuration template was written to {destination}"
+        )
+    )

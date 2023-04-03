@@ -2,6 +2,7 @@
 import json
 import os
 from contextlib import nullcontext as does_not_raise
+from typing import Callable, Dict, Union
 from unittest import mock
 from unittest.mock import MagicMock
 
@@ -10,6 +11,7 @@ import typer
 from _pytest.capture import SysCapture
 from python_terraform import TerraformCommandError
 
+from matcha_ml.errors import MatchaTerraformError
 from matcha_ml.templates.run_template import TerraformConfig, TerraformService
 
 
@@ -32,6 +34,31 @@ def terraform_test_config(matcha_testing_directory: str) -> TerraformConfig:
         state_file=os.path.join(infrastructure_directory, "matcha.state"),
         var_file=os.path.join(infrastructure_directory, "terraform.tfvars.json"),
     )
+
+
+@pytest.fixture
+def mock_output() -> Callable[[str, bool], Union[str, Dict[str, str]]]:
+    """Fixture for mocking the terraform output.
+
+    Returns:
+        Callable[[str, bool], Union[str, Dict[str, str]]]: the expected value based on the key
+    """
+
+    def output(name: str, full_value: bool) -> str:
+        expected_outputs = {
+            "mlflow-tracking-url": "mlflow-test-url",
+            "zenml-storage-path": "zenml-test-storage-path",
+            "zenml-connection-string": "zenml-test-connection-string",
+            "k8s-context": "k8s-test-context",
+        }
+        if name not in expected_outputs:
+            raise ValueError("Unexpected input")
+        if full_value:
+            return expected_outputs[name]
+        else:
+            return {"value": expected_outputs[name]}
+
+    return output
 
 
 def test_is_approved_confirmed():
@@ -165,50 +192,138 @@ def test_deprovision(terraform_test_config: TerraformConfig):
         tfs.terraform_client.destroy.assert_called()
 
 
-def test_write_outputs_state(terraform_test_config: TerraformConfig):
+def test_write_outputs_state(
+    terraform_test_config: TerraformConfig,
+    mock_output: Callable[[str, bool], Union[str, Dict[str, str]]],
+):
     """Test service writes the state file correctly.
 
     Args:
         terraform_test_config (TerraformConfig): test terraform service config
+        mock_output (Callable[[str, bool], Union[str, Dict[str, str]]]): the mock output
     """
     tfs = TerraformService()
     tfs.config = terraform_test_config
 
-    def mock_output(name: str, full_value: bool):
-        if name == "mlflow-tracking-url" and full_value:
-            return "mlflow-test-url"
-        else:
-            raise ValueError("Unexpected input")
+    print(type(mock_output))
 
     tfs.terraform_client.output = MagicMock(wraps=mock_output)
 
     with does_not_raise():
-        expected_output = {"mlflow-tracking-url": "mlflow-test-url"}
+        expected_output = {
+            "mlflow-tracking-url": "mlflow-test-url",
+            "zenml-storage-path": "zenml-test-storage-path",
+            "zenml-connection-string": "zenml-test-connection-string",
+            "k8s-context": "k8s-test-context",
+        }
         tfs.write_outputs_state()
         with open(terraform_test_config.state_file) as f:
             assert json.load(f) == expected_output
 
 
 def test_show_terraform_outputs(
-    terraform_test_config: TerraformConfig, capsys: SysCapture
+    terraform_test_config: TerraformConfig,
+    capsys: SysCapture,
+    mock_output: Callable[[str, bool], Union[str, Dict[str, str]]],
 ):
     """Test service shows the correct terraform output.
 
     Args:
         terraform_test_config (TerraformConfig): test terraform service config
         capsys (SysCapture): fixture to capture stdout and stderr
+        mock_output (Callable[[str, bool], Union[str, Dict[str, str]]]): the mock output
     """
     tfs = TerraformService()
     tfs.config = terraform_test_config
-
-    def mock_output(name: str, full_value: bool):
-        if name == "mlflow-tracking-url" and full_value:
-            return "mlflow-test-url"
-        else:
-            raise ValueError("Unexpected input")
 
     tfs.terraform_client.output = MagicMock(wraps=mock_output)
     with does_not_raise():
         tfs.show_terraform_outputs()
         captured = capsys.readouterr()
         assert '"mlflow-tracking-url": "mlflow-test-url"' in captured.out
+        assert '"zenml-storage-path": "zenml-test-storage-path"' in captured.out
+        assert (
+            '"zenml-connection-string": "zenml-test-connection-string"' in captured.out
+        )
+        assert '"k8s-context": "k8s-test-context"' in captured.out
+
+
+def test_terraform_raise_exception_provision_init(
+    terraform_test_config: TerraformConfig,
+):
+    """Test if terraform exception is handled correctly during init when provisioning resources.
+
+    Args:
+        terraform_test_config (TerraformConfig): terraform test service config
+    """
+    tfs = TerraformService()
+    tfs.config = terraform_test_config
+    tfs.check_installation = MagicMock()
+    tfs.validate_config = MagicMock()
+    tfs.terraform_client.init = MagicMock(return_value=(1, "", "Init failed"))
+
+    tfs.is_approved = MagicMock(
+        return_value=True
+    )  # the user approves, should provision
+
+    with pytest.raises(MatchaTerraformError) as exc_info:
+        tfs.provision()
+    assert (
+        str(exc_info.value)
+        == "Terraform failed because of the following error: 'Init failed'."
+    )
+
+
+def test_terraform_raise_exception_provision_apply(
+    terraform_test_config: TerraformConfig,
+):
+    """Test if terraform exception is handled correctly during apply when provisioning resources.
+
+    Args:
+        terraform_test_config (TerraformConfig): terraform test service config
+    """
+    tfs = TerraformService()
+    tfs.config = terraform_test_config
+    tfs.check_installation = MagicMock()
+    tfs.validate_config = MagicMock()
+    tfs.terraform_client.init = MagicMock(return_value=(0, "", ""))
+    tfs.terraform_client.apply = MagicMock(return_value=(1, "", "Apply failed"))
+    tfs.show_terraform_outputs = MagicMock()
+
+    tfs.is_approved = MagicMock(
+        return_value=True
+    )  # the user approves, should provision
+
+    with pytest.raises(MatchaTerraformError) as exc_info:
+        tfs.provision()
+        tfs.terraform_client.init.assert_called()
+    assert (
+        str(exc_info.value)
+        == "Terraform failed because of the following error: 'Apply failed'."
+    )
+
+
+def test_terraform_raise_exception_deprovision_destroy(
+    terraform_test_config: TerraformConfig,
+):
+    """Test if terraform exception is captured when performing deprovision.
+
+    Args:
+        terraform_test_config (TerraformConfig): terraform test service config
+    """
+    tfs = TerraformService()
+    tfs.config = terraform_test_config
+
+    tfs.check_installation = MagicMock()
+    tfs.terraform_client.destroy = MagicMock(return_value=(1, "", "Destroy failed"))
+
+    tfs.is_approved = MagicMock(
+        return_value=True
+    )  # the user approves, should deprovision
+
+    with pytest.raises(MatchaTerraformError) as exc_info:
+        tfs.deprovision()
+    assert (
+        str(exc_info.value)
+        == "Terraform failed because of the following error: 'Destroy failed'."
+    )

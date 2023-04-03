@@ -1,6 +1,6 @@
 """Destroy CLI."""
-from rich import print
-
+from matcha_ml.cli.ui.print_messages import print_status
+from matcha_ml.cli.ui.status_message_builders import build_step_success_status
 from matcha_ml.templates.run_template import TerraformService
 
 
@@ -12,4 +12,4 @@ def destroy_resources() -> None:
     # deprovision the resources
     tfs.deprovision()
 
-    print("[green bold]Destroying resources is complete![/green bold]")
+    print_status(build_step_success_status("Destroying resources is complete!"))
