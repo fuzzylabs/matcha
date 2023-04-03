@@ -166,17 +166,17 @@ class TerraformService:
                     print_error("The command 'terraform init' failed.")
                     raise MatchaTerraformError(tf_error=err)
 
-                print_status(
-                    build_substep_success_status(
-                        f"{Emojis.CHECKMARK.value} Matcha {Emojis.MATCHA.value} initialised!\n"
-                    )
-                )
-
                 # Create a directory to avoid running init multiple times
                 previous_temp_dir.mkdir(parents=True, exist_ok=True)
 
+            print_status(
+                build_substep_success_status(
+                    f"{Emojis.CHECKMARK.value} Matcha {Emojis.MATCHA.value} initialised!\n"
+                )
+            )
+
         print_status(
-            build_status(f"\n{Emojis.WAITING.value} Provisioning your resources...\n")
+            build_status(f"{Emojis.WAITING.value} Provisioning your resources...\n")
         )
 
         # once terraform init is success, call terraform apply
@@ -193,7 +193,7 @@ class TerraformService:
 
         print_status(
             build_substep_success_status(
-                f"{Emojis.CHECKMARK.value} Your environment has been provisioned!"
+                f"{Emojis.CHECKMARK.value} Your environment has been provisioned!\n"
             )
         )
 

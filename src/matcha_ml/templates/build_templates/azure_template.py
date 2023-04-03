@@ -53,7 +53,7 @@ def reuse_configuration(path: str) -> bool:
         print_status(confirmation_message)
 
         return not typer.confirm(
-            "Do you want to override the configuration? Otherwise, the existing configuration will be reused\n"
+            "Do you want to override the configuration? Otherwise, the existing configuration will be reused"
         )
     else:
         return False
