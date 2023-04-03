@@ -53,7 +53,7 @@ def reuse_configuration(path: str) -> bool:
         print_status(confirmation_message)
 
         return not typer.confirm(
-            "Do you want to override the configuration? Otherwise, the existing configuration will be reused"
+            "Do you want to override the configuration? Otherwise, the existing configuration will be reused\n"
         )
     else:
         return False
@@ -90,7 +90,7 @@ def build_template(
         MatchaPermissionError: when there are no write permissions on the configuration destination
     """
     try:
-        print_status(build_status("Building configuration template..."))
+        print_status(build_status("\nBuilding configuration template..."))
 
         # Override configuration if it already exists
         if os.path.exists(destination):

@@ -83,7 +83,7 @@ class TerraformService:
             Exit: if terraform is not installed.
         """
         if not self._is_terraform_installed():
-            print_error(f"{Emojis.CROSS} Terraform is not installed")
+            print_error(f"{Emojis.CROSS.value} Terraform is not installed")
             print_error(
                 "Terraform is required for to run and was not found installed on your machine."
                 "Please visit https://learn.hashicorp.com/tutorials/terraform/install-cli to install it."
@@ -122,7 +122,7 @@ class TerraformService:
                 ("Azure Kubernetes Service (AKS)", "A kubernetes cluster"),
                 ("Azure Storage Container", "A storage container"),
             ],
-            footer=f"{verb.capitalize()}ing the resources may take up to 10 minutes. May we suggest you to grab a cup of 🍵?",
+            footer=f"{verb.capitalize()}ing the resources may take up to 10 minutes. May we suggest you to grab a cup of {Emojis.MATCHA.value}?",
         )
 
         print_status(summary_message)
@@ -141,13 +141,15 @@ class TerraformService:
         if previous_temp_dir.exists():
             print_status(
                 build_status(
-                    f"matcha {Emojis.MATCHA} has already been initialised. Skipping this step..."
+                    f"matcha {Emojis.MATCHA.value} has already been initialised. Skipping this step..."
                 )
             )
 
         else:
             print_status(
-                build_status(f"\n{Emojis.WAITING} Brewing matcha {Emojis.MATCHA}...\n")
+                build_status(
+                    f"\n{Emojis.WAITING.value} Brewing matcha {Emojis.MATCHA.value}...\n"
+                )
             )
 
             # run terraform init
@@ -166,7 +168,7 @@ class TerraformService:
 
                 print_status(
                     build_substep_success_status(
-                        f"{Emojis.CHECKMARK} Matcha {Emojis.MATCHA} initialised!\n"
+                        f"{Emojis.CHECKMARK.value} Matcha {Emojis.MATCHA.value} initialised!\n"
                     )
                 )
 
@@ -174,7 +176,7 @@ class TerraformService:
                 previous_temp_dir.mkdir(parents=True, exist_ok=True)
 
         print_status(
-            build_status(f"\n{Emojis.WAITING} Provisioning your resources...\n")
+            build_status(f"\n{Emojis.WAITING.value} Provisioning your resources...\n")
         )
 
         # once terraform init is success, call terraform apply
@@ -191,7 +193,7 @@ class TerraformService:
 
         print_status(
             build_substep_success_status(
-                f"{Emojis.CHECKMARK} Your environment has been provisioned!"
+                f"{Emojis.CHECKMARK.value} Your environment has been provisioned!"
             )
         )
 
@@ -220,7 +222,9 @@ class TerraformService:
     def _destroy(self) -> None:
         """Destroy the provisioned resources."""
         print()
-        print(f"{Emojis.WAITING} Destroying your resources...")
+        print_status(
+            build_status(f"{Emojis.WAITING.value} Destroying your resources...")
+        )
         print()
 
         with Spinner("Destroying"):
@@ -248,7 +252,7 @@ class TerraformService:
         else:
             print_status(
                 build_status(
-                    "You decided to cancel - your resources will remain active! If you change your mind, then run 'matcha destory' again."
+                    "You decided to cancel - your resources will remain active! If you change your mind, then run 'matcha destroy' again."
                 )
             )
             raise typer.Exit()

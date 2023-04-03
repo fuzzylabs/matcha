@@ -18,7 +18,7 @@ from matcha_ml.cli.ui.status_message_builders import (
             "Header",
             [("Resource Name 1", "Description 1")],
             None,
-            "Header:\n1. [yellow]Resource Name 1[/yellow]: Description 1\n",
+            "\nHeader:\n1. [yellow]Resource Name 1[/yellow]: Description 1\n",
         ),
         (
             "Header",
@@ -27,7 +27,7 @@ from matcha_ml.cli.ui.status_message_builders import (
                 ("Resource Name 2", "Description 2"),
             ],
             None,
-            "Header:\n"
+            "\nHeader:\n"
             "1. [yellow]Resource Name 1[/yellow]: Description 1\n"
             "2. [yellow]Resource Name 2[/yellow]: Description 2\n",
         ),
@@ -38,7 +38,7 @@ from matcha_ml.cli.ui.status_message_builders import (
                 ("Resource Name 2", "Description 2"),
             ],
             "Footer",
-            "Header:\n"
+            "\nHeader:\n"
             "1. [yellow]Resource Name 1[/yellow]: Description 1\n"
             "2. [yellow]Resource Name 2[/yellow]: Description 2\n"
             "\n"
