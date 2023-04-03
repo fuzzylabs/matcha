@@ -2,7 +2,7 @@
 
 # create a storage account
 resource "azurerm_storage_account" "zenmlaccount" {
-  name                = "zenmlacc"
+  name                = "${var.prefix}zenmlacc"
   resource_group_name = var.resource_group_name
   location            = var.location
 
@@ -13,7 +13,7 @@ resource "azurerm_storage_account" "zenmlaccount" {
 
 # create a storage container inside created storage account
 resource "azurerm_storage_container" "zenmlstoragecontainer" {
-  name                  = "artifactstore"
+  name                  = "${var.prefix}artifactstore"
   storage_account_name  = azurerm_storage_account.zenmlaccount.name
   container_access_type = "private"
 }
