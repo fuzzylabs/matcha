@@ -8,7 +8,6 @@ from matcha_ml.cli import run
 from matcha_ml.cli._validation import prefix_typer_callback, region_typer_callback
 from matcha_ml.cli.destroy import destroy_resources
 from matcha_ml.cli.provision import provision_resources
-from matcha_ml.cli.region_validation import verify_azure_location
 from matcha_ml.cli.ui.print_messages import print_status
 
 app = typer.Typer(no_args_is_help=True, pretty_exceptions_show_locals=False)
