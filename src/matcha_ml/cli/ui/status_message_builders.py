@@ -19,7 +19,7 @@ def build_resource_confirmation(
     Returns:
         str: the confirmation message.
     """
-    message = f"\n{header}:\n"
+    message = f"\n{header}:\n\n"
     for idx, (name, description) in enumerate(resources):
         message += f"{idx+1}. [yellow]{name}[/yellow]: {description}\n"
 
