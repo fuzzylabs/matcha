@@ -6,7 +6,7 @@ output "seldon-workloads-namespace" {
   value = module.seldon.workloads-namespace
 }
 
-output "kubernetes-context" {
+output "k8s-context" {
   value = local.kubectl_context
 }
 
