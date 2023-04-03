@@ -1,11 +1,27 @@
 """Validation for user inputs."""
 from difflib import get_close_matches
+from re import match
 from typing import Optional, Union
 
 from typer import BadParameter
 
 from matcha_ml.errors import MatchaInputError
 from matcha_ml.services import AzureClient
+
+PREFIX_RULES = {
+    "alphanumeric": {
+        "pattern": r"^[a-zA-Z0-9\-]*$",
+        "message": "Resource group name prefix must contain only alphanumeric characters and hyphens.",
+    },
+    "hyphen": {
+        "pattern": r"^([^-].*[^-]|[^-])$",
+        "message": "Resource group name prefix cannot start or end with a hyphen.",
+    },
+    "length": {
+        "pattern": r"^[a-zA-Z0-9\-]{3,24}$",
+        "message": "Resource group name prefix must be between 3 and 24 characters long.",
+    },
+}
 
 
 def get_azure_client() -> AzureClient:
@@ -81,3 +97,50 @@ def region_typer_callback(region: str) -> str:
         raise BadParameter(str(e))
 
     return region
+
+
+def _is_valid_prefix(prefix: str) -> str:
+    """Check for whether a prefix is valid.
+
+    Args:
+        prefix (str): the prefix to check.
+
+    Raises:
+        MatchaInputError: raised when the prefix is invalid.
+
+    Returns:
+        str: if valid, the prefix is returned.
+    """
+    for rule, checker in PREFIX_RULES.items():
+        if not match(checker["pattern"], prefix):
+            raise MatchaInputError(checker["message"])
+
+    return prefix
+
+
+def prefix_typer_callback(prefix: str) -> str:
+    """Typer callback for the prefix - called when the user inputs a prefix.
+
+    Args:
+        prefix (str): the user inputted prefix.
+
+    Raises:
+        BadParameter: raised when the prefix doesn't pass the rules.
+        BadParameter: raised when the prefix already exists.
+
+    Returns:
+        str: if valid, the prefix is returned.
+    """
+    try:
+        _is_valid_prefix(prefix)
+    except MatchaInputError as e:
+        raise BadParameter(str(e))
+
+    azure_client = get_azure_client()
+
+    if not azure_client.is_valid_resource_group(prefix):
+        raise BadParameter(
+            "You entered a resource group name prefix that have been used before, prefix must be unique."
+        )
+
+    return prefix

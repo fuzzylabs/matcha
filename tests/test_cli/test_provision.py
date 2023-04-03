@@ -17,53 +17,81 @@ TEMPLATE_DIR = os.path.join(
 )
 
 
-@pytest.fixture(scope="session", autouse=True)
-def check_azure_is_authenticated_mock():
-    """Mock the return result of check_azure_is_authenticated.
+# @pytest.fixture(scope="session", autouse=True)
+# def check_azure_is_authenticated_mock():
+#     """Mock the return result of check_azure_is_authenticated.
+
+#     Yields:
+#         str: the mock authentication result.
+#     """
+#     with patch("matcha_ml.cli.region_validation.check_azure_is_authenticated") as mock:
+#         mock.return_value = None
+#         yield mock
+
+
+# @pytest.fixture(scope="session", autouse=True)
+# def get_azure_subscription_client_mock():
+#     """Mock the return result of get_azure_subscription_client.
+
+#     Yields:
+#         str: the mock Azure subscription client.
+#     """
+#     with patch("matcha_ml.cli.region_validation.get_azure_subscription_client") as mock:
+#         mock.return_value = None
+#         yield mock
+
+
+# @pytest.fixture(scope="session", autouse=True)
+# def get_azure_locations_mock():
+#     """Mock the return result of get_azure_locations.
+
+#     Yields:
+#         str: the mock Azure regions/locations.
+#     """
+#     with patch("matcha_ml.cli.region_validation.get_azure_locations") as mock:
+#         mock.return_value = ["uksouth", "ukwest"]
+#         yield mock
+
+
+# @pytest.fixture(scope="session", autouse=True)
+# def resource_group_name_mock():
+#     """Mock the return result of get_existing_resource_group_names.
+
+#     Yields:
+#         str: the mock existing resource group name.
+#     """
+#     with patch(
+#         "matcha_ml.cli.prefix_validation.get_existing_resource_group_names"
+#     ) as mock:
+#         mock.return_value = "repeated-prefix-resources"
+#         yield mock
+
+
+@pytest.fixture(scope="class", autouse=True)
+def mock_region_validation():
+    """Mock the region_validation function.
 
     Yields:
-        str: the mock authentication result.
+        str: mock region.
     """
-    with patch("matcha_ml.cli.region_validation.check_azure_is_authenticated") as mock:
-        mock.return_value = None
+    with patch("matcha_ml.cli._validation.region_validation") as mock:
+        mock.return_value = "uksouth"
         yield mock
 
 
-@pytest.fixture(scope="session", autouse=True)
-def get_azure_subscription_client_mock():
-    """Mock the return result of get_azure_subscription_client.
+@pytest.fixture(scope="class", autouse=True)
+def mock_prefix_validation(mocked_azure_client):
+    """Mock the get_azure_client with the mocked azure client.
+
+    Args:
+        mocked_azure_client: the mocked azure client conftest fixture
 
     Yields:
-        str: the mock Azure subscription client.
+        AzureClient: mocked Azure Client.
     """
-    with patch("matcha_ml.cli.region_validation.get_azure_subscription_client") as mock:
-        mock.return_value = None
-        yield mock
-
-
-@pytest.fixture(scope="session", autouse=True)
-def get_azure_locations_mock():
-    """Mock the return result of get_azure_locations.
-
-    Yields:
-        str: the mock Azure regions/locations.
-    """
-    with patch("matcha_ml.cli.region_validation.get_azure_locations") as mock:
-        mock.return_value = ["uksouth", "ukwest"]
-        yield mock
-
-
-@pytest.fixture(scope="session", autouse=True)
-def resource_group_name_mock():
-    """Mock the return result of get_existing_resource_group_names.
-
-    Yields:
-        str: the mock existing resource group name.
-    """
-    with patch(
-        "matcha_ml.cli.prefix_validation.get_existing_resource_group_names"
-    ) as mock:
-        mock.return_value = "repeated-prefix-resources"
+    with patch("matcha_ml.cli._validation.get_azure_client") as mock:
+        mock.return_value = mocked_azure_client
+        # mock.return_value.fetch_resource_group_names = {'random-resources'}
         yield mock
 
 
@@ -129,7 +157,11 @@ def test_cli_provision_command(
     os.chdir(matcha_testing_directory)
 
     # Invoke provision command
-    result = runner.invoke(app, ["provision"], input="\nuksouth\nmatcha\nno\n")
+    result = runner.invoke(app, ["provision"], input="\nuksouth\nmatcha\nN\n")
+
+    print(result.exit_code)
+    print(dir(result))
+    print("RESULT", result)
 
     # Exit code 0 means there was no error
     assert result.exit_code == 0
@@ -182,7 +214,7 @@ def test_cli_provision_command_with_prefix(runner, matcha_testing_directory):
     os.chdir(matcha_testing_directory)
 
     # Invoke provision command
-    result = runner.invoke(app, ["provision"], input="ukwest\ncoffee\nno\nno\n")
+    result = runner.invoke(app, ["provision"], input="uksouth\ncoffee\nno\nno\n")
 
     # Exit code 0 means there was no error
     assert result.exit_code == 0
@@ -191,7 +223,7 @@ def test_cli_provision_command_with_prefix(runner, matcha_testing_directory):
         matcha_testing_directory, ".matcha", "infrastructure"
     )
 
-    expected_tf_vars = {"location": "ukwest", "prefix": "coffee"}
+    expected_tf_vars = {"location": "uksouth", "prefix": "coffee"}
 
     assert_infrastructure(destination_path, expected_tf_vars)
 
@@ -206,7 +238,7 @@ def test_cli_provision_command_with_default_prefix(runner, matcha_testing_direct
     os.chdir(matcha_testing_directory)
 
     # Invoke provision command
-    result = runner.invoke(app, ["provision"], input="ukwest\n\nno\nno\n")
+    result = runner.invoke(app, ["provision"], input="uksouth\n\nno\nno\n")
 
     # Exit code 0 means there was no error
     assert result.exit_code == 0
@@ -215,7 +247,7 @@ def test_cli_provision_command_with_default_prefix(runner, matcha_testing_direct
         matcha_testing_directory, ".matcha", "infrastructure"
     )
 
-    expected_tf_vars = {"location": "ukwest", "prefix": "matcha"}
+    expected_tf_vars = {"location": "uksouth", "prefix": "matcha"}
 
     assert_infrastructure(destination_path, expected_tf_vars)
 
@@ -279,7 +311,7 @@ def test_cli_provision_command_prefix_rule(
     os.chdir(matcha_testing_directory)
 
     result = runner.invoke(app, ["provision"], input=user_input)
-    
+
     assert expected_output in result.stdout
 
 

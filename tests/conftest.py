@@ -33,7 +33,7 @@ def matcha_testing_directory() -> Iterator[str]:
     temp_dir.cleanup()
 
 
-@pytest.fixture(scope="session", autouse=True)
+@pytest.fixture(scope="session")
 def mocked_azure_client() -> AzureClient:
     """The Azure Client with mocked variables.
 
@@ -44,4 +44,4 @@ def mocked_azure_client() -> AzureClient:
         patch(f"{INTERNAL_FUNCTION_STUB}._authenticate", return_value=True),
         patch(f"{INTERNAL_FUNCTION_STUB}._subscription_id", return_value="id"),
     ):
-        return AzureClient()
+        yield AzureClient()

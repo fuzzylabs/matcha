@@ -5,7 +5,9 @@ import pytest
 from typer import BadParameter
 
 from matcha_ml.cli._validation import (
+    _is_valid_prefix,
     find_closest_matches,
+    prefix_typer_callback,
     region_typer_callback,
     region_validation,
 )
@@ -29,6 +31,10 @@ def mocked_components_validation(mocked_azure_client):
         patch(
             "matcha_ml.cli._validation.get_azure_client",
             return_value=mocked_azure_client,
+        ),
+        patch(
+            f"{INTERNAL_FUNCTION_STUB}.fetch_resource_group_names",
+            return_value={"random-resources"},
         ),
     ):
         yield
@@ -75,7 +81,6 @@ def test_region_validation_invalid_but_finds_a_match(mocked_components_validatio
     Args:
         mocked_components_validation (NoneType): the mocked components
     """
-    print(type(mocked_components_validation))
     with pytest.raises(MatchaInputError) as err:
         region_validation("ukwset")
         assert "Did you mean 'ukwset'?" in str(err)
@@ -109,3 +114,88 @@ def test_region_typer_callback_invalid(mocked_components_validation):
     """
     with pytest.raises(BadParameter):
         region_typer_callback("ukwset")
+
+
+def test_is_valid_prefix_expected():
+    """Test that the is valid prefix functions behaves as expected with correct input."""
+    assert _is_valid_prefix("matcha") == "matcha"
+
+
+@pytest.mark.parametrize(
+    "prefix, error_msg, expectation",
+    [
+        (
+            "matcha&&",
+            "Resource group name prefix must contain only alphanumeric characters and hyphens.",
+            MatchaInputError,
+        ),
+        (
+            "-matcha-",
+            "Resource group name prefix cannot start or end with a hyphen.",
+            MatchaInputError,
+        ),
+        (
+            "ma",
+            "Resource group name prefix must be between 3 and 24 characters long.",
+            MatchaInputError,
+        ),
+        (
+            "thisisareallylongprefixmatcha",
+            "Resource group name prefix must be between 3 and 24 characters long.",
+            MatchaInputError,
+        ),
+    ],
+)
+def test_is_valid_prefix_invalid(
+    prefix: str, error_msg: str, expectation: MatchaInputError
+):
+    """Test that the is_valid_prefix function behaves as expected when invalid input is given.
+
+    Args:
+        prefix (str): the invalid prefix.
+        error_msg (str): the specific error message that is expected.
+        expectation (MatchaInputError): the error that is expected to be raised.
+    """
+    with pytest.raises(expectation) as err:
+        _is_valid_prefix(prefix)
+        assert str(err) == error_msg
+
+
+def test_prefix_typer_callback_expected(mocked_components_validation):
+    """Test that the callback works as expected with valid input.
+
+    Args:
+        mocked_components_validation (NoneType): the mocked components necessary for validation.
+    """
+    assert prefix_typer_callback("matcha") == "matcha"
+
+
+@pytest.mark.parametrize(
+    "prefix, error_msg, expectation",
+    [
+        (
+            "matcha&&",
+            "Resource group name prefix must contain only alphanumeric characters and hyphens.",
+            BadParameter,
+        ),
+        (
+            "random",
+            "You entered a resource group name prefix that have been used before, prefix must be unique.",
+            BadParameter,
+        ),
+    ],
+)
+def test_prefix_typer_callback_invalid(
+    prefix: str, error_msg: str, expectation: BadParameter, mocked_components_validation
+):
+    """Tset that the prefix type callback behaves as expected with invalid input.
+
+    Args:
+        prefix (str): the invalid prefix.
+        error_msg (str): the specific error message that is expected.
+        expectation (BadParameter): the error that is expected to be raised.
+        mocked_components_validation (NoneType): the mocked components necessary for validation.
+    """
+    with pytest.raises(expectation) as err:
+        prefix_typer_callback(prefix)
+        assert str(err) == error_msg
