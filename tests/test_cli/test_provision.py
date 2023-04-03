@@ -3,7 +3,7 @@ import glob
 import json
 import os
 from typing import Dict
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 import pytest
 from typer.testing import CliRunner
@@ -67,16 +67,16 @@ TEMPLATE_DIR = os.path.join(
 #         yield mock
 
 
-@pytest.fixture(scope="class", autouse=True)
-def mock_region_validation():
-    """Mock the region_validation function.
+# @pytest.fixture(scope="class", autouse=True)
+# def mock_region_validation():
+#     """Mock the region_validation function.
 
-    Yields:
-        str: mock region.
-    """
-    with patch("matcha_ml.cli._validation.region_validation") as mock:
-        mock.return_value = "uksouth"
-        yield mock
+#     Yields:
+#         str: mock region.
+#     """
+#     with patch("matcha_ml.cli._validation.region_validation") as mock:
+#         mock.return_value = "uksouth"
+#         yield mock
 
 
 @pytest.fixture(scope="class", autouse=True)
@@ -91,7 +91,12 @@ def mock_prefix_validation(mocked_azure_client):
     """
     with patch("matcha_ml.cli._validation.get_azure_client") as mock:
         mock.return_value = mocked_azure_client
-        # mock.return_value.fetch_resource_group_names = {'random-resources'}
+        mock.return_value.fetch_resource_group_names = MagicMock(
+            return_value=({"rand-resources"})
+        )
+        mock.return_value.fetch_regions = MagicMock(
+            return_value=({"uksouth", "ukwest"})
+        )
         yield mock
 
 
@@ -158,10 +163,6 @@ def test_cli_provision_command(
 
     # Invoke provision command
     result = runner.invoke(app, ["provision"], input="\nuksouth\nmatcha\nN\n")
-
-    print(result.exit_code)
-    print(dir(result))
-    print("RESULT", result)
 
     # Exit code 0 means there was no error
     assert result.exit_code == 0
@@ -331,7 +332,7 @@ def test_cli_provision_command_with_existing_prefix_name(
     result = runner.invoke(
         app,
         ["provision"],
-        input="uksouth\nrepeated-prefix\nvalid-prefix\nno\n",
+        input="uksouth\nrand\nvalid\nN\n",
     )
 
     assert expected_error_message in result.stdout

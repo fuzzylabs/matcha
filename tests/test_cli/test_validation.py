@@ -83,7 +83,8 @@ def test_region_validation_invalid_but_finds_a_match(mocked_components_validatio
     """
     with pytest.raises(MatchaInputError) as err:
         region_validation("ukwset")
-        assert "Did you mean 'ukwset'?" in str(err)
+
+    assert "Did you mean 'ukwest'?" in str(err.value)
 
 
 def test_region_validation_invalid_no_match(mocked_components_validation):
@@ -94,7 +95,8 @@ def test_region_validation_invalid_no_match(mocked_components_validation):
     """
     with pytest.raises(MatchaInputError) as err:
         region_validation("thereisnothingclose")
-        assert str(err) == "A region named 'thereisnothingclose' does not exist."
+
+    assert str(err.value) == "A region named 'thereisnothingclose' does not exist."
 
 
 def test_region_typer_callback_expected(mocked_components_validation):
@@ -158,7 +160,8 @@ def test_is_valid_prefix_invalid(
     """
     with pytest.raises(expectation) as err:
         _is_valid_prefix(prefix)
-        assert str(err) == error_msg
+
+    assert str(err.value) == error_msg
 
 
 def test_prefix_typer_callback_expected(mocked_components_validation):
@@ -179,7 +182,7 @@ def test_prefix_typer_callback_expected(mocked_components_validation):
             BadParameter,
         ),
         (
-            "random",
+            "rand",
             "You entered a resource group name prefix that have been used before, prefix must be unique.",
             BadParameter,
         ),
@@ -188,7 +191,7 @@ def test_prefix_typer_callback_expected(mocked_components_validation):
 def test_prefix_typer_callback_invalid(
     prefix: str, error_msg: str, expectation: BadParameter, mocked_components_validation
 ):
-    """Tset that the prefix type callback behaves as expected with invalid input.
+    """Test that the prefix type callback behaves as expected with invalid input.
 
     Args:
         prefix (str): the invalid prefix.
@@ -198,4 +201,5 @@ def test_prefix_typer_callback_invalid(
     """
     with pytest.raises(expectation) as err:
         prefix_typer_callback(prefix)
-        assert str(err) == error_msg
+
+    assert str(err.value) == error_msg
