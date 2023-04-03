@@ -15,7 +15,7 @@ body:
       placeholder: email@email.com
     validations:
       required: false
-      
+
   - type: textarea
     id: bug-description
     attributes:
@@ -24,7 +24,7 @@ body:
       placeholder: A description of the bug (clear and concise, please)
     validations:
       required: true
-  
+
   - type: textarea
     id: reproduce
     attributes:
@@ -44,4 +44,3 @@ body:
       label: Any relevant log output
       description: Please include any relevant log output (this will automatically render into code).
       render: shell
-  

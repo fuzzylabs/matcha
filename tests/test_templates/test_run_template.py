@@ -11,6 +11,7 @@ import typer
 from _pytest.capture import SysCapture
 from python_terraform import TerraformCommandError
 
+from matcha_ml.errors import MatchaTerraformError
 from matcha_ml.templates.run_template import TerraformConfig, TerraformService
 
 
@@ -245,3 +246,84 @@ def test_show_terraform_outputs(
             '"zenml-connection-string": "zenml-test-connection-string"' in captured.out
         )
         assert '"k8s-context": "k8s-test-context"' in captured.out
+
+
+def test_terraform_raise_exception_provision_init(
+    terraform_test_config: TerraformConfig,
+):
+    """Test if terraform exception is handled correctly during init when provisioning resources.
+
+    Args:
+        terraform_test_config (TerraformConfig): terraform test service config
+    """
+    tfs = TerraformService()
+    tfs.config = terraform_test_config
+    tfs.check_installation = MagicMock()
+    tfs.validate_config = MagicMock()
+    tfs.terraform_client.init = MagicMock(return_value=(1, "", "Init failed"))
+
+    tfs.is_approved = MagicMock(
+        return_value=True
+    )  # the user approves, should provision
+
+    with pytest.raises(MatchaTerraformError) as exc_info:
+        tfs.provision()
+    assert (
+        str(exc_info.value)
+        == "Terraform failed because of the following error: 'Init failed'."
+    )
+
+
+def test_terraform_raise_exception_provision_apply(
+    terraform_test_config: TerraformConfig,
+):
+    """Test if terraform exception is handled correctly during apply when provisioning resources.
+
+    Args:
+        terraform_test_config (TerraformConfig): terraform test service config
+    """
+    tfs = TerraformService()
+    tfs.config = terraform_test_config
+    tfs.check_installation = MagicMock()
+    tfs.validate_config = MagicMock()
+    tfs.terraform_client.init = MagicMock(return_value=(0, "", ""))
+    tfs.terraform_client.apply = MagicMock(return_value=(1, "", "Apply failed"))
+    tfs.show_terraform_outputs = MagicMock()
+
+    tfs.is_approved = MagicMock(
+        return_value=True
+    )  # the user approves, should provision
+
+    with pytest.raises(MatchaTerraformError) as exc_info:
+        tfs.provision()
+        tfs.terraform_client.init.assert_called()
+    assert (
+        str(exc_info.value)
+        == "Terraform failed because of the following error: 'Apply failed'."
+    )
+
+
+def test_terraform_raise_exception_deprovision_destroy(
+    terraform_test_config: TerraformConfig,
+):
+    """Test if terraform exception is captured when performing deprovision.
+
+    Args:
+        terraform_test_config (TerraformConfig): terraform test service config
+    """
+    tfs = TerraformService()
+    tfs.config = terraform_test_config
+
+    tfs.check_installation = MagicMock()
+    tfs.terraform_client.destroy = MagicMock(return_value=(1, "", "Destroy failed"))
+
+    tfs.is_approved = MagicMock(
+        return_value=True
+    )  # the user approves, should deprovision
+
+    with pytest.raises(MatchaTerraformError) as exc_info:
+        tfs.deprovision()
+    assert (
+        str(exc_info.value)
+        == "Terraform failed because of the following error: 'Destroy failed'."
+    )
