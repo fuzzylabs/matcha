@@ -17,7 +17,7 @@ from matcha_ml.cli.ui.status_message_builders import (
 )
 from matcha_ml.errors import MatchaPermissionError
 
-SUBMODULE_NAMES = ["aks", "resource_group", "mlflow-module", "storage", "seldon"]
+SUBMODULE_NAMES = ["aks", "resource_group", "mlflow", "storage", "seldon"]
 
 
 @dataclasses.dataclass

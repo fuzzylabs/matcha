@@ -26,7 +26,7 @@ module "aks" {
 }
 
 module "mlflow" {
-  source = "./mlflow-module"
+  source = "mlflow"
 
   depends_on = [null_resource.configure-local-kubectl]
 
