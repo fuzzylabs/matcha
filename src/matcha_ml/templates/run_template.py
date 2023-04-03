@@ -16,6 +16,7 @@ from matcha_ml.cli.ui.status_message_builders import (
     build_status,
     build_substep_success_status,
 )
+from matcha_ml.errors import MatchaTerraformError
 
 MLFLOW_TRACKING_URL = "mlflow-tracking-url"
 
@@ -155,9 +156,13 @@ class TerraformService:
                     capture_output=self.config.capture_output
                 )
 
+                ret_code, _, err = self.terraform_client.init(
+                    capture_output=self.config.capture_output,
+                    raise_on_error=False,
+                )
                 if ret_code != 0:
                     print_error("The command 'terraform init' failed.")
-                    raise typer.Exit()
+                    raise MatchaTerraformError(tf_error=err)
 
                 print_status(
                     build_substep_success_status(
@@ -174,13 +179,15 @@ class TerraformService:
 
         # once terraform init is success, call terraform apply
         with Spinner("Applying"):
-            self.terraform_client.apply(
+            ret_code, _, err = self.terraform_client.apply(
                 input=False,
                 capture_output=self.config.capture_output,
-                raise_on_error=True,
+                raise_on_error=False,
                 skip_plan=True,
                 auto_approve=True,
             )
+            if ret_code != 0:
+                raise MatchaTerraformError(tf_error=err)
 
         print_status(
             build_substep_success_status(
@@ -218,12 +225,14 @@ class TerraformService:
 
         with Spinner("Destroying"):
             # Reference: https://github.com/beelit94/python-terraform/issues/108
-            self.terraform_client.destroy(
+            ret_code, _, err = self.terraform_client.destroy(
                 capture_output=self.config.capture_output,
-                raise_on_error=True,
+                raise_on_error=False,
                 force=python_terraform.IsNotFlagged,
                 auto_approve=True,
             )
+            if ret_code != 0:
+                raise MatchaTerraformError(tf_error=err)
 
     def deprovision(self) -> None:
         """Deprovision the resources.
