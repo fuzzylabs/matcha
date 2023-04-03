@@ -2,10 +2,9 @@
 import subprocess
 
 import typer
-from rich import print
-from rich.console import Console
 
-err_console = Console(stderr=True)
+from matcha_ml.cli.ui.print_messages import print_error, print_status
+from matcha_ml.cli.ui.status_message_builders import build_status
 
 # create a typer app to group all run subcommands
 app = typer.Typer()
@@ -26,11 +25,12 @@ def default_callback(context: typer.Context) -> None:
     """
     if context.invoked_subcommand is None:
         try:
-            print("No commands are passed, running run.py by default.")
+            print_status(
+                build_status("No commands are passed, running run.py by default.")
+            )
             subprocess.run(["python3", "run.py"])
 
         except FileNotFoundError:
-            err_console.print(
+            print_error(
                 "FileNotFoundError: No 'run.py' file found in this directory.",
-                style="blink",
             )
