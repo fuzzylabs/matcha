@@ -17,6 +17,15 @@ module "storage" {
   location            = var.location
 }
 
+module "zenml_storage" {
+  source = "./zenml_storage"
+
+  prefix              = var.prefix
+  resource_group_name = module.resource_group.name
+  location            = var.location
+  aks_principal_id    = module.aks.aks_principal_id
+}
+
 module "aks" {
   source = "./aks"
 
@@ -26,7 +35,7 @@ module "aks" {
 }
 
 module "mlflow" {
-  source = "./mlflow-module"
+  source = "./mlflow_module"
 
   # resource group variables
   resource_group_name = module.resource_group.name

@@ -4,7 +4,3 @@ resource "null_resource" "configure-local-kubectl" {
     command = "az aks get-credentials --resource-group ${var.resource_group_name} --name ${var.aks_cluster_name} --context ${local.kubectl_context} --overwrite-existing"
   }
 }
-
-locals {
-  kubectl_context = "terraform-${var.aks_cluster_name}-${replace(substr(timestamp(), 0, 16), ":", "_")}"
-}

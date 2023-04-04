@@ -27,3 +27,7 @@ output "host" {
 output "aks_cluster_name" {
   value = azurerm_kubernetes_cluster.matcha_kubernetes_cluster.name
 }
+
+output "aks_principal_id" {
+  value = azurerm_kubernetes_cluster.matcha_kubernetes_cluster.identity[0].principal_id
+}
