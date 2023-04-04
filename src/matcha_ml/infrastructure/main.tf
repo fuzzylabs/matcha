@@ -54,3 +54,17 @@ module "mlflow" {
   artifact_Azure_Access_Key = module.storage.primary_access_key
 
 }
+
+
+module "zenserver" {
+  source = "./zen_server"
+
+  # resource group variables
+  resource_group_name = module.resource_group.name
+  location            = var.location
+
+  # ZenServer credentials
+  username = var.zenserver_username
+  password = var.zenserver_password
+
+}

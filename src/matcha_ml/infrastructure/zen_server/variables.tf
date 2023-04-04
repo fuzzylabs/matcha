@@ -1,3 +1,14 @@
+variable "resource_group_name" {
+  description = "The resource group in Azure that you want to deploy ZenML to"
+  type        = string
+}
+
+variable "location" {
+  description = "The location for your Azure resources"
+  type        = string
+}
+
+# ZenServer credentials
 variable "username" {
   description = "Username for the default ZenML server account"
   default     = "default"
@@ -10,18 +21,8 @@ variable "password" {
 }
 
 variable "name" {
-  description = "The prefix to use for all AWS resource names"
+  description = "The prefix to use for all resource provisioned for zenserver"
   default     = "zenmlserver"
-  type        = string
-}
-
-variable "resource_group_name" {
-  description = "The resource group in Azure that you want to deploy ZenML to"
-  type        = string
-}
-
-variable "location" {
-  description = "The location for your Azure resources"
   type        = string
 }
 
@@ -62,7 +63,7 @@ variable "database_password" {
   type        = string
 }
 
-# if you enable the deploy_db option, the recipe will
+# if you enable the deploy_db option, this will
 # create a new Flexible MySQL instance and then use it for this
 # ZenServer. If disabled, you have to supply connection details
 # in the section below.

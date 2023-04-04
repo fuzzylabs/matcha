@@ -18,7 +18,7 @@ terraform {
 
     null = {
       source  = "hashicorp/null"
-      version = "3.1.0"
+      version = "3.2.1"
     }
 
     kubernetes = {
@@ -33,7 +33,7 @@ terraform {
 
     htpasswd = {
       source  = "loafoe/htpasswd"
-      version = "1.0.3"
+      version = "1.0.4"
     }
   }
 
