@@ -48,7 +48,7 @@ def mocked_azure_client() -> AzureClient:
 
 
 @pytest.fixture(scope="class", autouse=True)
-def mocked_components_validation(mocked_azure_client):
+def mocked_azure_client_components(mocked_azure_client):
     """A fixture for mocking components in the validation that use the Azure Client.
 
     Args:
