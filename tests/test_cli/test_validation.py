@@ -1,5 +1,4 @@
 """Tests for cli._validation."""
-from unittest.mock import patch, MagicMock
 
 import pytest
 from typer import BadParameter
@@ -12,6 +11,7 @@ from matcha_ml.cli._validation import (
     region_validation,
 )
 from matcha_ml.errors import MatchaInputError
+
 
 def test_find_closest_matches_expected():
     """Test that a closest pattern is found."""
