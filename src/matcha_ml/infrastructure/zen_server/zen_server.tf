@@ -8,7 +8,7 @@ resource "kubernetes_namespace" "zen-server" {
 resource "helm_release" "zen-server" {
 
   name      = "${var.name}-zenmlserver"
-  chart     = var.helm_chart
+  chart     = "${path.module}/zenml_helm"
   namespace = kubernetes_namespace.zen-server.metadata[0].name
 
   set {

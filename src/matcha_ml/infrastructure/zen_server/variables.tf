@@ -20,6 +20,7 @@ variable "password" {
   type        = string
 }
 
+# TODO: Replace name with prefix
 variable "name" {
   description = "The prefix to use for all resource provisioned for zenserver"
   default     = "zenmlserver"
@@ -32,11 +33,11 @@ variable "namespace" {
   type        = string
 }
 
-variable "helm_chart" {
-  description = "The path to the ZenML server helm chart"
-  default     = "./zenml_helm"
-  type        = string
-}
+# variable "helm_chart" {
+#   description = "The path to the ZenML server helm chart"
+#   default     = "../zenml_helm"
+#   type        = string
+# }
 
 variable "kubectl_config_path" {
   description = "The path to the kube config"
@@ -122,7 +123,7 @@ variable "database_ssl_key" {
 }
 variable "database_ssl_verify_server_cert" {
   description = "Should SSL be verified?"
-  default     = true
+  default     = false
   type        = bool
 }
 
