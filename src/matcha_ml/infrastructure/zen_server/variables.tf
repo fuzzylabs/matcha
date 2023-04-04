@@ -123,7 +123,7 @@ variable "database_ssl_key" {
 }
 variable "database_ssl_verify_server_cert" {
   description = "Should SSL be verified?"
-  default     = false
+  default     = true
   type        = bool
 }
 
@@ -149,12 +149,12 @@ variable "ingress_controller_hostname" {
 }
 variable "ingress_tls" {
   description = "Whether to enable tls on the ingress or not"
-  default     = false
+  default     = true
   type        = bool
 }
 variable "ingress_tls_generate_certs" {
   description = "Whether to enable tls certificates or not"
-  default     = false
+  default     = true
   type        = bool
 }
 variable "ingress_tls_secret_name" {
