@@ -11,7 +11,7 @@ from rich import print
 
 from matcha_ml.errors import MatchaPermissionError
 
-SUBMODULE_NAMES = ["aks", "resource_group", "mlflow_module", "storage", "zenml_storage"]
+SUBMODULE_NAMES = ["aks", "resource_group", "mlflow", "storage", "zenml_storage"]
 
 
 @dataclasses.dataclass

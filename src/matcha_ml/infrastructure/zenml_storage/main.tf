@@ -24,7 +24,7 @@ data "azurerm_storage_account" "zenmlaccount" {
   resource_group_name = var.resource_group_name
 }
 
-resource "azurerm_role_assignment" "storage" {
+resource "azurerm_role_assignment" "zenmlstorage" {
   scope                = azurerm_storage_account.zenmlaccount.id
   role_definition_name = "Contributor"
   principal_id         = var.aks_principal_id

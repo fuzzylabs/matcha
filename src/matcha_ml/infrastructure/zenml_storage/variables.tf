@@ -1,3 +1,7 @@
+variable "prefix" {
+  description = "A prefix used for all resources"
+}
+
 variable "resource_group_name" {
   description = "The resource group name which is used to create the resource group"
 }
