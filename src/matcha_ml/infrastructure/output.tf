@@ -12,5 +12,18 @@ output "zenml-connection-string" {
 }
 
 output "k8s-context" {
-  value = module.mlflow.k8s-context
+  value = local.kubectl_context
+}
+
+output "zen-server-url" {
+  value = module.zenserver.zenserver_url
+}
+
+output "zen-server-username" {
+  value = module.zenserver.zenserver_username
+}
+
+output "zen-server-password" {
+  value     = module.zenserver.zenserver_password
+  sensitive = true
 }
