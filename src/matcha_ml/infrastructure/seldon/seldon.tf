@@ -39,6 +39,7 @@ data "kubernetes_service" "seldon_ingress" {
   }
 
   depends_on = [
-    helm_release.seldon
+    helm_release.seldon,
+    helm_release.istio-ingress
   ]
 }
