@@ -73,7 +73,7 @@ class AzureClient:
             return self._resource_group_names
         else:
             self._resource_client = ResourceManagementClient(
-                self._credential, str(self._subscription_id())
+                self._credential, str(self.subscription_id)
             )
             self._resource_group_names = {
                 resource_group.name
