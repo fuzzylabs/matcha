@@ -50,6 +50,8 @@ def mock_output() -> Callable[[str, bool], Union[str, Dict[str, str]]]:
             "zenml-storage-path": "zenml-test-storage-path",
             "zenml-connection-string": "zenml-test-connection-string",
             "k8s-context": "k8s-test-context",
+            "seldon-workloads-namespace": "test-seldon-workloads-namespace",
+            "seldon-base-url": "test-seldon-base-url",
         }
         if name not in expected_outputs:
             raise ValueError("Unexpected input")
@@ -215,6 +217,8 @@ def test_write_outputs_state(
             "zenml-storage-path": "zenml-test-storage-path",
             "zenml-connection-string": "zenml-test-connection-string",
             "k8s-context": "k8s-test-context",
+            "seldon-workloads-namespace": "test-seldon-workloads-namespace",
+            "seldon-base-url": "test-seldon-base-url",
         }
         tfs.write_outputs_state()
         with open(terraform_test_config.state_file) as f:
@@ -246,6 +250,11 @@ def test_show_terraform_outputs(
             '"zenml-connection-string": "zenml-test-connection-string"' in captured.out
         )
         assert '"k8s-context": "k8s-test-context"' in captured.out
+        assert (
+            '"seldon-workloads-namespace": "test-seldon-workloads-namespace"'
+            in captured.out
+        )
+        assert '"seldon-base-url": "test-seldon-base-url"' in captured.out
 
 
 def test_terraform_raise_exception_provision_init(
