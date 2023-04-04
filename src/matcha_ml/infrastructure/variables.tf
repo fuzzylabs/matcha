@@ -16,4 +16,5 @@ variable "zenserver_username" {
 variable "zenserver_password" {
   description = "Password for ZenServer"
   sensitive   = true
+  default     = "sup3rsaf3pass"
 }

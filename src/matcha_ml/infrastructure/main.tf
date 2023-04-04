@@ -34,6 +34,15 @@ module "aks" {
   resource_group_name = module.resource_group.name
 }
 
+module "acr" {
+  source = "./azure_container_registry"
+
+  prefix              = var.prefix
+  resource_group_name = module.resource_group.name
+  location            = var.location
+  aks_principal_id    = module.aks.aks_object_id
+}
+
 module "mlflow" {
   source = "./mlflow_module"
 
