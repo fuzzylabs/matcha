@@ -12,7 +12,7 @@ output "zenml-connection-string" {
 }
 
 output "k8s-context" {
-  value = module.mlflow.k8s-context
+  value = local.kubectl_context
 }
 
 output "seldon-workloads-namespace" {
