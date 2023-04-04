@@ -37,20 +37,21 @@ module "aks" {
 module "mlflow" {
   source = "./mlflow_module"
 
-  # resource group variables
-  resource_group_name = module.resource_group.name
-  location            = var.location
-
-  # aks variables
-  aks_cluster_name          = module.aks.aks_cluster_name
-  k8_host                   = module.aks.host
-  k8_client_certificate     = module.aks.client_certificate
-  k8_client_key             = module.aks.client_key
-  k8_cluster_ca_certificate = module.aks.cluster_ca_certificate
+  depends_on = [null_resource.configure-local-kubectl]
 
   # storage variables
   storage_account_name      = module.storage.storage_account_name
   storage_container_name    = module.storage.storage_container_name
   artifact_Azure_Access_Key = module.storage.primary_access_key
 
+}
+
+module "seldon" {
+  source = "./seldon"
+
+  depends_on = [null_resource.configure-local-kubectl]
+
+  # details about the seldon deployment
+  seldon_name      = var.seldon_name
+  seldon_namespace = var.seldon_namespace
 }

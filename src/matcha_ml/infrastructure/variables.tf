@@ -6,3 +6,11 @@ variable "prefix" {
 variable "location" {
   description = "The Azure Region in which all resources should be provisioned"
 }
+
+# seldon variables
+variable "seldon_name" {
+      default = "seldon"
+}
+variable "seldon_namespace" {
+      default = "seldon-system"
+}
