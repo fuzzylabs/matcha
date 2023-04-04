@@ -40,7 +40,7 @@ module "acr" {
   prefix              = var.prefix
   resource_group_name = module.resource_group.name
   location            = var.location
-  aks_principal_id    = module.aks.aks_object_id
+  aks_object_id       = module.aks.aks_object_id
 }
 
 module "mlflow" {
