@@ -35,7 +35,7 @@ module "aks" {
 }
 
 module "mlflow" {
-  source = "./mlflow"
+  source = "./mlflow_module"
 
   # resource group variables
   resource_group_name = module.resource_group.name
