@@ -17,10 +17,10 @@ class AzureClient:
 
     def __init__(self) -> None:
         """Constructor for the Azure Client object."""
-        self.authenticated = self._authenticate()
+        self.authenticated = self._check_authentication()
         self.subscription_id = self._subscription_id()
 
-    def _authenticate(self) -> bool:
+    def _check_authentication(self) -> bool:
         """Check whether the user is authenticated with 'az login'.
 
         Raises:
