@@ -1,6 +1,6 @@
 """The Azure Service interface."""
 from subprocess import DEVNULL
-from typing import Set
+from typing import Optional, Set
 
 from azure.core.exceptions import ClientAuthenticationError
 from azure.identity import AzureCliCredential, CredentialUnavailableError
@@ -14,6 +14,9 @@ from matcha_ml.errors import MatchaAuthenticationError
 
 class AzureClient:
     """Azure client object to handle authentication checks and other Azure related functionality."""
+
+    _resource_group_names: Optional[Set[str]] = None
+    _regions: Optional[Set[str]] = None
 
     def __init__(self) -> None:
         """Constructor for the Azure Client object."""
@@ -50,7 +53,13 @@ class AzureClient:
         Returns:
             str: the subscription id.
         """
-        return str(list(self._client.subscriptions.list())[0].subscription_id)
+        subscriptions = self._client.subscriptions.list()
+        if subscriptions:
+            return str(list(subscriptions)[0].subscription_id)
+        else:
+            raise MatchaAuthenticationError(
+                "no subscriptions found - you at least one subscription active in your Azure account."
+            )
 
     def fetch_resource_group_names(self) -> Set[str]:
         """Fetch the resource group names for the current subscription_id.
@@ -60,17 +69,17 @@ class AzureClient:
         Returns:
             Set[str]: the set of resource groups the user has provisioned.
         """
-        if hasattr(self, "resource_group_names"):
-            return self.resource_group_names  # type: ignore
+        if self._resource_group_names:
+            return self._resource_group_names
         else:
             self._resource_client = ResourceManagementClient(
                 self._credential, str(self._subscription_id)
             )
-            self.resource_group_names = {
+            self._resource_group_names = {
                 resource_group.name
                 for resource_group in self._resource_client.resource_groups.list()
             }
-            return self.resource_group_names
+            return self._resource_group_names
 
     def fetch_regions(self) -> Set[str]:
         """Fetch the Azure regions.
@@ -78,16 +87,16 @@ class AzureClient:
         Returns:
             set[str]: the set of all Azure regions.
         """
-        if hasattr(self, "regions"):
-            return self.regions  # type: ignore
+        if self._regions:
+            return self._regions
         else:
-            self.regions = {
+            self._regions = {
                 region.name
                 for region in self._client.subscriptions.list_locations(
                     self.subscription_id
                 )
             }
-            return self.regions
+            return self._regions
 
     def is_valid_region(self, region: str) -> bool:
         """Check whether the user inputted region is valid.
