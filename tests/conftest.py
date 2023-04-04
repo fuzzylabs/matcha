@@ -1,7 +1,7 @@
 """Reusable fixtures."""
 import tempfile
 from typing import Iterator
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 
 import pytest
 from typer.testing import CliRunner
@@ -45,3 +45,20 @@ def mocked_azure_client() -> AzureClient:
     ):
         with (patch(f"{INTERNAL_FUNCTION_STUB}._subscription_id", return_value="id")):
             yield AzureClient()
+
+@pytest.fixture(scope='class', autouse=True)
+def mocked_components_validation(mocked_azure_client):
+    """A fixture for mocking components in the validation that use the Azure Client.
+
+    Args:
+        mocked_azure_client (AzureClient): the mocked AzureClient fixture in conftest
+    """
+    with patch('matcha_ml.cli._validation.get_azure_client') as mock:
+        mock.return_value = mocked_azure_client
+        mock.return_value.fetch_regions = MagicMock(
+            return_value=({'uksouth', 'ukwest'})
+        )
+        mock.return_value.fetch_resource_group_names = MagicMock(
+            return_value=({'rand-resources'})
+        )
+        yield mock

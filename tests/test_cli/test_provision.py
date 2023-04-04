@@ -16,29 +16,6 @@ TEMPLATE_DIR = os.path.join(
     BASE_DIR, os.pardir, os.pardir, "src", "matcha_ml", "infrastructure"
 )
 
-
-
-@pytest.fixture(scope="class", autouse=True)
-def mock_prefix_validation(mocked_azure_client):
-    """Mock the get_azure_client with the mocked azure client.
-
-    Args:
-        mocked_azure_client: the mocked azure client conftest fixture
-
-    Yields:
-        AzureClient: mocked Azure Client.
-    """
-    with patch("matcha_ml.cli._validation.get_azure_client") as mock:
-        mock.return_value = mocked_azure_client
-        mock.return_value.fetch_resource_group_names = MagicMock(
-            return_value=({"rand-resources"})
-        )
-        mock.return_value.fetch_regions = MagicMock(
-            return_value=({"uksouth", "ukwest"})
-        )
-        yield mock
-
-
 def assert_infrastructure(destination_path: str, expected_tf_vars: Dict[str, str]):
     """Assert if the infrastructure configuration is valid.
 

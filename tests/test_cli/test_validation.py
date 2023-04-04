@@ -13,42 +13,6 @@ from matcha_ml.cli._validation import (
 )
 from matcha_ml.errors import MatchaInputError
 
-INTERNAL_FUNCTION_STUB = "matcha_ml.services.AzureClient"
-
-
-@pytest.fixture
-def mocked_components_validation(mocked_azure_client):
-    """A fixture for mocking components in the validation that use the Azure Client.
-
-    Args:
-        mocked_azure_client (AzureClient): the mocked AzureClient fixture in conftest
-    """
-    # with (
-    #     patch(
-    #         f"{INTERNAL_FUNCTION_STUB}.fetch_regions",
-    #         return_value={"ukwest", "uksouth"},
-    #     ),
-    #     patch(
-    #         "matcha_ml.cli._validation.get_azure_client",
-    #         return_value=mocked_azure_client,
-    #     ),
-    #     patch(
-    #         f"{INTERNAL_FUNCTION_STUB}.fetch_resource_group_names",
-    #         return_value={"random-resources"},
-    #     )
-    # ):
-    #     yield
-    with patch('matcha_ml.cli._validation.get_azure_client') as mock:
-        mock.return_value = mocked_azure_client
-        mock.return_value.fetch_regions = MagicMock(
-            return_value=({'uksouth', 'ukwest'})
-        )
-        mock.return_value.fetch_resource_group_names = MagicMock(
-            return_value=({'rand-resources'})
-        )
-        yield mock
-
-
 def test_find_closest_matches_expected():
     """Test that a closest pattern is found."""
     pattern = "world"
@@ -75,54 +39,34 @@ def test_find_closest_matches_no_matches():
     )
 
 
-def test_region_validation_is_valid(mocked_components_validation):
-    """Test that a valid region is correctly validated.
-
-    Args:
-        mocked_components_validation (NoneType): the mocked components fixture
-    """
+def test_region_validation_is_valid():
+    """Test that a valid region is correctly validated."""
     assert region_validation("uksouth") == "uksouth"
 
 
-def test_region_validation_invalid_but_finds_a_match(mocked_components_validation):
-    """Test that a match is found when a region is invalid.
-
-    Args:
-        mocked_components_validation (NoneType): the mocked components
-    """
+def test_region_validation_invalid_but_finds_a_match():
+    """Test that a match is found when a region is invalid."""
     with pytest.raises(MatchaInputError) as err:
         region_validation("ukwset")
 
     assert "Did you mean 'ukwest'?" in str(err.value)
 
 
-def test_region_validation_invalid_no_match(mocked_components_validation):
-    """Test that no match is found when invalid.
-
-    Args:
-        mocked_components_validation (NoneType): the mocked components
-    """
+def test_region_validation_invalid_no_match():
+    """Test that no match is found when invalid."""
     with pytest.raises(MatchaInputError) as err:
         region_validation("thereisnothingclose")
 
     assert str(err.value) == "A region named 'thereisnothingclose' does not exist."
 
 
-def test_region_typer_callback_expected(mocked_components_validation):
-    """Test that the input callback finds the correct region.
-
-    Args:
-        mocked_components_validation (NoneType): the mocked components
-    """
+def test_region_typer_callback_expected():
+    """Test that the input callback finds the correct region."""
     assert region_typer_callback("uksouth") == "uksouth"
 
 
-def test_region_typer_callback_invalid(mocked_components_validation):
-    """Test that the callback raises a BadParameter error when invalid input is given.
-
-    Args:
-        mocked_components_validation (NoneType): the mocked components
-    """
+def test_region_typer_callback_invalid():
+    """Test that the callback raises a BadParameter error when invalid input is given."""
     with pytest.raises(BadParameter):
         region_typer_callback("ukwset")
 
@@ -173,12 +117,8 @@ def test_is_valid_prefix_invalid(
     assert str(err.value) == error_msg
 
 
-def test_prefix_typer_callback_expected(mocked_components_validation):
-    """Test that the callback works as expected with valid input.
-
-    Args:
-        mocked_components_validation (NoneType): the mocked components necessary for validation.
-    """
+def test_prefix_typer_callback_expected():
+    """Test that the callback works as expected with valid input."""
     assert prefix_typer_callback("matcha") == "matcha"
 
 
@@ -198,7 +138,7 @@ def test_prefix_typer_callback_expected(mocked_components_validation):
     ],
 )
 def test_prefix_typer_callback_invalid(
-    prefix: str, error_msg: str, expectation: BadParameter, mocked_components_validation
+    prefix: str, error_msg: str, expectation: BadParameter
 ):
     """Test that the prefix type callback behaves as expected with invalid input.
 
@@ -206,7 +146,6 @@ def test_prefix_typer_callback_invalid(
         prefix (str): the invalid prefix.
         error_msg (str): the specific error message that is expected.
         expectation (BadParameter): the error that is expected to be raised.
-        mocked_components_validation (NoneType): the mocked components necessary for validation.
     """
     with pytest.raises(expectation) as err:
         prefix_typer_callback(prefix)

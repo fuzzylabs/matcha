@@ -53,6 +53,7 @@ class MatchaInputError(Exception):
         """
         super().__init__(*args, **kwargs)
 
+
 class MatchaTerraformError(Exception):
     """Matcha Terraform Error.
 

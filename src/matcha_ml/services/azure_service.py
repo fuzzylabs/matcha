@@ -40,7 +40,7 @@ class AzureClient:
         except CredentialUnavailableError:
             raise MatchaAuthenticationError("unable to invoke the Azure CLI")
         except ClientAuthenticationError:
-            raise MatchaAuthenticationError("no access token recieved")
+            raise MatchaAuthenticationError("no access token received")
 
         return True
 
