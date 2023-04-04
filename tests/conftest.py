@@ -41,9 +41,11 @@ def mocked_azure_client() -> AzureClient:
         AzureClient: the mocked AzureClient.
     """
     with (
-        patch(f"{INTERNAL_FUNCTION_STUB}._authenticate", return_value=True),
-        patch(f"{INTERNAL_FUNCTION_STUB}._subscription_id", return_value="id"),
+        patch(f"{INTERNAL_FUNCTION_STUB}._authenticate") as auth,
+        patch(f"{INTERNAL_FUNCTION_STUB}._subscription_id") as sub,
     ):
+        auth.return_value = True
+        sub.return_value = "id"
         yield AzureClient()
 
 
