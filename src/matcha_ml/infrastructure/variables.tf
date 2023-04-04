@@ -8,12 +8,12 @@ variable "location" {
 }
 
 
-variable "zenserver_user" {
+variable "zenserver_username" {
   description = "Username for ZenServer"
   default     = "default"
 }
 
-variable "zenserver_pass" {
+variable "zenserver_password" {
   description = "Password for ZenServer"
   sensitive   = true
 }
