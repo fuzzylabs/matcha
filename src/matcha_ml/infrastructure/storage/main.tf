@@ -2,7 +2,7 @@
 
 # create a storage account
 resource "azurerm_storage_account" "storageaccount" {
-  name                = "${var.prefix}storageacc"
+  name                = "st${var.prefix}acc"
   resource_group_name = var.resource_group_name
   location            = var.location
 

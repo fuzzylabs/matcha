@@ -124,7 +124,7 @@ class TerraformService:
             resources=[
                 ("Resource group", "A resource group"),
                 ("Azure Kubernetes Service (AKS)", "A kubernetes cluster"),
-                ("Azure Storage Container", "A storage container"),
+                ("Two Azure Storage Container", "A storage container for experiment tracking artifacts and a second for model training artifacts"),
             ],
             footer=f"{verb.capitalize()}ing the resources may take up to 10 minutes. May we suggest you to grab a cup of {Emojis.MATCHA.value}?",
         )
