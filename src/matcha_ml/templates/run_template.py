@@ -124,7 +124,10 @@ class TerraformService:
             resources=[
                 ("Resource group", "A resource group"),
                 ("Azure Kubernetes Service (AKS)", "A kubernetes cluster"),
-                ("Azure Storage Container", "A storage container"),
+                (
+                    "Two Azure Storage Container",
+                    "A storage container for experiment tracking artifacts and a second for model training artifacts",
+                ),
                 (
                     "Seldon Core",
                     "A framework for model deployment on top of a kubernetes cluster",
