@@ -3,11 +3,11 @@ import glob
 import json
 import os
 from typing import Dict
-from unittest.mock import MagicMock, patch
 
 import pytest
 from typer.testing import CliRunner
 
+from matcha_ml.cli._validation import LONGEST_RESOURCE_NAME, MAXIMUM_RESOURCE_NAME_LEN
 from matcha_ml.cli.cli import app
 from matcha_ml.templates.build_templates.azure_template import SUBMODULE_NAMES
 
@@ -199,16 +199,20 @@ def test_cli_provision_command_with_verbose_arg(
     "user_input, expected_output",
     [
         (
-            "uksouth\n-1-\nvalid-prefix\n\nsup3rsaf3pass\nno\n",
-            "Error: Resource group name prefix cannot start or end with a hyphen.",
+            "uksouth\n-matcha-\nvalid\n\nsup3rsaf3pass\nno\n",
+            "Error: Resource group name prefix can only contain alphanumeric characters.",
         ),
         (
-            "uksouth\n12\nvalid-prefix\n\nsup3rsaf3pass\nno\n",
-            "Error: Resource group name prefix must be between 3 and 24 characters long.",
+            "uksouth\n12\nvalid\n\nsup3rsaf3pass\nno\n",
+            "Error: Resource group name prefix cannot contain only numbers.",
         ),
         (
-            "uksouth\ngood$prefix#\nvalid-prefix\n\nsup3rsaf3pass\nno\n",
-            "Error: Resource group name prefix must contain only alphanumeric characters and hyphens.",
+            "uksouth\ngood$prefix#\nvalid\n\nsup3rsaf3pass\nno\n",
+            "Error: Resource group name prefix can only contain alphanumeric characters.",
+        ),
+        (
+            "uksouth\nareallyloingprefix\nvalid\n\nsup3rsaf3pass\nno\n",
+            f"Resource group name prefix must be between 3 and {MAXIMUM_RESOURCE_NAME_LEN - len(LONGEST_RESOURCE_NAME)} characters long.",
         ),
     ],
 )
