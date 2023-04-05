@@ -157,9 +157,17 @@ def test_is_valid_prefix_invalid(
     assert str(err.value) == error_msg
 
 
-def test_prefix_typer_callback_expected():
-    """Test that the callback works as expected with valid input."""
-    assert prefix_typer_callback("matcha") == "matcha"
+@pytest.mark.parametrize(
+    "prefix, expectation", [("matcha", "matcha"), ("MATCHA", "matcha")]
+)
+def test_prefix_typer_callback_expected(prefix: str, expectation: str):
+    """Test that the callback works as expected with valid input.
+
+    Args:
+        prefix (str): the prefix acting as user input.
+        expectation (str): the expected outcome of the callback.
+    """
+    assert prefix_typer_callback(prefix) == expectation
 
 
 @pytest.mark.parametrize(

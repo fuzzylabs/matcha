@@ -170,6 +170,20 @@ def prefix_typer_callback(prefix: str) -> str:
     Returns:
         str: if valid, the prefix is returned.
     """
+
+    def _to_lowercase(prefix: str) -> str:
+        """Convert the prefix to lowercase (a requirement of Azure).
+
+        Args:
+            prefix (str): the prefix passed to the callback.
+
+        Returns:
+            str: the lowercase version of that prefix.
+        """
+        return prefix.lower()
+
+    prefix = _to_lowercase(prefix)
+
     try:
         _is_valid_prefix(prefix)
     except MatchaInputError as e:
