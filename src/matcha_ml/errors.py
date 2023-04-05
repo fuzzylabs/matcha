@@ -20,6 +20,40 @@ class MatchaPermissionError(Exception):
         super().__init__(message, *args, **kwargs)
 
 
+class MatchaAuthenticationError(Exception):
+    """Matcha Authentication Error.
+
+    Raised when the user is not authenticated with an external service.
+    """
+
+    def __init__(self, auth_error: str, *args: Any, **kwargs: Any):
+        """The initialiser for the Authentication error.
+
+        Args:
+            auth_error (str): the error to propagate to the user.
+            *args: additional arguments to pass to the Exception base class.
+            **kwargs: additional key word arguments to pass to the Exception base class.
+        """
+        message = f"Error - Matcha couldn't authenticate you with Azure: {auth_error}, make sure you've run 'az login'!"
+        super().__init__(message, *args, **kwargs)
+
+
+class MatchaInputError(Exception):
+    """Matcha Input Error.
+
+    Raised when the user inputs a bad value.
+    """
+
+    def __init__(self, *args: Any, **kwargs: Any):
+        """The initialiser for Input error.
+
+        Args:
+            *args: additional arguments to pass to the Exception base class.
+            **kwargs: additional key word arguments to pass to the Exception base class.
+        """
+        super().__init__(*args, **kwargs)
+
+
 class MatchaTerraformError(Exception):
     """Matcha Terraform Error.
 
@@ -36,3 +70,4 @@ class MatchaTerraformError(Exception):
         """
         message = f"Terraform failed because of the following error: '{tf_error}'."
         super().__init__(message, *args, **kwargs)
+

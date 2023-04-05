@@ -11,6 +11,11 @@ terraform {
       version = "3.1.0"
     }
 
+    helm = {
+      source  = "hashicorp/helm"
+      version = "~> 2.0.1"
+    }
+    
     local = {
       source  = "hashicorp/local"
       version = "2.1.0"
@@ -23,7 +28,7 @@ terraform {
 
     kubernetes = {
       source  = "hashicorp/kubernetes"
-      version = ">= 2.11.0"
+      version = "~> 2.11.0"
     }
 
     kubectl = {
@@ -39,4 +44,3 @@ terraform {
 
   required_version = ">= 0.14.8"
 }
-

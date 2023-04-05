@@ -22,7 +22,8 @@ MLFLOW_TRACKING_URL = "mlflow-tracking-url"
 ZENML_STORAGE_PATH = "zenml-storage-path"
 ZENML_CONNECTION_STRING = "zenml-connection-string"
 K8S_CONTEXT = "k8s-context"
-
+SELDON_WORKLOADS_NAMESPACE = "seldon-workloads-namespace"
+SELDON_BASE_URL = "seldon-base-url"
 
 SPINNER = "dots"
 
@@ -124,7 +125,14 @@ class TerraformService:
             resources=[
                 ("Resource group", "A resource group"),
                 ("Azure Kubernetes Service (AKS)", "A kubernetes cluster"),
-                ("Two Azure Storage Container", "A storage container for experiment tracking artifacts and a second for model training artifacts"),
+                (
+                    "Two Azure Storage Container",
+                    "A storage container for experiment tracking artifacts and a second for model training artifacts",
+                ),
+                (
+                    "Seldon Core",
+                    "A framework for model deployment on top of a kubernetes cluster",
+                ),
             ],
             footer=f"{verb.capitalize()}ing the resources may take up to 10 minutes. May we suggest you to grab a cup of {Emojis.MATCHA.value}?",
         )
@@ -274,6 +282,12 @@ class TerraformService:
                 ZENML_CONNECTION_STRING, full_value=True
             ),
             K8S_CONTEXT: self.terraform_client.output(K8S_CONTEXT, full_value=True),
+            SELDON_WORKLOADS_NAMESPACE: self.terraform_client.output(
+                SELDON_WORKLOADS_NAMESPACE, full_value=True
+            ),
+            SELDON_BASE_URL: self.terraform_client.output(
+                SELDON_BASE_URL, full_value=True
+            ),
         }
 
         # dump specific terraform output to state file

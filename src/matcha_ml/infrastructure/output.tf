@@ -31,3 +31,11 @@ output "zen-server-password" {
 output "azure-container-registry" {
   value = module.acr.container-registry-URL
 }
+
+output "seldon-workloads-namespace" {
+  value = module.seldon.workloads-namespace
+}
+
+output "seldon-base-url" {
+  value = module.seldon.base-url
+}
