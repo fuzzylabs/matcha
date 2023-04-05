@@ -3,7 +3,7 @@ import dataclasses
 import glob
 import json
 import os
-from shutil import copy, rmtree
+from shutil import copy, copytree, rmtree
 from typing import Optional
 
 import typer
@@ -156,6 +156,13 @@ def build_template(
                 src_path = os.path.join(template_src, submodule_name, filename)
                 destination_path = os.path.join(destination, submodule_name, filename)
                 copy(src_path, destination_path)
+
+            # Special case for the "zen_server" submodule to copy the local helm chart
+            if submodule_name == "zen_server":
+                source_path = os.path.join(template_src, "zen_server", "zenml_helm")
+                dirname = os.path.basename(source_path)
+                destination_path = os.path.join(destination, submodule_name, dirname)
+                copytree(source_path, destination_path)
 
             if verbose:
                 print_status(
