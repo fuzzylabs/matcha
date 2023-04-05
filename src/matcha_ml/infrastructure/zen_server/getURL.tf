@@ -1,7 +1,7 @@
 data "kubernetes_service" "zen_server" {
   metadata {
-    name      = "${var.prefix}-zenserver"
-    namespace = "${var.prefix}-${var.namespace}"
+    name      = "${helm_release.zen-server.name}-zenml"
+    namespace = helm_release.zen-server.namespace
   }
 
   depends_on = [
