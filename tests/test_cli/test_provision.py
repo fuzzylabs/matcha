@@ -3,11 +3,11 @@ import glob
 import json
 import os
 from typing import Dict
-from unittest.mock import MagicMock, patch
 
 import pytest
 from typer.testing import CliRunner
 
+from matcha_ml.cli._validation import LONGEST_RESOURCE_NAME, MAXIMUM_RESOURCE_NAME_LEN
 from matcha_ml.cli.cli import app
 from matcha_ml.templates.build_templates.azure_template import SUBMODULE_NAMES
 
@@ -15,6 +15,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 TEMPLATE_DIR = os.path.join(
     BASE_DIR, os.pardir, os.pardir, "src", "matcha_ml", "infrastructure"
 )
+
 
 def assert_infrastructure(destination_path: str, expected_tf_vars: Dict[str, str]):
     """Assert if the infrastructure configuration is valid.
@@ -198,16 +199,20 @@ def test_cli_provision_command_with_verbose_arg(
     "user_input, expected_output",
     [
         (
-            "uksouth\n-1-\nvalid-prefix\nno\n",
-            "Error: Resource group name prefix cannot start or end with a hyphen.",
+            "uksouth\n-matcha-\nvalid\nno\n",
+            "Error: Resource group name prefix must only contain alphanumeric characters.",
         ),
         (
-            "uksouth\n12\nvalid-prefix\nno\n",
-            "Error: Resource group name prefix must be between 3 and 24 characters long.",
+            "uksouth\n12\nvalid\nno\n",
+            "Error: Resource group name cannot only contain numbers.",
         ),
         (
-            "uksouth\ngood$prefix#\nvalid-prefix\nno\n",
-            "Error: Resource group name prefix must contain only alphanumeric characters and hyphens.",
+            "uksouth\ngood$prefix#\nvalid\nno\n",
+            "Error: Resource group name prefix must only contain alphanumeric characters.",
+        ),
+        (
+            "uksouth\nareallyloingprefix\nvalid\nno\n",
+            f"Resource group name prefix must be between 3 and {MAXIMUM_RESOURCE_NAME_LEN - len(LONGEST_RESOURCE_NAME)} characters long.",
         ),
     ],
 )
@@ -228,6 +233,8 @@ def test_cli_provision_command_prefix_rule(
     os.chdir(matcha_testing_directory)
 
     result = runner.invoke(app, ["provision"], input=user_input)
+
+    print(result.stdout)
 
     assert expected_output in result.stdout
 

@@ -1,25 +1,64 @@
 """Validation for user inputs."""
 from difflib import get_close_matches
-from re import match
-from typing import Optional, Union, Set, List
+from typing import List, Optional, Set, Union
 
 from typer import BadParameter
 
 from matcha_ml.errors import MatchaInputError
 from matcha_ml.services import AzureClient
 
+LONGEST_RESOURCE_NAME = "artifactstore"
+MAXIMUM_RESOURCE_NAME_LEN = 24
+
+
+def _is_alphanumeric(prefix: str) -> bool:
+    """Check whether the prefix is an alphanumeric string.
+
+    Args:
+        prefix (str): the prefix to be checked.
+
+    Returns:
+        bool: True if it is an alphanumeric string; False if not.
+    """
+    return prefix.isalnum()
+
+
+def _check_length(prefix: str) -> bool:
+    """Check whether the prefix is the correct length.
+
+    Args:
+        prefix (str): the prefix to be checked.
+
+    Returns:
+        bool: True if the prefix is less than the maximum length; False if not.
+    """
+    return (len(prefix) + len(LONGEST_RESOURCE_NAME)) < MAXIMUM_RESOURCE_NAME_LEN
+
+
+def _is_not_digits(prefix: str) -> bool:
+    """Check whether the prefix is only numbers.
+
+    Args:
+        prefix (str): the prefix to be checked.
+
+    Returns:
+        bool: True if the prefix doesn't contain only numbers; False otherwise.
+    """
+    return not prefix.isdigit()
+
+
 PREFIX_RULES = {
-    "alphanumeric": {
-        "pattern": r"^[a-zA-Z0-9\-]*$",
-        "message": "Resource group name prefix must contain only alphanumeric characters and hyphens.",
+    "numbers": {
+        "func": _is_not_digits,
+        "message": "Resource group name cannot only contain numbers.",
     },
-    "hyphen": {
-        "pattern": r"^([^-].*[^-]|[^-])$",
-        "message": "Resource group name prefix cannot start or end with a hyphen.",
+    "alphanumeric": {
+        "func": _is_alphanumeric,
+        "message": "Resource group name prefix must only contain alphanumeric characters.",
     },
     "length": {
-        "pattern": r"^[a-zA-Z0-9\-]{3,24}$",
-        "message": "Resource group name prefix must be between 3 and 24 characters long.",
+        "func": _check_length,
+        "message": f"Resource group name prefix must be between 3 and {MAXIMUM_RESOURCE_NAME_LEN - len(LONGEST_RESOURCE_NAME)} characters long.",
     },
 }
 
@@ -112,7 +151,7 @@ def _is_valid_prefix(prefix: str) -> str:
         str: if valid, the prefix is returned.
     """
     for rule, checker in PREFIX_RULES.items():
-        if not match(checker["pattern"], prefix):
+        if not checker["func"](prefix):  # type: ignore
             raise MatchaInputError(checker["message"])
 
     return prefix
