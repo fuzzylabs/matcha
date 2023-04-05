@@ -39,6 +39,9 @@ class TemplateVariables:
     # Prefix used for all resources
     prefix: str
 
+    # Password for ZenServer
+    password: str
+
 
 def reuse_configuration(path: str) -> bool:
     """Check if a configuration already exists, and prompt user to override or reuse it.
@@ -77,17 +80,18 @@ def reuse_configuration(path: str) -> bool:
         return False
 
 
-def build_template_configuration(location: str, prefix: str) -> TemplateVariables:
+def build_template_configuration(location: str, prefix: str, password: str) -> TemplateVariables:
     """Ask for variables and build the configuration.
 
     Args:
         location (str): Azure location in which all resources will be provisioned.
         prefix (str): Prefix used for all resources.
+        password (str): Password for ZenServer.
 
     Returns:
         TemplateVariables: Terraform variables required by a template
     """
-    return TemplateVariables(location=location, prefix=prefix)
+    return TemplateVariables(location=location, prefix=prefix, password=password)
 
 
 def build_template(

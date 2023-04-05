@@ -16,6 +16,7 @@ TEMPLATE_DIR = os.path.join(
     BASE_DIR, os.pardir, os.pardir, "src", "matcha_ml", "infrastructure"
 )
 
+
 def assert_infrastructure(destination_path: str, expected_tf_vars: Dict[str, str]):
     """Assert if the infrastructure configuration is valid.
 
@@ -78,7 +79,7 @@ def test_cli_provision_command(
     os.chdir(matcha_testing_directory)
 
     # Invoke provision command
-    result = runner.invoke(app, ["provision"], input="\nuksouth\nmatcha\nN\n")
+    result = runner.invoke(app, ["provision"], input="uksouth\nmatcha\n\nsup3rsaf3pass\nN\n")
 
     # Exit code 0 means there was no error
     assert result.exit_code == 0
@@ -87,7 +88,7 @@ def test_cli_provision_command(
         matcha_testing_directory, ".matcha", "infrastructure"
     )
 
-    expected_tf_vars = {"location": "uksouth", "prefix": "matcha"}
+    expected_tf_vars = {"location": "uksouth", "prefix": "matcha", "password": "sup3rsaf3pass"}
 
     assert_infrastructure(destination_path, expected_tf_vars)
 
@@ -106,7 +107,7 @@ def test_cli_provision_command_with_args(
 
     # Invoke provision command
     result = runner.invoke(
-        app, ["provision", "--location", "uksouth", "--prefix", "matcha"], input="no\n"
+        app, ["provision", "--location", "uksouth", "--prefix", "matcha", "--password", "ninja"], input="\nninja\nno\n"
     )
 
     # Exit code 0 means there was no error
@@ -116,7 +117,7 @@ def test_cli_provision_command_with_args(
         matcha_testing_directory, ".matcha", "infrastructure"
     )
 
-    expected_tf_vars = {"location": "uksouth", "prefix": "matcha"}
+    expected_tf_vars = {"location": "uksouth", "prefix": "matcha", "password": "ninja"}
 
     assert_infrastructure(destination_path, expected_tf_vars)
 
@@ -131,7 +132,7 @@ def test_cli_provision_command_with_prefix(runner, matcha_testing_directory):
     os.chdir(matcha_testing_directory)
 
     # Invoke provision command
-    result = runner.invoke(app, ["provision"], input="uksouth\ncoffee\nno\nno\n")
+    result = runner.invoke(app, ["provision"], input="uksouth\ncoffee\n\nsup3rsaf3pass\nno\nno\n")
 
     # Exit code 0 means there was no error
     assert result.exit_code == 0
@@ -140,7 +141,7 @@ def test_cli_provision_command_with_prefix(runner, matcha_testing_directory):
         matcha_testing_directory, ".matcha", "infrastructure"
     )
 
-    expected_tf_vars = {"location": "uksouth", "prefix": "coffee"}
+    expected_tf_vars = {"location": "uksouth", "prefix": "coffee", "password": "sup3rsaf3pass"}
 
     assert_infrastructure(destination_path, expected_tf_vars)
 
@@ -155,7 +156,7 @@ def test_cli_provision_command_with_default_prefix(runner, matcha_testing_direct
     os.chdir(matcha_testing_directory)
 
     # Invoke provision command
-    result = runner.invoke(app, ["provision"], input="uksouth\n\nno\nno\n")
+    result = runner.invoke(app, ["provision"], input="uksouth\n\n\nsup3rsaf3pass\nno\nno\n")
 
     # Exit code 0 means there was no error
     assert result.exit_code == 0
@@ -164,7 +165,7 @@ def test_cli_provision_command_with_default_prefix(runner, matcha_testing_direct
         matcha_testing_directory, ".matcha", "infrastructure"
     )
 
-    expected_tf_vars = {"location": "uksouth", "prefix": "matcha"}
+    expected_tf_vars = {"location": "uksouth", "prefix": "matcha", "password": "sup3rsaf3pass"}
 
     assert_infrastructure(destination_path, expected_tf_vars)
 
@@ -181,7 +182,7 @@ def test_cli_provision_command_with_verbose_arg(
     """
     os.chdir(matcha_testing_directory)
 
-    result = runner.invoke(app, ["provision", "--verbose"], input="uksouth\n\nno\n")
+    result = runner.invoke(app, ["provision", "--verbose"], input="uksouth\n\n\nsup3rsaf3pass\nno\n")
 
     assert result.exit_code == 0
 
@@ -198,15 +199,15 @@ def test_cli_provision_command_with_verbose_arg(
     "user_input, expected_output",
     [
         (
-            "uksouth\n-1-\nvalid-prefix\nno\n",
+            "uksouth\n-1-\nvalid-prefix\n\nsup3rsaf3pass\nno\n",
             "Error: Resource group name prefix cannot start or end with a hyphen.",
         ),
         (
-            "uksouth\n12\nvalid-prefix\nno\n",
+            "uksouth\n12\nvalid-prefix\n\nsup3rsaf3pass\nno\n",
             "Error: Resource group name prefix must be between 3 and 24 characters long.",
         ),
         (
-            "uksouth\ngood$prefix#\nvalid-prefix\nno\n",
+            "uksouth\ngood$prefix#\nvalid-prefix\n\nsup3rsaf3pass\nno\n",
             "Error: Resource group name prefix must contain only alphanumeric characters and hyphens.",
         ),
     ],
@@ -248,7 +249,7 @@ def test_cli_provision_command_with_existing_prefix_name(
     result = runner.invoke(
         app,
         ["provision"],
-        input="uksouth\nrand\nvalid\nN\n",
+        input="uksouth\nrand\nvalid\n\nsup3rsaf3pass\nN\n",
     )
 
     assert expected_error_message in result.stdout
@@ -265,7 +266,7 @@ def test_cli_provision_command_override(runner, matcha_testing_directory):
 
     # Invoke provision command
     runner.invoke(
-        app, ["provision", "--location", "uksouth", "--prefix", "matcha"], input="no\n"
+        app, ["provision", "--location", "uksouth", "--prefix", "matcha", "--password", "ninja"], input="\nninja\nno\n"
     )
 
     destination_path = os.path.join(
@@ -278,15 +279,33 @@ def test_cli_provision_command_override(runner, matcha_testing_directory):
 
     runner.invoke(
         app,
-        ["provision", "--location", "uksouth", "--prefix", "matcha"],
+        ["provision", "--location", "uksouth", "--prefix", "matcha", "--password", "ninja"],
         input="y\nno\n",
     )
 
     assert not os.path.exists(os.path.join(destination_path, "dummy.tf"))
 
-    expected_tf_vars = {"location": "uksouth", "prefix": "matcha"}
+    expected_tf_vars = {"location": "uksouth", "prefix": "matcha", "password": "ninja"}
 
     assert_infrastructure(destination_path, expected_tf_vars)
+
+
+def test_cli_provision_command_with_password_mismatch(runner, matcha_testing_directory):
+    """Test provision command to copy the infrastructure template with different prefix.
+
+    Args:
+        runner (CliRunner): typer CLI runner
+        matcha_testing_directory (str): temporary working directory
+    """
+    os.chdir(matcha_testing_directory)
+
+    # Invoke provision command
+    result = runner.invoke(app, ["provision"], input="uksouth\ncoffee\n\nninja\nno\nno\n")
+
+    # Exit code 0 means there was no error
+    assert result.exit_code == 0
+
+    assert "Error: The two entered values do not match." in result.stdout
 
 
 def test_cli_provision_command_reuse(runner, matcha_testing_directory):
@@ -300,7 +319,7 @@ def test_cli_provision_command_reuse(runner, matcha_testing_directory):
 
     # Invoke provision command
     runner.invoke(
-        app, ["provision", "--location", "uksouth", "--prefix", "matcha"], input="no\n"
+        app, ["provision", "--location", "uksouth", "--prefix", "matcha"], input="\nsup3rsaf3pass\nno\n"
     )
 
     destination_path = os.path.join(
@@ -314,11 +333,11 @@ def test_cli_provision_command_reuse(runner, matcha_testing_directory):
     runner.invoke(
         app,
         ["provision", "--location", "uksouth", "--prefix", "matcha"],
-        input="n\nno\n",
+        input="\nsup3rsaf3pass\nn\nno\n",
     )
 
     assert os.path.exists(os.path.join(destination_path, "dummy.tf"))
 
-    expected_tf_vars = {"location": "uksouth", "prefix": "matcha"}
+    expected_tf_vars = {"location": "uksouth", "prefix": "matcha", "password": "sup3rsaf3pass"}
 
     assert_infrastructure(destination_path, expected_tf_vars)

@@ -34,12 +34,19 @@ def provision(
         default="matcha",
         help="A unique prefix for your resources.",
     ),
+    password: str = typer.Option(
+        prompt="Please provide a password for ZenServer.",
+        confirmation_prompt=True,
+        hide_input=True,
+        help="Password for Zenserver",
+        default="sup3rsaf3pass"
+    ),
     verbose: Optional[bool] = typer.Option(
         False, help="Get more detailed information from matcha provision!"
     ),
 ) -> None:
     """Provision cloud resources with a template."""
-    provision_resources(location, prefix, verbose)
+    provision_resources(location, prefix, password, verbose)
 
 
 @app.command()

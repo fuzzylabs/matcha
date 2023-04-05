@@ -68,12 +68,12 @@ def test_build_template(matcha_testing_directory, template_src_path):
         matcha_testing_directory (str): Temporary .matcha directory path
         template_src_path (str): Existing template directory path
     """
-    config = TemplateVariables("uksouth", "matcha")
+    config = TemplateVariables("uksouth", "matcha", "superninja")
 
     destination_path = os.path.join(matcha_testing_directory, "infrastructure")
 
     build_template(config, template_src_path, destination_path)
 
-    expected_tf_vars = {"location": "uksouth", "prefix": "matcha"}
+    expected_tf_vars = {"location": "uksouth", "prefix": "matcha", "password": "superninja"}
 
     assert_infrastructure(destination_path, expected_tf_vars)

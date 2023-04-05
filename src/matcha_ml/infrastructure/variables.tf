@@ -7,12 +7,12 @@ variable "location" {
   description = "The Azure Region in which all resources should be provisioned"
 }
 
-variable "zenserver_username" {
+variable "username" {
   description = "Username for ZenServer"
   default     = "default"
 }
 
-variable "zenserver_password" {
+variable "password" {
   description = "Password for ZenServer"
   sensitive   = true
 }
