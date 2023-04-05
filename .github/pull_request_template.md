@@ -1,5 +1,3 @@
-## Describe changes
-
 _Write a short description which explains what this pull request does and, briefly, how._
 
 _If new dependencies are introduced to the project, please list them here:_
