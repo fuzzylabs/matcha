@@ -25,7 +25,7 @@ SUBMODULE_NAMES = [
     "seldon",
     "zenml_storage",
     "zen_server",
-    "azure_container_registry"
+    "azure_container_registry",
 ]
 
 
@@ -66,8 +66,11 @@ def reuse_configuration(path: str) -> bool:
                     "Seldon Core",
                     "A framework for model deployment on top of a kubernetes cluster",
                 ),
-                ("Azure Container Registry", "A container registry for storing docker images"),
-                ("ZenServer", "A zenml server required for remote orchestration")
+                (
+                    "Azure Container Registry",
+                    "A container registry for storing docker images",
+                ),
+                ("ZenServer", "A zenml server required for remote orchestration"),
             ],
         )
 
@@ -80,7 +83,9 @@ def reuse_configuration(path: str) -> bool:
         return False
 
 
-def build_template_configuration(location: str, prefix: str, password: str) -> TemplateVariables:
+def build_template_configuration(
+    location: str, prefix: str, password: str
+) -> TemplateVariables:
     """Ask for variables and build the configuration.
 
     Args:

@@ -74,6 +74,10 @@ def test_build_template(matcha_testing_directory, template_src_path):
 
     build_template(config, template_src_path, destination_path)
 
-    expected_tf_vars = {"location": "uksouth", "prefix": "matcha", "password": "superninja"}
+    expected_tf_vars = {
+        "location": "uksouth",
+        "prefix": "matcha",
+        "password": "superninja",
+    }
 
     assert_infrastructure(destination_path, expected_tf_vars)

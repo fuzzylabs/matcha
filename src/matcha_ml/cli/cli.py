@@ -39,7 +39,7 @@ def provision(
         confirmation_prompt=True,
         hide_input=True,
         help="Password for Zenserver",
-        default="default"
+        default="default",
     ),
     verbose: Optional[bool] = typer.Option(
         False, help="Get more detailed information from matcha provision!"

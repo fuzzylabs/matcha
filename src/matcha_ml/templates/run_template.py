@@ -133,8 +133,11 @@ class TerraformService:
                     "Seldon Core",
                     "A framework for model deployment on top of a kubernetes cluster",
                 ),
-                ("Azure Container Registry", "A container registry for storing docker images"),
-                ("ZenServer", "A zenml server required for remote orchestration")
+                (
+                    "Azure Container Registry",
+                    "A container registry for storing docker images",
+                ),
+                ("ZenServer", "A zenml server required for remote orchestration"),
             ],
             footer=f"{verb.capitalize()}ing the resources may take up to 20 minutes. May we suggest you to grab a cup of {Emojis.MATCHA.value}?",
         )

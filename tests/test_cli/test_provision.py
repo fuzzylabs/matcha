@@ -88,7 +88,11 @@ def test_cli_provision_command(
         matcha_testing_directory, ".matcha", "infrastructure"
     )
 
-    expected_tf_vars = {"location": "uksouth", "prefix": "matcha", "password": "default"}
+    expected_tf_vars = {
+        "location": "uksouth",
+        "prefix": "matcha",
+        "password": "default",
+    }
 
     assert_infrastructure(destination_path, expected_tf_vars)
 
@@ -107,7 +111,17 @@ def test_cli_provision_command_with_args(
 
     # Invoke provision command
     result = runner.invoke(
-        app, ["provision", "--location", "uksouth", "--prefix", "matcha", "--password", "ninja"], input="\nninja\nno\n"
+        app,
+        [
+            "provision",
+            "--location",
+            "uksouth",
+            "--prefix",
+            "matcha",
+            "--password",
+            "ninja",
+        ],
+        input="\nninja\nno\n",
     )
 
     # Exit code 0 means there was no error
@@ -132,7 +146,9 @@ def test_cli_provision_command_with_prefix(runner, matcha_testing_directory):
     os.chdir(matcha_testing_directory)
 
     # Invoke provision command
-    result = runner.invoke(app, ["provision"], input="uksouth\ncoffee\n\ndefault\nno\nno\n")
+    result = runner.invoke(
+        app, ["provision"], input="uksouth\ncoffee\n\ndefault\nno\nno\n"
+    )
 
     # Exit code 0 means there was no error
     assert result.exit_code == 0
@@ -141,7 +157,11 @@ def test_cli_provision_command_with_prefix(runner, matcha_testing_directory):
         matcha_testing_directory, ".matcha", "infrastructure"
     )
 
-    expected_tf_vars = {"location": "uksouth", "prefix": "coffee", "password": "default"}
+    expected_tf_vars = {
+        "location": "uksouth",
+        "prefix": "coffee",
+        "password": "default",
+    }
 
     assert_infrastructure(destination_path, expected_tf_vars)
 
@@ -165,7 +185,11 @@ def test_cli_provision_command_with_default_prefix(runner, matcha_testing_direct
         matcha_testing_directory, ".matcha", "infrastructure"
     )
 
-    expected_tf_vars = {"location": "uksouth", "prefix": "matcha", "password": "default"}
+    expected_tf_vars = {
+        "location": "uksouth",
+        "prefix": "matcha",
+        "password": "default",
+    }
 
     assert_infrastructure(destination_path, expected_tf_vars)
 
@@ -182,7 +206,9 @@ def test_cli_provision_command_with_verbose_arg(
     """
     os.chdir(matcha_testing_directory)
 
-    result = runner.invoke(app, ["provision", "--verbose"], input="uksouth\n\n\ndefault\nno\n")
+    result = runner.invoke(
+        app, ["provision", "--verbose"], input="uksouth\n\n\ndefault\nno\n"
+    )
 
     assert result.exit_code == 0
 
@@ -270,7 +296,17 @@ def test_cli_provision_command_override(runner, matcha_testing_directory):
 
     # Invoke provision command
     runner.invoke(
-        app, ["provision", "--location", "uksouth", "--prefix", "matcha", "--password", "ninja"], input="\nninja\nno\n"
+        app,
+        [
+            "provision",
+            "--location",
+            "uksouth",
+            "--prefix",
+            "matcha",
+            "--password",
+            "ninja",
+        ],
+        input="\nninja\nno\n",
     )
 
     destination_path = os.path.join(
@@ -283,7 +319,15 @@ def test_cli_provision_command_override(runner, matcha_testing_directory):
 
     runner.invoke(
         app,
-        ["provision", "--location", "uksouth", "--prefix", "matcha", "--password", "ninja"],
+        [
+            "provision",
+            "--location",
+            "uksouth",
+            "--prefix",
+            "matcha",
+            "--password",
+            "ninja",
+        ],
         input="y\nno\n",
     )
 
@@ -304,7 +348,9 @@ def test_cli_provision_command_with_password_mismatch(runner, matcha_testing_dir
     os.chdir(matcha_testing_directory)
 
     # Invoke provision command
-    result = runner.invoke(app, ["provision"], input="uksouth\ncoffee\n\nninja\nno\nno\n")
+    result = runner.invoke(
+        app, ["provision"], input="uksouth\ncoffee\n\nninja\nno\nno\n"
+    )
 
     # Exit code 0 means there was no error
     assert result.exit_code == 0
@@ -323,7 +369,9 @@ def test_cli_provision_command_reuse(runner, matcha_testing_directory):
 
     # Invoke provision command
     runner.invoke(
-        app, ["provision", "--location", "uksouth", "--prefix", "matcha"], input="\ndefault\nno\n"
+        app,
+        ["provision", "--location", "uksouth", "--prefix", "matcha"],
+        input="\ndefault\nno\n",
     )
 
     destination_path = os.path.join(
@@ -342,6 +390,10 @@ def test_cli_provision_command_reuse(runner, matcha_testing_directory):
 
     assert os.path.exists(os.path.join(destination_path, "dummy.tf"))
 
-    expected_tf_vars = {"location": "uksouth", "prefix": "matcha", "password": "default"}
+    expected_tf_vars = {
+        "location": "uksouth",
+        "prefix": "matcha",
+        "password": "default",
+    }
 
     assert_infrastructure(destination_path, expected_tf_vars)
