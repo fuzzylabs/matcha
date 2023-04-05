@@ -1,5 +1,5 @@
 output "zenserver_url" {
-  value = var.create_ingress_controller ? "https://${data.kubernetes_service.ingress-controller[0].status.0.load_balancer.0.ingress.0.ip}.nip.io/${var.ingress_path}" : "https://${var.ingress_controller_hostname}.nip.io/${var.ingress_path}"
+  value = "http://${data.kubernetes_service.zen-server.status.0.load_balancer.0.ingress.0.ip}"
 }
 
 output "zenserver_username" {
@@ -11,7 +11,7 @@ output "zenserver_password" {
   sensitive = true
 }
 
-output "zenserver_ca_crt" {
-  value     = base64decode(data.kubernetes_secret.certificates.binary_data["ca.crt"])
-  sensitive = true
-}
+# output "zenserver_url" {
+#   value = var.create_ingress_controller ? "https://${data.kubernetes_service.ingress-controller[0].status.0.load_balancer.0.ingress.0.ip}.nip.io/${var.ingress_path}" : "https://${var.ingress_controller_hostname}.nip.io/${var.ingress_path}"
+# }
+

@@ -1,13 +1,13 @@
 # create the ZenServer deployment
 resource "kubernetes_namespace" "zen-server" {
   metadata {
-    name = "${var.name}-${var.namespace}"
+    name = "${var.prefix}-${var.namespace}"
   }
 }
 
 resource "helm_release" "zen-server" {
 
-  name      = "${var.name}-zenmlserver"
+  name      = "${var.prefix}-zenserver"
   chart     = "${path.module}/zenml_helm"
   namespace = kubernetes_namespace.zen-server.metadata[0].name
 
@@ -33,35 +33,35 @@ resource "helm_release" "zen-server" {
     value = var.analytics_opt_in
   }
 
-  # set up the right path for ZenML
-  set {
-    name  = "zenml.rootUrlPath"
-    value = var.ingress_path != "" ? "/${var.ingress_path}" : ""
-  }
-  set {
-    name  = "zenml.ingress.path"
-    value = var.ingress_path != "" ? "/${var.ingress_path}/?(.*)" : "/"
-  }
-  set {
-    name  = "zenml.ingress.annotations.nginx\\.ingress\\.kubernetes\\.io/rewrite-target"
-    value = var.ingress_path != "" ? "/$1" : ""
-  }
-  set {
-    name  = "zenml.ingress.host"
-    value = var.create_ingress_controller ? "${data.kubernetes_service.ingress-controller[0].status.0.load_balancer.0.ingress.0.ip}.nip.io" : "${var.ingress_controller_hostname}.nip.io"
-  }
-  set {
-    name  = "zenml.ingress.tls.enabled"
-    value = var.ingress_tls
-  }
-  set {
-    name  = "zenml.ingress.tls.generateCerts"
-    value = var.ingress_tls_generate_certs
-  }
-  set {
-    name  = "zenml.ingress.tls.secretName"
-    value = "${var.name}-${var.ingress_tls_secret_name}"
-  }
+  # # Ingress set up
+  # set {
+  #   name  = "zenml.rootUrlPath"
+  #   value = var.ingress_path != "" ? "/${var.ingress_path}" : ""
+  # }
+  # set {
+  #   name  = "zenml.ingress.path"
+  #   value = var.ingress_path != "" ? "/${var.ingress_path}/?(.*)" : "/"
+  # }
+  # set {
+  #   name  = "zenml.ingress.annotations.nginx\\.ingress\\.kubernetes\\.io/rewrite-target"
+  #   value = var.ingress_path != "" ? "/$1" : ""
+  # }
+  # set {
+  #   name  = "zenml.ingress.host"
+  #   value = var.create_ingress_controller ? "${data.kubernetes_service.ingress-controller[0].status.0.load_balancer.0.ingress.0.ip}.nip.io" : "${var.ingress_controller_hostname}.nip.io"
+  # }
+  # set {
+  #   name  = "zenml.ingress.tls.enabled"
+  #   value = var.ingress_tls
+  # }
+  # set {
+  #   name  = "zenml.ingress.tls.generateCerts"
+  #   value = var.ingress_tls_generate_certs
+  # }
+  # set {
+  #   name  = "zenml.ingress.tls.secretName"
+  #   value = "${var.prefix}-${var.ingress_tls_secret_name}"
+  # }
 
   # set parameters for the mysql database
   set {
@@ -89,18 +89,18 @@ resource "helm_release" "zen-server" {
   ]
 }
 
-data "kubernetes_secret" "certificates" {
-  metadata {
-    name      = "${var.name}-${var.ingress_tls_secret_name}"
-    namespace = "${var.name}-${var.namespace}"
-  }
-  binary_data = {
-    "tls.crt" = ""
-    "tls.key" = ""
-    "ca.crt"  = ""
-  }
+# data "kubernetes_secret" "certificates" {
+#   metadata {
+#     name      = "${var.prefix}-${var.ingress_tls_secret_name}"
+#     namespace = "${var.prefix}-${var.namespace}"
+#   }
+#   binary_data = {
+#     "tls.crt" = ""
+#     "tls.key" = ""
+#     "ca.crt"  = ""
+#   }
 
-  depends_on = [
-    helm_release.zen-server
-  ]
-}
+#   depends_on = [
+#     helm_release.zen-server
+#   ]
+# }

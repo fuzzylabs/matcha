@@ -1,3 +1,6 @@
+variable "prefix" {
+  description = "A prefix used for all resources"
+}
 variable "resource_group_name" {
   description = "The resource group in Azure that you want to deploy ZenML to"
   type        = string
@@ -20,24 +23,11 @@ variable "password" {
   type        = string
 }
 
-# TODO: Replace name with prefix
-variable "name" {
-  description = "The prefix to use for all resource provisioned for zenserver"
-  default     = "zenmlserver"
-  type        = string
-}
-
 variable "namespace" {
   description = "The namespace to install the ZenML server Helm chart in"
   default     = "terraform-server"
   type        = string
 }
-
-# variable "helm_chart" {
-#   description = "The path to the ZenML server helm chart"
-#   default     = "../zenml_helm"
-#   type        = string
-# }
 
 variable "kubectl_config_path" {
   description = "The path to the kube config"
@@ -80,7 +70,7 @@ variable "db_instance_name" {
 }
 variable "db_name" {
   description = "The name for the database"
-  default     = "zenmlserver"
+  default     = "zendb"
   type        = string
 }
 variable "db_version" {
@@ -123,45 +113,46 @@ variable "database_ssl_key" {
 }
 variable "database_ssl_verify_server_cert" {
   description = "Should SSL be verified?"
-  default     = true
+  default     = false
   type        = bool
 }
 
-variable "ingress_path" {
-  description = "The path on the Ingress URL to expose ZenML at"
-  default     = "zenml"
-  type        = string
-}
+# # Ingress variables
+# variable "ingress_path" {
+#   description = "The path on the Ingress URL to expose ZenML at"
+#   default     = "zenml"
+#   type        = string
+# }
 
-# set to true if you don't already have an nginx ingress
-# controller in your cluster
-variable "create_ingress_controller" {
-  description = "set to true  if you want to create an ingress controller in your cluster"
-  default     = true
-  type        = bool
-}
+# # set to true if you don't already have an nginx ingress
+# # controller in your cluster
+# variable "create_ingress_controller" {
+#   description = "set to true  if you want to create an ingress controller in your cluster"
+#   default     = true
+#   type        = bool
+# }
 
-# if you already have an ingress controller, supply it's URL
-variable "ingress_controller_hostname" {
-  description = "The hostname for the ingress controller on your cluster"
-  default     = ""
-  type        = string
-}
-variable "ingress_tls" {
-  description = "Whether to enable tls on the ingress or not"
-  default     = true
-  type        = bool
-}
-variable "ingress_tls_generate_certs" {
-  description = "Whether to enable tls certificates or not"
-  default     = true
-  type        = bool
-}
-variable "ingress_tls_secret_name" {
-  description = "Name for the Kubernetes secret that stores certificates"
-  default     = "zenml-tls-certs"
-  type        = string
-}
+# # if you already have an ingress controller, supply it's URL
+# variable "ingress_controller_hostname" {
+#   description = "The hostname for the ingress controller on your cluster"
+#   default     = ""
+#   type        = string
+# }
+# variable "ingress_tls" {
+#   description = "Whether to enable tls on the ingress or not"
+#   default     = true
+#   type        = bool
+# }
+# variable "ingress_tls_generate_certs" {
+#   description = "Whether to enable tls certificates or not"
+#   default     = true
+#   type        = bool
+# }
+# variable "ingress_tls_secret_name" {
+#   description = "Name for the Kubernetes secret that stores certificates"
+#   default     = "zenml-tls-certs"
+#   type        = string
+# }
 
 variable "zenmlserver_image_repo" {
   description = "The repository to use for the zenmlserver docker image."

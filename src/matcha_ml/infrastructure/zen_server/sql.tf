@@ -1,6 +1,6 @@
 resource "azurerm_mysql_flexible_server" "mysql" {
   count                  = var.deploy_db ? 1 : 0
-  name                   = var.db_instance_name
+  name                   = "${var.prefix}${var.db_instance_name}"
   resource_group_name    = var.resource_group_name
   location               = var.location
   administrator_login    = var.database_username
@@ -14,7 +14,7 @@ resource "azurerm_mysql_flexible_server" "mysql" {
 
 resource "azurerm_mysql_flexible_database" "db" {
   count               = var.deploy_db ? 1 : 0
-  name                = var.db_name
+  name                = "${var.prefix}${var.db_name}"
   resource_group_name = var.resource_group_name
   server_name         = azurerm_mysql_flexible_server.mysql[0].name
   charset             = "utf8"
@@ -46,12 +46,12 @@ resource "random_password" "mysql_password" {
   min_upper   = 1
 }
 
-# download SSL certificate
-resource "null_resource" "download-SSL-certificate" {
-  count = var.deploy_db ? 1 : 0
+# # download SSL certificate
+# resource "null_resource" "download-SSL-certificate" {
+#   count = var.deploy_db ? 1 : 0
 
-  provisioner "local-exec" {
-    command = "wget https://dl.cacerts.digicert.com/DigiCertGlobalRootCA.crt.pem"
-  }
+#   provisioner "local-exec" {
+#     command = "wget https://dl.cacerts.digicert.com/DigiCertGlobalRootCA.crt.pem"
+#   }
 
-}
+# }

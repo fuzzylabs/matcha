@@ -45,8 +45,6 @@ module "acr" {
 
 module "mlflow" {
   source = "./mlflow_module"
-
-
   depends_on = [null_resource.configure-local-kubectl]
 
   # storage variables
@@ -65,6 +63,7 @@ module "zenserver" {
   # resource group variables
   resource_group_name = module.resource_group.name
   location            = var.location
+  prefix              = var.prefix
 
   # ZenServer credentials
   username = var.zenserver_username
