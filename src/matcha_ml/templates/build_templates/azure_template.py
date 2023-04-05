@@ -24,6 +24,8 @@ SUBMODULE_NAMES = [
     "storage",
     "seldon",
     "zenml_storage",
+    "zen_server",
+    "azure_container_registry"
 ]
 
 
@@ -61,6 +63,8 @@ def reuse_configuration(path: str) -> bool:
                     "Seldon Core",
                     "A framework for model deployment on top of a kubernetes cluster",
                 ),
+                ("Azure Container Registry", "A container registry for storing docker images"),
+                ("ZenServer", "A zenml server required for remote orchestration")
             ],
         )
 
