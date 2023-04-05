@@ -18,11 +18,16 @@ from matcha_ml.cli.ui.status_message_builders import (
 )
 from matcha_ml.errors import MatchaTerraformError
 
+# Required for ZenML to run on K8s
 MLFLOW_TRACKING_URL = "mlflow-tracking-url"
 ZENML_STORAGE_PATH = "zenml-storage-path"
 ZENML_CONNECTION_STRING = "zenml-connection-string"
 K8S_CONTEXT = "k8s-context"
-
+AZURE_CONTAINER_REGISTRY = "azure-container-registry"
+AZURE_REGISTRY_NAME = "azure-registry-name"
+ZEN_SERVER_URL = "zen-server-url"
+ZEN_SERVER_USERNAME = "zen-server-username"
+ZEN_SERVER_PASSWORD = "zen-server-password"
 
 SPINNER = "dots"
 
@@ -124,7 +129,10 @@ class TerraformService:
             resources=[
                 ("Resource group", "A resource group"),
                 ("Azure Kubernetes Service (AKS)", "A kubernetes cluster"),
-                ("Two Azure Storage Container", "A storage container for experiment tracking artifacts and a second for model training artifacts"),
+                (
+                    "Two Azure Storage Container",
+                    "A storage container for experiment tracking artifacts and a second for model training artifacts",
+                ),
             ],
             footer=f"{verb.capitalize()}ing the resources may take up to 10 minutes. May we suggest you to grab a cup of {Emojis.MATCHA.value}?",
         )
@@ -274,6 +282,21 @@ class TerraformService:
                 ZENML_CONNECTION_STRING, full_value=True
             ),
             K8S_CONTEXT: self.terraform_client.output(K8S_CONTEXT, full_value=True),
+            AZURE_CONTAINER_REGISTRY: self.terraform_client.output(
+                AZURE_CONTAINER_REGISTRY, full_value=True
+            ),
+            AZURE_REGISTRY_NAME: self.terraform_client.output(
+                AZURE_REGISTRY_NAME, full_value=True
+            ),
+            ZEN_SERVER_URL: self.terraform_client.output(
+                ZEN_SERVER_URL, full_value=True
+            ),
+            ZEN_SERVER_USERNAME: self.terraform_client.output(
+                ZEN_SERVER_USERNAME, full_value=True
+            ),
+            ZEN_SERVER_PASSWORD: self.terraform_client.output(
+                ZEN_SERVER_PASSWORD, full_value=True
+            ),
         }
 
         # dump specific terraform output to state file

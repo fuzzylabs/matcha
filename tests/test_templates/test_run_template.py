@@ -50,6 +50,11 @@ def mock_output() -> Callable[[str, bool], Union[str, Dict[str, str]]]:
             "zenml-storage-path": "zenml-test-storage-path",
             "zenml-connection-string": "zenml-test-connection-string",
             "k8s-context": "k8s-test-context",
+            "azure-container-registry": "azure-container-registry",
+            "azure-registry-name": "azure-registry-name",
+            "zen-server-url": "zen-server-url",
+            "zen-server-username": "zen-server-username",
+            "zen-server-password": "zen-server-password",
         }
         if name not in expected_outputs:
             raise ValueError("Unexpected input")
@@ -210,15 +215,20 @@ def test_write_outputs_state(
     tfs.terraform_client.output = MagicMock(wraps=mock_output)
 
     with does_not_raise():
-        expected_output = {
+        expected_outputs = {
             "mlflow-tracking-url": "mlflow-test-url",
             "zenml-storage-path": "zenml-test-storage-path",
             "zenml-connection-string": "zenml-test-connection-string",
             "k8s-context": "k8s-test-context",
+            "azure-container-registry": "azure-container-registry",
+            "azure-registry-name": "azure-registry-name",
+            "zen-server-url": "zen-server-url",
+            "zen-server-username": "zen-server-username",
+            "zen-server-password": "zen-server-password",
         }
         tfs.write_outputs_state()
         with open(terraform_test_config.state_file) as f:
-            assert json.load(f) == expected_output
+            assert json.load(f) == expected_outputs
 
 
 def test_show_terraform_outputs(
@@ -246,6 +256,11 @@ def test_show_terraform_outputs(
             '"zenml-connection-string": "zenml-test-connection-string"' in captured.out
         )
         assert '"k8s-context": "k8s-test-context"' in captured.out
+        assert '"azure-container-registry": "azure-container-registry"' in captured.out
+        assert '"azure-registry-name": "azure-registry-name"' in captured.out
+        assert '"zen-server-url": "zen-server-url"' in captured.out
+        assert '"zen-server-username": "zen-server-username"' in captured.out
+        assert '"zen-server-password": "zen-server-password"' in captured.out
 
 
 def test_terraform_raise_exception_provision_init(
