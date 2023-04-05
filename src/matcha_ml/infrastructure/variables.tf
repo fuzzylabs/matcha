@@ -19,10 +19,10 @@ variable "zenserver_password" {
 
 # seldon variables
 variable "seldon_name" {
-      default = "seldon"
+  default = "seldon"
 }
 
 variable "seldon_namespace" {
-      default = "seldon-system"
+  default = "seldon-system"
 
 }

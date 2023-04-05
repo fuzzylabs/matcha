@@ -32,6 +32,10 @@ output "azure-container-registry" {
   value = module.acr.container-registry-URL
 }
 
+output "azure-registry-name" {
+  value = module.acr.container-registry-name
+}
+
 output "seldon-workloads-namespace" {
   value = module.seldon.workloads-namespace
 }
