@@ -4,6 +4,11 @@ import pytest
 from typer import BadParameter
 
 from matcha_ml.cli._validation import (
+    LONGEST_RESOURCE_NAME,
+    MAXIMUM_RESOURCE_NAME_LEN,
+    _check_length,
+    _is_alphanumeric,
+    _is_not_digits,
     _is_valid_prefix,
     find_closest_matches,
     prefix_typer_callback,
@@ -77,26 +82,65 @@ def test_is_valid_prefix_expected():
 
 
 @pytest.mark.parametrize(
+    "prefix, expectation", [("mat-cha", False), ("matcha", True), ("matcha123", True)]
+)
+def test_is_alphanumeric(prefix: str, expectation: bool):
+    """Test that the _is_alphanumeric internal function works as expected.
+
+    Args:
+        prefix (str): the test prefix.
+        expectation (bool): what the expected result is.
+    """
+    assert _is_alphanumeric(prefix) == expectation
+
+
+@pytest.mark.parametrize(
+    "prefix, expectation", [("thisisareallylongprefix", False), ("matcha", True)]
+)
+def test_check_length(prefix: str, expectation: bool):
+    """Test that the _check_length internal function works as expected.
+
+    Args:
+        prefix (str): the test prefix.
+        expectation (bool): what the expected result is.
+    """
+    assert _check_length(prefix) == expectation
+
+
+@pytest.mark.parametrize(
+    "prefix, expectation", [("1234", False), ("matcha", True), ("matcha123", True)]
+)
+def test_is_not_digits(prefix: str, expectation: bool):
+    """Test that _is_not_digits works as expected.
+
+    Args:
+        prefix (str): the test prefix.
+        expectation (bool): what the expected result is.
+    """
+    assert _is_not_digits(prefix) == expectation
+
+
+@pytest.mark.parametrize(
     "prefix, error_msg, expectation",
     [
         (
+            "1234",
+            "Resource group name prefix cannot contain only numbers.",
+            MatchaInputError,
+        ),
+        (
             "matcha&&",
-            "Resource group name prefix must contain only alphanumeric characters and hyphens.",
+            "Resource group name prefix can only contain alphanumeric characters.",
             MatchaInputError,
         ),
         (
-            "-matcha-",
-            "Resource group name prefix cannot start or end with a hyphen.",
-            MatchaInputError,
-        ),
-        (
-            "ma",
-            "Resource group name prefix must be between 3 and 24 characters long.",
+            "mat-cha",
+            "Resource group name prefix can only contain alphanumeric characters.",
             MatchaInputError,
         ),
         (
             "thisisareallylongprefixmatcha",
-            "Resource group name prefix must be between 3 and 24 characters long.",
+            f"Resource group name prefix must be between 3 and {MAXIMUM_RESOURCE_NAME_LEN - len(LONGEST_RESOURCE_NAME)} characters long.",
             MatchaInputError,
         ),
     ],
@@ -117,9 +161,17 @@ def test_is_valid_prefix_invalid(
     assert str(err.value) == error_msg
 
 
-def test_prefix_typer_callback_expected():
-    """Test that the callback works as expected with valid input."""
-    assert prefix_typer_callback("matcha") == "matcha"
+@pytest.mark.parametrize(
+    "prefix, expectation", [("matcha", "matcha"), ("MATCHA", "matcha")]
+)
+def test_prefix_typer_callback_expected(prefix: str, expectation: str):
+    """Test that the callback works as expected with valid input.
+
+    Args:
+        prefix (str): the prefix acting as user input.
+        expectation (str): the expected outcome of the callback.
+    """
+    assert prefix_typer_callback(prefix) == expectation
 
 
 @pytest.mark.parametrize(
@@ -127,7 +179,7 @@ def test_prefix_typer_callback_expected():
     [
         (
             "matcha&&",
-            "Resource group name prefix must contain only alphanumeric characters and hyphens.",
+            "Resource group name prefix can only contain alphanumeric characters.",
             BadParameter,
         ),
         (
