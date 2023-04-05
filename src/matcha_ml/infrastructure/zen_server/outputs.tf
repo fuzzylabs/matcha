@@ -1,5 +1,5 @@
 output "zenserver_url" {
-  value = "http://${data.kubernetes_service.zen-server.status.0.load_balancer.0.ingress.0.ip}"
+  value = "http://${data.kubernetes_service.zen_server.status.0.load_balancer.0.ingress.0.ip}"
 }
 
 output "zenserver_username" {

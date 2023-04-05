@@ -1,6 +1,6 @@
 variable "prefix" {
   description = "A prefix used for all resources"
-  default     = "matcha"
+  default     = "cattest"
 }
 
 variable "location" {
@@ -15,6 +15,7 @@ variable "zenserver_username" {
 variable "zenserver_password" {
   description = "Password for ZenServer"
   sensitive   = true
+  default     = "sup3rsaf3pass"
 }
 
 # seldon variables
