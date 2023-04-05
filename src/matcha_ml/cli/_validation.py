@@ -7,6 +7,7 @@ from typer import BadParameter
 from matcha_ml.errors import MatchaInputError
 from matcha_ml.services import AzureClient
 
+# TODO: dynamically set both of these variables
 LONGEST_RESOURCE_NAME = "artifactstore"
 MAXIMUM_RESOURCE_NAME_LEN = 24
 
@@ -50,11 +51,11 @@ def _is_not_digits(prefix: str) -> bool:
 PREFIX_RULES = {
     "numbers": {
         "func": _is_not_digits,
-        "message": "Resource group name cannot only contain numbers.",
+        "message": "Resource group name prefix cannot contain only numbers.",
     },
     "alphanumeric": {
         "func": _is_alphanumeric,
-        "message": "Resource group name prefix must only contain alphanumeric characters.",
+        "message": "Resource group name prefix can only contain alphanumeric characters.",
     },
     "length": {
         "func": _check_length,

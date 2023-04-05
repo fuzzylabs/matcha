@@ -200,15 +200,15 @@ def test_cli_provision_command_with_verbose_arg(
     [
         (
             "uksouth\n-matcha-\nvalid\nno\n",
-            "Error: Resource group name prefix must only contain alphanumeric characters.",
+            "Error: Resource group name prefix can only contain alphanumeric characters.",
         ),
         (
             "uksouth\n12\nvalid\nno\n",
-            "Error: Resource group name cannot only contain numbers.",
+            "Error: Resource group name prefix cannot contain only numbers.",
         ),
         (
             "uksouth\ngood$prefix#\nvalid\nno\n",
-            "Error: Resource group name prefix must only contain alphanumeric characters.",
+            "Error: Resource group name prefix can only contain alphanumeric characters.",
         ),
         (
             "uksouth\nareallyloingprefix\nvalid\nno\n",
@@ -233,8 +233,6 @@ def test_cli_provision_command_prefix_rule(
     os.chdir(matcha_testing_directory)
 
     result = runner.invoke(app, ["provision"], input=user_input)
-
-    print(result.stdout)
 
     assert expected_output in result.stdout
 

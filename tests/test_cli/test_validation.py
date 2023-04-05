@@ -123,15 +123,19 @@ def test_is_not_digits(prefix: str, expectation: bool):
 @pytest.mark.parametrize(
     "prefix, error_msg, expectation",
     [
-        ("1234", "Resource group name cannot only contain numbers.", MatchaInputError),
+        (
+            "1234",
+            "Resource group name prefix cannot contain only numbers.",
+            MatchaInputError,
+        ),
         (
             "matcha&&",
-            "Resource group name prefix must only contain alphanumeric characters.",
+            "Resource group name prefix can only contain alphanumeric characters.",
             MatchaInputError,
         ),
         (
             "mat-cha",
-            "Resource group name prefix must only contain alphanumeric characters.",
+            "Resource group name prefix can only contain alphanumeric characters.",
             MatchaInputError,
         ),
         (
@@ -175,7 +179,7 @@ def test_prefix_typer_callback_expected(prefix: str, expectation: str):
     [
         (
             "matcha&&",
-            "Resource group name prefix must only contain alphanumeric characters.",
+            "Resource group name prefix can only contain alphanumeric characters.",
             BadParameter,
         ),
         (
