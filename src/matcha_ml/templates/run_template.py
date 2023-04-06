@@ -18,12 +18,19 @@ from matcha_ml.cli.ui.status_message_builders import (
 )
 from matcha_ml.errors import MatchaTerraformError
 
-MLFLOW_TRACKING_URL = "mlflow-tracking-url"
-ZENML_STORAGE_PATH = "zenml-storage-path"
-ZENML_CONNECTION_STRING = "zenml-connection-string"
-K8S_CONTEXT = "k8s-context"
-SELDON_WORKLOADS_NAMESPACE = "seldon-workloads-namespace"
-SELDON_BASE_URL = "seldon-base-url"
+OUTPUTS = {
+    "mlflow-tracking-url",
+    "zenml-storage-path",
+    "zenml-connection-string",
+    "k8s-context",
+    "azure-container-registry",
+    "azure-registry-name",
+    "zen-server-url",
+    "zen-server-username",
+    "zen-server-password",
+    "seldon-workloads-namespace",
+    "seldon-base-url",
+}
 
 SPINNER = "dots"
 
@@ -276,28 +283,14 @@ class TerraformService:
 
     def write_outputs_state(self) -> None:
         """Write the outputs of the terraform deployment to the state json file."""
-        outputs = {
-            MLFLOW_TRACKING_URL: self.terraform_client.output(
-                MLFLOW_TRACKING_URL, full_value=True
-            ),
-            ZENML_STORAGE_PATH: self.terraform_client.output(
-                ZENML_STORAGE_PATH, full_value=True
-            ),
-            ZENML_CONNECTION_STRING: self.terraform_client.output(
-                ZENML_CONNECTION_STRING, full_value=True
-            ),
-            K8S_CONTEXT: self.terraform_client.output(K8S_CONTEXT, full_value=True),
-            SELDON_WORKLOADS_NAMESPACE: self.terraform_client.output(
-                SELDON_WORKLOADS_NAMESPACE, full_value=True
-            ),
-            SELDON_BASE_URL: self.terraform_client.output(
-                SELDON_BASE_URL, full_value=True
-            ),
+        state_outputs = {
+            name: self.terraform_client.output(name, full_value=True)
+            for name in OUTPUTS
         }
 
         # dump specific terraform output to state file
         with open(self.config.state_file, "w") as fp:
-            json.dump(outputs, fp, indent=4)
+            json.dump(state_outputs, fp, indent=4)
 
     def show_terraform_outputs(self) -> None:
         """Print the terraform outputs from state file."""

@@ -45,22 +45,51 @@ def mock_output() -> Callable[[str, bool], Union[str, Dict[str, str]]]:
     """
 
     def output(name: str, full_value: bool) -> str:
-        expected_outputs = {
+        terraform_outputs = {
             "mlflow-tracking-url": "mlflow-test-url",
             "zenml-storage-path": "zenml-test-storage-path",
             "zenml-connection-string": "zenml-test-connection-string",
             "k8s-context": "k8s-test-context",
+            "azure-container-registry": "azure-container-registry",
+            "azure-registry-name": "azure-registry-name",
+            "zen-server-url": "zen-server-url",
+            "zen-server-username": "zen-server-username",
+            "zen-server-password": "zen-server-password",
             "seldon-workloads-namespace": "test-seldon-workloads-namespace",
             "seldon-base-url": "test-seldon-base-url",
         }
-        if name not in expected_outputs:
+        if name not in terraform_outputs:
             raise ValueError("Unexpected input")
         if full_value:
-            return expected_outputs[name]
+            return terraform_outputs[name]
         else:
-            return {"value": expected_outputs[name]}
+            return {"value": terraform_outputs[name]}
 
     return output
+
+
+@pytest.fixture
+def expected_outputs() -> dict:
+    """The expected output from terraform.
+
+    Returns:
+        dict: expected output.
+    """
+    outputs = {
+        "mlflow-tracking-url": "mlflow-test-url",
+        "zenml-storage-path": "zenml-test-storage-path",
+        "zenml-connection-string": "zenml-test-connection-string",
+        "k8s-context": "k8s-test-context",
+        "azure-container-registry": "azure-container-registry",
+        "azure-registry-name": "azure-registry-name",
+        "zen-server-url": "zen-server-url",
+        "zen-server-username": "zen-server-username",
+        "zen-server-password": "zen-server-password",
+        "seldon-workloads-namespace": "test-seldon-workloads-namespace",
+        "seldon-base-url": "test-seldon-base-url",
+    }
+
+    return outputs
 
 
 def test_is_approved_confirmed():
@@ -197,38 +226,31 @@ def test_deprovision(terraform_test_config: TerraformConfig):
 def test_write_outputs_state(
     terraform_test_config: TerraformConfig,
     mock_output: Callable[[str, bool], Union[str, Dict[str, str]]],
+    expected_outputs: dict,
 ):
     """Test service writes the state file correctly.
 
     Args:
         terraform_test_config (TerraformConfig): test terraform service config
         mock_output (Callable[[str, bool], Union[str, Dict[str, str]]]): the mock output
+        expected_outputs (dict): expected output from terraform
     """
     tfs = TerraformService()
     tfs.config = terraform_test_config
 
-    print(type(mock_output))
-
     tfs.terraform_client.output = MagicMock(wraps=mock_output)
 
     with does_not_raise():
-        expected_output = {
-            "mlflow-tracking-url": "mlflow-test-url",
-            "zenml-storage-path": "zenml-test-storage-path",
-            "zenml-connection-string": "zenml-test-connection-string",
-            "k8s-context": "k8s-test-context",
-            "seldon-workloads-namespace": "test-seldon-workloads-namespace",
-            "seldon-base-url": "test-seldon-base-url",
-        }
         tfs.write_outputs_state()
         with open(terraform_test_config.state_file) as f:
-            assert json.load(f) == expected_output
+            assert json.load(f) == expected_outputs
 
 
 def test_show_terraform_outputs(
     terraform_test_config: TerraformConfig,
     capsys: SysCapture,
     mock_output: Callable[[str, bool], Union[str, Dict[str, str]]],
+    expected_outputs: dict,
 ):
     """Test service shows the correct terraform output.
 
@@ -236,6 +258,7 @@ def test_show_terraform_outputs(
         terraform_test_config (TerraformConfig): test terraform service config
         capsys (SysCapture): fixture to capture stdout and stderr
         mock_output (Callable[[str, bool], Union[str, Dict[str, str]]]): the mock output
+        expected_outputs (dict): expected output from terraform
     """
     tfs = TerraformService()
     tfs.config = terraform_test_config
@@ -244,17 +267,9 @@ def test_show_terraform_outputs(
     with does_not_raise():
         tfs.show_terraform_outputs()
         captured = capsys.readouterr()
-        assert '"mlflow-tracking-url": "mlflow-test-url"' in captured.out
-        assert '"zenml-storage-path": "zenml-test-storage-path"' in captured.out
-        assert (
-            '"zenml-connection-string": "zenml-test-connection-string"' in captured.out
-        )
-        assert '"k8s-context": "k8s-test-context"' in captured.out
-        assert (
-            '"seldon-workloads-namespace": "test-seldon-workloads-namespace"'
-            in captured.out
-        )
-        assert '"seldon-base-url": "test-seldon-base-url"' in captured.out
+
+        for output in expected_outputs:
+            assert output in captured.out
 
 
 def test_terraform_raise_exception_provision_init(
