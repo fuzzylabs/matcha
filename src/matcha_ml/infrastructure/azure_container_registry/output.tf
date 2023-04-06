@@ -1,8 +1,8 @@
 # output for container registry
-output "container-registry-URL" {
+output "container_registry_url" {
   value = azurerm_container_registry.container_registry.login_server
 }
 
-output "container-registry-name" {
+output "container_registry_name" {
   value = azurerm_container_registry.container_registry.name
 }

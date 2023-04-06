@@ -45,7 +45,7 @@ module "acr" {
 
 module "mlflow" {
   source     = "./mlflow_module"
-  depends_on = [null_resource.configure-local-kubectl]
+  depends_on = [null_resource.configure_local_kubectl]
 
   # storage variables
   storage_account_name      = module.storage.storage_account_name
@@ -58,7 +58,7 @@ module "mlflow" {
 module "zenserver" {
   source = "./zen_server"
 
-  depends_on = [null_resource.configure-local-kubectl]
+  depends_on = [null_resource.configure_local_kubectl]
 
   # resource group variables
   resource_group_name = module.resource_group.name
@@ -74,7 +74,7 @@ module "zenserver" {
 module "seldon" {
   source = "./seldon"
 
-  depends_on = [null_resource.configure-local-kubectl]
+  depends_on = [null_resource.configure_local_kubectl]
 
   # details about the seldon deployment
   seldon_name      = var.seldon_name
