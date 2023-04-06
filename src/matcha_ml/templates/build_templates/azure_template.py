@@ -17,7 +17,14 @@ from matcha_ml.cli.ui.status_message_builders import (
 )
 from matcha_ml.errors import MatchaPermissionError
 
-SUBMODULE_NAMES = ["aks", "resource_group", "mlflow_module", "storage", "zenml_storage"]
+SUBMODULE_NAMES = [
+    "aks",
+    "resource_group",
+    "mlflow_module",
+    "storage",
+    "seldon",
+    "zenml_storage",
+]
 
 
 @dataclasses.dataclass
@@ -46,7 +53,14 @@ def reuse_configuration(path: str) -> bool:
             [
                 ("Resource group", "A resource group"),
                 ("Azure Kubernetes Service (AKS)", "A kubernetes cluster"),
-                ("Two Azure Storage Container", "A storage container for experiment tracking artifacts and a second for model training artifacts"),
+                (
+                    "Two Azure Storage Container",
+                    "A storage container for experiment tracking artifacts and a second for model training artifacts",
+                ),
+                (
+                    "Seldon Core",
+                    "A framework for model deployment on top of a kubernetes cluster",
+                ),
             ],
         )
 

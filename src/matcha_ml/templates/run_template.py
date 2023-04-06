@@ -28,6 +28,8 @@ AZURE_REGISTRY_NAME = "azure-registry-name"
 ZEN_SERVER_URL = "zen-server-url"
 ZEN_SERVER_USERNAME = "zen-server-username"
 ZEN_SERVER_PASSWORD = "zen-server-password"
+SELDON_WORKLOADS_NAMESPACE = "seldon-workloads-namespace"
+SELDON_BASE_URL = "seldon-base-url"
 
 SPINNER = "dots"
 
@@ -132,6 +134,10 @@ class TerraformService:
                 (
                     "Two Azure Storage Container",
                     "A storage container for experiment tracking artifacts and a second for model training artifacts",
+                ),
+                (
+                    "Seldon Core",
+                    "A framework for model deployment on top of a kubernetes cluster",
                 ),
             ],
             footer=f"{verb.capitalize()}ing the resources may take up to 10 minutes. May we suggest you to grab a cup of {Emojis.MATCHA.value}?",
@@ -296,6 +302,12 @@ class TerraformService:
             ),
             ZEN_SERVER_PASSWORD: self.terraform_client.output(
                 ZEN_SERVER_PASSWORD, full_value=True
+            ),
+            SELDON_WORKLOADS_NAMESPACE: self.terraform_client.output(
+                SELDON_WORKLOADS_NAMESPACE, full_value=True
+            ),
+            SELDON_BASE_URL: self.terraform_client.output(
+                SELDON_BASE_URL, full_value=True
             ),
         }
 
