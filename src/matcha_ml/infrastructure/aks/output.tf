@@ -31,3 +31,7 @@ output "aks_cluster_name" {
 output "aks_principal_id" {
   value = azurerm_kubernetes_cluster.matcha_kubernetes_cluster.identity[0].principal_id
 }
+
+output "aks_object_id" {
+  value = azurerm_kubernetes_cluster.matcha_kubernetes_cluster.kubelet_identity[0].object_id
+}
