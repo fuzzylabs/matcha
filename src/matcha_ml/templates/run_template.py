@@ -283,37 +283,20 @@ class TerraformService:
     def write_outputs_state(self) -> None:
         """Write the outputs of the terraform deployment to the state json file."""
         outputs = {
-            MLFLOW_TRACKING_URL: self.terraform_client.output(
-                MLFLOW_TRACKING_URL, full_value=True
-            ),
-            ZENML_STORAGE_PATH: self.terraform_client.output(
-                ZENML_STORAGE_PATH, full_value=True
-            ),
-            ZENML_CONNECTION_STRING: self.terraform_client.output(
-                ZENML_CONNECTION_STRING, full_value=True
-            ),
-            K8S_CONTEXT: self.terraform_client.output(K8S_CONTEXT, full_value=True),
-            AZURE_CONTAINER_REGISTRY: self.terraform_client.output(
-                AZURE_CONTAINER_REGISTRY, full_value=True
-            ),
-            AZURE_REGISTRY_NAME: self.terraform_client.output(
-                AZURE_REGISTRY_NAME, full_value=True
-            ),
-            ZEN_SERVER_URL: self.terraform_client.output(
-                ZEN_SERVER_URL, full_value=True
-            ),
-            ZEN_SERVER_USERNAME: self.terraform_client.output(
-                ZEN_SERVER_USERNAME, full_value=True
-            ),
-            ZEN_SERVER_PASSWORD: self.terraform_client.output(
-                ZEN_SERVER_PASSWORD, full_value=True
-            ),
-            SELDON_WORKLOADS_NAMESPACE: self.terraform_client.output(
-                SELDON_WORKLOADS_NAMESPACE, full_value=True
-            ),
-            SELDON_BASE_URL: self.terraform_client.output(
-                SELDON_BASE_URL, full_value=True
-            ),
+            var: self.terraform_client.output(var, full_value=True)
+            for var in [
+                MLFLOW_TRACKING_URL,
+                ZENML_STORAGE_PATH,
+                ZENML_CONNECTION_STRING,
+                K8S_CONTEXT,
+                AZURE_CONTAINER_REGISTRY,
+                AZURE_REGISTRY_NAME,
+                ZEN_SERVER_URL,
+                ZEN_SERVER_USERNAME,
+                ZEN_SERVER_PASSWORD,
+                SELDON_WORKLOADS_NAMESPACE,
+                SELDON_BASE_URL,
+            ]
         }
 
         # dump specific terraform output to state file
