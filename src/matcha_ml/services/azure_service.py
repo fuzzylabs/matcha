@@ -1,15 +1,25 @@
 """The Azure Service interface."""
 from subprocess import DEVNULL
-from typing import Optional, Set
+from typing import Optional, Set, cast
 
+import jwt
 from azure.core.exceptions import ClientAuthenticationError
 from azure.identity import AzureCliCredential, CredentialUnavailableError
+from azure.mgmt.authorization import AuthorizationManagementClient
 from azure.mgmt.resource import (
     ResourceManagementClient,
     SubscriptionClient,
 )
 
-from matcha_ml.errors import MatchaAuthenticationError
+from matcha_ml.errors import MatchaAuthenticationError, MatchaPermissionsError
+
+ROLE_ID_MAPPING = {
+    "Owner": "8e3af657-a8ff-443c-a75c-2fe8c4bcb635",
+    "Contributor": "b24988ac-6180-42a0-ab88-20f7382dd24c",
+    "User Access Administrator": "18d7d88d-d35e-4fb5-a5c3-7773c20a72d9",
+}
+
+ACCEPTED_ROLE_CONFIGURATIONS = [["Owner"], ["Contributor", "User Access Administrator"]]
 
 
 class AzureClient:
@@ -22,6 +32,7 @@ class AzureClient:
         """Constructor for the Azure Client object."""
         self.authenticated = self._check_authentication()
         self.subscription_id = self._subscription_id()
+        self.has_permissions = self._check_required_role_assignments()
 
     def _check_authentication(self) -> bool:
         """Check whether the user is authenticated with 'az login'.
@@ -60,6 +71,56 @@ class AzureClient:
             raise MatchaAuthenticationError(
                 "no subscriptions found - you at least one subscription active in your Azure account."
             )
+
+    def _get_principal_id(self) -> str:
+        """Get principal ID of the authenticated user.
+
+        Returns:
+            str: principal ID
+        """
+        access_token = self._credential.get_token("https://management.azure.com/")
+
+        decoded_token = jwt.decode(
+            access_token.token,
+            options={"verify_signature": False},
+            algorithms=["RS256"],
+        )
+        user_object_id = cast(str, decoded_token["oid"])
+
+        return user_object_id
+
+    def _check_required_role_assignments(self) -> bool:
+        """Check if the user has one of the required sets of roles.
+
+        Returns:
+            bool: True if required roles are assigned
+
+        Raises:
+            MatchaPermissionError: when the user does not have required roles
+
+        """
+        self._authorization_client = AuthorizationManagementClient(
+            self._credential, self.subscription_id
+        )
+        principal_id = self._get_principal_id()
+        role_assignments = (
+            self._authorization_client.role_assignments.list_for_subscription()
+        )
+        roles = [
+            x.role_definition_id
+            for x in role_assignments
+            if x.principal_id == principal_id
+        ]
+        for role_configuration in ACCEPTED_ROLE_CONFIGURATIONS:
+            expected_roles = [
+                f"/subscriptions/{self.subscription_id}/providers/Microsoft.Authorization/roleDefinitions/{ROLE_ID_MAPPING[role]}"
+                for role in role_configuration
+            ]
+            if all([role in roles for role in expected_roles]):
+                return True
+        raise MatchaPermissionsError(
+            "you need either Owner role or Contributor and User Access Administrator roles"
+        )
 
     def fetch_resource_group_names(self) -> Set[str]:
         """Fetch the resource group names for the current subscription_id.

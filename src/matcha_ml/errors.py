@@ -38,6 +38,24 @@ class MatchaAuthenticationError(Exception):
         super().__init__(message, *args, **kwargs)
 
 
+class MatchaPermissionsError(Exception):
+    """Matcha Permissions Error.
+
+    Raised when the user does not have .
+    """
+
+    def __init__(self, auth_error: str, *args: Any, **kwargs: Any):
+        """The initialiser for the Authentication error.
+
+        Args:
+            auth_error (str): the error to propagate to the user.
+            *args: additional arguments to pass to the Exception base class.
+            **kwargs: additional key word arguments to pass to the Exception base class.
+        """
+        message = f"Error - Matcha detected that you do not have enough permissions on Azure to run this action: {auth_error}."
+        super().__init__(message, *args, **kwargs)
+
+
 class MatchaInputError(Exception):
     """Matcha Input Error.
 
