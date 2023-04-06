@@ -70,4 +70,3 @@ class MatchaTerraformError(Exception):
         """
         message = f"Terraform failed because of the following error: '{tf_error}'."
         super().__init__(message, *args, **kwargs)
-

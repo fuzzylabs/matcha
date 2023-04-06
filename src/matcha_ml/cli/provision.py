@@ -20,6 +20,7 @@ app = typer.Typer()
 def provision_resources(
     location: str,
     prefix: str,
+    password: str,
     verbose: Optional[bool] = False,
 ) -> None:
     """Provision cloud resources using templates.
@@ -27,6 +28,7 @@ def provision_resources(
     Args:
         location (str): Azure location in which all resources will be provisioned.
         prefix (str): Prefix used for all resources.
+        password (str): Password for ZenServer.
         verbose (bool optional): additional output is show when True. Defaults to False.
     """
     project_directory = os.getcwd()
@@ -35,7 +37,7 @@ def provision_resources(
     template = os.path.join(os.path.dirname(__file__), os.pardir, "infrastructure")
 
     if not reuse_configuration(destination):
-        config = build_template_configuration(location, prefix)
+        config = build_template_configuration(location, prefix, password)
         build_template(config, template, destination, verbose)
 
     # create a terraform service to provision resources
