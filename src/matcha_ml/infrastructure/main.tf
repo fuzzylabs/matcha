@@ -44,7 +44,8 @@ module "acr" {
 }
 
 module "mlflow" {
-  source     = "./mlflow_module"
+  source = "./mlflow_module"
+
   depends_on = [null_resource.configure_local_kubectl]
 
   # storage variables
