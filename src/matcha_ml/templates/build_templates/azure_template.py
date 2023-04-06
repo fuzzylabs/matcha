@@ -3,8 +3,8 @@ import dataclasses
 import glob
 import json
 import os
-from shutil import copy, copytree, rmtree
-from typing import Optional
+from shutil import copy, rmtree
+from typing import List, Optional
 
 import typer
 
@@ -26,7 +26,10 @@ SUBMODULE_NAMES = [
     "zenml_storage",
     "zen_server",
     "azure_container_registry",
+    "zen_server/zenml_helm",
+    "zen_server/zenml_helm/templates",
 ]
+ALLOWED_EXTENSIONS = ["tf", "yaml", "tpl"]
 
 
 @dataclasses.dataclass
@@ -99,6 +102,24 @@ def build_template_configuration(
     return TemplateVariables(location=location, prefix=prefix, password=password)
 
 
+def copy_files(files: List[str], destination: str, sub_folder_path: str = "") -> None:
+    """Copy files from folders and sub folders to the destination directory.
+
+    Args:
+        files (List[str]): List of all allowed file paths in the folder/sub-folder to copy to destination.
+        destination (str): destination path to write template to.
+        sub_folder_path (str): Path to sub folder to create in destination. Defaults to "".
+    """
+    for source_path in files:
+        filename = os.path.basename(source_path)
+
+        if sub_folder_path:
+            destination_path = os.path.join(destination, sub_folder_path, filename)
+        else:
+            destination_path = os.path.join(destination, filename)
+        copy(source_path, destination_path)
+
+
 def build_template(
     config: TemplateVariables,
     template_src: str,
@@ -142,27 +163,17 @@ def build_template(
             destination_path = os.path.join(destination, filename)
             copy(source_path, destination_path)
 
-        for source_path in glob.glob(os.path.join(template_src, "*.tf")):
-            filename = os.path.basename(source_path)
-            destination_path = os.path.join(destination, filename)
-            copy(source_path, destination_path)
+        files = glob.glob(os.path.join(template_src, "*.tf"))
+        copy_files(files, destination)
 
         for submodule_name in SUBMODULE_NAMES:
             os.makedirs(os.path.join(destination, submodule_name), exist_ok=True)
-            for source_path in glob.glob(
-                os.path.join(template_src, submodule_name, "*.tf")
-            ):
-                filename = os.path.basename(source_path)
-                src_path = os.path.join(template_src, submodule_name, filename)
-                destination_path = os.path.join(destination, submodule_name, filename)
-                copy(src_path, destination_path)
-
-            # Special case for the "zen_server" submodule to copy the local helm chart
-            if submodule_name == "zen_server":
-                source_path = os.path.join(template_src, "zen_server", "zenml_helm")
-                dirname = os.path.basename(source_path)
-                destination_path = os.path.join(destination, submodule_name, dirname)
-                copytree(source_path, destination_path)
+            for ext in ALLOWED_EXTENSIONS:
+                files = glob.glob(
+                    os.path.join(template_src, submodule_name, f"*.{ext}")
+                )
+                sub_folder_path = submodule_name
+                copy_files(files, destination, sub_folder_path)
 
             if verbose:
                 print_status(
@@ -180,6 +191,7 @@ def build_template(
 
         if verbose:
             print_status(build_substep_success_status("Template variables were added."))
+
     except PermissionError:
         raise MatchaPermissionError(path=destination)
 
