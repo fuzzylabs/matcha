@@ -35,10 +35,10 @@ def provision(
         help="A unique prefix for your resources.",
     ),
     password: str = typer.Option(
-        prompt="The password for the ZenServer (place where your pipelines are stored).",
+        prompt="The password for the ZenServer (where your pipelines are stored).",
         confirmation_prompt=True,
         hide_input=True,
-        help="A password for the ZenServer (place where your pipelines are stored).",
+        help="A password for the ZenServer (where your pipelines are stored).",
         default="default",
     ),
     verbose: Optional[bool] = typer.Option(
