@@ -33,8 +33,7 @@ resource "kubernetes_cluster_role_binding_v1" "seldon-machinelearning-permission
   }
 
   subject {
-    kind      = "ServiceAccount"
-    name      = "default"
-    namespace = kubernetes_namespace.seldon-workloads.metadata[0].name
+    kind = "User"
+    name = "system:serviceaccount:zenml:default"
   }
 }
