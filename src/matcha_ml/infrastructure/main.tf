@@ -69,6 +69,9 @@ module "zenserver" {
   # ZenServer credentials
   username = var.username
   password = var.password
+
+  # Pin ZenServer version
+  zenmlserver_image_tag = "0.36.1"
 }
 
 

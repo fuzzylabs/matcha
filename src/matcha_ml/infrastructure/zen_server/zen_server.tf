@@ -17,6 +17,11 @@ resource "helm_release" "zen-server" {
   }
 
   set {
+    name  = "zenml.image.tag"
+    value = var.zenmlserver_image_tag
+  }
+
+  set {
     name  = "zenml.defaultUsername"
     value = var.username
   }
