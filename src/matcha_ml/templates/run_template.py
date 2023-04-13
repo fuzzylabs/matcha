@@ -102,6 +102,18 @@ class TerraformService:
             )
             raise typer.Exit()
 
+    def check_matcha_directory_exists(self) -> None:
+        """Checks if .matcha directory exists within the current working directory.
+
+        Raises:
+            Exit: if .matcha directory does not exist.
+        """
+        if not os.path.isdir(os.path.join(os.getcwd(), ".matcha")):
+            print_error(
+                "Error, the .matcha directory does not exist. Please ensure you are trying to destroy resources that you have provisioned in the current working directory."
+            )
+            raise typer.Exit()
+
     def validate_config(self) -> None:
         """Validate the configuration used for creating resources.
 
@@ -268,6 +280,8 @@ class TerraformService:
         Raises:
             Exit: if approval is not given by user.
         """
+        self.check_matcha_directory_exists()
+
         self.check_installation()
 
         if self.is_approved(verb="destroy"):
