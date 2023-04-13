@@ -11,7 +11,6 @@ resource "azurerm_kubernetes_cluster" "matcha_kubernetes_cluster" {
     enable_auto_scaling = true
     max_count           = 3
     min_count           = 1
-    node_count          = 2
   }
 
   identity {
