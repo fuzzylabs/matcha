@@ -132,6 +132,38 @@ def test_check_installation_not_installed():
 
         with pytest.raises(typer.Exit):
             tfs.check_installation()
+              
+               
+def test_check_matcha_directory_exists(tmp_path):
+    """Test app does not exit when .matcha file exists within current working directory."""
+    # Create a new directory within the temporary directory
+    new_dir = tmp_path / ".matcha"
+    os.mkdir(new_dir)
+    os.chdir(tmp_path)
+
+    tfs = TerraformService()
+
+    with mock.patch("python_terraform.Terraform") as mock_tf:
+        mock_tf_instance = mock_tf.return_value
+        mock_tf_instance.cmd.return_value = (0, "", "")
+
+        with does_not_raise():
+            tfs.check_matcha_directory_exists()
+            
+    os.chdir("..")
+
+
+def test_check_matcha_directory_does_not_exist(tmp_path):
+    """Test app exits when .matcha file does not exist within current working directory."""
+    tfs = TerraformService()
+
+    with mock.patch("python_terraform.Terraform") as mock_tf:
+        mock_tf_instance = mock_tf.return_value
+        mock_tf_instance.cmd.side_effect = TerraformCommandError(1, "", "", "")
+
+        with pytest.raises(typer.Exit):
+            print(os.getcwd())
+            tfs.check_matcha_directory_exists()
 
 
 def test_validate_config_not_exist(terraform_test_config: TerraformConfig):
@@ -172,6 +204,7 @@ def test_provision(terraform_test_config: TerraformConfig):
     """
     tfs = TerraformService()
     tfs.config = terraform_test_config
+    tfs.check_matcha_directory_exists = MagicMock()
     tfs.check_installation = MagicMock()
     tfs.validate_config = MagicMock()
     tfs.terraform_client.init = MagicMock(return_value=(0, "", ""))
@@ -205,6 +238,7 @@ def test_deprovision(terraform_test_config: TerraformConfig):
     """
     tfs = TerraformService()
     tfs.config = terraform_test_config
+    tfs.check_matcha_directory_exists = MagicMock()
     tfs.check_installation = MagicMock()
     tfs.terraform_client.destroy = MagicMock(return_value=(0, "", ""))
 
@@ -282,6 +316,7 @@ def test_terraform_raise_exception_provision_init(
     """
     tfs = TerraformService()
     tfs.config = terraform_test_config
+    tfs.check_matcha_directory_exists = MagicMock()
     tfs.check_installation = MagicMock()
     tfs.validate_config = MagicMock()
     tfs.terraform_client.init = MagicMock(return_value=(1, "", "Init failed"))
@@ -308,6 +343,7 @@ def test_terraform_raise_exception_provision_apply(
     """
     tfs = TerraformService()
     tfs.config = terraform_test_config
+    tfs.check_matcha_directory_exists = MagicMock()
     tfs.check_installation = MagicMock()
     tfs.validate_config = MagicMock()
     tfs.terraform_client.init = MagicMock(return_value=(0, "", ""))
@@ -338,6 +374,7 @@ def test_terraform_raise_exception_deprovision_destroy(
     tfs = TerraformService()
     tfs.config = terraform_test_config
 
+    tfs.check_matcha_directory_exists = MagicMock()
     tfs.check_installation = MagicMock()
     tfs.terraform_client.destroy = MagicMock(return_value=(1, "", "Destroy failed"))
 
