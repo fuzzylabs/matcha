@@ -61,6 +61,22 @@ def test_cli_train_command(runner: CliRunner):
 
     # Assert string is present in cli output
     assert "Run train subcommand." in result.stdout
+    
+
+def test_cli_train_command_script_does_not_exist(runner: CliRunner):
+    """Test that the FileNotFoundError is handled correctly when run.py does not exist.
+
+    Args:
+        runner (CliRunner): runner is what will "invoke" a command line application
+    """
+    # Invoke run command
+    result = runner.invoke(app, ["run", "train"])
+    
+    # Exit code other than 0 means there was an error in execution of program
+    assert result.exit_code != 0
+
+    # Check if exception is FileNotFoundError 
+    assert type(result.exception) == type(FileNotFoundError())
 
 
 def test_cli_default_callback(
