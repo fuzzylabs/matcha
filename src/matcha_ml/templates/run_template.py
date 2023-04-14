@@ -110,7 +110,7 @@ class TerraformService:
         """
         if not os.path.isdir(os.path.join(os.getcwd(), ".matcha")):
             print_error(
-                "Error, the .matcha directory does not exist. Please ensure you are trying to destroy resources that you have provisioned in the current working directory."
+                "Error, the .matcha directory does not exist in {os.getcwd()}. Please ensure you are trying to destroy resources that you have provisioned in the current working directory."
             )
             raise typer.Exit()
 
