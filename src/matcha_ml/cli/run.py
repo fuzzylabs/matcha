@@ -16,7 +16,7 @@ def train() -> None:
     """Run train subcommand."""
     try:
         print_status(
-            build_status("Running run.py with '--train' argument.")
+            build_status("Running the training pipeline.")
         )
         subprocess.run(["python3", "run.py", "--train"])
 
