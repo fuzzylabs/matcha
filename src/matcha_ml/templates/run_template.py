@@ -106,9 +106,10 @@ class TerraformService:
     def check_matcha_directory_integrity(self, directory_path: str) -> bool:
         """Checks the integrity of the .matcha directory
         
-        args:
+        Args:
+            directory_path (str): .matcha directory path
 
-        returns:
+        Returns:
             bool: False if .matcha directory is empty else True.
         """
         if len(os.listdir(directory_path)) == 0:
