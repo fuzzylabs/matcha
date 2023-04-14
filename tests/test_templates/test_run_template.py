@@ -162,7 +162,6 @@ def test_check_matcha_directory_does_not_exist(tmp_path):
         mock_tf_instance.cmd.side_effect = TerraformCommandError(1, "", "", "")
 
         with pytest.raises(typer.Exit):
-            print(os.getcwd())
             tfs.check_matcha_directory_exists()
 
 
