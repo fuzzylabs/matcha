@@ -102,16 +102,36 @@ class TerraformService:
             )
             raise typer.Exit()
 
+    
+    def check_matcha_directory_integrity(self, directory_path: str) -> bool:
+        """Checks the integrity of the .matcha directory
+        
+        args:
+
+        returns:
+            bool: False if .matcha directory is empty else True.
+        """
+        if len(os.listdir(directory_path)) == 0:
+            return False
+        else:
+            return True  
+
+
     def check_matcha_directory_exists(self) -> None:
         """Checks if .matcha directory exists within the current working directory.
 
         Raises:
-            Exit: if .matcha directory does not exist.
+            Exit: if .matcha directory does not exist or is empty.
         """
-        if not os.path.isdir(os.path.join(os.getcwd(), ".matcha")):
+        matcha_dir_path = os.path.join(os.getcwd(), ".matcha")
+        if not os.path.isdir(matcha_dir_path):
             print_error(
                 "Error, the .matcha directory does not exist in {os.getcwd()}. Please ensure you are trying to destroy resources that you have provisioned in the current working directory."
             )
+            raise typer.Exit()
+        
+        if not self.check_matcha_directory_integrity(matcha_dir_path):
+            print_error("Error, the .matcha directory is empty.")
             raise typer.Exit()
 
     def validate_config(self) -> None:
