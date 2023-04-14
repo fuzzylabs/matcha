@@ -12,19 +12,18 @@ app = typer.Typer()
 
 
 @app.command()
-def train(context: typer.Context) -> None:
+def train() -> None:
     """Run train subcommand."""
-    if context.invoked_subcommand is None:
-        try:
-            print_status(
-                build_status("Running run.py with '--train' argument.")
-            )
-            subprocess.run(["python3", "run.py", "--train"])
+    try:
+        print_status(
+            build_status("Running run.py with '--train' argument.")
+        )
+        subprocess.run(["python3", "run.py", "--train"])
 
-        except FileNotFoundError:
-            print_error(
-                "FileNotFoundError: No 'run.py' file found in this directory.",
-            )
+    except FileNotFoundError:
+        print_error(
+            "FileNotFoundError: No 'run.py' file found in this directory.",
+        )
 
 
 @app.callback(invoke_without_command=True)
