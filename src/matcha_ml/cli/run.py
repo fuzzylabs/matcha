@@ -1,5 +1,4 @@
 """Run CLI for matcha."""
-from typing import Optional
 import subprocess
 import os
 
