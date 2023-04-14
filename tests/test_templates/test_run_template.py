@@ -134,8 +134,41 @@ def test_check_installation_not_installed():
             tfs.check_installation()
               
                
-def test_check_matcha_directory_exists(tmp_path):
-    """Test app does not exit when .matcha file exists within current working directory."""
+def test_check_matcha_directory_exists(tmp_path: str):
+    """Test app does not exit when .matcha file exists within current working directory.
+    
+    args:
+        tmp_path (str): Pytest temporary path fixture for testing.
+    """
+    # Create a new directory within the temporary directory
+    new_dir = tmp_path / ".matcha"
+    os.mkdir(new_dir)
+    os.chdir(tmp_path)
+    
+    # Create a file in the new directory
+    filename = "matcha_test.txt"
+    filepath = os.path.join(new_dir, filename)
+
+    with open(filepath, "w") as file:
+        file.write("This is an test file.")
+
+    tfs = TerraformService()
+
+    with mock.patch("python_terraform.Terraform") as mock_tf:
+        mock_tf_instance = mock_tf.return_value
+        mock_tf_instance.cmd.return_value = (0, "", "")
+
+        with does_not_raise():
+            result = tfs.check_matcha_directory_exists()
+                        
+    os.chdir("..")
+    
+def test_check_matcha_directory_is_empty(tmp_path):
+    """Test app exits when .matcha file is empty.
+    
+    Args:
+        tmp_path (str): Pytest temporary path fixture for testing.
+    """
     # Create a new directory within the temporary directory
     new_dir = tmp_path / ".matcha"
     os.mkdir(new_dir)
@@ -147,14 +180,42 @@ def test_check_matcha_directory_exists(tmp_path):
         mock_tf_instance = mock_tf.return_value
         mock_tf_instance.cmd.return_value = (0, "", "")
 
-        with does_not_raise():
-            tfs.check_matcha_directory_exists()
+        with pytest.raises(typer.Exit):
+            result = tfs.check_matcha_directory_exists()
+            assert "Error, the .matcha directory is empty." in result
             
     os.chdir("..")
+    
 
+def test_check_matcha_directory_integrity(tmp_path):
+    """Test returns False when .matcha file is empty.
+    
+    Args:
+        tmp_path (str): Pytest temporary path fixture for testing.
+    """
+    # Create a new directory within the temporary directory
+    new_dir = tmp_path / ".matcha"
+    os.mkdir(new_dir)
+    os.chdir(tmp_path)
+
+    tfs = TerraformService()
+
+    with mock.patch("python_terraform.Terraform") as mock_tf:
+        mock_tf_instance = mock_tf.return_value
+        mock_tf_instance.cmd.return_value = (0, "", "")
+
+        result = tfs.check_matcha_directory_integrity(new_dir)
+        assert result is False
+        
+    os.chdir("..")
+    
 
 def test_check_matcha_directory_does_not_exist(tmp_path):
-    """Test app exits when .matcha file does not exist within current working directory."""
+    """Test app exits when .matcha file does not exist within current working directory.
+    
+    Args:
+        tmp_path (str): Pytest temporary path fixture for testing.    
+    """
     tfs = TerraformService()
 
     with mock.patch("python_terraform.Terraform") as mock_tf:
@@ -162,7 +223,8 @@ def test_check_matcha_directory_does_not_exist(tmp_path):
         mock_tf_instance.cmd.side_effect = TerraformCommandError(1, "", "", "")
 
         with pytest.raises(typer.Exit):
-            tfs.check_matcha_directory_exists()
+            result = tfs.check_matcha_directory_exists()
+            assert "Error, the .matcha directory is empty." in result
 
 
 def test_validate_config_not_exist(terraform_test_config: TerraformConfig):
