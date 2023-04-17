@@ -1,5 +1,6 @@
 """Run terraform templates to provision and deprovision resources."""
 import dataclasses
+import glob
 import json
 import os
 from pathlib import Path
@@ -102,18 +103,16 @@ class TerraformService:
             )
             raise typer.Exit()
 
-    
     def check_matcha_directory_integrity(self, directory_path: str) -> bool:
-        """Checks the integrity of the .matcha directory
-        
+        """Checks the integrity of the .matcha directory.
+
         Args:
             directory_path (str): .matcha directory path
 
         Returns:
-            bool: False if .matcha directory does not contain the infrastructure directory else True.
+            bool: False if .matcha directory is empty else True.
         """
-        return 'infrastructure' in os.listdir(directory_path)
-
+        return len(glob.glob(os.path.join(directory_path, "*"))) != 0
 
     def check_matcha_directory_exists(self) -> None:
         """Checks if .matcha directory exists within the current working directory.
@@ -127,9 +126,11 @@ class TerraformService:
                 f"Error, the .matcha directory does not exist in {os.getcwd()} . Please ensure you are trying to destroy resources that you have provisioned in the current working directory."
             )
             raise typer.Exit()
-        
+
         if not self.check_matcha_directory_integrity(matcha_dir_path):
-            print_error("Error, the .matcha directory does not contain files relating to deployed resources. Please ensure you are trying to destroy resources that you have provisioned in the current working directory.")
+            print_error(
+                "Error, the .matcha directory does not contain files relating to deployed resources. Please ensure you are trying to destroy resources that you have provisioned in the current working directory."
+            )
             raise typer.Exit()
 
     def validate_config(self) -> None:
