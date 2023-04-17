@@ -1,5 +1,6 @@
 """Run CLI for matcha."""
 import subprocess
+import os
 
 import typer
 
@@ -14,6 +15,23 @@ app = typer.Typer()
 def train() -> None:
     """Run train subcommand."""
     pass
+
+
+@app.command()
+def deploy() -> None:
+    """Run deploy subcommand."""
+    file_path = os.path.join(os.getcwd(), "run.py")
+
+    if not os.path.isfile(file_path):
+        print_error("Matcha cannot find a 'run.py' file, make sure you are in a directory that has one.")
+    else:
+        try:
+            print_status(
+                build_status("Running the deployment pipeline.")
+            )
+            subprocess.run(["python3", "run.py", "--deploy"], check=True)
+        except subprocess.CalledProcessError as e:
+            print_error(e)
 
 
 @app.callback(invoke_without_command=True)
