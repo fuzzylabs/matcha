@@ -17,7 +17,7 @@ def train() -> None:
     file_path = os.path.join(os.getcwd(), "run.py")
     
     if not os.path.isfile(file_path):
-        print_error("FileNotFoundError: No 'run.py' file found in this directory.")
+        print_error("Matcha cannot find a 'run.py' file, make sure you are in a directory that has one.")
     else:
         try:
             print_status(
@@ -39,7 +39,7 @@ def default_callback(context: typer.Context) -> None:
         file_path = os.path.join(os.getcwd(), "run.py")
     
         if not os.path.isfile(file_path):
-            print_error("FileNotFoundError: No 'run.py' file found in this directory.")
+            print_error("Matcha cannot find a 'run.py' file, make sure you are in a directory that has one.")
         else:
             try:
                 print_status(
