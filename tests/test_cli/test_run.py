@@ -76,7 +76,7 @@ def test_cli_train_command_script_does_not_exist(runner: CliRunner):
     assert result.exit_code != 0
 
     # Check if exception is FileNotFoundError
-    assert isinstance(result.exception, FileNotFoundError())
+    assert isinstance(result.exception, FileNotFoundError)
 
 
 def test_cli_deploy_command_script_does_not_exist(runner: CliRunner):
@@ -92,7 +92,7 @@ def test_cli_deploy_command_script_does_not_exist(runner: CliRunner):
     assert result.exit_code != 0
 
     # Check if exception is FileNotFoundError
-    assert isinstance(result.exception, FileNotFoundError())
+    assert isinstance(result.exception, FileNotFoundError)
 
 
 def test_cli_default_callback(
