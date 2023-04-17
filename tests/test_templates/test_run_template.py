@@ -145,12 +145,11 @@ def test_check_matcha_directory_exists(tmp_path: str):
     os.mkdir(new_dir)
     os.chdir(tmp_path)
     
-    # Create a file in the new directory
-    filename = "matcha_test.txt"
-    filepath = os.path.join(new_dir, filename)
+    # Create an infrastructure directory in the new directory
+    dir_name = "infrastructure"
+    dir_path = os.path.join(new_dir, dir_name)
 
-    with open(filepath, "w") as file:
-        file.write("This is an test file.")
+    os.mkdir(os.path.join(new_dir, dir_name))
 
     tfs = TerraformService()
 
