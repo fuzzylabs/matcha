@@ -22,6 +22,7 @@ class AzureClient:
         """Constructor for the Azure Client object."""
         self.authenticated = self._check_authentication()
         self.subscription_id = self._subscription_id()
+
         self._set_resource_management_client()
 
     def _check_authentication(self) -> bool:
