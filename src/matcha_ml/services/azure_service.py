@@ -50,7 +50,7 @@ class AzureClient:
         self._client = SubscriptionClient(self._credential)
 
         try:
-            self._credential.get_token(
+            self._access_token = self._credential.get_token(
                 "https://management.azure.com/.default", stdout=DEVNULL
             )
         except CredentialUnavailableError:
@@ -81,8 +81,8 @@ class AzureClient:
             str: principal ID
         """
         if self._access_token is None:
-            self._access_token = self._credential.get_token(
-                "https://management.azure.com/"
+            raise MatchaAuthenticationError(
+                "internal error: the client needs to be authenticated first"
             )
 
         decoded_token = jwt.decode(
