@@ -1,11 +1,14 @@
 variable "prefix" {
-  description = "A prefix used for all resources"
+  type        = string
+  description = "Prefix to be used for all resources in this module"
 }
 
 variable "location" {
-  description = "The Azure Region in which k8s cluster should be provisioned"
+  type        = string
+  description = "The location/region where the Kubernetes cluster will be created"
 }
 
 variable "resource_group_name" {
-  description = "The Azure resource group name to provision k8s cluster in"
+  type        = string
+  description = "The name of the resource group to create the Kubernetes cluster in"
 }

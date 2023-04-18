@@ -1,4 +1,4 @@
-resource "azurerm_kubernetes_cluster" "matcha_kubernetes_cluster" {
+resource "azurerm_kubernetes_cluster" "main" {
   name                = "${var.prefix}-k8s"
   location            = var.location
   resource_group_name = var.resource_group_name
