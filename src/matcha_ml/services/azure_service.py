@@ -22,6 +22,9 @@ class AzureClient:
         """Constructor for the Azure Client object."""
         self.authenticated = self._check_authentication()
         self.subscription_id = self._subscription_id()
+        self._resource_client = ResourceManagementClient(
+            self._credential, str(self.subscription_id)
+        )
 
     def _check_authentication(self) -> bool:
         """Check whether the user is authenticated with 'az login'.
@@ -119,3 +122,15 @@ class AzureClient:
             bool: True/False depending on validity
         """
         return f"{rg_name}-resources" not in self.fetch_resource_group_names()
+
+    def get_resource_group_state(self, rg_name: str) -> str:
+        """Gets the resource group state.
+
+        Args:
+            rg_name (str): the user inputted resource group name.
+
+        Returns:
+            str: Resource group status.
+        """
+        rg = self._resource_client.resource_groups.get(rg_name)
+        return str(rg.properties.provisioning_state)

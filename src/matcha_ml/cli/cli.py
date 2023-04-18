@@ -1,14 +1,20 @@
 """Matcha CLI."""
+import json
+import os
 from typing import Optional
 
 import typer
 
 from matcha_ml import __version__
 from matcha_ml.cli import run
-from matcha_ml.cli._validation import prefix_typer_callback, region_typer_callback
+from matcha_ml.cli._validation import (
+    get_azure_client,
+    prefix_typer_callback,
+    region_typer_callback,
+)
 from matcha_ml.cli.destroy import destroy_resources
 from matcha_ml.cli.provision import provision_resources
-from matcha_ml.cli.ui.print_messages import print_status
+from matcha_ml.cli.ui.print_messages import print_error, print_status
 
 app = typer.Typer(no_args_is_help=True, pretty_exceptions_show_locals=False)
 
@@ -18,6 +24,29 @@ app.add_typer(
     name="run",
     help="The run command. Default: finds and executes the pipelines run.py in the current directory if no command is passed.",
 )
+
+
+def check_current_deployment_exists() -> bool:
+    """Checks the current deployment using the .matcha directory current contents if it exists.
+
+    Returns:
+        bool
+    """
+    if not os.path.isfile(".matcha/infrastructure/terraform.tfvars.json"):
+        return False
+
+    with open(".matcha/infrastructure/terraform.tfvars.json") as f:
+        data = json.load(f)
+
+    # Extract the value of "prefix"
+    prefix = data["prefix"]
+    resource_group_name = prefix + "-resources"
+
+    client = get_azure_client()
+    rg_state = client.get_resource_group_state(resource_group_name)
+    print(f"State: {rg_state}")
+
+    return rg_state == "Succeeded"
 
 
 @app.command()
@@ -46,6 +75,11 @@ def provision(
     ),
 ) -> None:
     """Provision cloud resources with a template."""
+    if check_current_deployment_exists():
+        print_error(
+            "Error, a deployment already exits. Please destroy this using 'matcha destroy' before trying to provision."
+        )
+        typer.Exit()
     provision_resources(location, prefix, password, verbose)
 
 
