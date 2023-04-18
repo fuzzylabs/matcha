@@ -5,7 +5,7 @@ variable "prefix" {
 
 variable "location" {
   type        = string
-  description = "The location/region where the Kubernetes cluster will be created"
+  description = "The Azure region where the Kubernetes cluster will be created"
 }
 
 variable "resource_group_name" {
