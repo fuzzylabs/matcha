@@ -3,6 +3,7 @@ from subprocess import DEVNULL
 from typing import Optional, Set, cast
 
 import jwt
+from azure.core.credentials import AccessToken
 from azure.core.exceptions import ClientAuthenticationError
 from azure.identity import AzureCliCredential, CredentialUnavailableError
 from azure.mgmt.authorization import AuthorizationManagementClient
@@ -27,6 +28,7 @@ class AzureClient:
 
     _resource_group_names: Optional[Set[str]] = None
     _regions: Optional[Set[str]] = None
+    _access_token: Optional[AccessToken] = None
 
     def __init__(self) -> None:
         """Constructor for the Azure Client object."""
@@ -78,10 +80,13 @@ class AzureClient:
         Returns:
             str: principal ID
         """
-        access_token = self._credential.get_token("https://management.azure.com/")
+        if self._access_token is None:
+            self._access_token = self._credential.get_token(
+                "https://management.azure.com/"
+            )
 
         decoded_token = jwt.decode(
-            access_token.token,
+            self._access_token.token,
             options={"verify_signature": False},
             algorithms=["RS256"],
         )
