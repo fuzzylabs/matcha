@@ -22,9 +22,7 @@ class AzureClient:
         """Constructor for the Azure Client object."""
         self.authenticated = self._check_authentication()
         self.subscription_id = self._subscription_id()
-        self._resource_client = ResourceManagementClient(
-            self._credential, str(self.subscription_id)
-        )
+        self._set_resource_management_client()
 
     def _check_authentication(self) -> bool:
         """Check whether the user is authenticated with 'az login'.
@@ -63,6 +61,12 @@ class AzureClient:
             raise MatchaAuthenticationError(
                 "no subscriptions found - you at least one subscription active in your Azure account."
             )
+
+    def _set_resource_management_client(self) -> None:
+        """Sets the resource management client."""
+        self._resource_client = ResourceManagementClient(
+            self._credential, str(self.subscription_id)
+        )
 
     def fetch_resource_group_names(self) -> Set[str]:
         """Fetch the resource group names for the current subscription_id.
