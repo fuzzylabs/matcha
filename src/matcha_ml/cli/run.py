@@ -1,6 +1,6 @@
 """Run CLI for matcha."""
-import subprocess
 import os
+import subprocess
 
 import typer
 
@@ -15,17 +15,34 @@ app = typer.Typer()
 def train() -> None:
     """Run train subcommand."""
     file_path = os.path.join(os.getcwd(), "run.py")
-    
+
     if not os.path.isfile(file_path):
-        print_error("Matcha cannot find a 'run.py' file, make sure you are in a directory that has one.")
+        print_error(
+            "Matcha cannot find a 'run.py' file, make sure you are in a directory that has one."
+        )
     else:
         try:
-            print_status(
-                build_status("Running the training pipeline.")
-            )
+            print_status(build_status("Running the training pipeline."))
             subprocess.run(["python3", "run.py", "--train"], check=True)
         except subprocess.CalledProcessError as e:
-            print_error(e)
+            print_error(f"{e}")
+
+
+@app.command()
+def deploy() -> None:
+    """Run deploy subcommand."""
+    file_path = os.path.join(os.getcwd(), "run.py")
+
+    if not os.path.isfile(file_path):
+        print_error(
+            "Matcha cannot find a 'run.py' file, make sure you are in a directory that has one."
+        )
+    else:
+        try:
+            print_status(build_status("Running the deployment pipeline."))
+            subprocess.run(["python3", "run.py", "--deploy"], check=True)
+        except subprocess.CalledProcessError as e:
+            print_error(f"{e}")
 
 
 @app.callback(invoke_without_command=True)
@@ -37,9 +54,11 @@ def default_callback(context: typer.Context) -> None:
     """
     if context.invoked_subcommand is None:
         file_path = os.path.join(os.getcwd(), "run.py")
-    
+
         if not os.path.isfile(file_path):
-            print_error("Matcha cannot find a 'run.py' file, make sure you are in a directory that has one.")
+            print_error(
+                "Matcha cannot find a 'run.py' file, make sure you are in a directory that has one."
+            )
         else:
             try:
                 print_status(
@@ -47,4 +66,4 @@ def default_callback(context: typer.Context) -> None:
                 )
                 subprocess.run(["python3", "run.py"], check=True)
             except subprocess.CalledProcessError as e:
-                print_error(e)
+                print_error(f"{e}")
