@@ -12,8 +12,7 @@ from _pytest.capture import SysCapture
 from python_terraform import TerraformCommandError
 
 from matcha_ml.errors import MatchaTerraformError
-from matcha_ml.services.terraform_service import TerraformService
-from matcha_ml.templates.run_template import TerraformConfig
+from matcha_ml.services.terraform_service import TerraformConfig, TerraformService
 
 
 @pytest.fixture

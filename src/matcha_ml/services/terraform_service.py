@@ -1,4 +1,5 @@
 """The Terraform service interface."""
+import dataclasses
 import glob
 import json
 import os
@@ -17,7 +18,6 @@ from matcha_ml.cli.ui.status_message_builders import (
     build_substep_success_status,
 )
 from matcha_ml.errors import MatchaTerraformError
-from matcha_ml.templates.run_template import TerraformConfig
 
 OUTPUTS = {
     "mlflow-tracking-url",
@@ -34,6 +34,24 @@ OUTPUTS = {
 }
 
 SPINNER = "dots"
+
+
+@dataclasses.dataclass
+class TerraformConfig:
+    """Configuration required for terraform."""
+
+    # Path to terraform template are stored
+    working_dir: str = os.path.join(os.getcwd(), ".matcha", "infrastructure")
+
+    # state file to store output after terraform apply
+    state_file: str = os.path.join(working_dir, "matcha.state")
+
+    # variables file
+    var_file: str = os.path.join(working_dir, "terraform.tfvars.json")
+
+    # if set to False terraform output will be printed to stdout/stderr
+    # else no output will be printed and (ret_code, out, err) tuple will be returned
+    capture_output: bool = True
 
 
 class TerraformService:
