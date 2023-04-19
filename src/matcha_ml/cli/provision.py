@@ -6,12 +6,12 @@ import typer
 
 from matcha_ml.cli.ui.print_messages import print_status
 from matcha_ml.cli.ui.status_message_builders import build_step_success_status
+from matcha_ml.services.terraform_service import TerraformService
 from matcha_ml.templates.build_templates.azure_template import (
     build_template,
     build_template_configuration,
     reuse_configuration,
 )
-from matcha_ml.templates.run_template import TerraformService
 
 # create a typer app to group all provision subcommands
 app = typer.Typer()

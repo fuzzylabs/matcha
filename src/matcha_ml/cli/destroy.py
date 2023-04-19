@@ -1,7 +1,7 @@
 """Destroy CLI."""
 from matcha_ml.cli.ui.print_messages import print_status
 from matcha_ml.cli.ui.status_message_builders import build_step_success_status
-from matcha_ml.templates.run_template import TerraformService
+from matcha_ml.services.terraform_service import TerraformService
 
 
 def destroy_resources() -> None:
