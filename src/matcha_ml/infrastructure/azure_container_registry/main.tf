@@ -6,7 +6,7 @@ resource "azurerm_container_registry" "main" {
 }
 
 resource "azurerm_role_assignment" "aks_acr_access" {
-  scope                            = azurerm_container_registry.container_registry.id
+  scope                            = azurerm_container_registry.main.id
   role_definition_name             = "AcrPull"
   principal_id                     = var.aks_object_id
   skip_service_principal_aad_check = true
