@@ -76,9 +76,8 @@ def provision(
     """Provision cloud resources with a template."""
     if check_current_deployment_exists():
         print_error(
-            "A deployment already exists in Azure, if you continue you'll create a orphan resource - use 'matcha destroy' before trying to provision."
+            "WARNING: A deployment already exists in Azure, if you continue you'll create a orphan resource - use 'matcha destroy' before trying to provision."
         )
-        # raise typer.Exit()
     provision_resources(location, prefix, password, verbose)
 
 

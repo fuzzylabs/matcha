@@ -42,10 +42,13 @@ def mocked_azure_client() -> AzureClient:
     """
     with patch(f"{INTERNAL_FUNCTION_STUB}._check_authentication") as auth, patch(
         f"{INTERNAL_FUNCTION_STUB}._subscription_id"
-    ) as sub, patch(f"{INTERNAL_FUNCTION_STUB}._set_resource_groups") as rg:
+    ) as sub, patch(f"{INTERNAL_FUNCTION_STUB}._set_resource_groups") as rg, patch(
+        f"{INTERNAL_FUNCTION_STUB}.resource_group_state"
+    ) as rg_state:
         auth.return_value = True
         sub.return_value = "id"
         rg.return_value = None
+        rg_state.return_value = "Succeeded"
         yield AzureClient()
 
 
@@ -64,5 +67,4 @@ def mocked_azure_client_components(mocked_azure_client):
         mock.return_value.fetch_resource_group_names = MagicMock(
             return_value=({"rand-resources"})
         )
-        mock.return_value.resource_group_state = MagicMock(return_value=("Succeeded"))
         yield mock

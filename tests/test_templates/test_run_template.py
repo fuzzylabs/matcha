@@ -57,6 +57,7 @@ def mock_output() -> Callable[[str, bool], Union[str, Dict[str, str]]]:
             "zen-server-password": "zen-server-password",
             "seldon-workloads-namespace": "test-seldon-workloads-namespace",
             "seldon-base-url": "test-seldon-base-url",
+            "resource-group-name": "test-resources",
         }
         if name not in terraform_outputs:
             raise ValueError("Unexpected input")
@@ -87,6 +88,7 @@ def expected_outputs() -> dict:
         "zen-server-password": "zen-server-password",
         "seldon-workloads-namespace": "test-seldon-workloads-namespace",
         "seldon-base-url": "test-seldon-base-url",
+        "resource-group-name": "test-resources",
     }
 
     return outputs
