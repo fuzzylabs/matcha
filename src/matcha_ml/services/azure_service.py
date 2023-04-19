@@ -63,11 +63,7 @@ class AzureClient:
             )
 
     def _set_resource_groups(self) -> None:
-        """Sets the value of resource groups as Azure ResourceGroup objects in a dictionary.
-
-        Returns:
-            Dict[str, ResourceGroup]: Resource groups object dictionary
-        """
+        """Sets the value of resource groups as Azure ResourceGroup objects in a dictionary."""
         self._resource_client = ResourceManagementClient(
             self._credential, str(self.subscription_id)
         )
