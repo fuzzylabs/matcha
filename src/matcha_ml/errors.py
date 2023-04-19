@@ -41,7 +41,7 @@ class MatchaAuthenticationError(Exception):
 class MatchaPermissionsError(Exception):
     """Matcha Permissions Error.
 
-    Raised when the user does not have .
+    Raised when the user does not have enough permissions.
     """
 
     def __init__(self, auth_error: str, *args: Any, **kwargs: Any):
