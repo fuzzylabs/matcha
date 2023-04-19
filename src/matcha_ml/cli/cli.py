@@ -32,15 +32,13 @@ def check_current_deployment_exists() -> bool:
     Returns:
         bool
     """
-    if not os.path.isfile(".matcha/infrastructure/terraform.tfvars.json"):
+    if not os.path.isfile(".matcha/infrastructure/matcha.state"):
         return False
 
-    with open(".matcha/infrastructure/terraform.tfvars.json") as f:
+    with open(".matcha/infrastructure/matcha.state") as f:
         data = json.load(f)
 
-    # Extract the value of "prefix"
-    prefix = data["prefix"]
-    resource_group_name = prefix + "-resources"
+    resource_group_name = data["resource-group-name"]
 
     client = get_azure_client()
     rg_state = client.resource_group_state(resource_group_name)
