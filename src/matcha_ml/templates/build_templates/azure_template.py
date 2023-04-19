@@ -57,7 +57,7 @@ def reuse_configuration(path: str) -> bool:
     """
     if os.path.exists(path):
         confirmation_message = build_resource_confirmation(
-            "The following resources are already configured for provisioning",
+            "Matcha has detected that the following resources have already been configured for provisioning",
             [
                 ("Resource group", "A resource group"),
                 ("Azure Kubernetes Service (AKS)", "A kubernetes cluster"),
@@ -80,7 +80,7 @@ def reuse_configuration(path: str) -> bool:
         print_status(confirmation_message)
 
         return not typer.confirm(
-            "Do you want to override the configuration? Otherwise, the existing configuration will be reused"
+            "If you choose to override the existing configuration, the existing configuration will be deleted. Otherwise, the configuration will be reused.\n\nDo you want to override the existing configuration?"
         )
     else:
         return False
