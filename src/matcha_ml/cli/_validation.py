@@ -1,4 +1,6 @@
 """Validation for user inputs."""
+import json
+import os
 from difflib import get_close_matches
 from typing import List, Optional, Set, Union
 
@@ -198,3 +200,23 @@ def prefix_typer_callback(prefix: str) -> str:
         )
 
     return prefix
+
+
+def check_current_deployment_exists() -> bool:
+    """Checks the current deployment using the .matcha directory current contents if it exists.
+
+    Returns:
+        bool: True if a deployment currently exists, else False.
+    """
+    if not os.path.isfile(".matcha/infrastructure/matcha.state"):
+        return False
+
+    with open(".matcha/infrastructure/matcha.state") as f:
+        data = json.load(f)
+
+    resource_group_name = data["resource-group-name"]
+
+    client = get_azure_client()
+    rg_state = client.resource_group_state(resource_group_name)
+
+    return rg_state == "Succeeded"

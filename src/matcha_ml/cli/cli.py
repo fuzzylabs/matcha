@@ -1,6 +1,4 @@
 """Matcha CLI."""
-import json
-import os
 from typing import Optional
 
 import typer
@@ -8,7 +6,7 @@ import typer
 from matcha_ml import __version__
 from matcha_ml.cli import run
 from matcha_ml.cli._validation import (
-    get_azure_client,
+    check_current_deployment_exists,
     prefix_typer_callback,
     region_typer_callback,
 )
@@ -24,26 +22,6 @@ app.add_typer(
     name="run",
     help="The run command. Default: finds and executes the pipelines run.py in the current directory if no command is passed.",
 )
-
-
-def check_current_deployment_exists() -> bool:
-    """Checks the current deployment using the .matcha directory current contents if it exists.
-
-    Returns:
-        bool
-    """
-    if not os.path.isfile(".matcha/infrastructure/matcha.state"):
-        return False
-
-    with open(".matcha/infrastructure/matcha.state") as f:
-        data = json.load(f)
-
-    resource_group_name = data["resource-group-name"]
-
-    client = get_azure_client()
-    rg_state = client.resource_group_state(resource_group_name)
-
-    return rg_state == "Succeeded"
 
 
 @app.command()
