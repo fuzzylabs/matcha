@@ -24,7 +24,7 @@ No modules.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_aks_object_id"></a> [aks\_object\_id](#input\_aks\_object\_id) | Object id for aks cluster | `string` | n/a | yes |
-| <a name="input_location"></a> [location](#input\_location) | The Azure Region in which this resources should be created. | `string` | n/a | yes |
+| <a name="input_location"></a> [location](#input\_location) | The Azure region in which this resources should be created. | `string` | n/a | yes |
 | <a name="input_prefix"></a> [prefix](#input\_prefix) | A prefix used for all resources | `string` | n/a | yes |
 | <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | The resource group name which is used to create the resource group | `string` | n/a | yes |
 
