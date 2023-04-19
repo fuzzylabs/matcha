@@ -43,3 +43,7 @@ output "seldon-workloads-namespace" {
 output "seldon-base-url" {
   value = module.seldon.base_url
 }
+
+output "resource-group-name" {
+  value = module.resource_group.name
+}

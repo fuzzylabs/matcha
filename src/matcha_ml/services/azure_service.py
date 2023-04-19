@@ -90,9 +90,12 @@ class AzureClient:
         Returns:
             str: Resource group status.
         """
-        return str(
-            self._resource_groups[resource_group_name].properties.provisioning_state
-        )
+        if resource_group_name in self._resource_groups:
+            return str(
+                self._resource_groups[resource_group_name].properties.provisioning_state
+            )
+        else:
+            return "Not Provisioned"
 
     def fetch_regions(self) -> Set[str]:
         """Fetch the Azure regions.

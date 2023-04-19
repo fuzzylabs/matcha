@@ -31,6 +31,7 @@ OUTPUTS = {
     "zen-server-password",
     "seldon-workloads-namespace",
     "seldon-base-url",
+    "resource-group-name",
 }
 
 SPINNER = "dots"

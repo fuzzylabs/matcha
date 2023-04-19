@@ -78,7 +78,7 @@ def provision(
         print_error(
             "A deployment already exists in Azure, if you continue you'll create a orphan resource - use 'matcha destroy' before trying to provision."
         )
-        raise typer.Exit()
+        # raise typer.Exit()
     provision_resources(location, prefix, password, verbose)
 
 
