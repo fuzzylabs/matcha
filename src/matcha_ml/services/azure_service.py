@@ -1,6 +1,6 @@
 """The Azure Service interface."""
 from subprocess import DEVNULL
-from typing import Dict, Optional, Set
+from typing import Optional, Set
 
 from azure.core.exceptions import ClientAuthenticationError
 from azure.identity import AzureCliCredential, CredentialUnavailableError
@@ -8,7 +8,6 @@ from azure.mgmt.resource import (
     ResourceManagementClient,
     SubscriptionClient,
 )
-from azure.mgmt.resource.resources.models import ResourceGroup
 
 from matcha_ml.errors import MatchaAuthenticationError
 
@@ -22,10 +21,8 @@ class AzureClient:
     def __init__(self) -> None:
         """Constructor for the Azure Client object."""
         self.authenticated = self._check_authentication()
-        print("AAAAAAAAAA")
         self.subscription_id = self._subscription_id()
         self._set_resource_groups()
-        print("DDDDDDD")
 
     def _check_authentication(self) -> bool:
         """Check whether the user is authenticated with 'az login'.
@@ -77,39 +74,6 @@ class AzureClient:
         self._resource_groups = {
             rg.name: rg for rg in self._resource_client.resource_groups.list()
         }
-
-    # def _set_resource_groups(self) -> Dict[str, ResourceGroup]:
-    #     """Sets the value of resource groups as Azure ResourceGroup objects in a dictionary.
-
-    #     Returns:
-    #         Dict[str, ResourceGroup]: Resource groups object dictionary
-    #     """
-    #     self._resource_client = ResourceManagementClient(
-    #         self._credential, str(self.subscription_id)
-    #     )
-    #     self._resource_groups = {
-    #         rg.name: rg for rg in self._resource_client.resource_groups.list()
-    #     }
-
-    #     return self._resource_groups
-
-    def get_resource_groups(self) -> Dict[str, ResourceGroup]:
-        """Gets the set of resource groups as Azure ResourceGroup objects in a dictionary.
-
-        Returns:
-            Dict[str, ResourceGroup]: Resource groups object dictionary
-        """
-        try:
-            return self._resource_groups
-        except AttributeError:
-            self._resource_client = ResourceManagementClient(
-                self._credential, str(self.subscription_id)
-            )
-            self._resource_groups = {
-                rg.name: rg for rg in self._resource_client.resource_groups.list()
-            }
-
-            return self._resource_groups
 
     def fetch_resource_group_names(self) -> Set[str]:
         """Fetch the resource group names for the current subscription_id.
