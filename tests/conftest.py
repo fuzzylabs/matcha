@@ -42,7 +42,7 @@ def mocked_azure_client() -> AzureClient:
     """
     with patch(f"{INTERNAL_FUNCTION_STUB}._check_authentication") as auth, patch(
         f"{INTERNAL_FUNCTION_STUB}._subscription_id"
-    ) as sub, patch(f"{INTERNAL_FUNCTION_STUB}._set_resource_groups") as rg, patch(
+    ) as sub, patch(f"{INTERNAL_FUNCTION_STUB}.fetch_resource_groups") as rg, patch(
         f"{INTERNAL_FUNCTION_STUB}.resource_group_state"
     ) as rg_state, patch(
         f"{INTERNAL_FUNCTION_STUB}._check_required_role_assignments"
