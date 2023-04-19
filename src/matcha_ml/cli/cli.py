@@ -43,8 +43,7 @@ def check_current_deployment_exists() -> bool:
     resource_group_name = prefix + "-resources"
 
     client = get_azure_client()
-    rg_state = client.get_resource_group_state(resource_group_name)
-    print(f"State: {rg_state}")
+    rg_state = client.resource_group_state(resource_group_name)
 
     return rg_state == "Succeeded"
 
@@ -77,9 +76,9 @@ def provision(
     """Provision cloud resources with a template."""
     if check_current_deployment_exists():
         print_error(
-            "Error, a deployment already exits. Please destroy this using 'matcha destroy' before trying to provision."
+            "A deployment already exists in Azure, if you continue you'll create a orphan resource - use 'matcha destroy' before trying to provision."
         )
-        typer.Exit()
+        raise typer.Exit()
     provision_resources(location, prefix, password, verbose)
 
 

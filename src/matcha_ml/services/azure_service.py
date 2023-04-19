@@ -1,6 +1,6 @@
 """The Azure Service interface."""
 from subprocess import DEVNULL
-from typing import Optional, Set
+from typing import Dict, Optional, Set
 
 from azure.core.exceptions import ClientAuthenticationError
 from azure.identity import AzureCliCredential, CredentialUnavailableError
@@ -8,6 +8,7 @@ from azure.mgmt.resource import (
     ResourceManagementClient,
     SubscriptionClient,
 )
+from azure.mgmt.resource.resources.models import ResourceGroup
 
 from matcha_ml.errors import MatchaAuthenticationError
 
@@ -21,8 +22,10 @@ class AzureClient:
     def __init__(self) -> None:
         """Constructor for the Azure Client object."""
         self.authenticated = self._check_authentication()
+        print("AAAAAAAAAA")
         self.subscription_id = self._subscription_id()
-        self._set_resource_management_client()
+        self._set_resource_groups()
+        print("DDDDDDD")
 
     def _check_authentication(self) -> bool:
         """Check whether the user is authenticated with 'az login'.
@@ -62,11 +65,51 @@ class AzureClient:
                 "no subscriptions found - you at least one subscription active in your Azure account."
             )
 
-    def _set_resource_management_client(self) -> None:
-        """Sets the resource management client."""
+    def _set_resource_groups(self) -> None:
+        """Sets the value of resource groups as Azure ResourceGroup objects in a dictionary.
+
+        Returns:
+            Dict[str, ResourceGroup]: Resource groups object dictionary
+        """
         self._resource_client = ResourceManagementClient(
             self._credential, str(self.subscription_id)
         )
+        self._resource_groups = {
+            rg.name: rg for rg in self._resource_client.resource_groups.list()
+        }
+
+    # def _set_resource_groups(self) -> Dict[str, ResourceGroup]:
+    #     """Sets the value of resource groups as Azure ResourceGroup objects in a dictionary.
+
+    #     Returns:
+    #         Dict[str, ResourceGroup]: Resource groups object dictionary
+    #     """
+    #     self._resource_client = ResourceManagementClient(
+    #         self._credential, str(self.subscription_id)
+    #     )
+    #     self._resource_groups = {
+    #         rg.name: rg for rg in self._resource_client.resource_groups.list()
+    #     }
+
+    #     return self._resource_groups
+
+    def get_resource_groups(self) -> Dict[str, ResourceGroup]:
+        """Gets the set of resource groups as Azure ResourceGroup objects in a dictionary.
+
+        Returns:
+            Dict[str, ResourceGroup]: Resource groups object dictionary
+        """
+        try:
+            return self._resource_groups
+        except AttributeError:
+            self._resource_client = ResourceManagementClient(
+                self._credential, str(self.subscription_id)
+            )
+            self._resource_groups = {
+                rg.name: rg for rg in self._resource_client.resource_groups.list()
+            }
+
+            return self._resource_groups
 
     def fetch_resource_group_names(self) -> Set[str]:
         """Fetch the resource group names for the current subscription_id.
@@ -76,17 +119,20 @@ class AzureClient:
         Returns:
             Set[str]: the set of resource groups the user has provisioned.
         """
-        if self._resource_group_names:
-            return self._resource_group_names
-        else:
-            self._resource_client = ResourceManagementClient(
-                self._credential, str(self.subscription_id)
-            )
-            self._resource_group_names = {
-                resource_group.name
-                for resource_group in self._resource_client.resource_groups.list()
-            }
-            return self._resource_group_names
+        return set(self._resource_groups.keys())
+
+    def resource_group_state(self, resource_group_name: str) -> str:
+        """Gets the resource group state.
+
+        Args:
+            resource_group_name (str): the user inputted resource group name.
+
+        Returns:
+            str: Resource group status.
+        """
+        return str(
+            self._resource_groups[resource_group_name].properties.provisioning_state
+        )
 
     def fetch_regions(self) -> Set[str]:
         """Fetch the Azure regions.
@@ -126,15 +172,3 @@ class AzureClient:
             bool: True/False depending on validity
         """
         return f"{rg_name}-resources" not in self.fetch_resource_group_names()
-
-    def get_resource_group_state(self, rg_name: str) -> str:
-        """Gets the resource group state.
-
-        Args:
-            rg_name (str): the user inputted resource group name.
-
-        Returns:
-            str: Resource group status.
-        """
-        rg = self._resource_client.resource_groups.get(rg_name)
-        return str(rg.properties.provisioning_state)

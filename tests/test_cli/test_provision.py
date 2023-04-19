@@ -317,7 +317,7 @@ def test_cli_provision_command_override(runner, matcha_testing_directory):
     with open(os.path.join(destination_path, "dummy.tf"), "a"):
         ...
 
-    runner.invoke(
+    result = runner.invoke(
         app,
         [
             "provision",
@@ -330,6 +330,7 @@ def test_cli_provision_command_override(runner, matcha_testing_directory):
         ],
         input="y\nno\n",
     )
+    print(result)
 
     assert not os.path.exists(os.path.join(destination_path, "dummy.tf"))
 
