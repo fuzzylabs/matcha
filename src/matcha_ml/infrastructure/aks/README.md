@@ -22,7 +22,7 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_location"></a> [location](#input\_location) | The location/region where the Kubernetes cluster will be created | `string` | n/a | yes |
+| <a name="input_location"></a> [location](#input\_location) | The Azure region where the Kubernetes cluster will be created | `string` | n/a | yes |
 | <a name="input_prefix"></a> [prefix](#input\_prefix) | Prefix to be used for all resources in this module | `string` | n/a | yes |
 | <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | The name of the resource group to create the Kubernetes cluster in | `string` | n/a | yes |
 

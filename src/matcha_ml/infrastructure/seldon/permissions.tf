@@ -1,6 +1,6 @@
 # Allow the default service account in the zenml namespace to access machinelearning.seldon.io
 
-resource "kubernetes_cluster_role_v1" "seldon-machinelearning-permission" {
+resource "kubernetes_cluster_role_v1" "seldon-machinelearning_permission" {
   metadata {
     name = "seldon-machinelearning-permission"
     labels = {
@@ -21,7 +21,7 @@ resource "kubernetes_cluster_role_v1" "seldon-machinelearning-permission" {
 
 # Bind the cluster role to the default service account in the zenml namespace
 
-resource "kubernetes_cluster_role_binding_v1" "seldon-machinelearning-permission-binding" {
+resource "kubernetes_cluster_role_binding_v1" "seldon_machinelearning-permission_binding" {
   metadata {
     name = "seldon-machinelearning-permission-binding"
   }
@@ -29,7 +29,7 @@ resource "kubernetes_cluster_role_binding_v1" "seldon-machinelearning-permission
   role_ref {
     api_group = "rbac.authorization.k8s.io"
     kind      = "ClusterRole"
-    name      = kubernetes_cluster_role_v1.seldon-machinelearning-permission.metadata[0].name
+    name      = kubernetes_cluster_role_v1.seldon_machinelearning_permission.metadata[0].name
   }
 
   subject {

@@ -54,14 +54,14 @@
 
 | Name | Description |
 |------|-------------|
-| <a name="output_azure-container-registry"></a> [azure-container-registry](#output\_azure-container-registry) | The URL for the Azure Container Registry |
-| <a name="output_azure-registry-name"></a> [azure-registry-name](#output\_azure-registry-name) | The name of the Azure Container Registry |
-| <a name="output_k8s-context"></a> [k8s-context](#output\_k8s-context) | The name of the Kubernetes context used for deployment |
-| <a name="output_mlflow-tracking-url"></a> [mlflow-tracking-url](#output\_mlflow-tracking-url) | The URL for the MLflow tracking server |
-| <a name="output_seldon-base-url"></a> [seldon-base-url](#output\_seldon-base-url) | The base URL for the Seldon API server |
-| <a name="output_seldon-workloads-namespace"></a> [seldon-workloads-namespace](#output\_seldon-workloads-namespace) | The Kubernetes namespace for Seldon workloads |
-| <a name="output_zen-server-password"></a> [zen-server-password](#output\_zen-server-password) | The password for accessing the ZenServer API server |
-| <a name="output_zen-server-url"></a> [zen-server-url](#output\_zen-server-url) | The URL for the ZenServer API server |
-| <a name="output_zen-server-username"></a> [zen-server-username](#output\_zen-server-username) | The username for accessing the ZenServer API server |
-| <a name="output_zenml-connection-string"></a> [zenml-connection-string](#output\_zenml-connection-string) | The primary connection string for the ZenML Azure Storage Account |
-| <a name="output_zenml-storage-path"></a> [zenml-storage-path](#output\_zenml-storage-path) | The Azure Blob Storage Container path for storing ZenML artifacts |
+| <a name="output_azure_container_registry"></a> [azure\_container\_registry](#output\_azure\_container\_registry) | The URL for the Azure Container Registry |
+| <a name="output_azure_registry_name"></a> [azure\_registry\_name](#output\_azure\_registry\_name) | The name of the Azure Container Registry |
+| <a name="output_k8s_context"></a> [k8s\_context](#output\_k8s\_context) | The name of the Kubernetes context used for deployment |
+| <a name="output_mlflow_tracking_url"></a> [mlflow\_tracking\_url](#output\_mlflow\_tracking\_url) | The URL for the MLflow tracking server |
+| <a name="output_seldon_base_url"></a> [seldon\_base\_url](#output\_seldon\_base\_url) | The base URL for the Seldon API server |
+| <a name="output_seldon_workloads_namespace"></a> [seldon\_workloads\_namespace](#output\_seldon\_workloads\_namespace) | The Kubernetes namespace for Seldon workloads |
+| <a name="output_zen_server_password"></a> [zen\_server\_password](#output\_zen\_server\_password) | The password for accessing the ZenServer API server |
+| <a name="output_zen_server_url"></a> [zen\_server\_url](#output\_zen\_server\_url) | The URL for the ZenServer API server |
+| <a name="output_zen_server_username"></a> [zen\_server\_username](#output\_zen\_server\_username) | The username for accessing the ZenServer API server |
+| <a name="output_zenml_connection_string"></a> [zenml\_connection\_string](#output\_zenml\_connection\_string) | The primary connection string for the ZenML Azure Storage Account |
+| <a name="output_zenml_storage_path"></a> [zenml\_storage\_path](#output\_zenml\_storage\_path) | The Azure Blob Storage Container path for storing ZenML artifacts |

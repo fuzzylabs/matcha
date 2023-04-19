@@ -29,4 +29,4 @@ No modules.
 
 | Name | Description |
 |------|-------------|
-| <a name="output_name"></a> [name](#output\_name) | n/a |
+| <a name="output_name"></a> [name](#output\_name) | Name of the resource group |

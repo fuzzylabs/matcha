@@ -14,14 +14,14 @@ resource "helm_release" "mlflow-tracking" {
   # set proxied access to artifact storage
   set {
     name  = "artifactRoot.proxiedArtifactStorage"
-    value = var.artifact_Proxied_Access
+    value = var.artifact_proxied_access
     type  = "auto"
   }
 
   # set values for Azure Blob Storage
   set {
     name  = "artifactRoot.azureBlob.enabled"
-    value = var.artifact_Azure
+    value = var.artifact_azure
     type  = "auto"
   }
   set {
@@ -36,7 +36,7 @@ resource "helm_release" "mlflow-tracking" {
   }
   set_sensitive {
     name  = "artifactRoot.azureBlob.accessKey"
-    value = var.artifact_Azure_Access_Key
+    value = var.artifact_azure_access_key
     type  = "string"
   }
 

@@ -1,5 +1,5 @@
 # artifact storage variables
-variable "artifact_Proxied_Access" {
+variable "artifact_proxied_access" {
   description = "Boolean to indicate if we are using proxied artifact storage"
   type        = bool
   default     = false
@@ -15,14 +15,14 @@ variable "storage_container_name" {
   type        = string
 }
 
-variable "artifact_Azure" {
+variable "artifact_azure" {
   description = "Boolean to indicate if we are using Azure Blob Storage as storage for MLFlow"
   type        = bool
   default     = true
 }
 
 
-variable "artifact_Azure_Access_Key" {
+variable "artifact_azure_access_key" {
   description = "Access Key for Azure Blob Storage"
   type        = string
   default     = ""

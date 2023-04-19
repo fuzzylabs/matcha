@@ -1,4 +1,4 @@
-output "ingress-gateway-spec" {
+output "ingress_gateway_spec" {
   description = "The YAML specification for the Istio ingress gateway"
   value = kubectl_manifest.gateway.live_manifest_incluster
 }

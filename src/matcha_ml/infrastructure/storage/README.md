@@ -33,7 +33,7 @@ No modules.
 
 | Name | Description |
 |------|-------------|
-| <a name="output_blobstorage-container-path"></a> [blobstorage-container-path](#output\_blobstorage-container-path) | The Azure Blob Storage Container path for storing your artifacts |
+| <a name="output_blobstorage_container_path"></a> [blobstorage\_container\_path](#output\_blobstorage\_container\_path) | The Azure Blob Storage Container path for storing your artifacts |
 | <a name="output_primary_access_key"></a> [primary\_access\_key](#output\_primary\_access\_key) | Azure Storage Account - Primary access key |
 | <a name="output_primary_blob_connection_string"></a> [primary\_blob\_connection\_string](#output\_primary\_blob\_connection\_string) | Azure Storage Account - Primary Blob service connection string |
 | <a name="output_primary_connection_string"></a> [primary\_connection\_string](#output\_primary\_connection\_string) | Azure Storage Account - Primary connection string |

@@ -21,16 +21,16 @@ No modules.
 
 | Name | Type |
 |------|------|
-| [helm_release.istio-base](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
-| [helm_release.istio-ingress](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
+| [helm_release.istio_base](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
+| [helm_release.istio_ingress](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
 | [helm_release.istiod](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
 | [helm_release.seldon](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
 | [kubectl_manifest.gateway](https://registry.terraform.io/providers/gavinbunney/kubectl/1.14.0/docs/resources/manifest) | resource |
-| [kubernetes_cluster_role_binding_v1.seldon-machinelearning-permission-binding](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/cluster_role_binding_v1) | resource |
-| [kubernetes_cluster_role_v1.seldon-machinelearning-permission](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/cluster_role_v1) | resource |
-| [kubernetes_namespace.istio-ns](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/namespace) | resource |
-| [kubernetes_namespace.seldon-ns](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/namespace) | resource |
-| [kubernetes_namespace.seldon-workloads](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/namespace) | resource |
+| [kubernetes_cluster_role_binding_v1.seldon_machinelearning-permission_binding](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/cluster_role_binding_v1) | resource |
+| [kubernetes_cluster_role_v1.seldon-machinelearning_permission](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/cluster_role_v1) | resource |
+| [kubernetes_namespace.istio_ns](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/namespace) | resource |
+| [kubernetes_namespace.seldon_ns](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/namespace) | resource |
+| [kubernetes_namespace.seldon_workloads](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/namespace) | resource |
 | [kubernetes_service.seldon_ingress](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/data-sources/service) | data source |
 
 ## Inputs
@@ -45,5 +45,5 @@ No modules.
 | Name | Description |
 |------|-------------|
 | <a name="output_base_url"></a> [base\_url](#output\_base\_url) | The base URL of the Seldon deployment |
-| <a name="output_ingress-gateway-spec"></a> [ingress-gateway-spec](#output\_ingress-gateway-spec) | The YAML specification for the Istio ingress gateway |
+| <a name="output_ingress_gateway_spec"></a> [ingress\_gateway\_spec](#output\_ingress\_gateway\_spec) | The YAML specification for the Istio ingress gateway |
 | <a name="output_workloads_namespace"></a> [workloads\_namespace](#output\_workloads\_namespace) | The namespace for Seldon workloads |
