@@ -1,6 +1,8 @@
 variable "prefix" {
   description = "A prefix used for all resources"
+  type        = string
 }
+
 variable "resource_group_name" {
   description = "The resource group in Azure that you want to deploy ZenML to"
   type        = string

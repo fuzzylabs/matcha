@@ -89,6 +89,7 @@ def expected_outputs() -> dict:
         "seldon-workloads-namespace": "test-seldon-workloads-namespace",
         "seldon-base-url": "test-seldon-base-url",
         "resource-group-name": "test-resources",
+
     }
 
     return outputs

@@ -4,24 +4,18 @@ from typing import Optional
 import typer
 
 from matcha_ml import __version__
-from matcha_ml.cli import run
+
 from matcha_ml.cli._validation import (
     check_current_deployment_exists,
     prefix_typer_callback,
     region_typer_callback,
 )
+
 from matcha_ml.cli.destroy import destroy_resources
 from matcha_ml.cli.provision import provision_resources
 from matcha_ml.cli.ui.print_messages import print_error, print_status
 
 app = typer.Typer(no_args_is_help=True, pretty_exceptions_show_locals=False)
-
-# Create a group for all subcommands
-app.add_typer(
-    run.app,
-    name="run",
-    help="The run command. Default: finds and executes the pipelines run.py in the current directory if no command is passed.",
-)
 
 
 @app.command()
@@ -39,10 +33,10 @@ def provision(
         help="A unique prefix for your resources.",
     ),
     password: str = typer.Option(
-        prompt="The password for the ZenServer (where your pipelines are stored).",
+        prompt="Set a password for your deployment server",
         confirmation_prompt=True,
         hide_input=True,
-        help="A password for the ZenServer (where your pipelines are stored).",
+        help="A password for the deployment server",
         default="default",
     ),
     verbose: Optional[bool] = typer.Option(

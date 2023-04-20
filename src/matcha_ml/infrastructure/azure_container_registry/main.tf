@@ -1,4 +1,4 @@
-resource "azurerm_container_registry" "container_registry" {
+resource "azurerm_container_registry" "main" {
   name                = "cr${var.prefix}"
   resource_group_name = var.resource_group_name
   location            = var.location
@@ -6,8 +6,8 @@ resource "azurerm_container_registry" "container_registry" {
 }
 
 resource "azurerm_role_assignment" "aks_acr_access" {
-  principal_id                     = var.aks_object_id
+  scope                            = azurerm_container_registry.main.id
   role_definition_name             = "AcrPull"
-  scope                            = azurerm_container_registry.container_registry.id
+  principal_id                     = var.aks_object_id
   skip_service_principal_aad_check = true
 }
