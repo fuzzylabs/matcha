@@ -30,8 +30,8 @@ class ProvisionState(str, Enum, metaclass=CaseInsensitiveEnumMeta):
     """Provision states for Azure resources.
 
     Args:
-        str (_type_): _description_
-        Enum (_type_): _description_
+        str (str): Enum key
+        Enum (Enum): Enum inheritance class
     """
 
     ACCEPTED = "Accepted"
