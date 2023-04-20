@@ -12,6 +12,7 @@ from matcha_ml.templates.build_templates.azure_template import (
     build_template_configuration,
     reuse_configuration,
 )
+from matcha_ml.templates.run_template import provision
 
 # create a typer app to group all provision subcommands
 app = typer.Typer()
@@ -44,6 +45,6 @@ def provision_resources(
     tfs = TerraformService()
 
     # provision resources by running the template
-    tfs.provision()
+    provision(tfs)
 
     print_status(build_step_success_status("Provisioning is complete!"))
