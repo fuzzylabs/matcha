@@ -4,10 +4,15 @@ import os
 from difflib import get_close_matches
 from typing import List, Optional, Set, Union
 
+# from azure.mgmt.confluent.models._confluent_management_client_enums import (
+#     ProvisionState,
+# )
 from typer import BadParameter
 
+from matcha_ml.cli.ui.print_messages import print_error
 from matcha_ml.errors import MatchaInputError
 from matcha_ml.services import AzureClient
+from matcha_ml.services.azure_service import ProvisionState
 
 # TODO: dynamically set both of these variables
 LONGEST_RESOURCE_NAME = "artifactstore"
@@ -219,4 +224,12 @@ def check_current_deployment_exists() -> bool:
     client = get_azure_client()
     rg_state = client.resource_group_state(resource_group_name)
 
-    return rg_state == "Succeeded"
+    if rg_state is None:
+        return False
+    elif rg_state == ProvisionState.SUCCEEDED:
+        return True
+    else:
+        print_error(
+            f"Error, resource group '{resource_group_name}' is currently in a '{rg_state.value}' which is currently not handled by matcha. Please check your resources on Azure."
+        )
+        return True

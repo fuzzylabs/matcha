@@ -1,12 +1,18 @@
 """The Azure Service interface."""
+from enum import Enum
 from subprocess import DEVNULL
 from typing import Dict, Optional, Set, cast
 
 import jwt
+from azure.core import CaseInsensitiveEnumMeta
 from azure.core.credentials import AccessToken
 from azure.core.exceptions import ClientAuthenticationError
 from azure.identity import AzureCliCredential, CredentialUnavailableError
 from azure.mgmt.authorization import AuthorizationManagementClient
+
+# from azure.mgmt.confluent.models._confluent_management_client_enums import (
+#     ProvisionState,
+# )
 from azure.mgmt.resource import (
     ResourceManagementClient,
     SubscriptionClient,
@@ -22,6 +28,25 @@ ROLE_ID_MAPPING = {
 }
 
 ACCEPTED_ROLE_CONFIGURATIONS = [["Owner"], ["Contributor", "User Access Administrator"]]
+
+
+class ProvisionState(str, Enum, metaclass=CaseInsensitiveEnumMeta):
+    """Provision states for Azure resources.
+
+    Args:
+        str (_type_): _description_
+        Enum (_type_): _description_
+    """
+
+    ACCEPTED = "Accepted"
+    CREATING = "Creating"
+    UPDATING = "Updating"
+    DELETING = "Deleting"
+    SUCCEEDED = "Succeeded"
+    FAILED = "Failed"
+    CANCELED = "Canceled"
+    DELETED = "Deleted"
+    NOT_SPECIFIED = "NotSpecified"
 
 
 class AzureClient:
@@ -158,14 +183,16 @@ class AzureClient:
         """
         return set(self.fetch_resource_groups().keys())
 
-    def resource_group_state(self, resource_group_name: str) -> str:
+    def resource_group_state(
+        self, resource_group_name: str
+    ) -> Optional[ProvisionState]:
         """Gets the resource group state.
 
         Args:
             resource_group_name (str): the user inputted resource group name.
 
         Returns:
-            str: Resource group status.
+            ProvisionState: Resource group Enum state if it exists.
         """
         if resource_group_name in self.fetch_resource_groups():
             resource_group = self.fetch_resource_groups()[resource_group_name]
@@ -173,9 +200,9 @@ class AzureClient:
                 isinstance(resource_group, ResourceGroup)
                 and resource_group.properties is not None
             ):
-                return str(resource_group.properties.provisioning_state)
+                return ProvisionState[resource_group.properties.provisioning_state]  # type: ignore
 
-        return "Not Provisioned"
+        return None
 
     def fetch_regions(self) -> Set[str]:
         """Fetch the Azure regions.
