@@ -26,3 +26,9 @@ The components of the environment that you might want to deploy could differ dep
 The current version of `matcha` provisions the above with the single command - with sensible defaults for the infrastructure.
 
 There are more components that could be added here, for example, managing and versioning datasets, the management of models (registration and governance), and monitoring models. Adding all of these is on our roadmap.
+
+## Where do I go from here?
+
+Now that you've been convivinced by how awesome `matcha` is, you're probably wondering where on earth to go next?
+
+We've got that covered! We have a [getting started](getting-started.md) guide which will show you how to use `matcha` to provision an environment on Azure and then how to use `matcha` to hook that environment up to a pre-built recommendation workflow.
