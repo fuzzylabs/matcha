@@ -1,54 +1,28 @@
+`matcha` is a tool for efficiently and effectively provisioning MLOps environments to the cloud.
 
-`matcha` :tea: is your one-stop-shop for efficiently provisioning MLOps tooling and for well-structured ML workflows.
+## Why do you need `matcha`?
 
----
+Many proprietary MLOps platforms try to be an all-in-one solution, taking care of each stage in a machine learning model’s life cycle, from experimentation, to continuous training, deployment, and monitoring. More often than not, these come with vendor lock-in, inflexibility, and suffer from being a _jack of all trades, master of none._
 
-With `matcha`, you'll be up and running with an open source MLOPs environment in Azure, in 10 minutes.
+The alternative to this is to build your own MLOps environment by selecting and combining individual open source tools, each of which are good at one thing, but this time consuming. Broadly, there are a few components which you'll need for an MLOps solution:
 
-What are the key features?
+* An environment in which to do Machine Learning efficiently.
+* The ability to hooking that environment up to your ML workflow.
+* Knowledge around what best practise looks like for MLOps
 
-* Quickly get up and running with an MLOps environment where you can train and deploy models in the cloud, using only open-source tech
-* Build your own ML workflow to run in this environment with good MLOps templates to get you started.
+`matcha` seeks to address these, and we want to equip our users with two things:
 
-<!-- # Getting started
+1. Get quickly up and running with an MLOps environment where models can be trained and deployed, using only open source.
+2. Efficiently link your provisioned MLOps environment to your ML workflow.
 
-## Set up your environment
+## Sensible defaults
 
-```
-git clone git@github.com:fuzzylabs/matcha-example.git
-```
+The components of the environment that you might want to deploy could differ depending on your workflow. In most cases, however, the environment is broadly the same for most Machine Learning tasks and is usually composed of the following:
 
-First, install Matcha with PIP:
+* A way to run model training
+* A way to track experiments
+* A way to deploy and serve models
 
-```
-pip install matcha
-```
+The current version of `matcha` provisions the above with the single command - with sensible defaults for the infrastructure.
 
-Then, authenticate with Azure:
-
-```
-az login
-```
-
-And provision your base environment:
-
-```
-# sets up the basic env with sensible defaults
-matcha provision
-```
-
-## Run an example training workflow
-
-```
-cd recommender
-```
-
-```
-matcha run train deploy
-```
-
-Verify that it works
-
-```
-matcha verify -->
-```
+There are more components that could be added here, for example, managing and versioning datasets, the management of models (registration and governance), and monitoring models. Adding all of these is on our roadmap.
