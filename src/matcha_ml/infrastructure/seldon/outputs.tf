@@ -5,7 +5,7 @@ output "ingress_gateway_spec" {
 
 output "workloads_namespace" {
   description = "The namespace for Seldon workloads"
-  value = kubernetes_namespace.seldon-workloads.metadata[0].name
+  value = kubernetes_namespace.seldon_workloads.metadata[0].name
 }
 
 output "base_url" {

@@ -51,7 +51,7 @@ module "mlflow" {
   # storage variables
   storage_account_name      = module.storage.storage_account_name
   storage_container_name    = module.storage.storage_container_name
-  artifact_Azure_Access_Key = module.storage.primary_access_key
+  artifact_azure_access_key = module.storage.primary_access_key
 
 }
 

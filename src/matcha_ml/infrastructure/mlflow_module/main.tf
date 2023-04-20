@@ -1,6 +1,6 @@
 # create the mlflow tracking server deployment using mlflow helm charts
 # Reference: https://github.com/community-charts/helm-charts/blob/main/charts/mlflow/values.yaml
-resource "helm_release" "mlflow-tracking" {
+resource "helm_release" "mlflow_tracking" {
 
   name       = "mlflow-tracking"
   repository = "https://community-charts.github.io/helm-charts"

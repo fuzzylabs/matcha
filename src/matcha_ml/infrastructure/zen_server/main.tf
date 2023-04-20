@@ -9,7 +9,7 @@ resource "helm_release" "zen_server" {
 
   name      = "${var.prefix}-zenserver"
   chart     = "${path.module}/zenml_helm"
-  namespace = kubernetes_namespace.zen-server.metadata[0].name
+  namespace = kubernetes_namespace.zen_server.metadata[0].name
 
   set {
     name  = "zenml.image.repository"
@@ -85,7 +85,7 @@ resource "helm_release" "zen_server" {
     value = var.deploy_db ? false : var.database_ssl_verify_server_cert
   }
   depends_on = [
-    resource.kubernetes_namespace.zen-server
+    resource.kubernetes_namespace.zen_server
   ]
 }
 

@@ -21,7 +21,7 @@ resource "helm_release" "istio_base" {
 # the istio daemon
 resource "helm_release" "istiod" {
   name       = "istiod-seldon"
-  repository = helm_release.istio-base.repository # dependency on istio-base 
+  repository = helm_release.istio_base.repository # dependency on istio-base 
   chart      = "istiod"
 
   namespace = kubernetes_namespace.istio_ns.metadata[0].name

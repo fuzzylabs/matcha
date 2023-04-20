@@ -20,17 +20,17 @@ from matcha_ml.cli.ui.status_message_builders import (
 from matcha_ml.errors import MatchaTerraformError
 
 OUTPUTS = {
-    "mlflow-tracking-url",
-    "zenml-storage-path",
-    "zenml-connection-string",
-    "k8s-context",
-    "azure-container-registry",
-    "azure-registry-name",
-    "zen-server-url",
-    "zen-server-username",
-    "zen-server-password",
-    "seldon-workloads-namespace",
-    "seldon-base-url",
+    "mlflow_tracking_url",
+    "zenml_storage_path",
+    "zenml_connection_string",
+    "k8s_context",
+    "azure_container_registry",
+    "azure_registry_name",
+    "zen_server_url",
+    "zen_server_username",
+    "zen_server_password",
+    "seldon_workloads_namespace",
+    "seldon_base_url",
 }
 
 SPINNER = "dots"

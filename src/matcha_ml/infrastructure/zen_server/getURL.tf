@@ -5,6 +5,6 @@ data "kubernetes_service" "zen_server" {
   }
 
   depends_on = [
-    helm_release.zen-server
+    helm_release.zen_server
   ]
 }
