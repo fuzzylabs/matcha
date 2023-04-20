@@ -7,6 +7,7 @@ import pytest
 from typer.testing import CliRunner
 
 from matcha_ml.services import AzureClient
+from matcha_ml.services.azure_service import ProvisionState
 
 INTERNAL_FUNCTION_STUB = "matcha_ml.services.AzureClient"
 
@@ -50,7 +51,7 @@ def mocked_azure_client() -> AzureClient:
         auth.return_value = True
         sub.return_value = "id"
         rg.return_value = None
-        rg_state.return_value = "Succeeded"
+        rg_state.return_value = ProvisionState.SUCCEEDED
         roles.return_value = True
 
         yield AzureClient()

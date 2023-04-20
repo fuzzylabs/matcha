@@ -9,10 +9,6 @@ from azure.core.credentials import AccessToken
 from azure.core.exceptions import ClientAuthenticationError
 from azure.identity import AzureCliCredential, CredentialUnavailableError
 from azure.mgmt.authorization import AuthorizationManagementClient
-
-# from azure.mgmt.confluent.models._confluent_management_client_enums import (
-#     ProvisionState,
-# )
 from azure.mgmt.resource import (
     ResourceManagementClient,
     SubscriptionClient,
@@ -52,7 +48,6 @@ class ProvisionState(str, Enum, metaclass=CaseInsensitiveEnumMeta):
 class AzureClient:
     """Azure client object to handle authentication checks and other Azure related functionality."""
 
-    _resource_group_names: Optional[Set[str]] = None
     _regions: Optional[Set[str]] = None
     _access_token: Optional[AccessToken] = None
     _resource_groups: Optional[Dict[str, ResourceGroup]] = None
@@ -62,7 +57,6 @@ class AzureClient:
         self.authenticated = self._check_authentication()
         self.subscription_id = self._subscription_id()
         self.has_permissions = self._check_required_role_assignments()
-        # self._resource_groups = self.fetch_resource_groups()
 
     def _check_authentication(self) -> bool:
         """Check whether the user is authenticated with 'az login'.
