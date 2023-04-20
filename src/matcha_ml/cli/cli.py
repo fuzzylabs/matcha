@@ -4,20 +4,12 @@ from typing import Optional
 import typer
 
 from matcha_ml import __version__
-from matcha_ml.cli import run
 from matcha_ml.cli._validation import prefix_typer_callback, region_typer_callback
 from matcha_ml.cli.destroy import destroy_resources
 from matcha_ml.cli.provision import provision_resources
 from matcha_ml.cli.ui.print_messages import print_status
 
 app = typer.Typer(no_args_is_help=True, pretty_exceptions_show_locals=False)
-
-# Create a group for all subcommands
-app.add_typer(
-    run.app,
-    name="run",
-    help="The run command. Default: finds and executes the pipelines run.py in the current directory if no command is passed.",
-)
 
 
 @app.command()
