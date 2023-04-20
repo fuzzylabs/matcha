@@ -46,17 +46,17 @@ def mock_output() -> Callable[[str, bool], Union[str, Dict[str, str]]]:
 
     def output(name: str, full_value: bool) -> str:
         terraform_outputs = {
-            "mlflow-tracking-url": "mlflow-test-url",
-            "zenml-storage-path": "zenml-test-storage-path",
-            "zenml-connection-string": "zenml-test-connection-string",
-            "k8s-context": "k8s-test-context",
-            "azure-container-registry": "azure-container-registry",
-            "azure-registry-name": "azure-registry-name",
-            "zen-server-url": "zen-server-url",
-            "zen-server-username": "zen-server-username",
-            "zen-server-password": "zen-server-password",
-            "seldon-workloads-namespace": "test-seldon-workloads-namespace",
-            "seldon-base-url": "test-seldon-base-url",
+            "mlflow_tracking_url": "mlflow-test-url",
+            "zenml_storage_path": "zenml-test-storage-path",
+            "zenml_connection_string": "zenml-test-connection-string",
+            "k8s_context": "k8s-test-context",
+            "azure_container_registry": "azure-container-registry",
+            "azure_registry_name": "azure-registry-name",
+            "zen_server_url": "zen-server-url",
+            "zen_server_username": "zen-server-username",
+            "zen_server_password": "zen-server-password",
+            "seldon_workloads_namespace": "test-seldon-workloads-namespace",
+            "seldon_base_url": "test-seldon-base-url",
         }
         if name not in terraform_outputs:
             raise ValueError("Unexpected input")
@@ -76,17 +76,17 @@ def expected_outputs() -> dict:
         dict: expected output.
     """
     outputs = {
-        "mlflow-tracking-url": "mlflow-test-url",
-        "zenml-storage-path": "zenml-test-storage-path",
-        "zenml-connection-string": "zenml-test-connection-string",
-        "k8s-context": "k8s-test-context",
-        "azure-container-registry": "azure-container-registry",
-        "azure-registry-name": "azure-registry-name",
-        "zen-server-url": "zen-server-url",
-        "zen-server-username": "zen-server-username",
-        "zen-server-password": "zen-server-password",
-        "seldon-workloads-namespace": "test-seldon-workloads-namespace",
-        "seldon-base-url": "test-seldon-base-url",
+        "mlflow_tracking_url": "mlflow-test-url",
+        "zenml_storage_path": "zenml-test-storage-path",
+        "zenml_connection_string": "zenml-test-connection-string",
+        "k8s_context": "k8s-test-context",
+        "azure_container_registry": "azure-container-registry",
+        "azure_registry_name": "azure-registry-name",
+        "zen_server_url": "zen-server-url",
+        "zen_server_username": "zen-server-username",
+        "zen_server_password": "zen-server-password",
+        "seldon_workloads_namespace": "test-seldon-workloads-namespace",
+        "seldon_base_url": "test-seldon-base-url",
     }
 
     return outputs

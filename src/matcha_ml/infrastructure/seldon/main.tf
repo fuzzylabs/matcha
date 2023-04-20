@@ -1,5 +1,5 @@
 # creating the namespace for the seldon deployment
-resource "kubernetes_namespace" "seldon-ns" {
+resource "kubernetes_namespace" "seldon_ns" {
   metadata {
     name = var.seldon_namespace
   }
@@ -12,7 +12,7 @@ resource "helm_release" "seldon" {
   repository = "https://storage.googleapis.com/seldon-charts"
   chart      = "seldon-core-operator"
   # dependency on seldon-ns
-  namespace = kubernetes_namespace.seldon-ns.metadata[0].name
+  namespace = kubernetes_namespace.seldon_ns.metadata[0].name
 
   set {
     name  = "usageMetrics.enabled"
@@ -25,7 +25,7 @@ resource "helm_release" "seldon" {
   }
 }
 
-resource "kubernetes_namespace" "seldon-workloads" {
+resource "kubernetes_namespace" "seldon_workloads" {
   metadata {
     name = "matcha-seldon-workloads"
   }
@@ -40,6 +40,6 @@ data "kubernetes_service" "seldon_ingress" {
 
   depends_on = [
     helm_release.seldon,
-    helm_release.istio-ingress
+    helm_release.istio_ingress
   ]
 }

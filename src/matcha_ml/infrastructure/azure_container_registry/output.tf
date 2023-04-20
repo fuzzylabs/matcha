@@ -1,8 +1,10 @@
 # output for container registry
 output "container_registry_url" {
-  value = azurerm_container_registry.container_registry.login_server
+  description = "The URL used to log into the container registry"
+  value = azurerm_container_registry.main.login_server
 }
 
 output "container_registry_name" {
-  value = azurerm_container_registry.container_registry.name
+  description = "The name of the container registry"
+  value = azurerm_container_registry.main.name
 }

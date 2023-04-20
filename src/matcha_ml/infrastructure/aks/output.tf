@@ -1,37 +1,46 @@
-output "id" {
-  value = azurerm_kubernetes_cluster.matcha_kubernetes_cluster.id
-}
-
 output "kube_config" {
-  value     = azurerm_kubernetes_cluster.matcha_kubernetes_cluster.kube_config_raw
+  description = "Raw Kubernetes configuration for the created cluster"
+  value     = azurerm_kubernetes_cluster.main.kube_config_raw
   sensitive = true
 }
 
 output "client_key" {
-  value = azurerm_kubernetes_cluster.matcha_kubernetes_cluster.kube_config.0.client_key
+  description = "Client key for accessing the Kubernetes cluster"
+  value = azurerm_kubernetes_cluster.main.kube_config.0.client_key
 }
 
 output "client_certificate" {
-  value     = azurerm_kubernetes_cluster.matcha_kubernetes_cluster.kube_config.0.client_certificate
+  description = "Client certificate for accessing the Kubernetes cluster"
+  value     = azurerm_kubernetes_cluster.main.kube_config.0.client_certificate
   sensitive = true
 }
 
 output "cluster_ca_certificate" {
-  value = azurerm_kubernetes_cluster.matcha_kubernetes_cluster.kube_config.0.cluster_ca_certificate
+  description = "Cluster CA certificate for the Kubernetes cluster"
+  value = azurerm_kubernetes_cluster.main.kube_config.0.cluster_ca_certificate
 }
 
 output "host" {
-  value = azurerm_kubernetes_cluster.matcha_kubernetes_cluster.kube_config.0.host
+  description = "Host address for the Kubernetes cluster"
+  value = azurerm_kubernetes_cluster.main.kube_config.0.host
+}
+
+output "aks_cluster_id" {
+  description = "ID of the created Kubernetes cluster"
+  value = azurerm_kubernetes_cluster.main.id
 }
 
 output "aks_cluster_name" {
-  value = azurerm_kubernetes_cluster.matcha_kubernetes_cluster.name
+  description = "Name of the created Kubernetes cluster"
+  value = azurerm_kubernetes_cluster.main.name
 }
 
 output "aks_principal_id" {
-  value = azurerm_kubernetes_cluster.matcha_kubernetes_cluster.identity[0].principal_id
+  description = "Principal ID for the Kubernetes cluster"
+  value = azurerm_kubernetes_cluster.main.identity[0].principal_id
 }
 
 output "aks_object_id" {
-  value = azurerm_kubernetes_cluster.matcha_kubernetes_cluster.kubelet_identity[0].object_id
+  description = "Object ID for the Kubernetes cluster"
+  value = azurerm_kubernetes_cluster.main.kubelet_identity[0].object_id
 }
