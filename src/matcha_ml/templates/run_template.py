@@ -83,7 +83,7 @@ def _is_approved(verb: str) -> bool:
             ("Resource group", "A resource group"),
             ("Azure Kubernetes Service (AKS)", "A kubernetes cluster"),
             (
-                "Two Azure Storage Container",
+                "Two Storage Containers",
                 "A storage container for experiment tracking artifacts and a second for model training artifacts",
             ),
             (

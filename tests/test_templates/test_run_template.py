@@ -1,209 +1,179 @@
-"""Temp doc."""
-# def test_is_approved_confirmed():
-#     """Test the user can accept a terraform action."""
-#     tfs = TerraformService()
+"""Test for interacting with Terraform service."""
+import json
+import os
+from contextlib import nullcontext as does_not_raise
+from typing import Callable, Dict, Union
+from unittest import mock
+from unittest.mock import MagicMock
 
-#     with mock.patch("typer.confirm") as mock_confirm:
-#         mock_confirm.return_value = True
-#         assert tfs.is_approved("do")
+import pytest
+import typer
+from _pytest.capture import SysCapture
 
-# def test_is_approved_rejected():
-#     """Test the user can reject a terraform action."""
-#     tfs = TerraformService()
-
-#     with mock.patch("typer.confirm") as mock_confirm:
-#         mock_confirm.return_value = False
-#         assert not tfs.is_approved("do")
-
-# def test_provision(terraform_test_config: TerraformConfig):
-#     """Test service can provision resources using terraform.
-
-#     Args:
-#         terraform_test_config (TerraformConfig): test terraform service config
-#     """
-#     tfs = TerraformService()
-#     tfs.config = terraform_test_config
-#     tfs.check_matcha_directory_exists = MagicMock()
-#     tfs.check_installation = MagicMock()
-#     tfs.validate_config = MagicMock()
-#     tfs.terraform_client.init = MagicMock(return_value=(0, "", ""))
-#     tfs.terraform_client.apply = MagicMock(return_value=(0, "", ""))
-#     tfs.show_terraform_outputs = MagicMock()
-
-#     tfs.is_approved = MagicMock(
-#         return_value=False
-#     )  # the user does not approve, should not provision
-#     with pytest.raises(typer.Exit):
-#         tfs.provision()
-#         tfs.terraform_client.init.assert_not_called()
-#         tfs.terraform_client.apply.assert_not_called()
-#         tfs.show_terraform_outputs.assert_not_called()
-
-#     tfs.is_approved = MagicMock(
-#         return_value=True
-#     )  # the user approves, should provision
-#     with does_not_raise():
-#         tfs.provision()
-#         tfs.terraform_client.init.assert_called()
-#         tfs.terraform_client.apply.assert_called()
-#         tfs.show_terraform_outputs.assert_called()
+from matcha_ml.services.terraform_service import TerraformConfig, TerraformService
+from matcha_ml.templates.run_template import deprovision, provision
 
 
-# def test_deprovision(terraform_test_config: TerraformConfig):
-#     """Test service can destroy resources using terraform.
+@pytest.fixture
+def mock_output() -> Callable[[str, bool], Union[str, Dict[str, str]]]:
+    """Fixture for mocking the terraform output.
 
-#     Args:
-#         terraform_test_config (TerraformConfig): test terraform service config
-#     """
-#     tfs = TerraformService()
-#     tfs.config = terraform_test_config
-#     tfs.check_matcha_directory_exists = MagicMock()
-#     tfs.check_installation = MagicMock()
-#     tfs.terraform_client.destroy = MagicMock(return_value=(0, "", ""))
+    Returns:
+        Callable[[str, bool], Union[str, Dict[str, str]]]: the expected value based on the key
+    """
 
-#     tfs.is_approved = MagicMock(
-#         return_value=False
-#     )  # the user does not approve, should not provision
-#     with pytest.raises(typer.Exit):
-#         tfs.deprovision()
-#         tfs.terraform_client.destroy.assert_not_called()
+    def output(name: str, full_value: bool) -> str:
+        terraform_outputs = {
+            "mlflow-tracking-url": "mlflow-test-url",
+            "zenml-storage-path": "zenml-test-storage-path",
+            "zenml-connection-string": "zenml-test-connection-string",
+            "k8s-context": "k8s-test-context",
+            "azure-container-registry": "azure-container-registry",
+            "azure-registry-name": "azure-registry-name",
+            "zen-server-url": "zen-server-url",
+            "zen-server-username": "zen-server-username",
+            "zen-server-password": "zen-server-password",
+            "seldon-workloads-namespace": "test-seldon-workloads-namespace",
+            "seldon-base-url": "test-seldon-base-url",
+        }
+        if name not in terraform_outputs:
+            raise ValueError("Unexpected input")
+        if full_value:
+            return terraform_outputs[name]
+        else:
+            return {"value": terraform_outputs[name]}
 
-#     tfs.is_approved = MagicMock(
-#         return_value=True
-#     )  # the user approves, should provision
-#     with does_not_raise():
-#         tfs.deprovision()
-#         tfs.terraform_client.destroy.assert_called()
-
-
-# def test_write_outputs_state(
-#     terraform_test_config: TerraformConfig,
-#     mock_output: Callable[[str, bool], Union[str, Dict[str, str]]],
-#     expected_outputs: dict,
-# ):
-#     """Test service writes the state file correctly.
-
-#     Args:
-#         terraform_test_config (TerraformConfig): test terraform service config
-#         mock_output (Callable[[str, bool], Union[str, Dict[str, str]]]): the mock output
-#         expected_outputs (dict): expected output from terraform
-#     """
-#     tfs = TerraformService()
-#     tfs.config = terraform_test_config
-
-#     tfs.terraform_client.output = MagicMock(wraps=mock_output)
-
-#     with does_not_raise():
-#         tfs.write_outputs_state()
-#         with open(terraform_test_config.state_file) as f:
-#             assert json.load(f) == expected_outputs
+    return output
 
 
-# def test_show_terraform_outputs(
-#     terraform_test_config: TerraformConfig,
-#     capsys: SysCapture,
-#     mock_output: Callable[[str, bool], Union[str, Dict[str, str]]],
-#     expected_outputs: dict,
-# ):
-#     """Test service shows the correct terraform output.
+@pytest.fixture
+def expected_outputs() -> dict:
+    """The expected output from terraform.
 
-#     Args:
-#         terraform_test_config (TerraformConfig): test terraform service config
-#         capsys (SysCapture): fixture to capture stdout and stderr
-#         mock_output (Callable[[str, bool], Union[str, Dict[str, str]]]): the mock output
-#         expected_outputs (dict): expected output from terraform
-#     """
-#     tfs = TerraformService()
-#     tfs.config = terraform_test_config
+    Returns:
+        dict: expected output
+    """
+    outputs = {
+        "mlflow-tracking-url": "mlflow-test-url",
+        "zenml-storage-path": "zenml-test-storage-path",
+        "zenml-connection-string": "zenml-test-connection-string",
+        "k8s-context": "k8s-test-context",
+        "azure-container-registry": "azure-container-registry",
+        "azure-registry-name": "azure-registry-name",
+        "zen-server-url": "zen-server-url",
+        "zen-server-username": "zen-server-username",
+        "zen-server-password": "zen-server-password",
+        "seldon-workloads-namespace": "test-seldon-workloads-namespace",
+        "seldon-base-url": "test-seldon-base-url",
+    }
 
-#     tfs.terraform_client.output = MagicMock(wraps=mock_output)
-#     with does_not_raise():
-#         tfs.show_terraform_outputs()
-#         captured = capsys.readouterr()
-
-#         for output in expected_outputs:
-#             assert output in captured.out
+    return outputs
 
 
-# def test_terraform_raise_exception_provision_init(
-#     terraform_test_config: TerraformConfig,
-# ):
-#     """Test if terraform exception is handled correctly during init when provisioning resources.
+@pytest.fixture
+def terraform_test_config(matcha_testing_directory: str) -> TerraformConfig:
+    """Fixture for a test terraform service config pointing to a temporary directory.
 
-#     Args:
-#         terraform_test_config (TerraformConfig): terraform test service config
-#     """
-#     tfs = TerraformService()
-#     tfs.config = terraform_test_config
-#     tfs.check_matcha_directory_exists = MagicMock()
-#     tfs.check_installation = MagicMock()
-#     tfs.validate_config = MagicMock()
-#     tfs.terraform_client.init = MagicMock(return_value=(1, "", "Init failed"))
+    Args:
+        matcha_testing_directory: temporary directory path
 
-#     tfs.is_approved = MagicMock(
-#         return_value=True
-#     )  # the user approves, should provision
-
-#     with pytest.raises(MatchaTerraformError) as exc_info:
-#         tfs.provision()
-#     assert (
-#         str(exc_info.value)
-#         == "Terraform failed because of the following error: 'Init failed'."
-#     )
+    Returns:
+        TerraformConfig: test terraform config
+    """
+    infrastructure_directory = os.path.join(
+        matcha_testing_directory, ".matcha", "infrastructure"
+    )
+    os.makedirs(infrastructure_directory, exist_ok=True)
+    return TerraformConfig(
+        working_dir=infrastructure_directory,
+        state_file=os.path.join(infrastructure_directory, "matcha.state"),
+        var_file=os.path.join(infrastructure_directory, "terraform.tfvars.json"),
+    )
 
 
-# def test_terraform_raise_exception_provision_apply(
-#     terraform_test_config: TerraformConfig,
-# ):
-#     """Test if terraform exception is handled correctly during apply when provisioning resources.
+def test_provision(
+    terraform_test_config: TerraformConfig,
+    mock_output: Callable[[str, bool], Union[str, Dict[str, str]]],
+    expected_outputs: dict,
+    capsys: SysCapture,
+):
+    """Test service can provision resources using terraform.
 
-#     Args:
-#         terraform_test_config (TerraformConfig): terraform test service config
-#     """
-#     tfs = TerraformService()
-#     tfs.config = terraform_test_config
-#     tfs.check_matcha_directory_exists = MagicMock()
-#     tfs.check_installation = MagicMock()
-#     tfs.validate_config = MagicMock()
-#     tfs.terraform_client.init = MagicMock(return_value=(0, "", ""))
-#     tfs.terraform_client.apply = MagicMock(return_value=(1, "", "Apply failed"))
-#     tfs.show_terraform_outputs = MagicMock()
+    Args:
+        terraform_test_config (TerraformConfig): test terraform service config
+        mock_output (Callable[[str, bool], Union[str, Dict[str, str]]]): the expected value based on the key
+        expected_outputs (dict): the expected output from terraform
+        capsys (SysCapture): fixture to capture stdout and stderr
+    """
+    tfs = TerraformService()
+    tfs.config = terraform_test_config
 
-#     tfs.is_approved = MagicMock(
-#         return_value=True
-#     )  # the user approves, should provision
+    tfs.check_installation = MagicMock()
+    tfs.validate_config = MagicMock()
 
-#     with pytest.raises(MatchaTerraformError) as exc_info:
-#         tfs.provision()
-#         tfs.terraform_client.init.assert_called()
-#     assert (
-#         str(exc_info.value)
-#         == "Terraform failed because of the following error: 'Apply failed'."
-#     )
+    tfs.terraform_client.init = MagicMock(return_value=(0, "", ""))
+    tfs.terraform_client.apply = MagicMock(return_value=(0, "", ""))
+    tfs.terraform_client.output = MagicMock(wraps=mock_output)
+
+    with mock.patch("typer.confirm") as mock_confirm:
+        mock_confirm.return_value = False
+        expected_output = "You decided to cancel - if you change your mind, then run 'matcha provision' again."
+
+        with pytest.raises(typer.Exit):
+            provision(tfs)
+            tfs.terraform_client.init.assert_not_called()
+            tfs.terraform_client.apply.assert_not_called()
+            tfs.terraform_client.output.assert_not_called()
+
+            captured = capsys.readouterr()
+
+            assert expected_output in captured
+
+    with mock.patch("typer.confirm") as mock_confirm:
+        mock_confirm.return_value = True
+
+        with does_not_raise():
+            provision(tfs)
+            tfs.terraform_client.init.assert_called()
+            tfs.terraform_client.apply.assert_called()
+            tfs.terraform_client.output.assert_called()
+
+            with open(terraform_test_config.state_file) as f:
+                assert json.load(f) == expected_outputs
 
 
-# def test_terraform_raise_exception_deprovision_destroy(
-#     terraform_test_config: TerraformConfig,
-# ):
-#     """Test if terraform exception is captured when performing deprovision.
+def test_deprovision(
+    capsys: SysCapture,
+):
+    """Test service can provision resources using terraform.
 
-#     Args:
-#         terraform_test_config (TerraformConfig): terraform test service config
-#     """
-#     tfs = TerraformService()
-#     tfs.config = terraform_test_config
+    Args:
+        mock_output (Callable[[str, bool], Union[str, Dict[str, str]]]): the expected value based on the key
+        capsys (SysCapture): fixture to capture stdout and stderr
+    """
+    tfs = TerraformService()
 
-#     tfs.check_matcha_directory_exists = MagicMock()
-#     tfs.check_installation = MagicMock()
-#     tfs.terraform_client.destroy = MagicMock(return_value=(1, "", "Destroy failed"))
+    tfs.check_installation = MagicMock()
+    tfs.check_matcha_directory_exists = MagicMock()
+    tfs.check_matcha_directory_integrity = MagicMock()
 
-#     tfs.is_approved = MagicMock(
-#         return_value=True
-#     )  # the user approves, should deprovision
+    tfs.terraform_client.destroy = MagicMock(return_value=(0, "", ""))
 
-#     with pytest.raises(MatchaTerraformError) as exc_info:
-#         tfs.deprovision()
-#     assert (
-#         str(exc_info.value)
-#         == "Terraform failed because of the following error: 'Destroy failed'."
-#     )
+    with mock.patch("typer.confirm") as mock_confirm:
+        mock_confirm.return_value = False
+        expected_output = "You decided to cancel - your resources will remain active! If you change your mind, then run 'matcha destroy' again."
+
+        with pytest.raises(typer.Exit):
+            deprovision(tfs)
+            tfs.terraform_client.destroy.assert_not_called()
+
+            captured = capsys.readouterr()
+
+            assert expected_output in captured
+
+    with mock.patch("typer.confirm") as mock_confirm:
+        mock_confirm.return_value = True
+
+        with does_not_raise():
+            deprovision(tfs)
+            tfs.terraform_client.destroy.assert_called()

@@ -1,6 +1,5 @@
 """Tests for Terraform Service."""
 import os
-from typing import Callable, Dict, Union
 from unittest import mock
 from unittest.mock import MagicMock
 
@@ -29,62 +28,6 @@ def terraform_test_config(matcha_testing_directory: str) -> TerraformConfig:
         state_file=os.path.join(infrastructure_directory, "matcha.state"),
         var_file=os.path.join(infrastructure_directory, "terraform.tfvars.json"),
     )
-
-
-@pytest.fixture
-def mock_output() -> Callable[[str, bool], Union[str, Dict[str, str]]]:
-    """Fixture for mocking the terraform output.
-
-    Returns:
-        Callable[[str, bool], Union[str, Dict[str, str]]]: the expected value based on the key
-    """
-
-    def output(name: str, full_value: bool) -> str:
-        terraform_outputs = {
-            "mlflow-tracking-url": "mlflow-test-url",
-            "zenml-storage-path": "zenml-test-storage-path",
-            "zenml-connection-string": "zenml-test-connection-string",
-            "k8s-context": "k8s-test-context",
-            "azure-container-registry": "azure-container-registry",
-            "azure-registry-name": "azure-registry-name",
-            "zen-server-url": "zen-server-url",
-            "zen-server-username": "zen-server-username",
-            "zen-server-password": "zen-server-password",
-            "seldon-workloads-namespace": "test-seldon-workloads-namespace",
-            "seldon-base-url": "test-seldon-base-url",
-        }
-        if name not in terraform_outputs:
-            raise ValueError("Unexpected input")
-        if full_value:
-            return terraform_outputs[name]
-        else:
-            return {"value": terraform_outputs[name]}
-
-    return output
-
-
-@pytest.fixture
-def expected_outputs() -> dict:
-    """The expected output from terraform.
-
-    Returns:
-        dict: expected output.
-    """
-    outputs = {
-        "mlflow-tracking-url": "mlflow-test-url",
-        "zenml-storage-path": "zenml-test-storage-path",
-        "zenml-connection-string": "zenml-test-connection-string",
-        "k8s-context": "k8s-test-context",
-        "azure-container-registry": "azure-container-registry",
-        "azure-registry-name": "azure-registry-name",
-        "zen-server-url": "zen-server-url",
-        "zen-server-username": "zen-server-username",
-        "zen-server-password": "zen-server-password",
-        "seldon-workloads-namespace": "test-seldon-workloads-namespace",
-        "seldon-base-url": "test-seldon-base-url",
-    }
-
-    return outputs
 
 
 def test_check_installation_installed():
