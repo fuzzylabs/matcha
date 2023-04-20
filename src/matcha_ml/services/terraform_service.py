@@ -153,5 +153,9 @@ class TerraformService:
         return ret_code, out, err
 
     def get_state_file_dir(self) -> str:
-        """Return the path of state file."""
+        """Return the path of state file.
+
+        Returns:
+            str: the location of the state file.
+        """
         return self.config.state_file
