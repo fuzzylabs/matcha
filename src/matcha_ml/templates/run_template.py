@@ -131,9 +131,9 @@ def _initialise_terraform(tfs: TerraformService) -> None:
         with Spinner("Initializing"):
             ret_code, _, err = tfs.init()
 
-        if ret_code != 0:
-            print_error("The command 'terraform init' failed.")
-            raise MatchaTerraformError(tf_error=err)
+            if ret_code != 0:
+                print_error("The command 'terraform init' failed.")
+                raise MatchaTerraformError(tf_error=err)
 
         # Create a directory to avoid running init multiple times
         previous_temp_dir.mkdir(parents=True, exist_ok=True)
@@ -180,8 +180,8 @@ def _apply_terraform(tfs: TerraformService) -> None:
     with Spinner("Applying"):
         ret_code, _, err = tfs.apply()
 
-    if ret_code != 0:
-        raise MatchaTerraformError(tf_error=err)
+        if ret_code != 0:
+            raise MatchaTerraformError(tf_error=err)
 
     print_status(
         build_substep_success_status(
@@ -218,8 +218,8 @@ def _destroy_terraform(tfs: TerraformService) -> None:
     with Spinner("Destroying"):
         ret_code, _, err = tfs.destroy()
 
-    if ret_code != 0:
-        raise MatchaTerraformError(tf_error=err)
+        if ret_code != 0:
+            raise MatchaTerraformError(tf_error=err)
 
 
 def provision(tfs: TerraformService) -> None:
