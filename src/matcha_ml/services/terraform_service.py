@@ -90,9 +90,7 @@ class TerraformService:
         Returns:
             bool: True when the config file exists.
         """
-        var_file = Path(self.config.var_file)
-
-        return var_file.exists()
+        return Path(self.config.var_file).exists()
 
     def get_previous_temp_dir(self) -> Path:
         """Get the path to the previous temporary directory.
@@ -101,16 +99,13 @@ class TerraformService:
             str: a Path object that represents the path to the previous temporary
         directory.
         """
-        previous_temp_dir = Path(
-            os.path.join(self.terraform_client.working_dir, ".temp")
-        )
-        return previous_temp_dir
+        return Path(os.path.join(self.terraform_client.working_dir, ".temp"))
 
     def init(self) -> Tuple[int, str, str]:
-        """Run `terraform init`.
+        """Run `terraform init` with the initialised Terraform client from the python_terraform module.
 
         Returns:
-            Tuple[int, str, str]: return code of terraform, standard output and standard error.
+            Tuple[int, str, str]: return code of Terraform, standard output and standard error.
         """
         ret_code, out, err = self.terraform_client.init(
             capture_output=self.config.capture_output,
@@ -120,10 +115,10 @@ class TerraformService:
         return ret_code, out, err
 
     def apply(self) -> Tuple[int, str, str]:
-        """Run `terraform apply`.
+        """Run `terraform apply` with the initialised Terraform client from the python_terraform module.
 
         Returns:
-            Tuple[int, str, str]: return code of terraform, standard output and standard error.
+            Tuple[int, str, str]: return code of Terraform, standard output and standard error.
         """
         # once terraform init is success, call terraform apply
         ret_code, out, err = self.terraform_client.apply(
@@ -137,7 +132,7 @@ class TerraformService:
         return ret_code, out, err
 
     def destroy(self) -> Tuple[int, str, str]:
-        """Destroy the provisioned resources.
+        """Destroy the provisioned resources with the initialised Terraform client from the python_terraform module..
 
         Returns:
             Tuple[int, str, str]: return code of terraform, standard output and standard error.
