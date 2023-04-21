@@ -39,7 +39,7 @@ class TemplateRunner:
         """Constructor for the TemplateRunner object containing."""
         self.tfs = tfs
         self.previous_temp_dir = tfs.get_previous_temp_dir()
-        self.state_file = tfs.get_state_file_dir()
+        self.state_file = tfs.config.state_file
 
     def _check_terraform_installation(self) -> None:
         """Checks if terraform is installed on the host system.

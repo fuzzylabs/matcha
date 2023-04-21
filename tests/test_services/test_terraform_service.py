@@ -196,14 +196,3 @@ def test_destroy():
     _, _, _ = tfs.destroy()
 
     tfs.terraform_client.destroy.assert_called()
-
-
-def test_get_state_file_dir():
-    """Test get_state_file_dir returns the matcha.state directory."""
-    tfs = TerraformService()
-
-    state_file = tfs.get_state_file_dir()
-
-    last_component = os.path.basename(state_file)
-
-    assert last_component == "matcha.state"
