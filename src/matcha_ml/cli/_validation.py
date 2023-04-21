@@ -1,15 +1,23 @@
 """Validation for user inputs."""
+import json
+import os
 from difflib import get_close_matches
 from typing import List, Optional, Set, Union
 
+from azure.mgmt.confluent.models._confluent_management_client_enums import (  # type: ignore [import]
+    ProvisionState,
+)
 from typer import BadParameter
 
+from matcha_ml.cli.ui.print_messages import print_error
 from matcha_ml.errors import MatchaInputError
 from matcha_ml.services import AzureClient
 
 # TODO: dynamically set both of these variables
 LONGEST_RESOURCE_NAME = "artifactstore"
 MAXIMUM_RESOURCE_NAME_LEN = 24
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 def _is_alphanumeric(prefix: str) -> bool:
@@ -102,7 +110,7 @@ def region_validation(region: str) -> str:
         MatchaInputError: when the region isn't found and there's no match
 
     Returns:
-        str: _description_
+        str: the region if valid
     """
     azure_client = get_azure_client()
 
@@ -198,3 +206,31 @@ def prefix_typer_callback(prefix: str) -> str:
         )
 
     return prefix
+
+
+def check_current_deployment_exists() -> bool:
+    """Checks the current deployment using the .matcha directory current contents if it exists.
+
+    Returns:
+        bool: True if a deployment currently exists, else False.
+    """
+    if not os.path.isfile(f"{BASE_DIR}/.matcha/infrastructure/matcha.state"):
+        return False
+
+    with open(f"{BASE_DIR}/.matcha/infrastructure/matcha.state") as f:
+        data = json.load(f)
+
+    resource_group_name = data["resource-group-name"]
+
+    client = get_azure_client()
+    rg_state = client.resource_group_state(resource_group_name)
+
+    if rg_state is None:
+        return False
+    elif rg_state == ProvisionState.SUCCEEDED:
+        return True
+    else:
+        print_error(
+            f"Error, resource group '{resource_group_name}' is currently in a '{rg_state.value}' which is currently not handled by matcha. Please check your resources on Azure."
+        )
+        return True
