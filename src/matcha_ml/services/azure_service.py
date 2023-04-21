@@ -1,14 +1,15 @@
 """The Azure Service interface."""
-from enum import Enum
 from subprocess import DEVNULL
 from typing import Dict, Optional, Set, cast
 
 import jwt
-from azure.core import CaseInsensitiveEnumMeta
 from azure.core.credentials import AccessToken
 from azure.core.exceptions import ClientAuthenticationError
 from azure.identity import AzureCliCredential, CredentialUnavailableError
 from azure.mgmt.authorization import AuthorizationManagementClient
+from azure.mgmt.confluent.models._confluent_management_client_enums import (  # type: ignore [import]
+    ProvisionState,
+)
 from azure.mgmt.resource import (
     ResourceManagementClient,
     SubscriptionClient,
@@ -24,25 +25,6 @@ ROLE_ID_MAPPING = {
 }
 
 ACCEPTED_ROLE_CONFIGURATIONS = [["Owner"], ["Contributor", "User Access Administrator"]]
-
-
-class ProvisionState(str, Enum, metaclass=CaseInsensitiveEnumMeta):
-    """Provision states for Azure resources.
-
-    Args:
-        str (str): Enum key
-        Enum (Enum): Enum inheritance class
-    """
-
-    ACCEPTED = "Accepted"
-    CREATING = "Creating"
-    UPDATING = "Updating"
-    DELETING = "Deleting"
-    SUCCEEDED = "Succeeded"
-    FAILED = "Failed"
-    CANCELED = "Canceled"
-    DELETED = "Deleted"
-    NOT_SPECIFIED = "NotSpecified"
 
 
 class AzureClient:
@@ -146,7 +128,7 @@ class AzureClient:
             if all([role in roles for role in expected_roles]):
                 return True
         raise MatchaPermissionsError(
-            "you need either Owner role or Contributor and User Access Administrator roles"
+            "you need either the Owner role or Contributor and User Access Administrator roles"
         )
 
     def fetch_resource_groups(self) -> Dict[str, ResourceGroup]:
@@ -194,7 +176,7 @@ class AzureClient:
                 isinstance(resource_group, ResourceGroup)
                 and resource_group.properties is not None
             ):
-                return ProvisionState[resource_group.properties.provisioning_state]  # type: ignore
+                return ProvisionState[resource_group.properties.provisioning_state]
 
         return None
 

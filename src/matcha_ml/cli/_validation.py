@@ -4,15 +4,14 @@ import os
 from difflib import get_close_matches
 from typing import List, Optional, Set, Union
 
-# from azure.mgmt.confluent.models._confluent_management_client_enums import (
-#     ProvisionState,
-# )
+from azure.mgmt.confluent.models._confluent_management_client_enums import (  # type: ignore [import]
+    ProvisionState,
+)
 from typer import BadParameter
 
 from matcha_ml.cli.ui.print_messages import print_error
 from matcha_ml.errors import MatchaInputError
 from matcha_ml.services import AzureClient
-from matcha_ml.services.azure_service import ProvisionState
 
 # TODO: dynamically set both of these variables
 LONGEST_RESOURCE_NAME = "artifactstore"
@@ -109,7 +108,7 @@ def region_validation(region: str) -> str:
         MatchaInputError: when the region isn't found and there's no match
 
     Returns:
-        str: _description_
+        str: the region if valid
     """
     azure_client = get_azure_client()
 

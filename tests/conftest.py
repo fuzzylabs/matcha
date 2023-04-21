@@ -4,10 +4,12 @@ from typing import Iterator
 from unittest.mock import MagicMock, patch
 
 import pytest
+from azure.mgmt.confluent.models._confluent_management_client_enums import (
+    ProvisionState,  # type: ignore [import]
+)
 from typer.testing import CliRunner
 
 from matcha_ml.services import AzureClient
-from matcha_ml.services.azure_service import ProvisionState
 
 INTERNAL_FUNCTION_STUB = "matcha_ml.services.AzureClient"
 
