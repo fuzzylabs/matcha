@@ -11,7 +11,7 @@ import typer
 from _pytest.capture import SysCapture
 
 from matcha_ml.services.terraform_service import TerraformConfig, TerraformService
-from matcha_ml.templates.run_template import deprovision, provision
+from matcha_ml.templates.run_template import TemplateRunner
 
 
 @pytest.fixture
@@ -107,6 +107,7 @@ def test_provision(
     """
     tfs = TerraformService()
     tfs.config = terraform_test_config
+    template_runner = TemplateRunner(tfs)
 
     tfs.check_installation = MagicMock()
     tfs.validate_config = MagicMock()
@@ -120,7 +121,7 @@ def test_provision(
         expected_output = "You decided to cancel - if you change your mind, then run 'matcha provision' again."
 
         with pytest.raises(typer.Exit):
-            provision(tfs)
+            template_runner.provision()
             tfs.terraform_client.init.assert_not_called()
             tfs.terraform_client.apply.assert_not_called()
             tfs.terraform_client.output.assert_not_called()
@@ -133,7 +134,7 @@ def test_provision(
         mock_confirm.return_value = True
 
         with does_not_raise():
-            provision(tfs)
+            template_runner.provision()
             tfs.terraform_client.init.assert_called()
             tfs.terraform_client.apply.assert_called()
             tfs.terraform_client.output.assert_called()
@@ -145,13 +146,14 @@ def test_provision(
 def test_deprovision(
     capsys: SysCapture,
 ):
-    """Test service can provision resources using terraform.
+    """Test service can deprovision resources using terraform.
 
     Args:
         mock_output (Callable[[str, bool], Union[str, Dict[str, str]]]): the expected value based on the key
         capsys (SysCapture): fixture to capture stdout and stderr
     """
     tfs = TerraformService()
+    template_runner = TemplateRunner(tfs)
 
     tfs.check_installation = MagicMock()
     tfs.check_matcha_directory_exists = MagicMock()
@@ -164,7 +166,7 @@ def test_deprovision(
         expected_output = "You decided to cancel - your resources will remain active! If you change your mind, then run 'matcha destroy' again."
 
         with pytest.raises(typer.Exit):
-            deprovision(tfs)
+            template_runner.deprovision()
             tfs.terraform_client.destroy.assert_not_called()
 
             captured = capsys.readouterr()
@@ -175,5 +177,5 @@ def test_deprovision(
         mock_confirm.return_value = True
 
         with does_not_raise():
-            deprovision(tfs)
+            template_runner.deprovision()
             tfs.terraform_client.destroy.assert_called()
