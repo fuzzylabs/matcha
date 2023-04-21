@@ -6,7 +6,6 @@ import typer
 
 from matcha_ml.cli.ui.print_messages import print_status
 from matcha_ml.cli.ui.status_message_builders import build_step_success_status
-from matcha_ml.services.terraform_service import TerraformService
 from matcha_ml.templates.build_templates.azure_template import (
     build_template,
     build_template_configuration,
@@ -41,11 +40,8 @@ def provision_resources(
         config = build_template_configuration(location, prefix, password)
         build_template(config, template, destination, verbose)
 
-    # create a terraform service to provision resources
-    tfs = TerraformService()
-
     # create a runner for provisioning resource with Terraform service.
-    template_runner = TemplateRunner(tfs)
+    template_runner = TemplateRunner()
 
     # provision resources by running the template
     template_runner.provision()

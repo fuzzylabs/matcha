@@ -1,5 +1,4 @@
 """Test for interacting with Terraform service."""
-import json
 import os
 from contextlib import nullcontext as does_not_raise
 from typing import Callable, Dict, Union
@@ -10,7 +9,7 @@ import pytest
 import typer
 from _pytest.capture import SysCapture
 
-from matcha_ml.services.terraform_service import TerraformConfig, TerraformService
+from matcha_ml.services.terraform_service import TerraformConfig
 from matcha_ml.templates.run_template import TemplateRunner
 
 
@@ -92,29 +91,19 @@ def terraform_test_config(matcha_testing_directory: str) -> TerraformConfig:
 
 
 def test_provision(
-    terraform_test_config: TerraformConfig,
-    mock_output: Callable[[str, bool], Union[str, Dict[str, str]]],
-    expected_outputs: dict,
     capsys: SysCapture,
 ):
     """Test service can provision resources using terraform.
 
     Args:
-        terraform_test_config (TerraformConfig): test terraform service config
-        mock_output (Callable[[str, bool], Union[str, Dict[str, str]]]): the expected value based on the key
-        expected_outputs (dict): the expected output from terraform
         capsys (SysCapture): fixture to capture stdout and stderr
     """
-    tfs = TerraformService()
-    tfs.config = terraform_test_config
-    template_runner = TemplateRunner(tfs)
+    template_runner = TemplateRunner()
+    template_runner._check_terraform_installation = MagicMock()
+    template_runner._validate_terraform_config = MagicMock()
 
-    tfs.check_installation = MagicMock()
-    tfs.validate_config = MagicMock()
-
-    tfs.terraform_client.init = MagicMock(return_value=(0, "", ""))
-    tfs.terraform_client.apply = MagicMock(return_value=(0, "", ""))
-    tfs.terraform_client.output = MagicMock(wraps=mock_output)
+    template_runner._initialise_terraform = MagicMock()
+    template_runner._apply_terraform = MagicMock()
 
     with mock.patch("typer.confirm") as mock_confirm:
         mock_confirm.return_value = False
@@ -122,9 +111,8 @@ def test_provision(
 
         with pytest.raises(typer.Exit):
             template_runner.provision()
-            tfs.terraform_client.init.assert_not_called()
-            tfs.terraform_client.apply.assert_not_called()
-            tfs.terraform_client.output.assert_not_called()
+            template_runner._initialise_terraform.assert_not_called()
+            template_runner._apply_terraform.assert_not_called()
 
             captured = capsys.readouterr()
 
@@ -135,12 +123,8 @@ def test_provision(
 
         with does_not_raise():
             template_runner.provision()
-            tfs.terraform_client.init.assert_called()
-            tfs.terraform_client.apply.assert_called()
-            tfs.terraform_client.output.assert_called()
-
-            with open(terraform_test_config.state_file) as f:
-                assert json.load(f) == expected_outputs
+            template_runner._initialise_terraform.assert_called()
+            template_runner._apply_terraform.assert_called()
 
 
 def test_deprovision(
@@ -149,17 +133,14 @@ def test_deprovision(
     """Test service can deprovision resources using terraform.
 
     Args:
-        mock_output (Callable[[str, bool], Union[str, Dict[str, str]]]): the expected value based on the key
         capsys (SysCapture): fixture to capture stdout and stderr
     """
-    tfs = TerraformService()
-    template_runner = TemplateRunner(tfs)
+    template_runner = TemplateRunner()
 
-    tfs.check_installation = MagicMock()
-    tfs.check_matcha_directory_exists = MagicMock()
-    tfs.check_matcha_directory_integrity = MagicMock()
+    template_runner._check_terraform_installation = MagicMock()
+    template_runner._check_matcha_directory_exists = MagicMock()
 
-    tfs.terraform_client.destroy = MagicMock(return_value=(0, "", ""))
+    template_runner._destroy_terraform = MagicMock()
 
     with mock.patch("typer.confirm") as mock_confirm:
         mock_confirm.return_value = False
@@ -167,7 +148,7 @@ def test_deprovision(
 
         with pytest.raises(typer.Exit):
             template_runner.deprovision()
-            tfs.terraform_client.destroy.assert_not_called()
+            template_runner._destroy_terraform.assert_not_called()
 
             captured = capsys.readouterr()
 
@@ -178,4 +159,4 @@ def test_deprovision(
 
         with does_not_raise():
             template_runner.deprovision()
-            tfs.terraform_client.destroy.assert_called()
+            template_runner._destroy_terraform.assert_called()

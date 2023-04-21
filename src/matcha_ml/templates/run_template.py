@@ -35,17 +35,12 @@ SPINNER = "dots"
 class TemplateRunner:
     """A Runner class provides methods that interface with the Terraform service to facilitate the provisioning and deprovisioning of resources."""
 
-    def __init__(self, tfs: TerraformService):
-        """Constructor for the TemplateRunner object containing."""
-        self.tfs = tfs
-        self.previous_temp_dir = tfs.get_previous_temp_dir()
-        self.state_file = tfs.config.state_file
+    tfs: TerraformService = TerraformService()
+    previous_temp_dir = tfs.get_previous_temp_dir()
+    state_file = tfs.config.state_file
 
     def _check_terraform_installation(self) -> None:
         """Checks if terraform is installed on the host system.
-
-        Args:
-            tfs (TerraformService): the Terraform service interface.
 
         Raises:
             typer.Exit: if terraform is not installed.
@@ -60,9 +55,6 @@ class TemplateRunner:
 
     def _validate_terraform_config(self) -> None:
         """Validate the configuration used for creating resources.
-
-        Args:
-            tfs (TerraformService): the Terraform service interface.
 
         Raises:
             typer.Exit: if `terraform.tfvars.json` file not found in current directory.
@@ -112,9 +104,6 @@ class TemplateRunner:
     def _initialise_terraform(self) -> None:
         """Run terraform init to initialise Terraform .
 
-        Args:
-            tfs (TerraformService): the Terraform service interface.
-
         Raises:
             MatchaTerraformError: if 'terraform init' failed.
         """
@@ -152,9 +141,6 @@ class TemplateRunner:
     def _check_matcha_directory_exists(self) -> None:
         """Checks if .matcha directory exists within the current working directory.
 
-        Args:
-            tfs (TerraformService): the Terraform service interface.
-
         Raises:
             typer.Exit: if the .matcha directory does not exist.
             typer.Exit: if the .matcha directory does not contain the required files to deploy resources.
@@ -173,9 +159,6 @@ class TemplateRunner:
 
     def _apply_terraform(self) -> None:
         """Run terraform apply to create resources on cloud.
-
-        Args:
-            tfs (TerraformService): the Terraform service interface.
 
         Raises:
             MatchaTerraformError: if 'terraform apply' failed.
@@ -208,9 +191,6 @@ class TemplateRunner:
     def _destroy_terraform(self) -> None:
         """Destroy the provisioned resources.
 
-        Args:
-            tfs (TerraformService): the Terraform service interface.
-
         Raises:
             MatchaTerraformError: if 'terraform destroy' failed.
         """
@@ -227,9 +207,6 @@ class TemplateRunner:
 
     def provision(self) -> None:
         """Provision resources required for the deployment.
-
-        Args:
-            tfs (TerraformService): the Terraform service interface.
 
         Raises:
             typer.Exit: if approval is not given by user.
@@ -250,9 +227,6 @@ class TemplateRunner:
 
     def deprovision(self) -> None:
         """Destroy the provisioned resources.
-
-        Args:
-            tfs (TerraformService): the Terraform service interface.
 
         Raises:
             typer.Exit: if approval is not given by user.

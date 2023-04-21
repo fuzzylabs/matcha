@@ -1,17 +1,13 @@
 """Destroy CLI."""
 from matcha_ml.cli.ui.print_messages import print_status
 from matcha_ml.cli.ui.status_message_builders import build_step_success_status
-from matcha_ml.services.terraform_service import TerraformService
 from matcha_ml.templates.run_template import TemplateRunner
 
 
 def destroy_resources() -> None:
     """Destroy resources."""
-    # create a terraform service
-    tfs = TerraformService()
-
-    # create a runner for provisioning resource with Terraform service.
-    template_runner = TemplateRunner(tfs)
+    # create a runner for deprovisioning resource with Terraform service.
+    template_runner = TemplateRunner()
 
     # deprovision the resources
     template_runner.deprovision()
