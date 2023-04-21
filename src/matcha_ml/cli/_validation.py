@@ -17,6 +17,8 @@ from matcha_ml.services import AzureClient
 LONGEST_RESOURCE_NAME = "artifactstore"
 MAXIMUM_RESOURCE_NAME_LEN = 24
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
 
 def _is_alphanumeric(prefix: str) -> bool:
     """Check whether the prefix is an alphanumeric string.
@@ -212,10 +214,10 @@ def check_current_deployment_exists() -> bool:
     Returns:
         bool: True if a deployment currently exists, else False.
     """
-    if not os.path.isfile(".matcha/infrastructure/matcha.state"):
+    if not os.path.isfile(f"{BASE_DIR}/.matcha/infrastructure/matcha.state"):
         return False
 
-    with open(".matcha/infrastructure/matcha.state") as f:
+    with open(f"{BASE_DIR}/.matcha/infrastructure/matcha.state") as f:
         data = json.load(f)
 
     resource_group_name = data["resource-group-name"]
