@@ -55,6 +55,6 @@ output "seldon_base_url" {
   value       = module.seldon.base_url
 }
 
-output "resource-group-name" {
+output "resource_group_name" {
   value = module.resource_group.name
 }
