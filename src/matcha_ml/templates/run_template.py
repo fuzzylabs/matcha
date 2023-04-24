@@ -107,6 +107,7 @@ class TemplateRunner:
         Raises:
             MatchaTerraformError: if 'terraform init' failed.
         """
+        print(self.previous_temp_dir)
         if self.previous_temp_dir.exists():
             # this directory gets created after a successful init command
             print_status(
@@ -174,15 +175,19 @@ class TemplateRunner:
                 f"{Emojis.CHECKMARK.value} Your environment has been provisioned!\n"
             )
         )
+
+    def _write_outputs_state(self) -> None:
+        """Write the outputs of the terraform deployment to the state json file."""
         state_outputs = {
             name: self.tfs.terraform_client.output(name, full_value=True)
             for name in OUTPUTS
         }
-
-        # dump specific terraform output to state file
         with open(self.state_file, "w") as fp:
             json.dump(state_outputs, fp, indent=4)
 
+    def _show_terraform_outputs(self) -> None:
+        """Print the terraform outputs from state file."""
+        self._write_outputs_state()
         print_status(build_status("Here are the endpoints for what's been provisioned"))
         # print terraform output from state file
         with open(self.state_file) as fp:
@@ -217,6 +222,7 @@ class TemplateRunner:
         if self._is_approved(verb="provision"):
             self._initialise_terraform()
             self._apply_terraform()
+            self._show_terraform_outputs()
         else:
             print_status(
                 build_status(
