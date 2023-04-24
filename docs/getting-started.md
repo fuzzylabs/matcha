@@ -19,7 +19,13 @@ Alongside this, you need the Azure CLI installed - see [here](https://learn.micr
 
 ### Getting Setup
 
-Let's start with cloning our examples repository:
+Let's start with logging into Azure (make sure you've followed the steps above to install the Azure CLI):
+
+```bash
+az login
+```
+
+Clone our examples repository:
 
 ```bash
 git clone git@github.com:fuzzylabs/matcha-examples.git
@@ -71,16 +77,22 @@ To provision an experiment tracker using `matcha` run the following command (you
 matcha provision
 ```
 
-*TODO* Once `provision` has finished doing it's thing, you can run the following command to inspect what has been provisioned on Azure for you:
+*TODO* Once `provision` has finished it's thing, you can use the following command to inspect the resources that have been provisioned for you:
 
 ```bash
-matcha provision inspect
+matcha get
 ```
 
-You should have some output which is similar to the following:
+You should have something similar to the following output:
 
 ```bash
 OUTPUT
+```
+
+*TODO* You can then use the following to inspect specific resources, for example:
+
+```bash
+matcha get experiment-tracker
 ```
 
 ### Running your recommender
