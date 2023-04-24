@@ -214,13 +214,14 @@ def check_current_deployment_exists() -> bool:
     Returns:
         bool: True if a deployment currently exists, else False.
     """
-    if not os.path.isfile(f"{BASE_DIR}/.matcha/infrastructure/matcha.state"):
+    current_dir = os.getcwd()
+    if not os.path.isfile(f"{current_dir}/.matcha/infrastructure/matcha.state"):
         return False
 
-    with open(f"{BASE_DIR}/.matcha/infrastructure/matcha.state") as f:
+    with open(f"{current_dir}/.matcha/infrastructure/matcha.state") as f:
         data = json.load(f)
 
-    resource_group_name = data["resource-group-name"]
+    resource_group_name = data["resource_group_name"]
 
     client = get_azure_client()
     rg_state = client.resource_group_state(resource_group_name)
