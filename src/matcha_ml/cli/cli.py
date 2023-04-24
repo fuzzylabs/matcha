@@ -4,20 +4,18 @@ from typing import Optional
 import typer
 
 from matcha_ml import __version__
-from matcha_ml.cli import run
-from matcha_ml.cli._validation import prefix_typer_callback, region_typer_callback
+
+from matcha_ml.cli._validation import (
+    check_current_deployment_exists,
+    prefix_typer_callback,
+    region_typer_callback,
+)
+
 from matcha_ml.cli.destroy import destroy_resources
 from matcha_ml.cli.provision import provision_resources
-from matcha_ml.cli.ui.print_messages import print_status
+from matcha_ml.cli.ui.print_messages import print_error, print_status
 
 app = typer.Typer(no_args_is_help=True, pretty_exceptions_show_locals=False)
-
-# Create a group for all subcommands
-app.add_typer(
-    run.app,
-    name="run",
-    help="The run command. Default: finds and executes the pipelines run.py in the current directory if no command is passed.",
-)
 
 
 @app.command()
@@ -46,6 +44,10 @@ def provision(
     ),
 ) -> None:
     """Provision cloud resources with a template."""
+    if check_current_deployment_exists():
+        print_error(
+            "WARNING: A deployment already exists in Azure, if you continue you'll create a orphan resource - use 'matcha destroy' before trying to provision."
+        )
     provision_resources(location, prefix, password, verbose)
 
 
