@@ -102,8 +102,8 @@ class TemplateRunner:
         print_status(summary_message)
         return typer.confirm(f"Are you happy for '{verb}' to run?")
 
-    def _initialise_terraform(self) -> None:
-        """Run terraform init to initialise Terraform .
+    def _initialize_terraform(self) -> None:
+        """Run terraform init to initialize Terraform .
 
         Raises:
             MatchaTerraformError: if 'terraform init' failed.
@@ -112,7 +112,7 @@ class TemplateRunner:
             # this directory gets created after a successful init command
             print_status(
                 build_status(
-                    f"matcha {Emojis.MATCHA.value} has already been initialised. Skipping this step..."
+                    f"matcha {Emojis.MATCHA.value} has already been initialized. Skipping this step..."
                 )
             )
 
@@ -135,7 +135,7 @@ class TemplateRunner:
 
             print_status(
                 build_substep_success_status(
-                    f"{Emojis.CHECKMARK.value} Matcha {Emojis.MATCHA.value} initialised!\n"
+                    f"{Emojis.CHECKMARK.value} Matcha {Emojis.MATCHA.value} initialized!\n"
                 )
             )
 
@@ -220,7 +220,7 @@ class TemplateRunner:
         self._validate_terraform_config()
 
         if self._is_approved(verb="provision"):
-            self._initialise_terraform()
+            self._initialize_terraform()
             self._apply_terraform()
             self._show_terraform_outputs()
         else:

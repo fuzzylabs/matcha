@@ -160,8 +160,8 @@ def test_is_approved(template_runner: TemplateRunner):
         assert not template_runner._is_approved("provision")
 
 
-def test_initialise_terraform(capsys: SysCapture, template_runner: TemplateRunner):
-    """Test if service behaves as expected when initialising Terraform.
+def test_initialize_terraform(capsys: SysCapture, template_runner: TemplateRunner):
+    """Test if service behaves as expected when initializing Terraform.
 
     Args:
         capsys (SysCapture): fixture to capture stdout and stderr
@@ -172,9 +172,9 @@ def test_initialise_terraform(capsys: SysCapture, template_runner: TemplateRunne
     with mock.patch.object(
         template_runner.previous_temp_dir, "exists", return_value=True
     ):
-        expected = "has already been initialised"
+        expected = "has already been initialized"
 
-        template_runner._initialise_terraform()
+        template_runner._initialize_terraform()
 
         captured = capsys.readouterr()
 
@@ -184,8 +184,8 @@ def test_initialise_terraform(capsys: SysCapture, template_runner: TemplateRunne
         template_runner.previous_temp_dir, "exists", return_value=False
     ):
         template_runner.tfs.init = MagicMock(return_value=(0, "", ""))
-        expected = " initialised!"
-        template_runner._initialise_terraform()
+        expected = " initialized!"
+        template_runner._initialize_terraform()
 
         captured = capsys.readouterr()
 
@@ -334,7 +334,7 @@ def test_provision(capsys: SysCapture, template_runner: TemplateRunner):
     """
     template_runner._check_terraform_installation = MagicMock()
     template_runner._validate_terraform_config = MagicMock()
-    template_runner._initialise_terraform = MagicMock()
+    template_runner._initialize_terraform = MagicMock()
     template_runner._apply_terraform = MagicMock()
     template_runner._show_terraform_outputs = MagicMock()
 
@@ -344,7 +344,7 @@ def test_provision(capsys: SysCapture, template_runner: TemplateRunner):
 
         with pytest.raises(typer.Exit):
             template_runner.provision()
-            template_runner._initialise_terraform.assert_not_called()
+            template_runner._initialize_terraform.assert_not_called()
             template_runner._apply_terraform.assert_not_called()
 
             captured = capsys.readouterr()
@@ -356,7 +356,7 @@ def test_provision(capsys: SysCapture, template_runner: TemplateRunner):
 
         with does_not_raise():
             template_runner.provision()
-            template_runner._initialise_terraform.assert_called()
+            template_runner._initialize_terraform.assert_called()
             template_runner._apply_terraform.assert_called()
 
 
