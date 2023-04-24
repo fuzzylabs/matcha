@@ -107,7 +107,6 @@ class TemplateRunner:
         Raises:
             MatchaTerraformError: if 'terraform init' failed.
         """
-        print(self.previous_temp_dir)
         if self.previous_temp_dir.exists():
             # this directory gets created after a successful init command
             print_status(

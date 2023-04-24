@@ -165,26 +165,29 @@ def test_initialise_terraform(capsys: SysCapture, template_runner: TemplateRunne
         capsys (SysCapture): fixture to capture stdout and stderr
         template_runner (TemplateRunner): a TemplateRunner object instance
     """
-    with mock.patch(
-        "matcha_ml.templates.run_template.TemplateRunner.previous_temp_dir"
-    ) as mock_previous_temp_dir:
+    template_runner.previous_temp_dir = MagicMock()
 
-        with mock.patch.object(mock_previous_temp_dir, "exists", return_value=True):
-            expected = "has already been initialised"
+    with mock.patch.object(
+        template_runner.previous_temp_dir, "exists", return_value=True
+    ):
+        expected = "has already been initialised"
 
-            template_runner._initialise_terraform()
+        template_runner._initialise_terraform()
 
-            captured = capsys.readouterr()
+        captured = capsys.readouterr()
 
-            assert expected in captured.out
+        assert expected in captured.out
 
-        with mock.patch.object(mock_previous_temp_dir, "exists", return_value=False):
-            expected = " initialised!"
-            template_runner._initialise_terraform()
+    with mock.patch.object(
+        template_runner.previous_temp_dir, "exists", return_value=False
+    ):
+        template_runner.tfs.init = MagicMock(return_value=(0, "", ""))
+        expected = " initialised!"
+        template_runner._initialise_terraform()
 
-            captured = capsys.readouterr()
+        captured = capsys.readouterr()
 
-            assert expected in captured.out
+        assert expected in captured.out
 
 
 def test_check_matcha_directory_exists(
@@ -196,31 +199,24 @@ def test_check_matcha_directory_exists(
         capsys (SysCapture): fixture to capture stdout and stderr
         template_runner (TemplateRunner): a TemplateRunner object instance
     """
-    with mock.patch(
-        "matcha_ml.templates.run_template.TemplateRunner.tfs.check_matcha_directory_exists"
-    ) as mock_check_matcha_directory_exists:
-        mock_check_matcha_directory_exists.return_value = False
+    template_runner.tfs.check_matcha_directory_exists = MagicMock(return_value=False)
+    template_runner.tfs.check_matcha_directory_integrity = MagicMock(return_value=False)
+
+    with pytest.raises(typer.Exit):
         expected = "Error, the .matcha directory does not exist"
+        template_runner._check_matcha_directory_exists()
 
-        with pytest.raises(typer.Exit):
-            template_runner._check_matcha_directory_exists()
+        captured = capsys.readouterr()
 
-            captured = capsys.readouterr()
+        assert expected in captured.err
 
-            assert expected in captured.err
-
-    with mock.patch(
-        "matcha_ml.templates.run_template.TemplateRunner.tfs.check_matcha_directory_integrity"
-    ) as mock_check_matcha_directory_integrity:
-        mock_check_matcha_directory_integrity.return_value = False
+    with pytest.raises(typer.Exit):
         expected = "Error, the .matcha directory does not contain files relating to deployed resources. Please ensure you are trying to destroy resources that you have provisioned in the current working directory."
+        template_runner._check_matcha_directory_exists()
 
-        with pytest.raises(typer.Exit):
-            template_runner._check_matcha_directory_exists()
+        captured = capsys.readouterr()
 
-            captured = capsys.readouterr()
-
-            assert expected in captured.err
+        assert expected in captured.err
 
 
 def test_apply_terraform(capsys: SysCapture, template_runner: TemplateRunner):
@@ -230,22 +226,22 @@ def test_apply_terraform(capsys: SysCapture, template_runner: TemplateRunner):
         capsys (SysCapture): fixture to capture stdout and stderr
         template_runner (TemplateRunner): a TemplateRunner object instance
     """
-    with mock.patch("matcha_ml.templates.run_template.TemplateRunner.tfs") as mock_tfs:
-        mock_tfs.apply.return_value = (0, "", "")
-        expected = "Your environment has been provisioned!"
+    template_runner.tfs.apply = MagicMock(return_value=(0, "", ""))
+    expected = "Your environment has been provisioned!"
 
+    template_runner._apply_terraform()
+    captured = capsys.readouterr()
+
+    assert expected in captured.out
+
+    template_runner.tfs.apply = MagicMock(return_value=(1, "", "Apply failed"))
+
+    with pytest.raises(MatchaTerraformError) as exc_info:
         template_runner._apply_terraform()
-        captured = capsys.readouterr()
-        assert expected in captured.out
-
-        mock_tfs.apply.return_value = (1, "", "Init failed")
-
-        with pytest.raises(MatchaTerraformError) as exc_info:
-            template_runner._apply_terraform()
-            assert (
-                str(exc_info.value)
-                == "Terraform failed because of the following error: 'Apply failed'."
-            )
+        assert (
+            str(exc_info.value)
+            == "Terraform failed because of the following error: 'Apply failed'."
+        )
 
 
 def test_write_outputs_state(
@@ -262,14 +258,13 @@ def test_write_outputs_state(
         mock_output (Callable[[str, bool], Union[str, Dict[str, str]]]): the mock output
         expected_outputs (dict): expected output from terraform
     """
-    with mock.patch("matcha_ml.templates.run_template.TemplateRunner.tfs") as mock_tfs:
-        template_runner.state_file = terraform_test_config.state_file
-        mock_tfs.terraform_client.output = MagicMock(wraps=mock_output)
+    template_runner.state_file = terraform_test_config.state_file
+    template_runner.tfs.terraform_client.output = MagicMock(wraps=mock_output)
 
-        with does_not_raise():
-            template_runner._write_outputs_state()
-            with open(terraform_test_config.state_file) as f:
-                assert json.load(f) == expected_outputs
+    with does_not_raise():
+        template_runner._write_outputs_state()
+        with open(terraform_test_config.state_file) as f:
+            assert json.load(f) == expected_outputs
 
 
 def test_show_terraform_outputs(
@@ -288,16 +283,15 @@ def test_show_terraform_outputs(
         mock_output (Callable[[str, bool], Union[str, Dict[str, str]]]): the mock output
         expected_outputs (dict): expected output from terraform
     """
-    with mock.patch("matcha_ml.templates.run_template.TemplateRunner.tfs") as mock_tfs:
-        template_runner.state_file = terraform_test_config.state_file
-        mock_tfs.terraform_client.output = MagicMock(wraps=mock_output)
+    template_runner.state_file = terraform_test_config.state_file
+    template_runner.tfs.terraform_client.output = MagicMock(wraps=mock_output)
 
-        with does_not_raise():
-            template_runner._show_terraform_outputs()
-            captured = capsys.readouterr()
+    with does_not_raise():
+        template_runner._show_terraform_outputs()
+        captured = capsys.readouterr()
 
-            for output in expected_outputs:
-                assert output in captured.out
+        for output in expected_outputs:
+            assert output in captured.out
 
 
 def test_destroy_terraform(capsys: SysCapture, template_runner: TemplateRunner):
@@ -307,42 +301,40 @@ def test_destroy_terraform(capsys: SysCapture, template_runner: TemplateRunner):
         capsys (SysCapture): fixture to capture stdout and stderr
         template_runner (TemplateRunner): a TemplateRunner object instance
     """
-    with mock.patch("matcha_ml.templates.run_template.TemplateRunner.tfs") as mock_tfs:
-        mock_tfs.destroy.return_value = (0, "", "")
-        expected = "Destroying your resources"
+    template_runner.tfs.destroy = MagicMock(return_value=(0, "", ""))
 
+    expected = "Destroying your resources"
+
+    template_runner._destroy_terraform()
+
+    captured = capsys.readouterr()
+
+    template_runner.tfs.destroy.assert_called()
+
+    assert expected in captured.out
+
+    template_runner.tfs.destroy = MagicMock(return_value=(1, "", "Init failed"))
+
+    with pytest.raises(MatchaTerraformError) as exc_info:
         template_runner._destroy_terraform()
-
-        captured = capsys.readouterr()
-
-        mock_tfs.destroy.assert_called()
-
-        assert expected in captured.out
-
-        mock_tfs.destroy.return_value = (1, "", "Init failed")
-
-        with pytest.raises(MatchaTerraformError) as exc_info:
-            template_runner._destroy_terraform()
-            assert (
-                str(exc_info.value)
-                == "Terraform failed because of the following error: 'Destroy failed'."
-            )
+        assert (
+            str(exc_info.value)
+            == "Terraform failed because of the following error: 'Destroy failed'."
+        )
 
 
-def test_provision(
-    capsys: SysCapture,
-):
+def test_provision(capsys: SysCapture, template_runner: TemplateRunner):
     """Test service can provision resources using terraform.
 
     Args:
         capsys (SysCapture): fixture to capture stdout and stderr
+        template_runner (TemplateRunner): a TemplateRunner object instance
     """
-    template_runner = TemplateRunner()
     template_runner._check_terraform_installation = MagicMock()
     template_runner._validate_terraform_config = MagicMock()
-
     template_runner._initialise_terraform = MagicMock()
     template_runner._apply_terraform = MagicMock()
+    template_runner._show_terraform_outputs = MagicMock()
 
     with mock.patch("typer.confirm") as mock_confirm:
         mock_confirm.return_value = False
@@ -366,19 +358,15 @@ def test_provision(
             template_runner._apply_terraform.assert_called()
 
 
-def test_deprovision(
-    capsys: SysCapture,
-):
+def test_deprovision(capsys: SysCapture, template_runner: TemplateRunner):
     """Test service can deprovision resources using terraform.
 
     Args:
         capsys (SysCapture): fixture to capture stdout and stderr
+        template_runner (TemplateRunner): a TemplateRunner object instance
     """
-    template_runner = TemplateRunner()
-
     template_runner._check_terraform_installation = MagicMock()
     template_runner._check_matcha_directory_exists = MagicMock()
-
     template_runner._destroy_terraform = MagicMock()
 
     with mock.patch("typer.confirm") as mock_confirm:
