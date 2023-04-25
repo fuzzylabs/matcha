@@ -6,6 +6,7 @@ import typer
 import yaml
 
 from matcha_ml.cli import experiment_tracker
+from matcha_ml.cli._validation import check_current_deployment_exists
 
 
 def load_state_file() -> Dict[str, str]:
@@ -23,6 +24,7 @@ app.add_typer(
     experiment_tracker.app,
     name="experiment-tracker",
     help="The get command. Default: prints all information about the current provisioned resources.",
+    callback=check_current_deployment_exists,
 )
 
 

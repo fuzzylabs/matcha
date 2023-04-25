@@ -22,6 +22,7 @@ app.add_typer(
     get.app,
     name="get",
     help="The get command. Default: prints all information about the current provisioned resources.",
+    callback=check_current_deployment_exists,
 )
 
 
