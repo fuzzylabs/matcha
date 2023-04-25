@@ -4,38 +4,7 @@ import json
 import typer
 import yaml
 
-# from rich import print
 from matcha_ml.cli import experiment_tracker
-
-# class ResourceStack:
-#     """Resource object class."""
-
-#     deployment_exists = False
-
-#     def __init__(self) -> None:
-#         """ResourceStack constructor."""
-#         self.deployment_exists = check_current_deployment_exists()
-#         self.deployment_exists = True
-
-#         if not self.deployment_exists:
-#             return
-
-#         current_dir = os.getcwd()
-#         with open(f"{current_dir}/.matcha/infrastructure/matcha.state") as f:
-#             self.json_data = json.load(f)
-
-#     def get_resource_group(self) -> None:
-#         """ "Gets the resource group information."""
-#         return self.json_data.get("resource_group_name")
-
-#     def get_all_resource(self) -> None:
-#         return self.json_data
-
-#     def get_experiment_tracker(self) -> None:
-#         experiment_tracker_resource = {}
-
-#         experiment_tracker_resource["url"] = self.json_data.get("mlflow_tracking_url")
-#         return experiment_tracker
 
 
 def load_state_file() -> dict:
@@ -54,13 +23,13 @@ app.add_typer(
 resources = load_state_file()
 
 
-def to_json(resources: dict, names: list):
-    temp_dict = {name: resources.get(name) for name in names}
+def dict_subset_to_json(resources: dict, subset_keys: list):
+    temp_dict = {key: resources.get(key) for key in subset_keys}
     return json.dumps(temp_dict, indent=4)
 
 
-def to_yaml(resources: dict, names: list):
-    temp_dict = {name: resources.get(name) for name in names}
+def dict_subset_to_to_yaml(resources: dict, subset_keys: list):
+    temp_dict = {key: resources.get(key) for key in subset_keys}
     return yaml.dump(temp_dict)
 
 
@@ -73,18 +42,17 @@ def resource_group(
     """Gets the resource group information."""
     resource_component_names = ["resource_group_name"]
     if output == "json":
-        # to_json(resources, "resource_group_name")
-        print(to_json(resources, resource_component_names))
+        print(dict_subset_to_json(resources, resource_component_names))
     elif output == "yaml":
-        print(to_yaml(resources, resource_component_names))
+        print(dict_subset_to_to_yaml(resources, resource_component_names))
     else:
         print(f"The resource group name is: {resources.get('resource_group_name')}")
 
 
 @app.command(name="experiment-tracker")
-def experiment_tracker(resources=resources) -> None:
+def experiment_tracker() -> None:
     """Gets the resource group information."""
-    experiment_tracker.app.call_command("url", resources=resources)
+
 
 
 @app.callback(invoke_without_command=True)
