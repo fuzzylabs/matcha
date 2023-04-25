@@ -11,7 +11,7 @@ from matcha_ml.templates.build_templates.azure_template import (
     build_template_configuration,
     reuse_configuration,
 )
-from matcha_ml.templates.run_template import TerraformService
+from matcha_ml.templates.run_template import TemplateRunner
 
 # create a typer app to group all provision subcommands
 app = typer.Typer()
@@ -40,10 +40,10 @@ def provision_resources(
         config = build_template_configuration(location, prefix, password)
         build_template(config, template, destination, verbose)
 
-    # create a terraform service to provision resources
-    tfs = TerraformService()
+    # create a runner for provisioning resource with Terraform service.
+    template_runner = TemplateRunner()
 
     # provision resources by running the template
-    tfs.provision()
+    template_runner.provision()
 
     print_status(build_step_success_status("Provisioning is complete!"))

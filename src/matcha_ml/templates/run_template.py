@@ -1,12 +1,7 @@
 """Run terraform templates to provision and deprovision resources."""
-import dataclasses
-import glob
 import json
 import os
-from pathlib import Path
-from typing import Optional
 
-import python_terraform
 import typer
 
 from matcha_ml.cli.ui.emojis import Emojis
@@ -18,6 +13,7 @@ from matcha_ml.cli.ui.status_message_builders import (
     build_substep_success_status,
 )
 from matcha_ml.errors import MatchaTerraformError
+from matcha_ml.services.terraform_service import TerraformService
 
 OUTPUTS = {
     "mlflow_tracking_url",
@@ -37,66 +33,20 @@ OUTPUTS = {
 SPINNER = "dots"
 
 
-@dataclasses.dataclass
-class TerraformConfig:
-    """Configuration required for terraform."""
+class TemplateRunner:
+    """A Runner class provides methods that interface with the Terraform service to facilitate the provisioning and deprovisioning of resources."""
 
-    # Path to terraform template are stored
-    working_dir: str = os.path.join(os.getcwd(), ".matcha", "infrastructure")
+    tfs: TerraformService = TerraformService()
+    previous_temp_dir = tfs.get_previous_temp_dir()
+    state_file = tfs.config.state_file
 
-    # state file to store output after terraform apply
-    state_file: str = os.path.join(working_dir, "matcha.state")
-
-    # variables file
-    var_file: str = os.path.join(working_dir, "terraform.tfvars.json")
-
-    # if set to False terraform output will be printed to stdout/stderr
-    # else no output will be printed and (ret_code, out, err) tuple will be returned
-    capture_output: bool = True
-
-
-class TerraformService:
-    """TerraformService class to provision and deprovision resources."""
-
-    # configuration required for terraform
-    config: TerraformConfig = TerraformConfig()
-
-    # terraform client
-    _terraform_client: Optional[python_terraform.Terraform] = None
-
-    @property
-    def terraform_client(self) -> python_terraform.Terraform:
-        """Initialize and/or return the terraform client.
-
-        Returns:
-            python_terraform.Terraform: The terraform client.
-        """
-        if self._terraform_client is None:
-            self._terraform_client = python_terraform.Terraform(
-                working_dir=self.config.working_dir, var_file=self.config.var_file
-            )
-        return self._terraform_client
-
-    def _is_terraform_installed(self) -> bool:
-        """Check if terraform is installed on host machine.
-
-        Returns:
-            bool: True if terraform is installed, False otherwise.
-        """
-        try:
-            self.terraform_client.cmd(cmd="-help")
-        except Exception:
-            return False
-
-        return True
-
-    def check_installation(self) -> None:
+    def _check_terraform_installation(self) -> None:
         """Checks if terraform is installed on the host system.
 
         Raises:
-            Exit: if terraform is not installed.
+            typer.Exit: if terraform is not installed.
         """
-        if not self._is_terraform_installed():
+        if not self.tfs.check_installation():
             print_error(f"{Emojis.CROSS.value} Terraform is not installed")
             print_error(
                 "Terraform is required for to run and was not found installed on your machine. "
@@ -104,57 +54,25 @@ class TerraformService:
             )
             raise typer.Exit()
 
-    def check_matcha_directory_integrity(self, directory_path: str) -> bool:
-        """Checks the integrity of the .matcha directory.
-
-        Args:
-            directory_path (str): .matcha directory path
-
-        Returns:
-            bool: False if .matcha directory is empty else True.
-        """
-        return len(glob.glob(os.path.join(directory_path, "*"))) != 0
-
-    def check_matcha_directory_exists(self) -> None:
-        """Checks if .matcha directory exists within the current working directory.
-
-        Raises:
-            Exit: if .matcha directory does not exist or is empty.
-        """
-        matcha_dir_path = os.path.join(os.getcwd(), ".matcha")
-        if not os.path.isdir(matcha_dir_path):
-            print_error(
-                f"Error, the .matcha directory does not exist in {os.getcwd()} . Please ensure you are trying to destroy resources that you have provisioned in the current working directory."
-            )
-            raise typer.Exit()
-
-        if not self.check_matcha_directory_integrity(matcha_dir_path):
-            print_error(
-                "Error, the .matcha directory does not contain files relating to deployed resources. Please ensure you are trying to destroy resources that you have provisioned in the current working directory."
-            )
-            raise typer.Exit()
-
-    def validate_config(self) -> None:
+    def _validate_terraform_config(self) -> None:
         """Validate the configuration used for creating resources.
 
         Raises:
-            Exit: If `terraform.tfvars.json` file not found in current directory.
+            typer.Exit: if `terraform.tfvars.json` file not found in current directory.
         """
-        var_file = Path(self.config.var_file)
-
-        if not var_file.exists():
+        if not self.tfs.validate_config():
             print_error(
                 "The file terraform.tfvars.json was not found in the "
-                f"current directory at {self.config.var_file}. Please "
+                f"current directory at {self.tfs.config.var_file}. Please "
                 "verify if it exists."
             )
             raise typer.Exit()
 
-    def is_approved(self, verb: str) -> bool:
+    def _is_approved(self, verb: str) -> bool:
         """Get approval from user to modify resources on cloud.
 
         Args:
-            verb: The verb to use in the approval message.
+            verb (str): the verb to use in the approval message.
 
         Returns:
             bool: True if user approves, False otherwise.
@@ -184,17 +102,14 @@ class TerraformService:
         print_status(summary_message)
         return typer.confirm(f"Are you happy for '{verb}' to run?")
 
-    def _init_and_apply(self) -> None:
-        """Run terraform init and apply to create resources on cloud.
+    def _initialize_terraform(self) -> None:
+        """Run terraform init to initialize Terraform .
 
         Raises:
-            Exit: if terraform is not installed.
+            MatchaTerraformError: if 'terraform init' failed.
         """
-        # this directory gets created after a successful init command
-        previous_temp_dir = Path(
-            os.path.join(self.terraform_client.working_dir, ".temp")
-        )
-        if previous_temp_dir.exists():
+        if self.previous_temp_dir.exists():
+            # this directory gets created after a successful init command
             print_status(
                 build_status(
                     f"matcha {Emojis.MATCHA.value} has already been initialized. Skipping this step..."
@@ -208,22 +123,15 @@ class TerraformService:
                 )
             )
 
-            # run terraform init
             with Spinner("Initializing"):
-                ret_code, _, _ = self.terraform_client.init(
-                    capture_output=self.config.capture_output
-                )
+                ret_code, _, err = self.tfs.init()
 
-                ret_code, _, err = self.terraform_client.init(
-                    capture_output=self.config.capture_output,
-                    raise_on_error=False,
-                )
                 if ret_code != 0:
                     print_error("The command 'terraform init' failed.")
                     raise MatchaTerraformError(tf_error=err)
 
-                # Create a directory to avoid running init multiple times
-                previous_temp_dir.mkdir(parents=True, exist_ok=True)
+            # Create a directory to avoid running init multiple times
+            self.previous_temp_dir.mkdir(parents=True, exist_ok=True)
 
             print_status(
                 build_substep_success_status(
@@ -231,19 +139,34 @@ class TerraformService:
                 )
             )
 
-        print_status(
-            build_status(f"{Emojis.WAITING.value} Provisioning your resources...\n")
-        )
+    def _check_matcha_directory_exists(self) -> None:
+        """Checks if .matcha directory exists within the current working directory.
 
-        # once terraform init is success, call terraform apply
-        with Spinner("Applying"):
-            ret_code, _, err = self.terraform_client.apply(
-                input=False,
-                capture_output=self.config.capture_output,
-                raise_on_error=False,
-                skip_plan=True,
-                auto_approve=True,
+        Raises:
+            typer.Exit: if the .matcha directory does not exist.
+            typer.Exit: if the .matcha directory does not contain the required files to deploy resources.
+        """
+        if not self.tfs.check_matcha_directory_exists():
+            print_error(
+                f"Error, the .matcha directory does not exist in {os.getcwd()} . Please ensure you are trying to destroy resources that you have provisioned in the current working directory."
             )
+            raise typer.Exit()
+
+        if not self.tfs.check_matcha_directory_integrity():
+            print_error(
+                "Error, the .matcha directory does not contain files relating to deployed resources. Please ensure you are trying to destroy resources that you have provisioned in the current working directory."
+            )
+            raise typer.Exit()
+
+    def _apply_terraform(self) -> None:
+        """Run terraform apply to create resources on cloud.
+
+        Raises:
+            MatchaTerraformError: if 'terraform apply' failed.
+        """
+        with Spinner("Applying"):
+            ret_code, _, err = self.tfs.apply()
+
             if ret_code != 0:
                 raise MatchaTerraformError(tf_error=err)
 
@@ -253,20 +176,53 @@ class TerraformService:
             )
         )
 
+    def _write_outputs_state(self) -> None:
+        """Write the outputs of the terraform deployment to the state json file."""
+        state_outputs = {
+            name: self.tfs.terraform_client.output(name, full_value=True)
+            for name in OUTPUTS
+        }
+        with open(self.state_file, "w") as fp:
+            json.dump(state_outputs, fp, indent=4)
+
+    def _show_terraform_outputs(self) -> None:
+        """Print the terraform outputs from state file."""
+        self._write_outputs_state()
+        print_status(build_status("Here are the endpoints for what's been provisioned"))
+        # print terraform output from state file
+        with open(self.state_file) as fp:
+            print_json(fp.read())
+
+    def _destroy_terraform(self) -> None:
+        """Destroy the provisioned resources.
+
+        Raises:
+            MatchaTerraformError: if 'terraform destroy' failed.
+        """
+        print()
+        print_status(
+            build_status(f"{Emojis.WAITING.value} Destroying your resources...")
+        )
+        print()
+        with Spinner("Destroying"):
+            ret_code, _, err = self.tfs.destroy()
+
+            if ret_code != 0:
+                raise MatchaTerraformError(tf_error=err)
+
     def provision(self) -> None:
         """Provision resources required for the deployment.
 
         Raises:
-            Exit: if approval is not given by user.
+            typer.Exit: if approval is not given by user.
         """
-        self.check_installation()
+        self._check_terraform_installation()
+        self._validate_terraform_config()
 
-        self.validate_config()
-
-        if self.is_approved(verb="provision"):
-            self._init_and_apply()
-            self.show_terraform_outputs()
-
+        if self._is_approved(verb="provision"):
+            self._initialize_terraform()
+            self._apply_terraform()
+            self._show_terraform_outputs()
         else:
             print_status(
                 build_status(
@@ -275,38 +231,18 @@ class TerraformService:
             )
             raise typer.Exit()
 
-    def _destroy(self) -> None:
-        """Destroy the provisioned resources."""
-        print()
-        print_status(
-            build_status(f"{Emojis.WAITING.value} Destroying your resources...")
-        )
-        print()
-
-        with Spinner("Destroying"):
-            # Reference: https://github.com/beelit94/python-terraform/issues/108
-            ret_code, _, err = self.terraform_client.destroy(
-                capture_output=self.config.capture_output,
-                raise_on_error=False,
-                force=python_terraform.IsNotFlagged,
-                auto_approve=True,
-            )
-            if ret_code != 0:
-                raise MatchaTerraformError(tf_error=err)
-
     def deprovision(self) -> None:
-        """Deprovision the resources.
+        """Destroy the provisioned resources.
 
         Raises:
-            Exit: if approval is not given by user.
+            typer.Exit: if approval is not given by user.
         """
-        self.check_matcha_directory_exists()
+        self._check_terraform_installation()
 
-        self.check_installation()
+        self._check_matcha_directory_exists()
 
-        if self.is_approved(verb="destroy"):
-            self._destroy()
-
+        if self._is_approved(verb="destroy"):
+            self._destroy_terraform()
         else:
             print_status(
                 build_status(
@@ -314,24 +250,3 @@ class TerraformService:
                 )
             )
             raise typer.Exit()
-
-    def write_outputs_state(self) -> None:
-        """Write the outputs of the terraform deployment to the state json file."""
-        state_outputs = {
-            name: self.terraform_client.output(name, full_value=True)
-            for name in OUTPUTS
-        }
-
-        # dump specific terraform output to state file
-        with open(self.config.state_file, "w") as fp:
-            json.dump(state_outputs, fp, indent=4)
-
-    def show_terraform_outputs(self) -> None:
-        """Print the terraform outputs from state file."""
-        # copy terraform output to state file
-        self.write_outputs_state()
-
-        print_status(build_status("Here are the endpoints for what's been provisioned"))
-        # print terraform output from state file
-        with open(self.config.state_file) as fp:
-            print_json(fp.read())
