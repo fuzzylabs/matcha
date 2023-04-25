@@ -2,7 +2,9 @@
 import json
 
 import typer
+import yaml
 
+# from rich import print
 from matcha_ml.cli import experiment_tracker
 
 # class ResourceStack:
@@ -38,7 +40,7 @@ from matcha_ml.cli import experiment_tracker
 
 def load_state_file() -> dict:
     with open(".matcha/infrastructure/matcha.state") as f:
-        return f.read()
+        return json.load(f)
 
 
 app = typer.Typer()
@@ -52,18 +54,37 @@ app.add_typer(
 resources = load_state_file()
 
 
+def to_json(resources: dict, names: list):
+    temp_dict = {name: resources.get(name) for name in names}
+    return json.dumps(temp_dict, indent=4)
+
+
+def to_yaml(resources: dict, names: list):
+    temp_dict = {name: resources.get(name) for name in names}
+    return yaml.dump(temp_dict)
+
+
 @app.command(name="resource-group")
-def resource_group() -> None:
-    """Gets the resource group information."""
-    print(
-        f"The resource group name is: {json.loads(resources).get('resource_group_name')}"
+def resource_group(
+    output: str = typer.Option(
+        default=None,
     )
-
-
-@app.command(name="experiment-tracker")
-def experiment_tracker(resources=resources) -> None:
+) -> None:
     """Gets the resource group information."""
-    experiment_tracker.app.call_command("url", resources=resources)
+    resource_component_names = ["resource_group_name"]
+    if output == "json":
+        # to_json(resources, "resource_group_name")
+        print(to_json(resources, resource_component_names))
+    elif output == "yaml":
+        print(to_yaml(resources, resource_component_names))
+    else:
+        print(f"The resource group name is: {resources.get('resource_group_name')}")
+
+
+# @app.command(name="experiment-tracker")
+# def experiment_tracker(resources=resources) -> None:
+#     """Gets the resource group information."""
+#     experiment_tracker.app.call_command("url", resources=resources)
 
 
 @app.callback(invoke_without_command=True)
