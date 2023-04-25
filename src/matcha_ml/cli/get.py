@@ -81,10 +81,10 @@ def resource_group(
         print(f"The resource group name is: {resources.get('resource_group_name')}")
 
 
-# @app.command(name="experiment-tracker")
-# def experiment_tracker(resources=resources) -> None:
-#     """Gets the resource group information."""
-#     experiment_tracker.app.call_command("url", resources=resources)
+@app.command(name="experiment-tracker")
+def experiment_tracker(resources=resources) -> None:
+    """Gets the resource group information."""
+    experiment_tracker.app.call_command("url", resources=resources)
 
 
 @app.callback(invoke_without_command=True)
