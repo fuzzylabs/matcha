@@ -29,6 +29,7 @@ def default_callback(
     context: typer.Context,
     output: str = typer.Option(
         default=None,
+        help="The format of your output, e.g., 'json', 'yaml'",
     ),
 ) -> None:
     """Return all the resources if no subcommand is passed.

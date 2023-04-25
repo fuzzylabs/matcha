@@ -14,6 +14,7 @@ matcha_state_service = MatchaStateService()
 def experiment_tracker_url(
     output: str = typer.Option(
         default=None,
+        help="The format of your output, e.g., 'json', 'yaml'",
     )
 ) -> None:
     """Prints the URL for the experiment tracker provisioned."""
@@ -28,6 +29,7 @@ def experiment_tracker_url(
 def experiment_tracker_username(
     output: str = typer.Option(
         default=None,
+        help="The format of your output, e.g., 'json', 'yaml'",
     )
 ) -> None:
     """Prints the login username for the experiment tracker provisioned."""
@@ -42,6 +44,7 @@ def experiment_tracker_username(
 def experiment_tracker_password(
     output: str = typer.Option(
         default=None,
+        help="The format of your output, e.g., 'json', 'yaml'",
     )
 ) -> None:
     """Prints the login password for the experiment tracker provisioned."""
@@ -57,13 +60,14 @@ def default_callback(
     context: typer.Context,
     output: str = typer.Option(
         default=None,
+        help="The format of your output, e.g., 'json', 'yaml'",
     ),
 ) -> None:
     """Return all the resources if no subcommand is passed.
 
     Args:
         context (typer.Context): data about the current execution
-        output (typer.Option): the format of the output specificed by the user.
+        output (typer.Option): the format of the output specified by the user.
     """
     if context.invoked_subcommand is None:
         resource_component_names = [
