@@ -1,24 +1,10 @@
 """Get command CLI."""
-import json
-from typing import Dict, List
-
 import typer
-import yaml
 
 from matcha_ml.cli import experiment_tracker
-from matcha_ml.cli._validation import check_current_deployment_exists
-from matcha_ml.cli.ui.print_messages import print_error
-
-
-def load_state_file() -> Dict[str, str]:
-    """Load the matcha.state file into a dictionary.
-
-    Returns:
-        Dict[str, str]: matcha.state file in dictionary format.
-    """
-    with open(".matcha/infrastructure/matcha.state") as f:
-        return dict(json.load(f))
-
+from matcha_ml.cli.ui.print_messages import print_resource_output
+from matcha_ml.cli.ui.resource_message_builders import build_resource_output
+from matcha_ml.services.matcha_state import MatchaStateService
 
 app = typer.Typer()
 app.add_typer(
@@ -28,35 +14,7 @@ app.add_typer(
 )
 
 
-resources = load_state_file()
-
-
-def dict_subset_to_json(resources: Dict[str, str], subset_keys: List[str]) -> str:
-    """Return a subset of the resources as str in JSON format.
-
-    Args:
-        resources (Dict[str, str]): matcha.state file in dictionary format.
-        subset_keys (List[str]): a list of keys for filtering the resources.
-
-    Returns:
-        str: a subset of the resources as str in JSON format.
-    """
-    temp_dict = {key: resources.get(key) for key in subset_keys}
-    return json.dumps(temp_dict, indent=4)
-
-
-def dict_subset_to_to_yaml(resources: Dict[str, str], subset_keys: List[str]) -> str:
-    """Return a subset of the resources as str in yaml format.
-
-    Args:
-        resources (Dict[str, str]): matcha.state file in dictionary format.
-        subset_keys (List[str]): a list of keys for filtering the resources.
-
-    Returns:
-        str: a subset of the resources as str in yaml format.
-    """
-    temp_dict = {key: resources.get(key) for key in subset_keys}
-    return str(yaml.dump(temp_dict))
+matcha_state_service = MatchaStateService()
 
 
 @app.command(name="resource-group")
@@ -67,24 +25,32 @@ def resource_group(
 ) -> None:
     """Gets the resource group information."""
     resource_component_names = ["resource_group_name"]
-    if output == "json":
-        print(dict_subset_to_json(resources, resource_component_names))
-    elif output == "yaml":
-        print(dict_subset_to_to_yaml(resources, resource_component_names))
-    else:
-        print(f"The resource group name is: {resources.get('resource_group_name')}")
+    resources = matcha_state_service.fetch_resources_from_state_file(
+        resource_component_names
+    )
+    resource_output = build_resource_output(resources=resources, output_format=output)
+    print_resource_output(resource_output, output_format=output)
 
 
 @app.callback(invoke_without_command=True)
-def default_callback(context: typer.Context) -> None:
+def default_callback(
+    context: typer.Context,
+    output: str = typer.Option(
+        default=None,
+    ),
+) -> None:
     """Return all the resources if no subcommand is passed.
 
     Args:
         context (typer.Context): data about the current execution
+        output (typer.Option): the format of the output specified by the user.
     """
-    if not check_current_deployment_exists():
-        print_error("Error, no resources are currently provisioned.")
-        raise typer.Exit()
-
+    # if not check_current_deployment_exists():
+    #     print_error("Error, no resources are currently provisioned.")
+    #     raise typer.Exit()
     if context.invoked_subcommand is None:
-        print(f"All the provisioned resource: {resources}")
+        resources = matcha_state_service.fetch_resources_from_state_file()
+        resource_output = build_resource_output(
+            resources=resources, output_format=output
+        )
+        print_resource_output(resource_output, output_format=output)
