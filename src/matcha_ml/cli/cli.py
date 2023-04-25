@@ -34,7 +34,7 @@ def provision(
         help="The region where your resources will be provisioned, e.g., 'ukwest'",
     ),
     prefix: str = typer.Option(
-        prompt="Your resources need a name (a alphanumerical prefix; 3-24 character limit), what should matcha call them?",
+        prompt="Your resources need a name (an alphanumerical prefix; 3-11 character limit), what should matcha call them?",
         callback=prefix_typer_callback,
         default="matcha",
         help="A unique prefix for your resources.",

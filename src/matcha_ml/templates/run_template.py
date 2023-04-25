@@ -99,7 +99,7 @@ class TerraformService:
         if not self._is_terraform_installed():
             print_error(f"{Emojis.CROSS.value} Terraform is not installed")
             print_error(
-                "Terraform is required for to run and was not found installed on your machine."
+                "Terraform is required for to run and was not found installed on your machine. "
                 "Please visit https://learn.hashicorp.com/tutorials/terraform/install-cli to install it."
             )
             raise typer.Exit()
@@ -178,7 +178,7 @@ class TerraformService:
                 ),
                 ("ZenServer", "A zenml server required for remote orchestration"),
             ],
-            footer=f"{verb.capitalize()}ing the resources may take up to 20 minutes. May we suggest you to grab a cup of {Emojis.MATCHA.value}?",
+            footer=f"{verb.capitalize()}ing the resources may take approximately 20 minutes. May we suggest you grab a cup of {Emojis.MATCHA.value}?",
         )
 
         print_status(summary_message)
@@ -197,7 +197,7 @@ class TerraformService:
         if previous_temp_dir.exists():
             print_status(
                 build_status(
-                    f"matcha {Emojis.MATCHA.value} has already been initialised. Skipping this step..."
+                    f"matcha {Emojis.MATCHA.value} has already been initialized. Skipping this step..."
                 )
             )
 
@@ -227,7 +227,7 @@ class TerraformService:
 
             print_status(
                 build_substep_success_status(
-                    f"{Emojis.CHECKMARK.value} Matcha {Emojis.MATCHA.value} initialised!\n"
+                    f"{Emojis.CHECKMARK.value} Matcha {Emojis.MATCHA.value} initialized!\n"
                 )
             )
 
