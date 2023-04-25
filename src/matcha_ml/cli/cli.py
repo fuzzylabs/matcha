@@ -4,13 +4,11 @@ from typing import Optional
 import typer
 
 from matcha_ml import __version__
-
 from matcha_ml.cli._validation import (
     check_current_deployment_exists,
     prefix_typer_callback,
     region_typer_callback,
 )
-
 from matcha_ml.cli.destroy import destroy_resources
 from matcha_ml.cli.provision import provision_resources
 from matcha_ml.cli.ui.print_messages import print_error, print_status
@@ -27,7 +25,7 @@ def provision(
         help="The region where your resources will be provisioned, e.g., 'ukwest'",
     ),
     prefix: str = typer.Option(
-        prompt="Your resources need a name (a alphanumerical prefix; 3-24 character limit), what should matcha call them?",
+        prompt="Your resources need a name (an alphanumerical prefix; 3-11 character limit), what should matcha call them?",
         callback=prefix_typer_callback,
         default="matcha",
         help="A unique prefix for your resources.",
