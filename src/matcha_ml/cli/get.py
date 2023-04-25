@@ -1,5 +1,6 @@
 """Get command CLI."""
 import json
+from typing import Dict, List
 
 import typer
 import yaml
@@ -7,9 +8,14 @@ import yaml
 from matcha_ml.cli import experiment_tracker
 
 
-def load_state_file() -> dict:
+def load_state_file() -> Dict[str, str]:
+    """Load the matcha.state file into a dictionary.
+
+    Returns:
+        Dict[str, str]: matcha.state file in dictionary format.
+    """
     with open(".matcha/infrastructure/matcha.state") as f:
-        return json.load(f)
+        return dict(json.load(f))
 
 
 app = typer.Typer()
@@ -23,14 +29,32 @@ app.add_typer(
 resources = load_state_file()
 
 
-def dict_subset_to_json(resources: dict, subset_keys: list):
+def dict_subset_to_json(resources: Dict[str, str], subset_keys: List[str]) -> str:
+    """Return a subset of the resources as str in JSON format.
+
+    Args:
+        resources (Dict[str, str]): matcha.state file in dictionary format.
+        subset_keys (List[str]): a list of keys for filtering the resources.
+
+    Returns:
+        str: a subset of the resources as str in JSON format.
+    """
     temp_dict = {key: resources.get(key) for key in subset_keys}
     return json.dumps(temp_dict, indent=4)
 
 
-def dict_subset_to_to_yaml(resources: dict, subset_keys: list):
+def dict_subset_to_to_yaml(resources: Dict[str, str], subset_keys: List[str]) -> str:
+    """Return a subset of the resources as str in yaml format.
+
+    Args:
+        resources (Dict[str, str]): matcha.state file in dictionary format.
+        subset_keys (List[str]): a list of keys for filtering the resources.
+
+    Returns:
+        str: a subset of the resources as str in yaml format.
+    """
     temp_dict = {key: resources.get(key) for key in subset_keys}
-    return yaml.dump(temp_dict)
+    return str(yaml.dump(temp_dict))
 
 
 @app.command(name="resource-group")
@@ -47,12 +71,6 @@ def resource_group(
         print(dict_subset_to_to_yaml(resources, resource_component_names))
     else:
         print(f"The resource group name is: {resources.get('resource_group_name')}")
-
-
-@app.command(name="experiment-tracker")
-def experiment_tracker() -> None:
-    """Gets the resource group information."""
-
 
 
 @app.callback(invoke_without_command=True)
