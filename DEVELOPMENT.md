@@ -103,7 +103,7 @@ Pre-requisite: [Terraform](https://developer.hashicorp.com/terraform/tutorials/a
 Initialise terraform module:
 
 ```bash
-cd src/infrastructure
+cd src/matcha_ml/infrastructure
 terraform init
 ```
 
