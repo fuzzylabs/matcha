@@ -5,6 +5,7 @@ import os
 from typer.testing import CliRunner
 
 from matcha_ml.cli.cli import app
+from matcha_ml.cli.ui.resource_message_builders import build_resource_output
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -21,11 +22,9 @@ def test_cli_get_command_help(runner: CliRunner):
     # Exit code 0 means there was no error
     assert result.exit_code == 0
 
-    print(result.stdout)
-
     # Assert string is present in cli output
     assert (
-        " The get command. Default: prints all information about the current"
+        "The get command. Default: prints all information about the current"
         in result.stdout
     )
 
@@ -60,13 +59,14 @@ def test_cli_get_command(
         "resource_group_name": "test_resources",
     }
 
-    with open("matcha.state", "w") as f:
+    with open(os.path.join(matcha_infrastructure_dir, "matcha.state"), "w") as f:
         json.dump(terraform_outputs, f)
 
-    # Invoke provision command
+    expected = build_resource_output(terraform_outputs)
+
     result = runner.invoke(app, ["get"])
 
     # Exit code 0 means there was no error
     assert result.exit_code == 0
-    print(result.stdout)
-    assert False
+    expected = build_resource_output(terraform_outputs)
+    assert expected in result.stdout

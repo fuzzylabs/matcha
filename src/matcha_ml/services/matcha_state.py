@@ -7,8 +7,6 @@ from typing import Dict, List, Optional
 class MatchaStateService:
     """A matcha state service for handling to matcha.state file."""
 
-    # _state: Optional[Dict[str, str]] = None
-
     def __init__(self) -> None:
         """A constructor for the service which loads the state file."""
         if os.path.isfile(".matcha/infrastructure/matcha.state"):
