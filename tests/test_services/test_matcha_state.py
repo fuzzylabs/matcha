@@ -29,7 +29,7 @@ def mock_state_file(matcha_testing_directory: str):
     matcha_infrastructure_dir = os.path.join(".matcha", "infrastructure")
     os.makedirs(matcha_infrastructure_dir)
 
-    state_file = {
+    state_file_resources = {
         "mlflow_tracking_url": "mlflow_test_url",
         "zenml_storage_path": "zenml_test_storage_path",
         "zenml_connection_string": "zenml_test_connection_string",
@@ -45,7 +45,7 @@ def mock_state_file(matcha_testing_directory: str):
     }
 
     with open(os.path.join(matcha_infrastructure_dir, "matcha.state"), "w") as f:
-        json.dump(state_file, f)
+        json.dump(state_file_resources, f)
 
 
 @pytest.fixture
