@@ -21,7 +21,7 @@ app = typer.Typer(no_args_is_help=True, pretty_exceptions_show_locals=False)
 app.add_typer(
     get.app,
     name="get",
-    help="The get command. Default: prints all information about the current provisioned resources.",
+    help="Get information about the resources you've provisioned. Default: outputs all information about the current provisioned resources.",
 )
 
 

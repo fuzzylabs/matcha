@@ -80,10 +80,7 @@ def test_cli_get_command_help(runner: CliRunner):
     assert result.exit_code == 0
 
     # Assert string is present in cli output
-    assert (
-        "The get command. Default: prints all information about the current"
-        in result.stdout
-    )
+    assert "Get information about the resources you've provisioned." in result.stdout
 
 
 def test_cli_get_command(runner, expected_outputs: dict):
