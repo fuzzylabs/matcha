@@ -3,14 +3,16 @@ import json
 import os
 from typing import Dict, List, Optional
 
+MATCHA_STATE_DIR = os.path.join(".matcha", "infrastructure", "matcha.state")
+
 
 class MatchaStateService:
     """A matcha state service for handling to matcha.state file."""
 
     def __init__(self) -> None:
         """A constructor for the service which loads the state file."""
-        if os.path.isfile(".matcha/infrastructure/matcha.state"):
-            with open(".matcha/infrastructure/matcha.state") as f:
+        if os.path.isfile(MATCHA_STATE_DIR):
+            with open(MATCHA_STATE_DIR) as f:
                 self._state = dict(json.load(f))
 
     @property
