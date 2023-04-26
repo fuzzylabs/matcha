@@ -56,18 +56,30 @@ def expected_outputs() -> dict:
         dict: expected output
     """
     outputs = {
-        "mlflow_tracking_url": "mlflow_test_url",
-        "zenml_storage_path": "zenml_test_storage_path",
-        "zenml_connection_string": "zenml_test_connection_string",
-        "k8s_context": "k8s_test_context",
-        "azure_container_registry": "azure_container_registry",
-        "azure_registry_name": "azure_registry_name",
-        "zen_server_url": "zen_server_url",
-        "zen_server_username": "zen_server_username",
-        "zen_server_password": "zen_server_password",
-        "seldon_workloads_namespace": "test_seldon_workloads_namespace",
-        "seldon_base_url": "test_seldon_base_url",
-        "resource_group_name": "test_resources",
+        "experiment_tracker": {
+            "mlflow_tracking_url": "mlflow_test_url",
+        },
+        "pipeline": {
+            "zenml_storage_path": "zenml_test_storage_path",
+            "zenml_connection_string": "zenml_test_connection_string",
+            "zen_server_url": "zen_server_url",
+            "zen_server_username": "zen_server_username",
+            "zen_server_password": "zen_server_password",
+        },
+        "model_deployer": {
+            "seldon_workloads_namespace": "test_seldon_workloads_namespace",
+            "seldon_base_url": "test_seldon_base_url",
+        },
+        "cloud_service": {
+            "resource_group_name": "test_resources",
+        },
+        "orchestrator": {
+            "k8s_context": "k8s_test_context",
+        },
+        "container_registry": {
+            "azure_container_registry": "azure_container_registry",
+            "azure_registry_name": "azure_registry_name",
+        },
     }
 
     return outputs

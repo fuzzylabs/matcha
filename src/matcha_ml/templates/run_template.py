@@ -16,18 +16,31 @@ from matcha_ml.errors import MatchaTerraformError
 from matcha_ml.services.terraform_service import TerraformService
 
 OUTPUTS = {
-    "mlflow_tracking_url",
-    "zenml_storage_path",
-    "zenml_connection_string",
-    "k8s_context",
-    "azure_container_registry",
-    "azure_registry_name",
-    "zen_server_url",
-    "zen_server_username",
-    "zen_server_password",
-    "seldon_workloads_namespace",
-    "seldon_base_url",
-    "resource_group_name",
+    "experiment_tracker": {
+        "mlflow_tracking_url",
+    },
+    "pipeline": {
+        "zenml_storage_path",
+        "zenml_storage_path",
+        "zenml_connection_string",
+        "zen_server_url",
+        "zen_server_username",
+        "zen_server_password",
+    },
+    "model_deployer": {
+        "seldon_workloads_namespace",
+        "seldon_base_url",
+    },
+    "cloud_service": {
+        "resource_group_name",
+    },
+    "orchestrator": {
+        "k8s_context",
+    },
+    "container_registry": {
+        "azure_container_registry",
+        "azure_registry_name",
+    },
 }
 
 SPINNER = "dots"
@@ -178,10 +191,14 @@ class TemplateRunner:
 
     def _write_outputs_state(self) -> None:
         """Write the outputs of the terraform deployment to the state json file."""
-        state_outputs = {
-            name: self.tfs.terraform_client.output(name, full_value=True)
-            for name in OUTPUTS
-        }
+        state_outputs = {}
+        for group_name, group_set in OUTPUTS.items():
+            group_outputs = {
+                name: self.tfs.terraform_client.output(name, full_value=True)
+                for name in group_set
+            }
+            state_outputs[group_name] = group_outputs
+
         with open(self.state_file, "w") as fp:
             json.dump(state_outputs, fp, indent=4)
 
