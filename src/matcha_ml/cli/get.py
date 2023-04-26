@@ -1,8 +1,9 @@
 """Get command CLI."""
 import typer
 
+from matcha_ml.cli._validation import check_current_deployment_exists
 from matcha_ml.cli.resources import experiment_tracker, resource_group
-from matcha_ml.cli.ui.print_messages import print_resource_output
+from matcha_ml.cli.ui.print_messages import print_error, print_resource_output
 from matcha_ml.cli.ui.resource_message_builders import build_resource_output
 from matcha_ml.services.matcha_state import MatchaStateService
 
@@ -38,9 +39,9 @@ def default_callback(
         context (typer.Context): data about the current execution
         output (typer.Option): the format of the output specified by the user.
     """
-    # if not check_current_deployment_exists():
-    #     print_error("Error, no resources are currently provisioned.")
-    #     raise typer.Exit()
+    if not check_current_deployment_exists():
+        print_error("Error, no resources are currently provisioned.")
+        raise typer.Exit()
     if context.invoked_subcommand is None:
         resources = matcha_state_service.fetch_resources_from_state_file()
         resource_output = build_resource_output(

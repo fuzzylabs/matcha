@@ -1,5 +1,6 @@
 """The matcha state interface."""
 import json
+import os
 from typing import Dict, List, Optional
 
 
@@ -10,8 +11,9 @@ class MatchaStateService:
 
     def __init__(self) -> None:
         """A constructor for the service which loads the state file."""
-        with open(".matcha/infrastructure/matcha.state") as f:
-            self._state = dict(json.load(f))
+        if os.path.isfile(".matcha/infrastructure/matcha.state"):
+            with open(".matcha/infrastructure/matcha.state") as f:
+                self._state = dict(json.load(f))
 
     @property
     def state_file(self) -> Dict[str, str]:
