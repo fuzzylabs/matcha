@@ -7,8 +7,6 @@ from matcha_ml.services.matcha_state import MatchaStateService
 
 app = typer.Typer()
 
-matcha_state_service = MatchaStateService()
-
 
 @app.command("url")
 def experiment_tracker_url(
@@ -18,6 +16,7 @@ def experiment_tracker_url(
     )
 ) -> None:
     """Prints the URL for the experiment tracker provisioned."""
+    matcha_state_service = MatchaStateService()
     resources = matcha_state_service.fetch_resources_from_state_file(
         ["mlflow_tracking_url"]
     )
@@ -33,6 +32,7 @@ def experiment_tracker_username(
     )
 ) -> None:
     """Prints the login username for the experiment tracker provisioned."""
+    matcha_state_service = MatchaStateService()
     resources = matcha_state_service.fetch_resources_from_state_file(
         ["mlflow_tracking_username"]
     )
@@ -48,6 +48,7 @@ def experiment_tracker_password(
     )
 ) -> None:
     """Prints the login password for the experiment tracker provisioned."""
+    matcha_state_service = MatchaStateService()
     resources = matcha_state_service.fetch_resources_from_state_file(
         ["mlflow_tracking_url_password"]
     )
@@ -69,6 +70,7 @@ def default_callback(
         context (typer.Context): data about the current execution
         output (typer.Option): the format of the output specified by the user.
     """
+    matcha_state_service = MatchaStateService()
     if context.invoked_subcommand is None:
         resource_component_names = [
             "mlflow_tracking_url",

@@ -7,8 +7,6 @@ from matcha_ml.services.matcha_state import MatchaStateService
 
 app = typer.Typer()
 
-matcha_state_service = MatchaStateService()
-
 
 @app.command("name")
 def resource_group_name(
@@ -18,6 +16,7 @@ def resource_group_name(
     )
 ) -> None:
     """Prints the URL for the experiment tracker provisioned."""
+    matcha_state_service = MatchaStateService()
     resources = matcha_state_service.fetch_resources_from_state_file(
         ["resource_group_name"]
     )
@@ -39,6 +38,7 @@ def default_callback(
         context (typer.Context): data about the current execution
         output (typer.Option): the format of the output specified by the user.
     """
+    matcha_state_service = MatchaStateService()
     if context.invoked_subcommand is None:
         resource_component_names = [
             "resource_group_name",
