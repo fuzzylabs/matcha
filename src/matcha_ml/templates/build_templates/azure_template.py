@@ -194,7 +194,7 @@ def build_template(
 
     except PermissionError:
         raise MatchaPermissionError(
-            f"You do not have permission to write the configuration. Check if you have write permissions for '{destination}'."
+            f"Error - You do not have permission to write the configuration. Check if you have write permissions for '{destination}'."
         )
 
     if verbose:
