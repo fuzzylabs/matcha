@@ -1,6 +1,7 @@
 """Run terraform templates to provision and deprovision resources."""
 import json
 import os
+from typing import Dict
 
 import typer
 
@@ -14,34 +15,6 @@ from matcha_ml.cli.ui.status_message_builders import (
 )
 from matcha_ml.errors import MatchaTerraformError
 from matcha_ml.services.terraform_service import TerraformService
-
-OUTPUTS = {
-    "experiment_tracker": {
-        "mlflow_tracking_url",
-    },
-    "pipeline": {
-        "zenml_storage_path",
-        "zenml_storage_path",
-        "zenml_connection_string",
-        "zen_server_url",
-        "zen_server_username",
-        "zen_server_password",
-    },
-    "model_deployer": {
-        "seldon_workloads_namespace",
-        "seldon_base_url",
-    },
-    "cloud_service": {
-        "resource_group_name",
-    },
-    "orchestrator": {
-        "k8s_context",
-    },
-    "container_registry": {
-        "azure_container_registry",
-        "azure_registry_name",
-    },
-}
 
 SPINNER = "dots"
 
@@ -191,13 +164,22 @@ class TemplateRunner:
 
     def _write_outputs_state(self) -> None:
         """Write the outputs of the terraform deployment to the state json file."""
-        state_outputs = {}
-        for group_name, group_set in OUTPUTS.items():
-            group_outputs = {
-                name: self.tfs.terraform_client.output(name, full_value=True)
-                for name in group_set
-            }
-            state_outputs[group_name] = group_outputs
+        tf_outputs = self.tfs.terraform_client.output()
+        state_outputs: Dict[str, Dict[str, str]] = {}
+
+        for name, properties in tf_outputs.items():
+            result = name.split("_", 2)
+            resource_type = result[0]
+            flavor = result[1]
+            resource_name = result[2]
+            value = properties["value"]
+
+            if resource_type in state_outputs:
+                temp_dict = state_outputs[resource_type]
+                temp_dict[resource_name] = value
+                state_outputs[resource_type] = temp_dict
+            else:
+                state_outputs[resource_type] = {"flavor": flavor, resource_name: value}
 
         with open(self.state_file, "w") as fp:
             json.dump(state_outputs, fp, indent=4)
