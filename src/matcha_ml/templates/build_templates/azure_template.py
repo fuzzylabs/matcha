@@ -193,7 +193,9 @@ def build_template(
             print_status(build_substep_success_status("Template variables were added."))
 
     except PermissionError:
-        raise MatchaPermissionError(path=destination)
+        raise MatchaPermissionError(
+            f"Error - You do not have permission to write the configuration. Check if you have write permissions for '{destination}'."
+        )
 
     if verbose:
         print_status(
