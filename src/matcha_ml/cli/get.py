@@ -14,12 +14,12 @@ app = typer.Typer()
 app.add_typer(
     experiment_tracker.app,
     name="experiment-tracker",
-    help="Get information about the current deployed experiment tracker. Default: prints all information of the experiment tracker provisioned.",
+    help="Get information about the currently deployed experiment tracker. Default: prints all information of the experiment tracker provisioned.",
 )
 app.add_typer(
     resource_group.app,
     name="resource-group",
-    help="Get information about the current deployed resource group. Default: prints all information of the resource group provisioned.",
+    help="Get information about the currently deployed resource group. Default: prints all information of the resource group provisioned.",
 )
 
 
