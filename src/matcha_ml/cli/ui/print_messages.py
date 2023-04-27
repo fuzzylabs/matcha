@@ -1,4 +1,6 @@
 """UI print functions."""
+from typing import Optional
+
 import rich
 from rich.console import Console
 
@@ -30,3 +32,18 @@ def print_json(json: str) -> None:
         json (str): JSON string to print
     """
     rich.print_json(json)
+
+
+def print_resource_output(
+    resource_output: str, output_format: Optional[str] = None
+) -> None:
+    """Print the resource output based on the output format specified by the user.
+
+    Args:
+        resource_output (str): the resource output to be printed.
+        output_format (str, optional):  the format of the resource output specified by the user. Defaults to None.
+    """
+    if output_format == "json":
+        print_json(resource_output)
+    else:
+        rich.print(resource_output)
