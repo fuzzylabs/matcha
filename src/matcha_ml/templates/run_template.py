@@ -18,6 +18,15 @@ from matcha_ml.services.terraform_service import TerraformService
 
 SPINNER = "dots"
 
+RESOURCE_NAME_MAP = {
+    "experimenttracker": "experiment-tracker",
+    "pipeline": "pipeline",
+    "orchestrator": "orchestrator",
+    "cloud": "cloud",
+    "modeldeployer": "model-deployer",
+    "containerregistry": "container-registry",
+}
+
 
 class TemplateRunner:
     """A Runner class provides methods that interface with the Terraform service to facilitate the provisioning and deprovisioning of resources."""
@@ -169,9 +178,9 @@ class TemplateRunner:
 
         for name, properties in tf_outputs.items():
             result = name.split("_", 2)
-            resource_type = result[0]
+            resource_type = RESOURCE_NAME_MAP.get(result[0])
             flavor = result[1]
-            resource_name = result[2]
+            resource_name = result[2].replace("_", "-")
             value = properties["value"]
 
             if resource_type in state_outputs:
