@@ -16,7 +16,7 @@ from azure.mgmt.resource import (
 )
 from azure.mgmt.resource.resources.models import ResourceGroup
 
-from matcha_ml.errors import MatchaAuthenticationError, MatchaPermissionsError
+from matcha_ml.errors import MatchaAuthenticationError, MatchaPermissionError
 
 ROLE_ID_MAPPING = {
     "Owner": "8e3af657-a8ff-443c-a75c-2fe8c4bcb635",
@@ -120,6 +120,7 @@ class AzureClient:
             for x in role_assignments
             if x.principal_id == principal_id
         ]
+
         for role_configuration in ACCEPTED_ROLE_CONFIGURATIONS:
             expected_roles = [
                 f"/subscriptions/{self.subscription_id}/providers/Microsoft.Authorization/roleDefinitions/{ROLE_ID_MAPPING[role]}"
@@ -127,8 +128,8 @@ class AzureClient:
             ]
             if all([role in roles for role in expected_roles]):
                 return True
-        raise MatchaPermissionsError(
-            "you need either the Owner role or Contributor and User Access Administrator roles"
+        raise MatchaPermissionError(
+            f"Error - Matcha detected that you do not have the appropriate role-based permissions on Azure to run this action. You need one of the following role configurations: {ACCEPTED_ROLE_CONFIGURATIONS} note: list items containing multiple roles require all of the listed roles."
         )
 
     def fetch_resource_groups(self) -> Dict[str, ResourceGroup]:
