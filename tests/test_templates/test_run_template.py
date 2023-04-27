@@ -57,32 +57,32 @@ def expected_outputs() -> dict:
         dict: expected output
     """
     outputs = {
-        "cloud": {"flavor": "azure", "resource_group_name": "test_resources"},
-        "containerregistry": {
+        "cloud": {"flavor": "azure", "resource-group-name": "test_resources"},
+        "container-registry": {
             "flavor": "azure",
-            "registry_name": "azure_registry_name",
-            "registry_url": "azure_container_registry",
+            "registry-name": "azure_registry_name",
+            "registry-url": "azure_container_registry",
         },
-        "experimenttracker": {
+        "experiment-tracker": {
             "flavor": "mlflow",
-            "tracking_url": "mlflow_test_url",
+            "tracking-url": "mlflow_test_url",
         },
-        "modeldeployer": {
+        "model-deployer": {
             "flavor": "seldon",
-            "base_url": "test_seldon_base_url",
-            "workloads_namespace": "test_seldon_workloads_namespace",
+            "base-url": "test_seldon_base_url",
+            "workloads-namespace": "test_seldon_workloads_namespace",
         },
         "orchestrator": {
             "flavor": "aks",
-            "k8s_context": "k8s_test_context",
+            "k8s-context": "k8s_test_context",
         },
         "pipeline": {
             "flavor": "zenml",
-            "connection_string": "zenml_test_connection_string",
-            "server_password": "zen_server_password",
-            "server_url": "zen_server_url",
-            "server_username": "zen_server_username",
-            "storage_path": "zenml_test_storage_path",
+            "connection-string": "zenml_test_connection_string",
+            "server-password": "zen_server_password",
+            "server-url": "zen_server_url",
+            "server-username": "zen_server_username",
+            "storage-path": "zenml_test_storage_path",
         },
     }
 
