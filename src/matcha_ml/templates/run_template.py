@@ -19,15 +19,6 @@ from matcha_ml.services.terraform_service import TerraformService
 
 SPINNER = "dots"
 
-RESOURCE_NAME_MAP = {
-    "experiment_tracker": "experiment-tracker",
-    "pipeline": "pipeline",
-    "orchestrator": "orchestrator",
-    "cloud": "cloud",
-    "model_deployer": "model-deployer",
-    "container_registry": "container-registry",
-}
-
 RESOURCE_NAMES = [
     "experiment_tracker",
     "pipeline",
