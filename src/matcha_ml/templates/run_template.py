@@ -1,6 +1,8 @@
 """Run terraform templates to provision and deprovision resources."""
 import json
 import os
+from collections import defaultdict
+from typing import Tuple
 
 import typer
 
@@ -15,22 +17,16 @@ from matcha_ml.cli.ui.status_message_builders import (
 from matcha_ml.errors import MatchaTerraformError
 from matcha_ml.services.terraform_service import TerraformService
 
-OUTPUTS = {
-    "mlflow_tracking_url",
-    "zenml_storage_path",
-    "zenml_connection_string",
-    "k8s_context",
-    "azure_container_registry",
-    "azure_registry_name",
-    "zen_server_url",
-    "zen_server_username",
-    "zen_server_password",
-    "seldon_workloads_namespace",
-    "seldon_base_url",
-    "resource_group_name",
-}
-
 SPINNER = "dots"
+
+RESOURCE_NAMES = [
+    "experiment_tracker",
+    "pipeline",
+    "orchestrator",
+    "cloud",
+    "container_registry",
+    "model_deployer",
+]
 
 
 class TemplateRunner:
@@ -176,12 +172,47 @@ class TemplateRunner:
             )
         )
 
+    def _build_resource_output(self, output_name: str) -> Tuple[str, str, str]:
+        """Build resource output for each Terraform output.
+
+        Args:
+            output_name (str): the name of the Terraform output.
+
+        Returns:
+            Tuple[str, str, str]: the resource output for matcha.state.
+        """
+        resource_type = None
+
+        for key in RESOURCE_NAMES:
+            if key in output_name:
+                resource_type = key
+                break
+
+        if resource_type is None:
+            print_error(
+                "A valid resource type for the output '{output_name}' does not exist."
+            )
+
+        flavour_and_resource_name = output_name[len(resource_type) + 1 :]
+
+        flavor, resource_name = flavour_and_resource_name.split("_", maxsplit=1)
+        resource_name = resource_name.replace("_", "-")
+        resource_type = resource_type.replace("_", "-")
+
+        return resource_type, flavor, resource_name
+
     def _write_outputs_state(self) -> None:
-        """Write the outputs of the terraform deployment to the state json file."""
-        state_outputs = {
-            name: self.tfs.terraform_client.output(name, full_value=True)
-            for name in OUTPUTS
-        }
+        """Write the outputs of the Terraform deployment to the state JSON file."""
+        tf_outputs = self.tfs.terraform_client.output()
+        state_outputs: dict[str, dict[str, str]] = defaultdict(dict)
+
+        for output_name, properties in tf_outputs.items():
+            resource_type, flavor, resource_name = self._build_resource_output(
+                output_name
+            )
+            state_outputs[resource_type].setdefault("flavor", flavor)
+            state_outputs[resource_type][resource_name] = properties["value"]
+
         with open(self.state_file, "w") as fp:
             json.dump(state_outputs, fp, indent=4)
 

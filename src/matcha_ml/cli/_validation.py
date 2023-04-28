@@ -220,7 +220,7 @@ def check_current_deployment_exists() -> bool:
     with open(MATCHA_STATE_DIR) as f:
         data = json.load(f)
 
-    resource_group_name = data["resource_group_name"]
+    resource_group_name = data["cloud"]["resource-group-name"]
 
     client = get_azure_client()
     rg_state = client.resource_group_state(resource_group_name)
