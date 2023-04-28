@@ -172,7 +172,7 @@ class TemplateRunner:
             )
         )
 
-    def build_resource_output(self, output_name: str) -> Tuple[str, str, str]:
+    def _build_resource_output(self, output_name: str) -> Tuple[str, str, str]:
         """Build resource output for each Terraform output.
 
         Args:
@@ -198,7 +198,7 @@ class TemplateRunner:
         state_outputs: dict[str, dict[str, str]] = defaultdict(dict)
 
         for output_name, properties in tf_outputs.items():
-            resource_type, flavor, resource_name = self.build_resource_output(
+            resource_type, flavor, resource_name = self._build_resource_output(
                 output_name
             )
             state_outputs[resource_type].setdefault("flavor", flavor)
