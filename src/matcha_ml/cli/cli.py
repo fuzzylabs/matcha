@@ -49,18 +49,19 @@ def provision(
     provision_resources(location, prefix, password, verbose)
 
 
-@app.command()
+@app.command(help="Get information for the provisioned resources.")
 def get(
     resource_name: Optional[str] = typer.Argument(None),
     property_name: Optional[str] = typer.Argument(None),
 ) -> None:
-    """Get information of the provisioned resources.
+    """Get information for the provisioned resources.
 
     Args:
         resource_name (Optional[str]): the name of the resource.
         property_name (Optional[str]): the specific property of the resource to return.
     """
-    pass
+    print(f"This is the resource name argument: {resource_name}")
+    print(f"This is the property name argument: {property_name}")
 
 
 @app.command()
