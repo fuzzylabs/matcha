@@ -184,7 +184,7 @@ class TemplateRunner:
         resource_type = str(
             next((key for key in RESOURCE_NAME_MAP if key in output_name), None)
         )
-        flavour_and_resource_name = output_name.removeprefix(resource_type + "_")
+        flavour_and_resource_name = output_name.replace(resource_type + "_", "")
 
         resource_type = str(RESOURCE_NAME_MAP.get(resource_type))
         flavor, resource_name = flavour_and_resource_name.split("_", maxsplit=1)
