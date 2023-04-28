@@ -28,6 +28,15 @@ RESOURCE_NAME_MAP = {
     "container_registry": "container-registry",
 }
 
+RESOURCE_NAMES = [
+    "experiment_tracker",
+    "pipeline",
+    "orchestrator",
+    "cloud",
+    "container_registry",
+    "model_deployer",
+]
+
 
 class TemplateRunner:
     """A Runner class provides methods that interface with the Terraform service to facilitate the provisioning and deprovisioning of resources."""
@@ -181,14 +190,20 @@ class TemplateRunner:
         Returns:
             Tuple[str, str, str]: the resource output for matcha.state.
         """
-        resource_type = str(
-            next((key for key in RESOURCE_NAME_MAP if key in output_name), None)
-        )
-        flavour_and_resource_name = output_name.replace(resource_type + "_", "")
+        resource_types = [key for key in RESOURCE_NAMES if key in output_name]
 
-        resource_type = str(RESOURCE_NAME_MAP.get(resource_type))
+        if resource_types:
+            resource_type = resource_types[0]
+        else:
+            print_error(
+                "A valid resource type for the output '{output_name}' does not exist."
+            )
+
+        flavour_and_resource_name = output_name[len(resource_type) + 1 :]
+
         flavor, resource_name = flavour_and_resource_name.split("_", maxsplit=1)
         resource_name = resource_name.replace("_", "-")
+        resource_type = resource_type.replace("_", "-")
 
         return resource_type, flavor, resource_name
 
