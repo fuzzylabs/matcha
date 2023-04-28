@@ -181,11 +181,14 @@ class TemplateRunner:
         Returns:
             Tuple[str, str, str]: the resource output for matcha.state.
         """
-        resource_types = [key for key in RESOURCE_NAMES if key in output_name]
+        resource_type = None
 
-        if resource_types:
-            resource_type = resource_types[0]
-        else:
+        for key in RESOURCE_NAMES:
+            if key in output_name:
+                resource_type = key
+                break
+
+        if resource_type is None:
             print_error(
                 "A valid resource type for the output '{output_name}' does not exist."
             )
