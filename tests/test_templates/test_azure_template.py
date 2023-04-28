@@ -97,6 +97,8 @@ def test_build_template_raises_permission_error(
     config = TemplateVariables("uksouth", "matcha", "superninja")
 
     destination_path = os.path.join(matcha_testing_directory, "infrastructure")
+
+    # Alters the permissions on the testing directory to be read-only
     os.chmod(matcha_testing_directory, S_IREAD)
 
     with pytest.raises(MatchaPermissionError):
