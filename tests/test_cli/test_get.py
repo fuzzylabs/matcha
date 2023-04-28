@@ -17,7 +17,7 @@ def test_cli_get_command_help(runner: CliRunner):
     assert result.exit_code == 0
 
     # Assert string is present in cli output
-    # assert "Get information of the provisioned resources." in result.stdout
+    assert "Get information for the provisioned resources." in result.stdout
 
 
 def test_cli_get_command(runner: CliRunner):
