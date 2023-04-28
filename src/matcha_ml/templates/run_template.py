@@ -184,9 +184,7 @@ class TemplateRunner:
             value = properties["value"]
 
             if resource_type in state_outputs:
-                temp_dict = state_outputs[resource_type]
-                temp_dict[resource_name] = value
-                state_outputs[resource_type] = temp_dict
+                state_outputs[resource_type][resource_name] = value
             else:
                 state_outputs[resource_type] = {"flavor": flavor, resource_name: value}
 
