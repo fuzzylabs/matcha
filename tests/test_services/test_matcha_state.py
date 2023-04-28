@@ -30,18 +30,27 @@ def mock_state_file(matcha_testing_directory: str):
     os.makedirs(matcha_infrastructure_dir)
 
     state_file_resources = {
-        "mlflow_tracking_url": "mlflow_test_url",
-        "zenml_storage_path": "zenml_test_storage_path",
-        "zenml_connection_string": "zenml_test_connection_string",
-        "k8s_context": "k8s_test_context",
-        "azure_container_registry": "azure_container_registry",
-        "azure_registry_name": "azure_registry_name",
-        "zen_server_url": "zen_server_url",
-        "zen_server_username": "zen_server_username",
-        "zen_server_password": "zen_server_password",
-        "seldon_workloads_namespace": "test_seldon_workloads_namespace",
-        "seldon_base_url": "test_seldon_base_url",
-        "resource_group_name": "test_resources",
+        "cloud": {"flavor": "azure", "resource-group-name": "test_resources"},
+        "container-registry": {
+            "flavor": "azure",
+            "registry-name": "azure_registry_name",
+            "registry-url": "azure_container_registry",
+        },
+        "experiment-tracker": {"flavor": "mlflow", "tracking-url": "mlflow_test_url"},
+        "model-deployer": {
+            "flavor": "seldon",
+            "base-url": "test_seldon_base_url",
+            "workloads-namespace": "test_seldon_workloads_namespace",
+        },
+        "orchestrator": {"flavor": "aks", "k8s-context": "k8s_test_context"},
+        "pipeline": {
+            "flavor": "zenml",
+            "connection-string": "zenml_test_connection_string",
+            "server-password": "zen_server_password",
+            "server-url": "zen_server_url",
+            "server-username": "zen_server_username",
+            "storage-path": "zenml_test_storage_path",
+        },
     }
 
     with open(os.path.join(matcha_infrastructure_dir, "matcha.state"), "w") as f:
@@ -56,18 +65,27 @@ def expected_outputs() -> dict:
         dict: expected output
     """
     outputs = {
-        "mlflow_tracking_url": "mlflow_test_url",
-        "zenml_storage_path": "zenml_test_storage_path",
-        "zenml_connection_string": "zenml_test_connection_string",
-        "k8s_context": "k8s_test_context",
-        "azure_container_registry": "azure_container_registry",
-        "azure_registry_name": "azure_registry_name",
-        "zen_server_url": "zen_server_url",
-        "zen_server_username": "zen_server_username",
-        "zen_server_password": "zen_server_password",
-        "seldon_workloads_namespace": "test_seldon_workloads_namespace",
-        "seldon_base_url": "test_seldon_base_url",
-        "resource_group_name": "test_resources",
+        "cloud": {"flavor": "azure", "resource-group-name": "test_resources"},
+        "container-registry": {
+            "flavor": "azure",
+            "registry-name": "azure_registry_name",
+            "registry-url": "azure_container_registry",
+        },
+        "experiment-tracker": {"flavor": "mlflow", "tracking-url": "mlflow_test_url"},
+        "model-deployer": {
+            "flavor": "seldon",
+            "base-url": "test_seldon_base_url",
+            "workloads-namespace": "test_seldon_workloads_namespace",
+        },
+        "orchestrator": {"flavor": "aks", "k8s-context": "k8s_test_context"},
+        "pipeline": {
+            "flavor": "zenml",
+            "connection-string": "zenml_test_connection_string",
+            "server-password": "zen_server_password",
+            "server-url": "zen_server_url",
+            "server-username": "zen_server_username",
+            "storage-path": "zenml_test_storage_path",
+        },
     }
 
     return outputs
@@ -80,7 +98,7 @@ def test_state_file(matcha_state_service: MatchaStateService, expected_outputs: 
         matcha_state_service (MatchaStateService): The matcha_state_service testing instance.
         expected_outputs (dict): The expected state file.
     """
-    result = matcha_state_service.state_file
+    result = matcha_state_service._state_file
     assert result == expected_outputs
 
 
@@ -95,15 +113,13 @@ def test_fetch_resources_from_state_file(
         matcha_state_service (MatchaStateService): The matcha_state_service testing instance.
         expected_outputs (dict): The expected state file.
     """
+    _ = matcha_state_service.check_state_file_exists()
+
     result = matcha_state_service.fetch_resources_from_state_file()
     assert result == expected_outputs
 
     result = matcha_state_service.fetch_resources_from_state_file(
-        ["zen_server_url", "zen_server_username", "zen_server_password"]
+        resource_name="experiment-tracker", property_name="tracking-url"
     )
-    expected = {
-        "zen_server_url": "zen_server_url",
-        "zen_server_username": "zen_server_username",
-        "zen_server_password": "zen_server_password",
-    }
+    expected = {"experiment-tracker": {"tracking-url": "mlflow_test_url"}}
     assert result == expected

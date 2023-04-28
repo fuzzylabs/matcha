@@ -10,8 +10,15 @@ from matcha_ml.cli._validation import (
     region_typer_callback,
 )
 from matcha_ml.cli.destroy import destroy_resources
+from matcha_ml.cli.get import get_resources
 from matcha_ml.cli.provision import provision_resources
-from matcha_ml.cli.ui.print_messages import print_error, print_status
+from matcha_ml.cli.ui.print_messages import (
+    print_error,
+    print_resource_output,
+    print_status,
+)
+from matcha_ml.cli.ui.resource_message_builders import build_resource_output
+from matcha_ml.services.matcha_state import MatchaStateService
 
 app = typer.Typer(no_args_is_help=True, pretty_exceptions_show_locals=False)
 
@@ -53,15 +60,29 @@ def provision(
 def get(
     resource_name: Optional[str] = typer.Argument(None),
     property_name: Optional[str] = typer.Argument(None),
+    output: str = typer.Option(
+        default=None,
+        help="The format of your output, e.g., 'json', 'yaml'",
+    ),
 ) -> None:
     """Get information for the provisioned resources.
 
     Args:
         resource_name (Optional[str]): the name of the resource.
         property_name (Optional[str]): the specific property of the resource to return.
+        output (typer.Option): the format of the output specified by the user.
     """
-    print(f"This is the resource name argument: {resource_name}")
-    print(f"This is the property name argument: {property_name}")
+    matcha_state_service = MatchaStateService()
+
+    if not matcha_state_service.check_state_file_exists():
+        print_error(
+            "Error: matcha.state file does not exists. Please run 'matcha provision' before trying to get the resource."
+        )
+        raise typer.Exit()
+
+    resources = get_resources(resource_name, property_name, matcha_state_service)
+    resource_output = build_resource_output(resources=resources, output_format=output)
+    print_resource_output(resource_output=resource_output, output_format=output)
 
 
 @app.command()
