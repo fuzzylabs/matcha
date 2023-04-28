@@ -50,11 +50,15 @@ def provision(
 
 
 @app.command()
-def get(args: Optional[str] = typer.Argument(None)) -> None:
+def get(
+    resource_name: Optional[str] = typer.Argument(None),
+    property_name: Optional[str] = typer.Argument(None),
+) -> None:
     """Get information of the provisioned resources.
 
     Args:
-        args (Optional[str]): the name of the resource to get.
+        resource_name (Optional[str]): the name of the resource.
+        property_name (Optional[str]): the specific property of the resource to return.
     """
     pass
 
