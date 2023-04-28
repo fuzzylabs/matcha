@@ -1,6 +1,7 @@
 """Run terraform templates to provision and deprovision resources."""
 import json
 import os
+from collections import defaultdict
 from typing import Dict
 
 import typer
@@ -174,7 +175,7 @@ class TemplateRunner:
     def _write_outputs_state(self) -> None:
         """Write the outputs of the terraform deployment to the state json file."""
         tf_outputs = self.tfs.terraform_client.output()
-        state_outputs: Dict[str, Dict[str, str]] = {}
+        state_outputs: Dict[str, Dict[str, str]] = defaultdict(dict)
 
         for name, properties in tf_outputs.items():
             result = name.split("_", 2)
@@ -182,11 +183,8 @@ class TemplateRunner:
             flavor = result[1]
             resource_name = result[2].replace("_", "-")
             value = properties["value"]
-
-            if resource_type in state_outputs:
-                state_outputs[resource_type][resource_name] = value
-            else:
-                state_outputs[resource_type] = {"flavor": flavor, resource_name: value}
+            state_outputs[resource_type]["flavor"] = flavor
+            state_outputs[resource_type][resource_name] = value
 
         with open(self.state_file, "w") as fp:
             json.dump(state_outputs, fp, indent=4)
