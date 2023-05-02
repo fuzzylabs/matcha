@@ -234,3 +234,58 @@ def check_current_deployment_exists() -> bool:
             f"Error, resource group '{resource_group_name}' is currently in a '{rg_state.value}' which is currently not handled by matcha. Please check your resources on Azure."
         )
         return True
+
+
+def resource_name_validation(
+    resource_name: str, valid_resource_names: List[str]
+) -> str:
+    """Checks if the resource name exists in data from the matcha state file.
+
+    Args:
+        resource_name (str): Resource name to check
+        valid_resource_names (List[str]): A list of resource names found within the matcha state file
+
+    Raises:
+        MatchaInputError: Raised when the resource name is not valid
+
+    Returns:
+        str: The resource name if valid
+    """
+    if resource_name not in valid_resource_names:
+        err_msg = (
+            f"Error - a resource type with the name '{resource_name}' does not exist."
+        )
+        closest_name = find_closest_matches(
+            pattern=resource_name, possibilities=valid_resource_names, number_to_find=1
+        )
+        if closest_name:
+            err_msg += f" Did you mean '{closest_name[0]}'?"
+        raise MatchaInputError(err_msg)
+    return resource_name
+
+
+def property_name_validation(
+    property_name: str, resource_name: str, valid_property_names: List[str]
+) -> str:
+    """Checks if the property name exists for a valid resource name in data from the matcha state file.
+
+    Args:
+        property_name (str): A property name to check if it belongs to the specified resource
+        resource_name (str): A valid resource name
+        valid_property_names (List[str]): A list of property names belonging to the resource
+
+    Raises:
+        MatchaInputError: Raised when the property name does not belong to the resource
+
+    Returns:
+        str: The property name if valid
+    """
+    if property_name not in valid_property_names:
+        err_msg = f"Error - a property with the name '{property_name}' does not exist for the '{resource_name}' resource."
+        closest_name = find_closest_matches(
+            pattern=property_name, possibilities=valid_property_names, number_to_find=1
+        )
+        if closest_name:
+            err_msg += f" Did you mean '{closest_name[0]}'?"
+        raise MatchaInputError(err_msg)
+    return property_name

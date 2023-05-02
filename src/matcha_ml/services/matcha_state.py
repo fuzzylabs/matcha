@@ -3,15 +3,13 @@ import json
 import os
 from typing import Dict, Optional
 
-from matcha_ml.errors import MatchaInputError
+from matcha_ml.cli._validation import property_name_validation, resource_name_validation
 
 MATCHA_STATE_DIR = os.path.join(".matcha", "infrastructure", "matcha.state")
 
 
 class MatchaStateService:
     """A matcha state service for handling to matcha.state file."""
-
-    _state: Optional[Dict[str, Dict[str, str]]] = None
 
     def check_state_file_exists(self) -> bool:
         """Check if state file exists.
@@ -53,19 +51,20 @@ class MatchaStateService:
         if resource_name is None:
             return self._state
 
-        if resource_name not in self._state.keys():
-            raise MatchaInputError(
-                f"Error - a resource type with the name '{resource_name}' does not exist."
-            )
+        _ = resource_name_validation(resource_name, list(self._state.keys()))
 
         if property_name is None:
             return {str(resource_name): dict(self._state[resource_name])}
 
+        _ = property_name_validation(
+            property_name,
+            resource_name,
+            list(self._state.get(resource_name, {}).keys()),
+        )
+
         property_value = self._state.get(resource_name, {}).get(property_name)
 
-        if property_value is None:
-            raise MatchaInputError(
-                f"Error - a property with the name '{property_name}' does not exist for the '{resource_name}' resource."
-            )
-
-        return {resource_name: {property_name: property_value}}
+        if property_value:
+            return {resource_name: {property_name: property_value}}
+        else:
+            return None
