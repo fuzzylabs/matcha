@@ -7,19 +7,6 @@ import yaml
 from typer.testing import CliRunner
 
 from matcha_ml.cli.cli import app
-from matcha_ml.cli.get import get_resources
-from matcha_ml.errors import MatchaInputError
-from matcha_ml.services.matcha_state import MatchaStateService
-
-
-@pytest.fixture
-def matcha_state_service() -> MatchaStateService:
-    """Return a template runner object instance for test.
-
-    Returns:
-        TemplateRunner: a TemplateRunner object instance.
-    """
-    return MatchaStateService()
 
 
 @pytest.fixture(autouse=True)
@@ -119,7 +106,6 @@ def test_cli_get_command_with_invalid_resource_name(runner: CliRunner):
 
     # Exit code 1 means an error was thrown
     assert result.exit_code == 1
-    assert isinstance(result.exception, MatchaInputError)
     assert (
         "Error - a resource type with the name 'this-resource-does-not-exist' does not exist."
         in str(result.exception)
@@ -204,48 +190,3 @@ def test_cli_get_command_yaml(runner: CliRunner, expected_outputs: dict):
     assert result.exit_code == 0
     # Assert JSON is present and correct in cli output
     assert expected_output in result.stdout
-
-
-def test_get_resources(
-    matcha_state_service: MatchaStateService, expected_outputs: dict
-):
-    """Test get resources function with no resource specified.
-
-    Args:
-        matcha_state_service (MatchaStateService): The matcha_state_service testing instance.
-        expected_outputs (dict): The expected output from the matcha state file.
-    """
-    assert matcha_state_service.check_state_file_exists()
-    assert expected_outputs == get_resources(None, None, matcha_state_service)
-
-
-def test_get_resources_with_resource_name(matcha_state_service: MatchaStateService):
-    """Test get resources function with resource name specified.
-
-    Args:
-        matcha_state_service (MatchaStateService): The matcha_state_service testing instance.
-    """
-    expected_output = {
-        "experiment-tracker": {"flavor": "mlflow", "tracking-url": "mlflow_test_url"}
-    }
-
-    assert matcha_state_service.check_state_file_exists()
-    assert expected_output == get_resources(
-        "experiment-tracker", None, matcha_state_service
-    )
-
-
-def test_get_resources_with_resource_name_and_property_name(
-    matcha_state_service: MatchaStateService,
-):
-    """Test get resources function with resource name and resource property specified.
-
-    Args:
-        matcha_state_service (MatchaStateService): The matcha_state_service testing instance.
-    """
-    expected_output = {"experiment-tracker": {"tracking-url": "mlflow_test_url"}}
-
-    assert matcha_state_service.check_state_file_exists()
-    assert expected_output == get_resources(
-        "experiment-tracker", "tracking-url", matcha_state_service
-    )

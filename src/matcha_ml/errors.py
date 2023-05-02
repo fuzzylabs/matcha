@@ -1,6 +1,22 @@
 """matcha custom errors."""
 from typing import Any
 
+# Create MatchaError
+
+
+class MatchaError(Exception):
+    """Matcha generic Error."""
+
+    def __init__(self, message: str, *args: Any, **kwargs: Any):
+        """Initialise Matcha Error.
+
+        Args:
+            message: the error message to propagate to the user
+            *args: args
+            **kwargs: kwargs
+        """
+        super().__init__(message, *args, **kwargs)
+
 
 class MatchaPermissionError(Exception):
     """Matcha Permission Error.

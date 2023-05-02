@@ -11,6 +11,7 @@ from matcha_ml.cli._validation import (
     _is_not_digits,
     _is_valid_prefix,
     find_closest_matches,
+    get_command_validation,
     prefix_typer_callback,
     region_typer_callback,
     region_validation,
@@ -203,3 +204,30 @@ def test_prefix_typer_callback_invalid(
         prefix_typer_callback(prefix)
 
     assert str(err.value) == error_msg
+
+
+def test_get_command_validation_invalid_resource_name():
+    """Test whether get_command_validation function raises the expected error with the expected error message when an invalid resource name is passed."""
+    mock_valid_options = ["option-1", "second-option"]
+
+    mock_argument = "option"
+    expected_output = "Error - a resource type with the name 'option' does not exist. Did you mean 'option-1'?"
+
+    with pytest.raises(MatchaInputError) as err:
+        get_command_validation(mock_argument, mock_valid_options)
+
+    assert str(err.value) in expected_output
+
+
+def test_get_command_validation_invalid_property_name():
+    """Test whether get_command_validation function raises the expected error with the expected error message when an invalid property name is passed."""
+    mock_valid_options = ["option-1", "second-option"]
+    mock_valid_options = ["option-1", "second-option"]
+
+    mock_argument = "second-opt"
+    expected_output = "Error - a property with the name 'second-opt' does not exist. Did you mean 'second-option'?"
+
+    with pytest.raises(MatchaInputError) as err:
+        get_command_validation(mock_argument, mock_valid_options, True)
+
+    assert str(err.value) in expected_output

@@ -1,9 +1,7 @@
 """The matcha state interface."""
 import json
 import os
-from typing import Dict, Optional
-
-from matcha_ml.cli._validation import property_name_validation, resource_name_validation
+from typing import Dict, List, Optional
 
 MATCHA_STATE_DIR = os.path.join(".matcha", "infrastructure", "matcha.state")
 
@@ -14,6 +12,8 @@ class MatchaStateService:
     def __init__(self) -> None:
         """MatchaStateService constructor."""
         self.state_file_exist = self.check_state_file_exists()
+        if self.state_file_exist:
+            self._state = self._state_file
 
     def check_state_file_exists(self) -> bool:
         """Check if state file exists.
@@ -21,11 +21,7 @@ class MatchaStateService:
         Returns:
             bool: returns True if exists, otherwise False.
         """
-        if os.path.isfile(MATCHA_STATE_DIR):
-            self._state = self._state_file
-            return True
-        else:
-            return False
+        return bool(os.path.isfile(MATCHA_STATE_DIR))
 
     @property
     def _state_file(self) -> Dict[str, Dict[str, str]]:
@@ -42,7 +38,7 @@ class MatchaStateService:
         self,
         resource_name: Optional[str] = None,
         property_name: Optional[str] = None,
-    ) -> Optional[Dict[str, Dict[str, str]]]:
+    ) -> Dict[str, Dict[str, str]]:
         """Either return all of the resources or resource specified by the resource name.
 
         Args:
@@ -55,20 +51,30 @@ class MatchaStateService:
         if resource_name is None:
             return self._state
 
-        _ = resource_name_validation(resource_name, list(self._state.keys()))
-
         if property_name is None:
             return {str(resource_name): dict(self._state[resource_name])}
 
-        _ = property_name_validation(
-            property_name,
-            resource_name,
-            list(self._state.get(resource_name, {}).keys()),
-        )
+        property_value = self._state.get(resource_name, {})[property_name]
 
-        property_value = self._state.get(resource_name, {}).get(property_name)
+        return {resource_name: {property_name: property_value}}
+        # else:
+        #     return None
 
-        if property_value:
-            return {resource_name: {property_name: property_value}}
-        else:
-            return None
+    def get_resource_names(self) -> List[str]:
+        """Method for returning all existing resource names.
+
+        Returns:
+            List[str]: a list of existing resource names.
+        """
+        return list(self._state.keys())
+
+    def get_property_names(self, resource_name: str) -> List[str]:
+        """Method for returning all existing properties for a given resource.
+
+        Args:
+            resource_name (str): the resource name to get properties from.
+
+        Returns:
+            List[str]: a list of existing properties for a given resource.
+        """
+        return list(self._state.get(resource_name, {}).keys())

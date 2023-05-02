@@ -1,13 +1,14 @@
-"""Get CLI consists of ."""
+"""The core functions for matcha."""
 from typing import Dict, Optional
 
+from matcha_ml.cli._validation import get_command_validation
+from matcha_ml.errors import MatchaError
 from matcha_ml.services.matcha_state import MatchaStateService
 
 
-def get_resources(
+def get(
     resource_name: Optional[str],
     property_name: Optional[str],
-    matcha_state_service: MatchaStateService,
 ) -> Dict[str, Dict[str, str]]:
     """Return the information of the provisioned resource based on the resource name specified.
 
@@ -19,9 +20,25 @@ def get_resources(
         matcha_state_service (MatchaStateService): the matcha state service for interacting with the matcha.state file.
 
     Returns:
-        Dict[str, Dict[str, str]]: the information of the provisioned resource.
+        Optional[Dict[str, Dict[str, str]]]: the information of the provisioned resource.
     """
+    matcha_state_service = MatchaStateService()
+
+    if not matcha_state_service.state_file_exist:
+        raise MatchaError(
+            "Error: matcha.state file does not exists. Please run 'matcha provision' before trying to get the resource."
+        )
+
+    if resource_name:
+        get_command_validation(resource_name, matcha_state_service.get_resource_names())
+
+    if resource_name and property_name:
+        get_command_validation(
+            property_name, matcha_state_service.get_property_names(resource_name), True
+        )
+
     result = matcha_state_service.fetch_resources_from_state_file(
         resource_name, property_name
     )
+
     return result
