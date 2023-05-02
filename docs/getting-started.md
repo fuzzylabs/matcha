@@ -89,7 +89,7 @@ You should have something similar to the following output:
 OUTPUT
 ```
 
-*TODO* You can then use the following to inspect specific resources, for example:
+*TODO* You can then use `get` to inspect specific resources, for example:
 
 ```bash
 matcha get experiment-tracker
