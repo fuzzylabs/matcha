@@ -42,20 +42,6 @@ def mock_state_file(matcha_testing_directory: str):
             "registry-url": "azure_container_registry",
         },
         "experiment-tracker": {"flavor": "mlflow", "tracking-url": "mlflow_test_url"},
-        "model-deployer": {
-            "flavor": "seldon",
-            "base-url": "test_seldon_base_url",
-            "workloads-namespace": "test_seldon_workloads_namespace",
-        },
-        "orchestrator": {"flavor": "aks", "k8s-context": "k8s_test_context"},
-        "pipeline": {
-            "flavor": "zenml",
-            "connection-string": "zenml_test_connection_string",
-            "server-password": "zen_server_password",
-            "server-url": "zen_server_url",
-            "server-username": "zen_server_username",
-            "storage-path": "zenml_test_storage_path",
-        },
     }
 
     with open(os.path.join(matcha_infrastructure_dir, "matcha.state"), "w") as f:
@@ -77,20 +63,6 @@ def expected_outputs() -> dict:
             "registry-url": "azure_container_registry",
         },
         "experiment-tracker": {"flavor": "mlflow", "tracking-url": "mlflow_test_url"},
-        "model-deployer": {
-            "flavor": "seldon",
-            "base-url": "test_seldon_base_url",
-            "workloads-namespace": "test_seldon_workloads_namespace",
-        },
-        "orchestrator": {"flavor": "aks", "k8s-context": "k8s_test_context"},
-        "pipeline": {
-            "flavor": "zenml",
-            "connection-string": "zenml_test_connection_string",
-            "server-password": "zen_server_password",
-            "server-url": "zen_server_url",
-            "server-username": "zen_server_username",
-            "storage-path": "zenml_test_storage_path",
-        },
     }
 
     return outputs
@@ -175,6 +147,7 @@ def test_cli_get_command_with_resource_and_property(runner: CliRunner):
 
     for line in expected_output_lines:
         assert line in result.stdout
+
 
 def test_cli_get_command_with_resource_and_property_json(runner: CliRunner):
     """Test cli for get command with a specified resource and resource property in the JSON output format.
