@@ -53,3 +53,18 @@ To check your permissions using the Azure portal, do the following:
 3. Click *Access Control (IAM)* in the panel to the left
 4. Either search for, or navigate to, your account
 5. Check in the *Role* column whether it matches one of the [required roles](#what-permissions-does-matcha-require)
+
+TODO Add picture
+
+## How much does it cost?
+
+`matcha` deploys a set of resources to Azure for you, so a natural question is: what on earth is this going to cost?! Below is how much it would cost to run the provisioned resources on Azure for a month.
+
+<figure markdown>
+  ![Azure Cost Breakdown](img/azure-cost-breakdown.png)
+  <figcaption>Azure Cost Breakdown</figcaption>
+</figure>
+
+This is a minimal setup and we've minimised the amount of resources where possible, reducing the overall cost. It's worth noting that if you don't have an Azure account, new joiners get Azure Credit which more than covers the cost of deploying these resources for exploring `matcha`.
+
+Our advice would be to make use of the `matcha destroy` command which will deprovision resources for you.
