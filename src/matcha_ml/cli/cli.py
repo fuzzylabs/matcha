@@ -74,7 +74,7 @@ def get(
     """
     matcha_state_service = MatchaStateService()
 
-    if not matcha_state_service.check_state_file_exists():
+    if not matcha_state_service.state_file_exist:
         print_error(
             "Error: matcha.state file does not exists. Please run 'matcha provision' before trying to get the resource."
         )
