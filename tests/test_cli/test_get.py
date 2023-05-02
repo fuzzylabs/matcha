@@ -176,7 +176,6 @@ def test_cli_get_command_with_resource_and_property(runner: CliRunner):
     for line in expected_output_lines:
         assert line in result.stdout
 
-
 def test_cli_get_command_with_resource_and_property_json(runner: CliRunner):
     """Test cli for get command with a specified resource and resource property in the JSON output format.
 

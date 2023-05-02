@@ -2,10 +2,12 @@
 import glob
 import json
 import os
+from stat import S_IREAD
 from typing import Dict
 
 import pytest
 
+from matcha_ml.errors import MatchaPermissionError
 from matcha_ml.templates.build_templates.azure_template import (
     SUBMODULE_NAMES,
     TemplateVariables,
@@ -81,3 +83,23 @@ def test_build_template(matcha_testing_directory, template_src_path):
     }
 
     assert_infrastructure(destination_path, expected_tf_vars)
+
+
+def test_build_template_raises_permission_error(
+    matcha_testing_directory, template_src_path
+):
+    """Test that the MatchaPermissionError is thrown where the user does not have permission to write to the target directory.
+
+    Args:
+        matcha_testing_directory (str): Temporary .matcha directory path
+        template_src_path (str): Existing template directory path
+    """
+    config = TemplateVariables("uksouth", "matcha", "superninja")
+
+    destination_path = os.path.join(matcha_testing_directory, "infrastructure")
+
+    # Alters the permissions on the testing directory to be read-only
+    os.chmod(matcha_testing_directory, S_IREAD)
+
+    with pytest.raises(MatchaPermissionError):
+        build_template(config, template_src_path, destination_path)
