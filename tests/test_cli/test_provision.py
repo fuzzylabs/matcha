@@ -79,7 +79,9 @@ def test_cli_provision_command(
     os.chdir(matcha_testing_directory)
 
     # Invoke provision command
-    result = runner.invoke(app, ["provision"], input="uksouth\nmatcha\n\ndefault\nN\n")
+    result = runner.invoke(
+        app, ["provision"], input="uksouth\nmatcha\ndefault\ndefault\nN\n"
+    )
 
     # Exit code 0 means there was no error
     assert result.exit_code == 0
@@ -147,7 +149,7 @@ def test_cli_provision_command_with_prefix(runner, matcha_testing_directory):
 
     # Invoke provision command
     result = runner.invoke(
-        app, ["provision"], input="uksouth\ncoffee\n\ndefault\nno\nno\n"
+        app, ["provision"], input="uksouth\ncoffee\ndefault\ndefault\nno\nno\n"
     )
 
     # Exit code 0 means there was no error
@@ -176,7 +178,9 @@ def test_cli_provision_command_with_default_prefix(runner, matcha_testing_direct
     os.chdir(matcha_testing_directory)
 
     # Invoke provision command
-    result = runner.invoke(app, ["provision"], input="uksouth\n\n\ndefault\nno\nno\n")
+    result = runner.invoke(
+        app, ["provision"], input="uksouth\n\ndefault\ndefault\nno\nno\n"
+    )
 
     # Exit code 0 means there was no error
     assert result.exit_code == 0
@@ -207,7 +211,7 @@ def test_cli_provision_command_with_verbose_arg(
     os.chdir(matcha_testing_directory)
 
     result = runner.invoke(
-        app, ["provision", "--verbose"], input="uksouth\n\n\ndefault\nno\n"
+        app, ["provision", "--verbose"], input="uksouth\n\ndefault\ndefault\nno\n"
     )
 
     assert result.exit_code == 0
@@ -225,19 +229,19 @@ def test_cli_provision_command_with_verbose_arg(
     "user_input, expected_output",
     [
         (
-            "uksouth\n-matcha-\nvalid\n\ndefault\nno\n",
+            "uksouth\n-matcha-\nvalid\ndefault\ndefault\nno\n",
             "Error: Resource group name prefix can only contain alphanumeric characters.",
         ),
         (
-            "uksouth\n12\nvalid\n\ndefault\nno\n",
+            "uksouth\n12\nvalid\ndefault\ndefault\nno\n",
             "Error: Resource group name prefix cannot contain only numbers.",
         ),
         (
-            "uksouth\ngood$prefix#\nvalid\n\ndefault\nno\n",
+            "uksouth\ngood$prefix#\nvalid\ndefault\ndefault\nno\n",
             "Error: Resource group name prefix can only contain alphanumeric characters.",
         ),
         (
-            "uksouth\nareallyloingprefix\nvalid\n\ndefault\nno\n",
+            "uksouth\nareallyloingprefix\nvalid\ndefault\ndefault\nno\n",
             f"Resource group name prefix must be between 3 and {MAXIMUM_RESOURCE_NAME_LEN - len(LONGEST_RESOURCE_NAME)} characters long.",
         ),
     ],
@@ -279,7 +283,7 @@ def test_cli_provision_command_with_existing_prefix_name(
     result = runner.invoke(
         app,
         ["provision"],
-        input="uksouth\nrand\nvalid\n\ndefault\nN\n",
+        input="uksouth\nrand\nvalid\ndefault\ndefault\nN\n",
     )
 
     assert expected_error_message in result.stdout
@@ -349,7 +353,7 @@ def test_cli_provision_command_with_password_mismatch(runner, matcha_testing_dir
 
     # Invoke provision command
     result = runner.invoke(
-        app, ["provision"], input="uksouth\ncoffee\n\nninja\nno\nno\n"
+        app, ["provision"], input="uksouth\ncoffee\ndefault\nninja\nno\nno\n"
     )
 
     # Exit code 0 means there was no error
@@ -371,7 +375,7 @@ def test_cli_provision_command_reuse(runner, matcha_testing_directory):
     runner.invoke(
         app,
         ["provision", "--location", "uksouth", "--prefix", "matcha"],
-        input="\ndefault\nno\n",
+        input="default\ndefault\nno\n",
     )
 
     destination_path = os.path.join(
@@ -385,7 +389,7 @@ def test_cli_provision_command_reuse(runner, matcha_testing_directory):
     runner.invoke(
         app,
         ["provision", "--location", "uksouth", "--prefix", "matcha"],
-        input="\ndefault\nn\nno\n",
+        input="default\ndefault\nn\nno\n",
     )
 
     assert os.path.exists(os.path.join(destination_path, "dummy.tf"))

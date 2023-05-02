@@ -31,11 +31,11 @@ def provision(
         help="A unique prefix for your resources.",
     ),
     password: str = typer.Option(
+        default=None,
         prompt="Set a password for your deployment server",
         confirmation_prompt=True,
         hide_input=True,
         help="A password for the deployment server",
-        default="default",
     ),
     verbose: Optional[bool] = typer.Option(
         False, help="Get more detailed information from matcha provision!"
