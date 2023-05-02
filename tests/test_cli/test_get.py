@@ -8,6 +8,7 @@ from typer.testing import CliRunner
 
 from matcha_ml.cli.cli import app
 from matcha_ml.cli.get import get_resources
+from matcha_ml.errors import MatchaInputError
 from matcha_ml.services.matcha_state import MatchaStateService
 
 
@@ -133,6 +134,24 @@ def test_cli_get_command_with_resource(runner: CliRunner):
 
     for line in expected_output_lines:
         assert line in result.stdout
+
+
+def test_cli_get_command_with_invalid_resource_name(runner: CliRunner):
+    """Test cli for get command with a resource name that does not exist in the state file.
+
+    Args:
+        runner (CliRunner): typer CLI runner
+    """
+    # Invoke get command
+    result = runner.invoke(app, ["get", "this-resource-does-not-exist"])
+
+    # Exit code 1 means an error was thrown
+    assert result.exit_code == 1
+    assert isinstance(result.exception, MatchaInputError)
+    assert (
+        "Error - a resource type with the name 'this-resource-does-not-exist' does not exist."
+        in str(result.exception)
+    )
 
 
 def test_cli_get_command_with_resource_and_property(runner: CliRunner):

@@ -3,6 +3,8 @@ import json
 import os
 from typing import Dict, Optional
 
+from matcha_ml.errors import MatchaInputError
+
 MATCHA_STATE_DIR = os.path.join(".matcha", "infrastructure", "matcha.state")
 
 
@@ -38,7 +40,7 @@ class MatchaStateService:
         self,
         resource_name: Optional[str] = None,
         property_name: Optional[str] = None,
-    ) -> Dict[str, Dict[str, str]]:
+    ) -> Optional[Dict[str, Dict[str, str]]]:
         """Either return all of the resources or resource specified by the resource name.
 
         Args:
@@ -46,12 +48,24 @@ class MatchaStateService:
             property_name (Optional[str]): the property to get from the specified resource. Defaults to None.
 
         Returns:
-            Dict[str, Dict[str, str]]: resources in the format of a dictionary.
+            Optional[Dict[str, Dict[str, str]]]: resources in the format of a dictionary.
         """
         if resource_name is None:
             return self._state
-        elif resource_name and property_name is None:
-            return {str(resource_name): dict(self._state.get(resource_name))}
-        else:
-            property_value = str(self._state.get(resource_name).get(property_name))
-            return {resource_name: {property_name: property_value}}
+
+        if resource_name not in self._state.keys():
+            raise MatchaInputError(
+                f"Error - a resource type with the name '{resource_name}' does not exist."
+            )
+
+        if property_name is None:
+            return {str(resource_name): dict(self._state[resource_name])}
+
+        property_value = self._state.get(resource_name, {}).get(property_name)
+
+        if property_value is None:
+            raise MatchaInputError(
+                f"Error - a property with the name '{property_name}' does not exist for the '{resource_name}' resource."
+            )
+
+        return {resource_name: {property_name: property_value}}
