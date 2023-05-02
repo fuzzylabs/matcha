@@ -85,8 +85,6 @@ def test_fetch_resources_from_state_file(
         matcha_state_service (MatchaStateService): The matcha_state_service testing instance.
         expected_outputs (dict): The expected state file.
     """
-    _ = matcha_state_service.check_state_file_exists()
-
     result = matcha_state_service.fetch_resources_from_state_file()
     assert result == expected_outputs
 
@@ -95,3 +93,25 @@ def test_fetch_resources_from_state_file(
     )
     expected = {"experiment-tracker": {"tracking-url": "mlflow_test_url"}}
     assert result == expected
+
+
+def test_check_state_file_exists(matcha_state_service: MatchaStateService):
+    """Test check state file returns True when matcha state file exists.
+
+    Args:
+        matcha_state_service (MatchaStateService): The matcha_state_service testing instance.
+    """
+    result = matcha_state_service.check_state_file_exists()
+    assert result is True
+
+
+def test_check_state_file_does_not_exist(matcha_state_service: MatchaStateService):
+    """Test check state file returns False when matcha state file does not exist.
+
+    Args:
+        matcha_state_service (MatchaStateService): The matcha_state_service testing instance.
+    """
+    matcha_infrastructure_dir = os.path.join(".matcha", "infrastructure")
+    os.remove(os.path.join(matcha_infrastructure_dir, "matcha.state"))
+    result = matcha_state_service.check_state_file_exists()
+    assert result is False

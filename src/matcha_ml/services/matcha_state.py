@@ -11,6 +11,10 @@ MATCHA_STATE_DIR = os.path.join(".matcha", "infrastructure", "matcha.state")
 class MatchaStateService:
     """A matcha state service for handling to matcha.state file."""
 
+    def __init__(self) -> None:
+        """MatchaStateService constructor."""
+        _ = self.check_state_file_exists()
+
     def check_state_file_exists(self) -> bool:
         """Check if state file exists.
 
