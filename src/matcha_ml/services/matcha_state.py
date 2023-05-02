@@ -57,8 +57,6 @@ class MatchaStateService:
         property_value = self._state.get(resource_name, {})[property_name]
 
         return {resource_name: {property_name: property_value}}
-        # else:
-        #     return None
 
     def get_resource_names(self) -> List[str]:
         """Method for returning all existing resource names.
