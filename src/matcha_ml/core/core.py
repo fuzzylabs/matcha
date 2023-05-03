@@ -19,7 +19,7 @@ def get(
         property_name (Optional[str]): the property of the resource to get.
 
     Returns:
-        Optional[Dict[str, Dict[str, str]]]: the information of the provisioned resource.
+        Dict[str, Dict[str, str]]: the information of the provisioned resource.
     """
     matcha_state_service = MatchaStateService()
 

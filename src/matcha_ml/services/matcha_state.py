@@ -46,7 +46,7 @@ class MatchaStateService:
             property_name (Optional[str]): the property to get from the specified resource. Defaults to None.
 
         Returns:
-            Optional[Dict[str, Dict[str, str]]]: resources in the format of a dictionary.
+            Dict[str, Dict[str, str]]: resources in the format of a dictionary.
         """
         if resource_name is None:
             return self._state
