@@ -21,6 +21,10 @@ def get(
 
     Returns:
         Dict[str, Dict[str, str]]: the information of the provisioned resource.
+
+    Raises:
+        MatchaError: Raised when the matcha.state file does not exist
+        MatchaInputError: Raised when the resource or property name does not exist in the matcha.state file
     """
     matcha_state_service = MatchaStateService()
 
