@@ -63,14 +63,16 @@ def expected_outputs() -> dict:
     return outputs
 
 
-def test_state_file(matcha_state_service: MatchaStateService, expected_outputs: dict):
+def test_state_file_getter(
+    matcha_state_service: MatchaStateService, expected_outputs: dict
+):
     """Test whether the state file getter behaves and return as expected.
 
     Args:
         matcha_state_service (MatchaStateService): The matcha_state_service testing instance.
         expected_outputs (dict): The expected state file.
     """
-    result = matcha_state_service._state_file
+    result = matcha_state_service.state_file
     assert result == expected_outputs
 
 
