@@ -48,20 +48,31 @@ Check the `roleDefinitionName` field and if eithe rof the two roles [defined abo
 
 To check your permissions using the Azure portal, do the following:
 
-1. In the Azure portal, go to *Subscriptions*
-2. Select the subscription that you want to check the roles for
-3. Click *Access Control (IAM)* in the panel to the left
-4. Either search for, or navigate to, your account
-5. Check in the *Role* column whether it matches one of the [required roles](#what-permissions-does-matcha-require)
+- In the Azure portal, go to *Subscriptions*
+- Select the subscription that you want to check the roles for
+- Click *Access Control (IAM)* in the panel to the left
 
-TODO Add picture
+<figure markdown>
+  ![Azure Access Control Location](img/azure-permissions/azure-access-control-location.png)
+  <figcaption>Azure Access Control</figcaption>
+</figure>
+
+- Go to the *Role assignments* tab
+- Check in the *Role* column whether it matches one of the [required roles](#what-permissions-does-matcha-require)
+
+<figure markdown>
+  ![Azure Role Assignments](img/azure-permissions/azure-role-assignments.png)
+  <figcaption>Azure Role Assignments</figcaption>
+</figure>
+
+From the above, we can see that the user has the Owner permissions.
 
 ## How much does it cost?
 
 `matcha` deploys a set of resources to Azure for you, so a natural question is: what on earth is this going to cost?! Below is how much it would cost to run the provisioned resources on Azure for a month.
 
 <figure markdown>
-  ![Azure Cost Breakdown](img/azure-cost-breakdown.png)
+  ![Azure Cost Breakdown](img/azure-permissions/azure-cost-breakdown.png)
   <figcaption>Azure Cost Breakdown</figcaption>
 </figure>
 
