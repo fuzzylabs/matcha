@@ -13,7 +13,7 @@ class MatchaStateService:
         """MatchaStateService constructor."""
         self.state_file_exists = self.check_state_file_exists()
         if self.state_file_exists:
-            self._state = self._state_file
+            self._state = self.state_file
 
     @classmethod
     def check_state_file_exists(cls) -> bool:
@@ -25,7 +25,7 @@ class MatchaStateService:
         return bool(os.path.isfile(cls.matcha_state_dir))
 
     @property
-    def _state_file(self) -> Dict[str, Dict[str, str]]:
+    def state_file(self) -> Dict[str, Dict[str, str]]:
         """Getter of the state file.
 
         Returns:
