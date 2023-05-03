@@ -11,8 +11,8 @@ class MatchaStateService:
 
     def __init__(self) -> None:
         """MatchaStateService constructor."""
-        self.state_file_exist = self.check_state_file_exists()
-        if self.state_file_exist:
+        self.state_file_exists = self.check_state_file_exists()
+        if self.state_file_exists:
             self._state = self._state_file
 
     def check_state_file_exists(self) -> bool:

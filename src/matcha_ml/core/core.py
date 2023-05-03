@@ -24,9 +24,9 @@ def get(
     """
     matcha_state_service = MatchaStateService()
 
-    if not matcha_state_service.state_file_exist:
+    if not matcha_state_service.state_file_exists:
         raise MatchaError(
-            f"Error: matcha.state file does not exist at {os.path.join(os.getcwd(), matcha_state_service.matcha_state_dir)} . Please run 'matcha provision' before trying to get the resource."
+            f"Error: matcha.state file does not exist at {os.path.join(os.getcwd(), '.matcha', 'infrastructure')} . Please run 'matcha provision' before trying to get the resource."
         )
 
     if resource_name:

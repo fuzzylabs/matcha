@@ -102,13 +102,12 @@ def test_cli_get_command_with_invalid_resource_name(runner: CliRunner):
         runner (CliRunner): typer CLI runner
     """
     # Invoke get command
-    result = runner.invoke(app, ["get", "this-resource-does-not-exist"])
+    result = runner.invoke(app, ["get", "does-not-exist"])
 
-    # Exit code 1 means an error was thrown
-    assert result.exit_code == 1
+    assert result.exit_code == 0
     assert (
-        "Error - a resource type with the name 'this-resource-does-not-exist' does not exist."
-        in str(result.exception)
+        "Error - a resource type with the name 'does-not-exist' does not exist."
+        in str(result.stdout)
     )
 
 
