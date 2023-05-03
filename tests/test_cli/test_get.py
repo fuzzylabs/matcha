@@ -71,6 +71,22 @@ def test_cli_get_command_help(runner: CliRunner):
     assert "Get information for the provisioned resources." in result.stdout
 
 
+def test_cli_get_command_with_no_state_file(runner: CliRunner):
+    """Test cli for get command when the state file does not exist.
+
+    Args:
+        runner (CliRunner): typer CLI runner
+    """
+    state_file_path = os.path.join(".matcha", "infrastructure", "matcha.state")
+    os.remove(state_file_path)
+
+    # Invoke get command
+    result = runner.invoke(app, ["get", "experiment-tracker"])
+
+    assert result.exit_code == 0
+    assert "Error: matcha.state file does not exist at" in str(result.stdout)
+
+
 def test_cli_get_command_with_resource(runner: CliRunner):
     """Test cli for get command with a specified resource.
 
