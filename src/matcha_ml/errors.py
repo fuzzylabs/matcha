@@ -1,8 +1,6 @@
 """matcha custom errors."""
 from typing import Any
 
-# Create MatchaError
-
 
 class MatchaError(Exception):
     """Matcha generic Error."""
