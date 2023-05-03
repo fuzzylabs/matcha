@@ -71,6 +71,10 @@ def get(
         resource_name (Optional[str]): the name of the resource.
         property_name (Optional[str]): the specific property of the resource to return.
         output (typer.Option): the format of the output specified by the user.
+
+    Raises:
+        Exit: Exit if matcha.state file does not exist.
+        Exit: Exit if resource type or property does not exist in matcha.state.
     """
     try:
         resources = core.get(resource_name, property_name)
