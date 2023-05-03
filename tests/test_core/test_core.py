@@ -5,6 +5,7 @@ import os
 import pytest
 
 from matcha_ml.core.core import get
+from matcha_ml.errors import MatchaError, MatchaInputError
 
 
 @pytest.fixture(autouse=True)
@@ -62,6 +63,15 @@ def test_get_resources(expected_outputs: dict):
     assert expected_outputs == get(None, None)
 
 
+def test_get_resources_without_state_file():
+    """Test get resources function when a state file does not exist."""
+    state_file_path = os.path.join(".matcha", "infrastructure", "matcha.state")
+    os.remove(state_file_path)
+
+    with pytest.raises(MatchaError):
+        get(None, None)
+
+
 def test_get_resources_with_resource_name():
     """Test get resources function with resource name specified."""
     expected_output = {
@@ -69,6 +79,12 @@ def test_get_resources_with_resource_name():
     }
 
     assert expected_output == get("experiment-tracker", None)
+
+
+def test_get_resources_with_invalid_resource_name():
+    """Test get resources function with an invalid resource name specified."""
+    with pytest.raises(MatchaInputError):
+        get("invalid-resource", None)
 
 
 def test_get_resources_with_resource_name_and_property_name():
