@@ -14,7 +14,7 @@ from matcha_ml.cli.ui.status_message_builders import (
     build_status,
     build_substep_success_status,
 )
-from matcha_ml.errors import MatchaTerraformError
+from matcha_ml.errors import MatchaInputError, MatchaTerraformError
 from matcha_ml.services.terraform_service import TerraformService
 
 SPINNER = "dots"
@@ -192,6 +192,7 @@ class TemplateRunner:
             print_error(
                 "A valid resource type for the output '{output_name}' does not exist."
             )
+            raise MatchaInputError()
 
         flavour_and_resource_name = output_name[len(resource_type) + 1 :]
 
@@ -249,18 +250,9 @@ class TemplateRunner:
         """
         self._check_terraform_installation()
         self._validate_terraform_config()
-
-        if self._is_approved(verb="provision"):
-            self._initialize_terraform()
-            self._apply_terraform()
-            self._show_terraform_outputs()
-        else:
-            print_status(
-                build_status(
-                    "You decided to cancel - if you change your mind, then run 'matcha provision' again."
-                )
-            )
-            raise typer.Exit()
+        self._initialize_terraform()
+        self._apply_terraform()
+        self._show_terraform_outputs()
 
     def deprovision(self) -> None:
         """Destroy the provisioned resources.
