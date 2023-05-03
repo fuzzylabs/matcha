@@ -41,7 +41,6 @@ def build_resource_output(
     Args:
         resources (Dict[str, str]): a dictionary of resources.
         output_format (Optional[str], optional): the format of the resource output specified by the user. Defaults to None.
-        header (Optional[str], optional): header of the resource output.
 
     Returns:
         str: the resource output in the format as a string.

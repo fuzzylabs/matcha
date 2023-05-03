@@ -17,7 +17,6 @@ def get(
     Args:
         resource_name (Optional[str]): name of the resource to get information for.
         property_name (Optional[str]): the property of the resource to get.
-        matcha_state_service (MatchaStateService): the matcha state service for interacting with the matcha.state file.
 
     Returns:
         Optional[Dict[str, Dict[str, str]]]: the information of the provisioned resource.
@@ -30,11 +29,15 @@ def get(
         )
 
     if resource_name:
-        get_command_validation(resource_name, matcha_state_service.get_resource_names())
+        get_command_validation(
+            resource_name, matcha_state_service.get_resource_names(), "resource type"
+        )
 
     if resource_name and property_name:
         get_command_validation(
-            property_name, matcha_state_service.get_property_names(resource_name), True
+            property_name,
+            matcha_state_service.get_property_names(resource_name),
+            "property",
         )
 
     result = matcha_state_service.fetch_resources_from_state_file(

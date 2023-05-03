@@ -214,7 +214,7 @@ def test_get_command_validation_invalid_resource_name():
     expected_output = "Error - a resource type with the name 'option' does not exist. Did you mean 'option-1'?"
 
     with pytest.raises(MatchaInputError) as err:
-        get_command_validation(mock_argument, mock_valid_options)
+        get_command_validation(mock_argument, mock_valid_options, "resource type")
 
     assert str(err.value) in expected_output
 
@@ -228,6 +228,6 @@ def test_get_command_validation_invalid_property_name():
     expected_output = "Error - a property with the name 'second-opt' does not exist. Did you mean 'second-option'?"
 
     with pytest.raises(MatchaInputError) as err:
-        get_command_validation(mock_argument, mock_valid_options, True)
+        get_command_validation(mock_argument, mock_valid_options, "property")
 
     assert str(err.value) in expected_output

@@ -57,18 +57,13 @@ def test_get_resources(expected_outputs: dict):
     """Test get resources function with no resource specified.
 
     Args:
-        matcha_state_service (MatchaStateService): The matcha_state_service testing instance.
         expected_outputs (dict): The expected output from the matcha state file.
     """
     assert expected_outputs == get(None, None)
 
 
 def test_get_resources_with_resource_name():
-    """Test get resources function with resource name specified.
-
-    Args:
-        matcha_state_service (MatchaStateService): The matcha_state_service testing instance.
-    """
+    """Test get resources function with resource name specified."""
     expected_output = {
         "experiment-tracker": {"flavor": "mlflow", "tracking-url": "mlflow_test_url"}
     }
@@ -77,11 +72,7 @@ def test_get_resources_with_resource_name():
 
 
 def test_get_resources_with_resource_name_and_property_name():
-    """Test get resources function with resource name and resource property specified.
-
-    Args:
-        matcha_state_service (MatchaStateService): The matcha_state_service testing instance.
-    """
+    """Test get resources function with resource name and resource property specified."""
     expected_output = {"experiment-tracker": {"tracking-url": "mlflow_test_url"}}
 
     assert expected_output == get("experiment-tracker", "tracking-url")
