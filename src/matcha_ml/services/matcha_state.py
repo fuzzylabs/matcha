@@ -15,13 +15,14 @@ class MatchaStateService:
         if self.state_file_exists:
             self._state = self._state_file
 
-    def check_state_file_exists(self) -> bool:
+    @classmethod
+    def check_state_file_exists(cls) -> bool:
         """Check if state file exists.
 
         Returns:
             bool: returns True if exists, otherwise False.
         """
-        return bool(os.path.isfile(self.matcha_state_dir))
+        return bool(os.path.isfile(cls.matcha_state_dir))
 
     @property
     def _state_file(self) -> Dict[str, Dict[str, str]]:
