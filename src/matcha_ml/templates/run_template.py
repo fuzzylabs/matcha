@@ -7,7 +7,11 @@ from typing import Tuple
 import typer
 
 from matcha_ml.cli.ui.emojis import Emojis
-from matcha_ml.cli.ui.print_messages import print_error, print_json, print_status
+from matcha_ml.cli.ui.print_messages import (
+    print_error,
+    print_resource_output,
+    print_status,
+)
 from matcha_ml.cli.ui.spinner import Spinner
 from matcha_ml.cli.ui.status_message_builders import (
     build_resource_confirmation,
@@ -181,7 +185,7 @@ class TemplateRunner:
         Returns:
             Tuple[str, str, str]: the resource output for matcha.state.
         """
-        resource_type = None
+        resource_type: str
 
         for key in RESOURCE_NAMES:
             if key in output_name:
@@ -222,7 +226,7 @@ class TemplateRunner:
         print_status(build_status("Here are the endpoints for what's been provisioned"))
         # print terraform output from state file
         with open(self.state_file) as fp:
-            print_json(fp.read())
+            print_resource_output(fp.read(), show_sensitive=False)
 
     def _destroy_terraform(self) -> None:
         """Destroy the provisioned resources.
