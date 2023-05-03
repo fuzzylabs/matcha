@@ -52,7 +52,6 @@ def print_resource_output(
         show_sensitive (bool): whether to show or hide sensitive output. Show all resource information if true.
     """
     resource_output_dict = json.loads(resource_output)
-    print(type(resource_output_dict))
 
     if not show_sensitive:
         resource_output = hide_sensitive_in_output(resource_output_dict)

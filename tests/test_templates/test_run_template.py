@@ -343,10 +343,10 @@ def test_show_terraform_outputs(
 
     with does_not_raise():
         template_runner._show_terraform_outputs()
-        # captured = capsys.readouterr()
+        captured = capsys.readouterr()
 
-        # for output in expected_outputs_hide_sensitive:
-        #     assert output in captured.out
+        for output in expected_outputs_hide_sensitive:
+            assert output in captured.out
 
 
 def test_destroy_terraform(capsys: SysCapture, template_runner: TemplateRunner):
