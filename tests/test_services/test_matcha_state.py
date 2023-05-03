@@ -30,18 +30,13 @@ def mock_state_file(matcha_testing_directory: str):
     os.makedirs(matcha_infrastructure_dir)
 
     state_file_resources = {
-        "mlflow_tracking_url": "mlflow_test_url",
-        "zenml_storage_path": "zenml_test_storage_path",
-        "zenml_connection_string": "zenml_test_connection_string",
-        "k8s_context": "k8s_test_context",
-        "azure_container_registry": "azure_container_registry",
-        "azure_registry_name": "azure_registry_name",
-        "zen_server_url": "zen_server_url",
-        "zen_server_username": "zen_server_username",
-        "zen_server_password": "zen_server_password",
-        "seldon_workloads_namespace": "test_seldon_workloads_namespace",
-        "seldon_base_url": "test_seldon_base_url",
-        "resource_group_name": "test_resources",
+        "cloud": {"flavor": "azure", "resource-group-name": "test_resources"},
+        "container-registry": {
+            "flavor": "azure",
+            "registry-name": "azure_registry_name",
+            "registry-url": "azure_container_registry",
+        },
+        "experiment-tracker": {"flavor": "mlflow", "tracking-url": "mlflow_test_url"},
     }
 
     with open(os.path.join(matcha_infrastructure_dir, "matcha.state"), "w") as f:
@@ -56,24 +51,21 @@ def expected_outputs() -> dict:
         dict: expected output
     """
     outputs = {
-        "mlflow_tracking_url": "mlflow_test_url",
-        "zenml_storage_path": "zenml_test_storage_path",
-        "zenml_connection_string": "zenml_test_connection_string",
-        "k8s_context": "k8s_test_context",
-        "azure_container_registry": "azure_container_registry",
-        "azure_registry_name": "azure_registry_name",
-        "zen_server_url": "zen_server_url",
-        "zen_server_username": "zen_server_username",
-        "zen_server_password": "zen_server_password",
-        "seldon_workloads_namespace": "test_seldon_workloads_namespace",
-        "seldon_base_url": "test_seldon_base_url",
-        "resource_group_name": "test_resources",
+        "cloud": {"flavor": "azure", "resource-group-name": "test_resources"},
+        "container-registry": {
+            "flavor": "azure",
+            "registry-name": "azure_registry_name",
+            "registry-url": "azure_container_registry",
+        },
+        "experiment-tracker": {"flavor": "mlflow", "tracking-url": "mlflow_test_url"},
     }
 
     return outputs
 
 
-def test_state_file(matcha_state_service: MatchaStateService, expected_outputs: dict):
+def test_state_file_getter(
+    matcha_state_service: MatchaStateService, expected_outputs: dict
+):
     """Test whether the state file getter behaves and return as expected.
 
     Args:
@@ -99,11 +91,29 @@ def test_fetch_resources_from_state_file(
     assert result == expected_outputs
 
     result = matcha_state_service.fetch_resources_from_state_file(
-        ["zen_server_url", "zen_server_username", "zen_server_password"]
+        resource_name="experiment-tracker", property_name="tracking-url"
     )
-    expected = {
-        "zen_server_url": "zen_server_url",
-        "zen_server_username": "zen_server_username",
-        "zen_server_password": "zen_server_password",
-    }
+    expected = {"experiment-tracker": {"tracking-url": "mlflow_test_url"}}
     assert result == expected
+
+
+def test_check_state_file_exists(matcha_state_service: MatchaStateService):
+    """Test check state file returns True when matcha state file exists.
+
+    Args:
+        matcha_state_service (MatchaStateService): The matcha_state_service testing instance.
+    """
+    result = matcha_state_service.check_state_file_exists()
+    assert result is True
+
+
+def test_check_state_file_does_not_exist(matcha_state_service: MatchaStateService):
+    """Test check state file returns False when matcha state file does not exist.
+
+    Args:
+        matcha_state_service (MatchaStateService): The matcha_state_service testing instance.
+    """
+    matcha_infrastructure_dir = os.path.join(".matcha", "infrastructure")
+    os.remove(os.path.join(matcha_infrastructure_dir, "matcha.state"))
+    result = matcha_state_service.check_state_file_exists()
+    assert result is False

@@ -234,3 +234,25 @@ def check_current_deployment_exists() -> bool:
             f"Error, resource group '{resource_group_name}' is currently in a '{rg_state.value}' which is currently not handled by matcha. Please check your resources on Azure."
         )
         return True
+
+
+def get_command_validation(argument: str, valid_options: List[str], noun: str) -> None:
+    """Checks if an argument exists within a list of valid options, if it is not valid an exception is raised.
+
+    Args:
+        argument (str): A string to check
+        valid_options (List[str]): A list of possible valid strings
+        noun (str): Either 'property' or 'resource type'
+
+    Raises:
+        MatchaInputError: Raised when the argument is not valid
+    """
+    if argument not in valid_options:
+        err_msg = f"Error - a {noun} with the name '{argument}' does not exist."
+
+        closest = find_closest_matches(argument, valid_options, 1)
+
+        if closest:
+            err_msg += f" Did you mean '{closest[0]}'?"
+
+        raise MatchaInputError(err_msg)

@@ -8,7 +8,7 @@ from rich.console import Console
 err_console = Console(stderr=True)
 
 
-def dict_to_json(resources: Dict[str, str]) -> str:
+def dict_to_json(resources: Dict[str, Dict[str, str]]) -> str:
     """Return the resources as str in JSON format.
 
     Args:
@@ -20,7 +20,7 @@ def dict_to_json(resources: Dict[str, str]) -> str:
     return json.dumps(resources, indent=4)
 
 
-def dict_to_yaml(resources: Dict[str, str]) -> str:
+def dict_to_yaml(resources: Dict[str, Dict[str, str]]) -> str:
     """Return the resources as str in YAML format.
 
     Args:
@@ -33,16 +33,14 @@ def dict_to_yaml(resources: Dict[str, str]) -> str:
 
 
 def build_resource_output(
-    resources: Dict[str, str],
+    resources: Dict[str, Dict[str, str]],
     output_format: Optional[str] = None,
-    header: Optional[str] = None,
 ) -> str:
     """Build the output of the resource based on the format specified by the user.
 
     Args:
         resources (Dict[str, str]): a dictionary of resources.
         output_format (Optional[str], optional): the format of the resource output specified by the user. Defaults to None.
-        header (Optional[str], optional): header of the resource output.
 
     Returns:
         str: the resource output in the format as a string.
@@ -52,9 +50,14 @@ def build_resource_output(
     elif output_format == "yaml":
         return dict_to_yaml(resources)
     else:
-        message = "" if header is None else f"\n{header}:\n\n"
+        message = "\nBelow are the resources provisioned.\n\n"
 
-        for key, value in resources.items():
-            message += f"The {key.replace('_', ' ')} is: {value}\n"
+        for resource_name, properties in resources.items():
+            message += f"{resource_name.replace('-', ' ').capitalize()}\n"
+
+            for property_name, property_value in properties.items():
+                message += f"   - {property_name}: {property_value}\n"
+
+            message += "\n"
 
         return message
