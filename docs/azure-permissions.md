@@ -42,7 +42,7 @@ You should see something similar to the following (there might be multiple roles
 ]
 ```
 
-Check the `roleDefinitionName` field and if eithe rof the two roles [defined above](#what-permissions-does-matcha-require) are present, then you have the correct level of permissions to run `matcha provision`.
+Check the `roleDefinitionName` field and if either of the two roles [defined above](#what-permissions-does-matcha-require) are present, then you have the correct level of permissions to run `matcha provision`.
 
 ### Azure Portal
 
