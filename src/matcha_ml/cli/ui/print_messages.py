@@ -1,5 +1,4 @@
 """UI print functions."""
-import json
 from typing import Optional
 
 import rich
@@ -36,13 +35,12 @@ def print_json(json: str) -> None:
     Args:
         json (str): JSON string to print
     """
-    rich.print_json(json)
+    rich.print_json(data=json)
 
 
 def print_resource_output(
     resource_output: str,
-    output_format: Optional[str] = "json",
-    show_sensitive: bool = False,
+    output_format: Optional[str] = None,
 ) -> None:
     """Print the resource output based on the output format specified by the user.
 
@@ -51,18 +49,15 @@ def print_resource_output(
         output_format (str, optional):  the format of the resource output specified by the user. Defaults to None.
         show_sensitive (bool): whether to show or hide sensitive output. Show all resource information if true.
     """
-    resource_output_dict = json.loads(resource_output)
-
-    if not show_sensitive:
-        resource_output = hide_sensitive_in_output(resource_output_dict)
-
     if output_format == "json":
         print_json(resource_output)
     else:
         rich.print(resource_output)
 
 
-def hide_sensitive_in_output(resource_output_dict: dict[str, dict[str, str]]) -> str:
+def hide_sensitive_in_output(
+    resource_output_dict: dict[str, dict[str, str]]
+) -> dict[str, dict[str, str]]:
     """Hide sensitive value in output.
 
     Args:
@@ -78,4 +73,4 @@ def hide_sensitive_in_output(resource_output_dict: dict[str, dict[str, str]]) ->
                 # properties.pop(value_to_censor, None)
                 properties[value_to_censor] = "********"
 
-    return str(json.dumps(resource_output_dict))
+    return resource_output_dict
