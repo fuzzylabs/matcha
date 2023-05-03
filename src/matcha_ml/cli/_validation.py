@@ -236,16 +236,19 @@ def check_current_deployment_exists() -> bool:
         return True
 
 
-def get_command_validation(
-    argument: str, valid_options: List[str], is_property: bool = False
-) -> None:
+def get_command_validation(argument: str, valid_options: List[str], verb: str) -> None:
+    """Checks if an argument exists within a list of valid options, if it is not valid an exception is raised.
+
+    Args:
+        argument (str): A string to check
+        valid_options (List[str]): A list of possible valid strings
+        verb (str): Either 'property' or 'resource type'
+
+    Raises:
+        MatchaInputError: Raised when the argument is not valid
+    """
     if argument not in valid_options:
-        if is_property:
-            err_msg = f"Error - a property with the name '{argument}' does not exist."
-        else:
-            err_msg = (
-                f"Error - a resource type with the name '{argument}' does not exist."
-            )
+        err_msg = f"Error - a {verb} with the name '{argument}' does not exist."
 
         closest = find_closest_matches(argument, valid_options, 1)
 
