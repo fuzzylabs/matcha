@@ -3,11 +3,11 @@ import json
 import os
 from typing import Dict, List, Optional
 
-MATCHA_STATE_DIR = os.path.join(".matcha", "infrastructure", "matcha.state")
-
 
 class MatchaStateService:
     """A matcha state service for handling to matcha.state file."""
+
+    matcha_state_dir = os.path.join(".matcha", "infrastructure", "matcha.state")
 
     def __init__(self) -> None:
         """MatchaStateService constructor."""
@@ -21,7 +21,7 @@ class MatchaStateService:
         Returns:
             bool: returns True if exists, otherwise False.
         """
-        return bool(os.path.isfile(MATCHA_STATE_DIR))
+        return bool(os.path.isfile(self.matcha_state_dir))
 
     @property
     def _state_file(self) -> Dict[str, Dict[str, str]]:
@@ -30,7 +30,7 @@ class MatchaStateService:
         Returns:
             Dict[str, Dict[str, str]]: the state file in the format of a dictionary.
         """
-        with open(MATCHA_STATE_DIR) as f:
+        with open(self.matcha_state_dir) as f:
             self._state = dict(json.load(f))
             return dict(self._state)
 
