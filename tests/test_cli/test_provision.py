@@ -282,7 +282,6 @@ def test_cli_provision_command_with_existing_prefix_name(
         ["provision"],
         input="uksouth\nrand\nvalid\ndefault\ndefault\nN\n",
     )
-    print(result.stdout)
     assert expected_error_message in result.stdout
 
 

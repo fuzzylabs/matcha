@@ -170,10 +170,10 @@ def test_is_approved(template_runner: TemplateRunner):
     """
     with mock.patch("typer.confirm") as mock_confirm:
         mock_confirm.return_value = True
-        assert template_runner._is_approved("provision")
+        assert template_runner.is_approved("provision")
 
         mock_confirm.return_value = False
-        assert not template_runner._is_approved("provision")
+        assert not template_runner.is_approved("provision")
 
 
 def test_initialize_terraform(capsys: SysCapture, template_runner: TemplateRunner):
@@ -341,46 +341,34 @@ def test_destroy_terraform(capsys: SysCapture, template_runner: TemplateRunner):
         )
 
 
-# def test_provision(capsys: SysCapture, template_runner: TemplateRunner):
-#     """Test service can provision resources using terraform.
+def test_provision(template_runner: TemplateRunner):
+    """Test service can provision resources using terraform.
 
-#     Args:
-#         capsys (SysCapture): fixture to capture stdout and stderr
-#         template_runner (TemplateRunner): a TemplateRunner object instance
-#     """
-#     template_runner._check_terraform_installation = MagicMock()
-#     template_runner._validate_terraform_config = MagicMock()
-#     template_runner._initialize_terraform = MagicMock()
-#     template_runner._apply_terraform = MagicMock()
-#     template_runner._show_terraform_outputs = MagicMock()
+    Args:
+        template_runner (TemplateRunner): a TemplateRunner object instance
+    """
+    template_runner._check_terraform_installation = MagicMock()
+    template_runner._validate_terraform_config = MagicMock()
+    template_runner._initialize_terraform = MagicMock()
+    template_runner._apply_terraform = MagicMock()
+    template_runner._show_terraform_outputs = MagicMock()
 
-#     with mock.patch("typer.confirm") as mock_confirm:
-#         mock_confirm.return_value = False
-#         expected_output = "You decided to cancel - if you change your mind, then run 'matcha provision' again."
+    with mock.patch("typer.confirm") as mock_confirm:
+        mock_confirm.return_value = False
+        template_runner._initialize_terraform.assert_not_called()
+        template_runner._apply_terraform.assert_not_called()
 
-#         with pytest.raises(typer.Exit):
-#             template_runner.provision
-#             template_runner._initialize_terraform.assert_not_called()
-#             template_runner._apply_terraform.assert_not_called()
-
-#             captured = capsys.readouterr()
-
-#             assert expected_output in captured
-
-#     with mock.patch("typer.confirm") as mock_confirm:
-#         mock_confirm.return_value = True
-
-#         with does_not_raise():
-#             template_runner.provision()
-#             template_runner._initialize_terraform.assert_called()
-#             template_runner._apply_terraform.assert_called()
+    with mock.patch("typer.confirm") as mock_confirm:
+        mock_confirm.return_value = True
+        template_runner.provision()
+        template_runner._initialize_terraform.assert_called()
+        template_runner._apply_terraform.assert_called()
 
 
-def test_deprovision(capsys: SysCapture, template_runner: TemplateRunner):
+def test_deprovision(template_runner: TemplateRunner):
     """Test service can deprovision resources using terraform.
 
     Args:
-        capsys (SysCapture): fixture to capture stdout and stderr
         template_runner (TemplateRunner): a TemplateRunner object instance
     """
     template_runner._check_terraform_installation = MagicMock()
@@ -389,19 +377,9 @@ def test_deprovision(capsys: SysCapture, template_runner: TemplateRunner):
 
     with mock.patch("typer.confirm") as mock_confirm:
         mock_confirm.return_value = False
-        expected_output = "You decided to cancel - your resources will remain active! If you change your mind, then run 'matcha destroy' again."
-
-        with pytest.raises(typer.Exit):
-            template_runner.deprovision()
-            template_runner._destroy_terraform.assert_not_called()
-
-            captured = capsys.readouterr()
-
-            assert expected_output in captured
+        template_runner._destroy_terraform.assert_not_called()
 
     with mock.patch("typer.confirm") as mock_confirm:
         mock_confirm.return_value = True
-
-        with does_not_raise():
-            template_runner.deprovision()
-            template_runner._destroy_terraform.assert_called()
+        template_runner.deprovision()
+        template_runner._destroy_terraform.assert_called()

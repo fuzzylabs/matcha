@@ -38,7 +38,7 @@ def provision_resources(
     template_runner = TemplateRunner()
 
     # initialises the infrastructure provisioning process.
-    if template_runner._is_approved(verb="provision"):
+    if template_runner.is_approved(verb="provision"):
 
         project_directory = os.getcwd()
         destination = os.path.join(project_directory, ".matcha", "infrastructure")
