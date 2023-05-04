@@ -11,6 +11,7 @@ nav:
   - Usage:
     - Getting Started: 'getting-started.md'
     - Azure Permissions: 'azure-permissions.md'
+    - Cost: 'costings.md'
   - Workflows: 'workflows.md'
   - MLOps Principles: 'mlops-principles.md'
 

@@ -15,7 +15,7 @@ In its current form, the following Azure permissions are required:
 1. Owner
 2. A combination of: Contributor + User Access Administrator
 
-> Note: These are high level roles with a lot of privilages and we're actively working on introducing more granular permissions.
+> Note: These are high level roles with a lot of privileges and we're actively working on introducing more granular permissions.
 
 ## How do I check what permissions my account has?
 
@@ -66,16 +66,3 @@ To check your permissions using the Azure portal, do the following:
 </figure>
 
 From the above, we can see that the user has the Owner permissions.
-
-## How much does it cost?
-
-`matcha` deploys a set of resources to Azure for you, so a natural question is: what is this going to cost? Below is how much it would cost to run the provisioned resources on Azure for a month.
-
-<figure markdown>
-  ![Azure Cost Breakdown](img/azure-permissions/azure-cost-breakdown.png)
-  <figcaption>Azure Cost Breakdown</figcaption>
-</figure>
-
-This is a minimal setup and we've minimised the amount of resources where possible, reducing the overall cost. It's worth noting that if you don't have an Azure account, new joiners get Azure Credit which more than covers the cost of deploying these resources for exploring `matcha`.
-
-Our advice would be to make use of the `matcha destroy` command which will deprovision resources for you.

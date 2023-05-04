@@ -10,7 +10,7 @@ In this example, we'll show you how to use `matcha` to setup a default cloud env
 
 If you're reading through our documentation, then it's quite likely that we don't need to sell the benefit of tracking your experiments. Even so, it's worth emphasising. Having experiment tracking means that for each run of your pipeline, its metadata is stored in a central place. See our [MLOps Principles](mlops_principles.md) page for more!
 
-### Pre-requisties
+### Pre-requisites
 
 Before trying to provision infrastructure on Azure, `matcha` needs to you to be authenticated and to have the correct permissions for the tools you're wanting to deploy. See our explainer on [Azure Permissions](azure_permissions.md).
 
