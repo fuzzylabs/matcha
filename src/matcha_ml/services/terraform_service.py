@@ -96,7 +96,7 @@ class TerraformService:
         """Get the path to the previous temporary directory.
 
         Returns:
-            str: a Path object that represents the path to the previous temporary
+            Path: a Path object that represents the path to the previous temporary
         directory.
         """
         return Path(
