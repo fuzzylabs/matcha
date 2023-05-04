@@ -1,7 +1,6 @@
 # Getting Started
 
-Getting started with `matcha` :tea: couldn't be simpler, we'll have you up and running with a fully provision cloud environment in less than 10 minutes. We have a number of examples, see [here](https://github.com/fuzzylabs/matcha-examples) for our examples respository.
-
+This guide will show you how to get up and running with a fully provisioned cloud environment using `matcha` :tea:. We have a number of examples, see [here](https://github.com/fuzzylabs/matcha-examples) for our examples repository.
 
 ## A movie recommender with experiment tracking
 
@@ -11,9 +10,9 @@ In this example, we'll show you how to use `matcha` to setup a default cloud env
 
 If you're reading through our documentation, then it's quite likely that we don't need to sell the benefit of tracking your experiments. Even so, it's worth emphasising. Having experiment tracking means that for each run of your pipeline, its metadata is stored in a central place. See our [MLOps Principles](mlops_principles.md) page for more!
 
-### Pre-requisties
+### Pre-requisites
 
-While `matcha` is an easy to use tool, it unfortunately can't do everything. Before trying to provision infrastructure on Azure, `matcha` needs to you to be authenticated and to have the correct permissions for the tools you're wanting to deploy. See our explainer on [Azure Permissions](azure_permissions.md).
+Before trying to provision infrastructure on Azure, `matcha` needs to you to be authenticated and to have the correct permissions for the tools you're wanting to deploy. See our explainer on [Azure Permissions](azure_permissions.md).
 
 Alongside this, you need the Azure CLI installed - see [here](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli) on how to install it
 
@@ -65,7 +64,7 @@ az login
 
 `matcha` has a set of sensible defaults for the infrastructure that it'll provision for you - see *HERE (TODO)* for more details.
 
-To provision an experiment tracker using `matcha`, run the following command (you'll be asked a series of questions which helps `matcha` personalised the environment to you):
+To provision an experiment tracker using `matcha`, run the following command (you'll be asked a series of questions which helps `matcha` personalise the environment to you):
 
 ```bash
 matcha provision
@@ -93,7 +92,7 @@ Running the following command will run the recommendation pipeline locally, but 
 python run.py --train
 ```
 
-From here, you'll be able to visit your experiment tracker and see the runs stored there - cool, right?
+From here, you'll be able to visit your experiment tracker and see the runs stored there.
 
 ### Releasing Resources
 

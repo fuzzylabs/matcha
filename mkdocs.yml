@@ -11,6 +11,7 @@ nav:
   - Usage:
     - Getting Started: 'getting-started.md'
     - Azure Permissions: 'azure-permissions.md'
+    - Cost: 'costings.md'
   - Workflows: 'workflows.md'
   - MLOps Principles: 'mlops-principles.md'
 
@@ -29,7 +30,11 @@ markdown_extensions:
   - pymdownx.emoji:
       emoji_index: !!python/name:materialx.emoji.twemoji
       emoji_generator: !!python/name:materialx.emoji.to_svg
+  - md_in_html
 
+plugins:
+  - glightbox:
+      zoomable: true
 
 extra:
   social:
