@@ -16,7 +16,7 @@ class MatchaError(Exception):
         super().__init__(message, *args, **kwargs)
 
 
-class MatchaPermissionError(Exception):
+class MatchaPermissionError(MatchaError):
     """Matcha Permission Error.
 
     Raised when the user does not have the appropriate permissions.
@@ -33,7 +33,7 @@ class MatchaPermissionError(Exception):
         super().__init__(message, *args, **kwargs)
 
 
-class MatchaAuthenticationError(Exception):
+class MatchaAuthenticationError(MatchaError):
     """Matcha Authentication Error.
 
     Raised when the user is not authenticated with an external service.
@@ -51,7 +51,7 @@ class MatchaAuthenticationError(Exception):
         super().__init__(message, *args, **kwargs)
 
 
-class MatchaInputError(Exception):
+class MatchaInputError(MatchaError):
     """Matcha Input Error.
 
     Raised when the user inputs a bad value.
@@ -67,7 +67,7 @@ class MatchaInputError(Exception):
         super().__init__(*args, **kwargs)
 
 
-class MatchaTerraformError(Exception):
+class MatchaTerraformError(MatchaError):
     """Matcha Terraform Error.
 
     Raised when terraform fails to run.
