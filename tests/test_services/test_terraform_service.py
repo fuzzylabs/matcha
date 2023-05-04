@@ -146,23 +146,23 @@ def test_validate_config_not_exist(terraform_test_config: TerraformConfig):
     assert not tfs.validate_config()
 
 
-def test_get_previous_temp_dir(tmp_path):
+def test_get_tf_state_dir(tmp_path):
     """Test get_previous_temp_dir returns the .temp directory.
 
     Args:
         tmp_path (str): Pytest temporary path fixture for testing.
     """
-    new_dir = tmp_path / ".temp"
+    new_dir = tmp_path / "terraform.tfstate"
     os.mkdir(new_dir)
 
     tfs = TerraformService()
 
-    path = tfs.get_previous_temp_dir()
+    path = tfs.get_tf_state_dir()
 
     # Extract the last component of the path otherwise it will return full path
     last_component = os.path.basename(path)
 
-    assert last_component == ".temp"
+    assert last_component == "terraform.tfstate"
 
 
 def test_init():

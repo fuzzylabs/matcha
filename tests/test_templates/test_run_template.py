@@ -183,11 +183,9 @@ def test_initialize_terraform(capsys: SysCapture, template_runner: TemplateRunne
         capsys (SysCapture): fixture to capture stdout and stderr
         template_runner (TemplateRunner): a TemplateRunner object instance
     """
-    template_runner.previous_temp_dir = MagicMock()
+    template_runner.tf_state_dir = MagicMock()
 
-    with mock.patch.object(
-        template_runner.previous_temp_dir, "exists", return_value=True
-    ):
+    with mock.patch.object(template_runner.tf_state_dir, "exists", return_value=True):
         expected = "has already been initialized"
 
         template_runner._initialize_terraform()
@@ -196,9 +194,7 @@ def test_initialize_terraform(capsys: SysCapture, template_runner: TemplateRunne
 
         assert expected in captured.out
 
-    with mock.patch.object(
-        template_runner.previous_temp_dir, "exists", return_value=False
-    ):
+    with mock.patch.object(template_runner.tf_state_dir, "exists", return_value=False):
         template_runner.tfs.init = MagicMock(return_value=(0, "", ""))
         expected = " initialized!"
         template_runner._initialize_terraform()

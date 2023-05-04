@@ -33,7 +33,7 @@ class TemplateRunner:
     """A Runner class provides methods that interface with the Terraform service to facilitate the provisioning and deprovisioning of resources."""
 
     tfs: TerraformService = TerraformService()
-    previous_temp_dir = tfs.get_previous_temp_dir()
+    tf_state_dir = tfs.get_tf_state_dir()
     state_file = tfs.config.state_file
 
     def _check_terraform_installation(self) -> None:
@@ -104,7 +104,7 @@ class TemplateRunner:
         Raises:
             MatchaTerraformError: if 'terraform init' failed.
         """
-        if self.previous_temp_dir.exists():
+        if self.tf_state_dir.exists():
             # this directory gets created after a successful init command
             print_status(
                 build_status(
@@ -125,9 +125,6 @@ class TemplateRunner:
                 if ret_code != 0:
                     print_error("The command 'terraform init' failed.")
                     raise MatchaTerraformError(tf_error=err)
-
-            # Create a directory to avoid running init multiple times
-            self.previous_temp_dir.mkdir(parents=True, exist_ok=True)
 
             print_status(
                 build_substep_success_status(
