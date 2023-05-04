@@ -13,6 +13,7 @@ from matcha_ml.cli.ui.print_messages import (
     print_json,
     print_status,
 )
+from matcha_ml.cli.ui.resource_message_builders import dict_to_json
 from matcha_ml.cli.ui.spinner import Spinner
 from matcha_ml.cli.ui.status_message_builders import (
     build_resource_confirmation,
@@ -227,8 +228,9 @@ class TemplateRunner:
         print_status(build_status("Here are the endpoints for what's been provisioned"))
         # print terraform output from state file
         with open(self.state_file) as fp:
-            resources = hide_sensitive_in_output(json.loads(fp.read()))
-            print_json(str(resources))
+            resources_dict = hide_sensitive_in_output(json.loads(fp.read()))
+            resources_json = dict_to_json(resources_dict)
+            print_json(resources_json)
 
     def _destroy_terraform(self) -> None:
         """Destroy the provisioned resources.

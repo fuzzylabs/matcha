@@ -33,7 +33,7 @@ def print_json(json: str) -> None:
     Args:
         json (str): JSON string to print
     """
-    rich.print_json(data=json)
+    rich.print_json(json)
 
 
 def print_resource_output(
@@ -47,7 +47,6 @@ def print_resource_output(
         output_format (str, optional):  the format of the resource output specified by the user. Defaults to None.
         show_sensitive (bool): whether to show or hide sensitive output. Show all resource information if true.
     """
-    print_json(resource_output)
     if output_format == "json":
         print_json(resource_output)
     else:
