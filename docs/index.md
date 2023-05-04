@@ -1,4 +1,4 @@
-`matcha` is a tool for efficiently and effectively provisioning MLOps environments to the cloud.
+`matcha` is a tool for provisioning MLOps environments to the cloud.
 
 ## Why do you need `matcha`?
 
@@ -12,8 +12,8 @@ One alternative to this would be to build your own MLOps environment by selectin
 
 `matcha` seeks to address these, and we want to provide our users with the ability to:
 
-1. Quickly get up and running with an MLOps environment where models can be trained and deployed, using only open source technologies.
-2. Efficiently link your provisioned MLOps environment to your ML workflow.
+1. Get up and running with an MLOps environment where models can be trained and deployed, using only open source technologies.
+2. Link your provisioned MLOps environment to your ML workflow.
 
 ## Sensible defaults
 

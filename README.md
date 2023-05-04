@@ -10,7 +10,7 @@ Data Scientists and practitioners build ML pipelines and productionize them with
 
 There are other capabilities, such as model monitoring, but as a starting point the above would enable a Data Scientist to train, track, and deploy models in the cloud. Having an environment for setting these up is difficult and time consuming.
 
-`matcha` uses open source to solve this problem in an elegant way.
+`matcha` uses open source to solve this problem.
 
 By default, `matcha` will `provision` an MLOps environment to Azure with sensible defaults - enough for you to get going with cloud-based training and deployment. From there, you can use `matcha` to `get` information about your provisioned environment.
 
