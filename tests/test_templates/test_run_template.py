@@ -120,6 +120,9 @@ def expected_outputs_hide_sensitive() -> dict:
             "flavor": "zenml",
             "server-url": "zen_server_url",
             "storage-path": "zenml_test_storage_path",
+            "connection-string": "********",
+            "server-password": "********",
+            "server-username": "********",
         },
     }
 
