@@ -1,12 +1,10 @@
 """UI print functions."""
-from typing import Dict, Optional
+from typing import Optional
 
 import rich
 from rich.console import Console
 
 err_console = Console(stderr=True)
-
-SENSITIVE_OUTPUT = ["connection-string", "server-username", "server-password"]
 
 
 def print_status(status: str) -> None:
@@ -51,22 +49,3 @@ def print_resource_output(
         print_json(resource_output)
     else:
         rich.print(resource_output)
-
-
-def hide_sensitive_in_output(
-    resource_output_dict: Dict[str, Dict[str, str]]
-) -> Dict[str, Dict[str, str]]:
-    """Hide sensitive value in output.
-
-    Args:
-        resource_output_dict (Dict[str, Dict[str, str]]): all resource outputs in the format of a dictionary.
-
-    Returns:
-        str: resource outputs without sensitive value.
-    """
-    for _, properties in resource_output_dict.items():
-        for property_name in properties:
-            if property_name in SENSITIVE_OUTPUT:
-                properties[property_name] = "********"
-
-    return resource_output_dict

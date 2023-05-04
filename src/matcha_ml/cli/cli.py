@@ -12,12 +12,14 @@ from matcha_ml.cli._validation import (
 from matcha_ml.cli.destroy import destroy_resources
 from matcha_ml.cli.provision import provision_resources
 from matcha_ml.cli.ui.print_messages import (
-    hide_sensitive_in_output,
     print_error,
     print_resource_output,
     print_status,
 )
-from matcha_ml.cli.ui.resource_message_builders import build_resource_output
+from matcha_ml.cli.ui.resource_message_builders import (
+    build_resource_output,
+    hide_sensitive_in_output,
+)
 from matcha_ml.core import core
 from matcha_ml.errors import MatchaError, MatchaInputError
 

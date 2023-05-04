@@ -8,12 +8,14 @@ import typer
 
 from matcha_ml.cli.ui.emojis import Emojis
 from matcha_ml.cli.ui.print_messages import (
-    hide_sensitive_in_output,
     print_error,
     print_json,
     print_status,
 )
-from matcha_ml.cli.ui.resource_message_builders import dict_to_json
+from matcha_ml.cli.ui.resource_message_builders import (
+    dict_to_json,
+    hide_sensitive_in_output,
+)
 from matcha_ml.cli.ui.spinner import Spinner
 from matcha_ml.cli.ui.status_message_builders import (
     build_resource_confirmation,
