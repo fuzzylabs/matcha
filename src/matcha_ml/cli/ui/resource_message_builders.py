@@ -74,7 +74,7 @@ def hide_sensitive_in_output(
         resource_output_dict (Dict[str, Dict[str, str]]): all resource outputs in the format of a dictionary.
 
     Returns:
-        str: resource outputs without sensitive value.
+        Dict[str, Dict[str, str]]: resource outputs without sensitive value.
     """
     for _, properties in resource_output_dict.items():
         for property_name in properties:
