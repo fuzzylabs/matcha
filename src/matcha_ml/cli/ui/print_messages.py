@@ -6,9 +6,7 @@ from rich.console import Console
 
 err_console = Console(stderr=True)
 
-SENSITIVE_OUTPUT = {
-    "zenml": ["connection-string", "server-username", "server-password"]
-}
+SENSITIVE_OUTPUT = ["connection-string", "server-username", "server-password"]
 
 
 def print_status(status: str) -> None:
@@ -49,6 +47,7 @@ def print_resource_output(
         output_format (str, optional):  the format of the resource output specified by the user. Defaults to None.
         show_sensitive (bool): whether to show or hide sensitive output. Show all resource information if true.
     """
+    print_json(resource_output)
     if output_format == "json":
         print_json(resource_output)
     else:
@@ -67,10 +66,8 @@ def hide_sensitive_in_output(
         str: resource outputs without sensitive value.
     """
     for _, properties in resource_output_dict.items():
-        if properties["flavor"] in SENSITIVE_OUTPUT:
-            sensitive_values = SENSITIVE_OUTPUT[properties["flavor"]]
-            for value_to_censor in sensitive_values:
-                # properties.pop(value_to_censor, None)
-                properties[value_to_censor] = "********"
+        for property_name in properties:
+            if property_name in SENSITIVE_OUTPUT:
+                properties[property_name] = "********"
 
     return resource_output_dict

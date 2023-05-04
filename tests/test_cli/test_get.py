@@ -120,10 +120,12 @@ def test_cli_get_command_with_invalid_resource_name(runner: CliRunner):
     # Invoke get command
     result = runner.invoke(app, ["get", "does-not-exist"])
 
+    # print(result.stdout)
+
     assert result.exit_code == 0
     assert (
         "Error - a resource type with the name 'does-not-exist' does not exist."
-        in str(result.stdout)
+        in result.stdout
     )
 
 
@@ -165,6 +167,8 @@ def test_cli_get_command_with_resource_and_property_json(runner: CliRunner):
         app, ["get", "experiment-tracker", "tracking-url", "--output", "json"]
     )
 
+    print(expected_output)
+    print(result.stdout)
     # Exit code 0 means there was no error
     assert result.exit_code == 0
     # Assert JSON is present and correct in cli output
