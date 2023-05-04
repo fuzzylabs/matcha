@@ -50,7 +50,7 @@ def mock_output() -> Callable[[str, bool], Union[str, Dict[str, str]]]:
 
 
 @pytest.fixture
-def expected_outputs_show_sensitive() -> dict:
+def expected_outputs_show_sensitive() -> Dict[str, Dict[str, str]]:
     """The expected output from terraform.
 
     Returns:
