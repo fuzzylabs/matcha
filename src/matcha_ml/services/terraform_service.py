@@ -93,10 +93,10 @@ class TerraformService:
         return Path(self.config.var_file).exists()
 
     def get_tf_state_dir(self) -> Path:
-        """Get the path to the previous temporary directory.
+        """Get the path of the terraform.tfstate file generated on completion of `terraform init`.
 
         Returns:
-            Path: a Path object that represents the path to the previous temporary
+            Path: a Path object that represents the path to the terraform.tfstate file
         directory.
         """
         return Path(

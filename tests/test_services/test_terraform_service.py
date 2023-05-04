@@ -147,7 +147,7 @@ def test_validate_config_not_exist(terraform_test_config: TerraformConfig):
 
 
 def test_get_tf_state_dir(tmp_path):
-    """Test get_previous_temp_dir returns the .temp directory.
+    """Test get_previous_temp_dir returns the path of the terraform.tfstate file.
 
     Args:
         tmp_path (str): Pytest temporary path fixture for testing.
