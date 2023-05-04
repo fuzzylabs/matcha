@@ -23,7 +23,7 @@ There are two ways you can do this, one is via the [Azure CLI](https://learn.mic
 
 ### Azure CLI
 
-To check usig the Azure CLI, do the following (replacing `<your-account-name>`):
+To check using the Azure CLI, do the following (replacing `<your-account-name>`):
 
 ```bash
 az login
@@ -69,7 +69,7 @@ From the above, we can see that the user has the Owner permissions.
 
 ## How much does it cost?
 
-`matcha` deploys a set of resources to Azure for you, so a natural question is: what on earth is this going to cost?! Below is how much it would cost to run the provisioned resources on Azure for a month.
+`matcha` deploys a set of resources to Azure for you, so a natural question is: what is this going to cost? Below is how much it would cost to run the provisioned resources on Azure for a month.
 
 <figure markdown>
   ![Azure Cost Breakdown](img/azure-permissions/azure-cost-breakdown.png)
