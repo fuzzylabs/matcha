@@ -68,7 +68,7 @@ def build_resource_output(
 def hide_sensitive_in_output(
     resource_output_dict: Dict[str, Dict[str, str]]
 ) -> Dict[str, Dict[str, str]]:
-    """Hide sensitive value in output.
+    """Hides the sensitive resource property values for provisioned resources.
 
     Args:
         resource_output_dict (Dict[str, Dict[str, str]]): all resource outputs in the format of a dictionary.
