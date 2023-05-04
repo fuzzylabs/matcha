@@ -16,7 +16,10 @@ from matcha_ml.cli.ui.print_messages import (
     print_resource_output,
     print_status,
 )
-from matcha_ml.cli.ui.resource_message_builders import build_resource_output
+from matcha_ml.cli.ui.resource_message_builders import (
+    build_resource_output,
+    hide_sensitive_in_output,
+)
 from matcha_ml.core import core
 from matcha_ml.errors import MatchaError, MatchaInputError
 
@@ -85,6 +88,7 @@ def get(
         print_error(str(e))
         raise typer.Exit()
 
+    resources = hide_sensitive_in_output(resources)
     resource_output = build_resource_output(resources=resources, output_format=output)
     print_resource_output(resource_output=resource_output, output_format=output)
 

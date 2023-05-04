@@ -2,12 +2,20 @@
 import json
 import os
 from collections import defaultdict
-from typing import Tuple
+from typing import Dict, Tuple
 
 import typer
 
 from matcha_ml.cli.ui.emojis import Emojis
-from matcha_ml.cli.ui.print_messages import print_error, print_json, print_status
+from matcha_ml.cli.ui.print_messages import (
+    print_error,
+    print_json,
+    print_status,
+)
+from matcha_ml.cli.ui.resource_message_builders import (
+    dict_to_json,
+    hide_sensitive_in_output,
+)
 from matcha_ml.cli.ui.spinner import Spinner
 from matcha_ml.cli.ui.status_message_builders import (
     build_resource_confirmation,
@@ -181,7 +189,7 @@ class TemplateRunner:
         Returns:
             Tuple[str, str, str]: the resource output for matcha.state.
         """
-        resource_type = None
+        resource_type: str
 
         for key in RESOURCE_NAMES:
             if key in output_name:
@@ -204,7 +212,7 @@ class TemplateRunner:
     def _write_outputs_state(self) -> None:
         """Write the outputs of the Terraform deployment to the state JSON file."""
         tf_outputs = self.tfs.terraform_client.output()
-        state_outputs: dict[str, dict[str, str]] = defaultdict(dict)
+        state_outputs: Dict[str, Dict[str, str]] = defaultdict(dict)
 
         for output_name, properties in tf_outputs.items():
             resource_type, flavor, resource_name = self._build_resource_output(
@@ -222,7 +230,9 @@ class TemplateRunner:
         print_status(build_status("Here are the endpoints for what's been provisioned"))
         # print terraform output from state file
         with open(self.state_file) as fp:
-            print_json(fp.read())
+            resources_dict = hide_sensitive_in_output(json.loads(fp.read()))
+            resources_json = dict_to_json(resources_dict)
+            print_json(resources_json)
 
     def _destroy_terraform(self) -> None:
         """Destroy the provisioned resources.

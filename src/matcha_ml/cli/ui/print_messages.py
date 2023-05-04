@@ -35,7 +35,8 @@ def print_json(json: str) -> None:
 
 
 def print_resource_output(
-    resource_output: str, output_format: Optional[str] = None
+    resource_output: str,
+    output_format: Optional[str] = None,
 ) -> None:
     """Print the resource output based on the output format specified by the user.
 

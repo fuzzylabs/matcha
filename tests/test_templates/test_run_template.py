@@ -26,23 +26,15 @@ def mock_output() -> Callable[[str, bool], Union[str, Dict[str, str]]]:
     def output() -> str:
         terraform_outputs = {
             "experiment_tracker_mlflow_tracking_url": {"value": "mlflow_test_url"},
-            "pipeline_zenml_storage_path": {"value": "zenml_test_storage_path"},
             "pipeline_zenml_connection_string": {
                 "value": "zenml_test_connection_string"
             },
+            "pipeline_zenml_server_url": {"value": "zen_server_url"},
+            "pipeline_zenml_server_password": {"value": "zen_server_password"},
             "orchestrator_aks_k8s_context": {"value": "k8s_test_context"},
             "container_registry_azure_registry_url": {
                 "value": "azure_container_registry"
             },
-            "container_registry_azure_registry_name": {"value": "azure_registry_name"},
-            "pipeline_zenml_server_url": {"value": "zen_server_url"},
-            "pipeline_zenml_server_username": {"value": "zen_server_username"},
-            "pipeline_zenml_server_password": {"value": "zen_server_password"},
-            "model_deployer_seldon_workloads_namespace": {
-                "value": "test_seldon_workloads_namespace"
-            },
-            "model_deployer_seldon_base_url": {"value": "test_seldon_base_url"},
-            "cloud_azure_resource_group_name": {"value": "test_resources"},
         }
         return terraform_outputs
 
@@ -50,42 +42,63 @@ def mock_output() -> Callable[[str, bool], Union[str, Dict[str, str]]]:
 
 
 @pytest.fixture
-def expected_outputs() -> dict:
+def expected_outputs_show_sensitive() -> Dict[str, Dict[str, str]]:
     """The expected output from terraform.
 
     Returns:
         dict: expected output
     """
     outputs = {
-        "cloud": {"flavor": "azure", "resource-group-name": "test_resources"},
-        "container-registry": {
-            "flavor": "azure",
-            "registry-name": "azure_registry_name",
-            "registry-url": "azure_container_registry",
-        },
         "experiment-tracker": {
             "flavor": "mlflow",
             "tracking-url": "mlflow_test_url",
-        },
-        "model-deployer": {
-            "flavor": "seldon",
-            "base-url": "test_seldon_base_url",
-            "workloads-namespace": "test_seldon_workloads_namespace",
-        },
-        "orchestrator": {
-            "flavor": "aks",
-            "k8s-context": "k8s_test_context",
         },
         "pipeline": {
             "flavor": "zenml",
             "connection-string": "zenml_test_connection_string",
             "server-password": "zen_server_password",
             "server-url": "zen_server_url",
-            "server-username": "zen_server_username",
-            "storage-path": "zenml_test_storage_path",
+        },
+        "orchestrator": {
+            "flavor": "aks",
+            "k8s-context": "k8s_test_context",
+        },
+        "container-registry": {
+            "flavor": "azure",
+            "registry-url": "azure_container_registry",
         },
     }
 
+    return outputs
+
+
+@pytest.fixture
+def expected_outputs_hide_sensitive() -> dict:
+    """The expected output from terraform.
+
+    Returns:
+        dict: expected output
+    """
+    outputs = {
+        "experiment-tracker": {
+            "flavor": "mlflow",
+            "tracking-url": "mlflow_test_url",
+        },
+        "pipeline": {
+            "flavor": "zenml",
+            "connection-string": "********",
+            "server-password": "********",
+            "server-url": "zen_server_url",
+        },
+        "orchestrator": {
+            "flavor": "aks",
+            "k8s-context": "k8s_test_context",
+        },
+        "container-registry": {
+            "flavor": "azure",
+            "registry-url": "azure_container_registry",
+        },
+    }
     return outputs
 
 
@@ -266,7 +279,7 @@ def test_write_outputs_state(
     template_runner: TemplateRunner,
     terraform_test_config: TerraformConfig,
     mock_output: Callable[[str, bool], Union[str, Dict[str, str]]],
-    expected_outputs,
+    expected_outputs_show_sensitive: dict,
 ):
     """Test service writes the state file correctly.
 
@@ -274,7 +287,7 @@ def test_write_outputs_state(
         template_runner (TemplateRunner): a TemplateRunner object instance
         terraform_test_config (TerraformConfig): test terraform service config
         mock_output (Callable[[str, bool], Union[str, Dict[str, str]]]): the mock output
-        expected_outputs (dict): expected output from terraform
+        expected_outputs_show_sensitive (dict): expected output from terraform
     """
     template_runner.state_file = terraform_test_config.state_file
     template_runner.tfs.terraform_client.output = MagicMock(wraps=mock_output)
@@ -282,7 +295,7 @@ def test_write_outputs_state(
     with does_not_raise():
         template_runner._write_outputs_state()
         with open(terraform_test_config.state_file) as f:
-            assert json.load(f) == expected_outputs
+            assert json.load(f) == expected_outputs_show_sensitive
 
 
 def test_show_terraform_outputs(
@@ -290,7 +303,7 @@ def test_show_terraform_outputs(
     terraform_test_config: TerraformConfig,
     capsys: SysCapture,
     mock_output: Callable[[str, bool], Union[str, Dict[str, str]]],
-    expected_outputs: dict,
+    expected_outputs_hide_sensitive: dict,
 ):
     """Test service shows the correct terraform output.
 
@@ -299,7 +312,7 @@ def test_show_terraform_outputs(
         terraform_test_config (TerraformConfig): test terraform service config
         capsys (SysCapture): fixture to capture stdout and stderr
         mock_output (Callable[[str, bool], Union[str, Dict[str, str]]]): the mock output
-        expected_outputs (dict): expected output from terraform
+        expected_outputs_hide_sensitive (dict): expected output from terraform
     """
     template_runner.state_file = terraform_test_config.state_file
     template_runner.tfs.terraform_client.output = MagicMock(wraps=mock_output)
@@ -308,7 +321,7 @@ def test_show_terraform_outputs(
         template_runner._show_terraform_outputs()
         captured = capsys.readouterr()
 
-        for output in expected_outputs:
+        for output in expected_outputs_hide_sensitive:
             assert output in captured.out
 
 

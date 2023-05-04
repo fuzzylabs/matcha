@@ -123,7 +123,7 @@ def test_cli_get_command_with_invalid_resource_name(runner: CliRunner):
     assert result.exit_code == 0
     assert (
         "Error - a resource type with the name 'does-not-exist' does not exist."
-        in str(result.stdout)
+        in result.stdout
     )
 
 
