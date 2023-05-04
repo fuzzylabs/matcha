@@ -92,14 +92,16 @@ class TerraformService:
         """
         return Path(self.config.var_file).exists()
 
-    def get_previous_temp_dir(self) -> Path:
-        """Get the path to the previous temporary directory.
+    def get_tf_state_dir(self) -> Path:
+        """Get the path of the terraform.tfstate file generated on completion of `terraform init`.
 
         Returns:
-            str: a Path object that represents the path to the previous temporary
+            Path: a Path object that represents the path to the terraform.tfstate file
         directory.
         """
-        return Path(os.path.join(self.terraform_client.working_dir, ".temp"))
+        return Path(
+            os.path.join(self.terraform_client.working_dir, "terraform.tfstate")
+        )
 
     def init(self) -> Tuple[int, str, str]:
         """Run `terraform init` with the initialised Terraform client from the python_terraform module.
