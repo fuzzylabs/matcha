@@ -243,11 +243,7 @@ class TemplateRunner:
         return typer.confirm(f"Are you happy for '{verb}' to run?")
 
     def provision(self) -> None:
-        """Provision resources required for the deployment.
-
-        Raises:
-            typer.Exit: if approval is not given by user.
-        """
+        """Provision resources required for the deployment."""
         self._check_terraform_installation()
         self._validate_terraform_config()
         self._initialize_terraform()
@@ -255,11 +251,7 @@ class TemplateRunner:
         self._show_terraform_outputs()
 
     def deprovision(self) -> None:
-        """Destroy the provisioned resources.
-
-        Raises:
-            typer.Exit: if approval is not given by user.
-        """
+        """Destroy the provisioned resources."""
         self._check_matcha_directory_exists()
         self._check_terraform_installation()
         self._destroy_terraform()

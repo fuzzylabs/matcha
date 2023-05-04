@@ -10,7 +10,11 @@ from matcha_ml.templates.run_template import TemplateRunner
 
 
 def destroy_resources() -> None:
-    """Destroy resources."""
+    """Destroy resources.
+
+    Raises:
+        typer.Exit: if approval is not given by user.
+    """
     # create a runner for deprovisioning resource with Terraform service.
     template_runner = TemplateRunner()
 

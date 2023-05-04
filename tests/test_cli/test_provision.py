@@ -285,57 +285,59 @@ def test_cli_provision_command_with_existing_prefix_name(
     assert expected_error_message in result.stdout
 
 
-# def test_cli_provision_command_override(runner, matcha_testing_directory):
-#     """Test provision command to override the configuration.
+def test_cli_provision_command_override(runner, matcha_testing_directory):
+    """Test provision command to override the configuration file within the .matcha directory.
 
-#     Args:
-#         runner (CliRunner): typer CLI runner
-#         matcha_testing_directory (str): temporary working directory.
-#     """
-#     os.chdir(matcha_testing_directory)
+    Args:
+        runner (CliRunner): typer CLI runner
+        matcha_testing_directory (str): temporary working directory.
+    """
+    os.chdir(matcha_testing_directory)
 
-#     # Invoke provision command
-#     runner.invoke(
-#         app,
-#         [
-#             "provision",
-#             "--location",
-#             "uksouth",
-#             "--prefix",
-#             "matcha",
-#             "--password",
-#             "ninja",
-#         ],
-#         input="Y\n",
-#     )
+    # Invoke provision command for the first time which creates the .matcha directory
+    runner.invoke(
+        app,
+        [
+            "provision",
+            "--location",
+            "uksouth",
+            "--prefix",
+            "matcha",
+            "--password",
+            "ninja",
+        ],
+        input="Y\n",
+    )
 
-#     destination_path = os.path.join(
-#         matcha_testing_directory, ".matcha", "infrastructure"
-#     )
+    destination_path = os.path.join(
+        matcha_testing_directory, ".matcha", "infrastructure"
+    )
 
-#     # Touch a file in the infrastructure configuration directory
-#     with open(os.path.join(destination_path, "dummy.tf"), "a"):
-#         ...
+    # Touch a 'dummy.tf' file in the infrastructure configuration directory within the .matcha directory
+    with open(os.path.join(destination_path, "dummy.tf"), "a"):
+        ...
 
-#     runner.invoke(
-#         app,
-#         [
-#             "provision",
-#             "--location",
-#             "uksouth",
-#             "--prefix",
-#             "matcha",
-#             "--password",
-#             "ninja",
-#         ],
-#         input="y\nno\n",
-#     )
+    # Invoke provision command for a second time, which overwrites the existing .matcha directory and removes the 'dummy.tf' file
+    runner.invoke(
+        app,
+        [
+            "provision",
+            "--location",
+            "uksouth",
+            "--prefix",
+            "matcha",
+            "--password",
+            "ninja",
+        ],
+        input="Y\nY\n",
+    )
 
-#     assert not os.path.exists(os.path.join(destination_path, "dummy.tf"))
+    # Checks the 'dummy.tf' file is not present within the overwritten .matcha directory
+    assert not os.path.exists(os.path.join(destination_path, "dummy.tf"))
 
-#     expected_tf_vars = {"location": "uksouth", "prefix": "matcha", "password": "ninja"}
+    expected_tf_vars = {"location": "uksouth", "prefix": "matcha", "password": "ninja"}
 
-#     assert_infrastructure(destination_path, expected_tf_vars)
+    assert_infrastructure(destination_path, expected_tf_vars)
 
 
 def test_cli_provision_command_with_password_mismatch(runner, matcha_testing_directory):
@@ -359,7 +361,7 @@ def test_cli_provision_command_with_password_mismatch(runner, matcha_testing_dir
 
 
 def test_cli_provision_command_reuse(runner, matcha_testing_directory):
-    """Test provision command to reuse the configuration.
+    """Test provision command to reuse the configuration file within the .matcha directory.
 
     Args:
         runner (CliRunner): typer CLI runner
@@ -367,7 +369,7 @@ def test_cli_provision_command_reuse(runner, matcha_testing_directory):
     """
     os.chdir(matcha_testing_directory)
 
-    # Invoke provision command
+    # Invoke provision command for the first time which creates the .matcha directory
     runner.invoke(
         app,
         ["provision", "--location", "uksouth", "--prefix", "matcha"],
@@ -378,16 +380,18 @@ def test_cli_provision_command_reuse(runner, matcha_testing_directory):
         matcha_testing_directory, ".matcha", "infrastructure"
     )
 
-    # Touch a file in the infrastructure configuration directory
+    # Touch a 'dummy.tf' file in the infrastructure configuration directory within the .matcha directory
     with open(os.path.join(destination_path, "dummy.tf"), "a"):
         ...
 
+    # Invoke provision command for a second time, electing to reuse the existing .matcha directory and therefore retain the 'dummy.tf' file
     runner.invoke(
         app,
         ["provision", "--location", "uksouth", "--prefix", "matcha"],
         input="default\ndefault\nn\nY\n",
     )
 
+    # Checks the 'dummy.tf' file is present within the reused .matcha directory
     assert os.path.exists(os.path.join(destination_path, "dummy.tf"))
 
     expected_tf_vars = {

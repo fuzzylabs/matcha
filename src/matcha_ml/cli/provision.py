@@ -33,6 +33,9 @@ def provision_resources(
         prefix (str): Prefix used for all resources.
         password (str): Password for ZenServer.
         verbose (bool optional): additional output is show when True. Defaults to False.
+
+    Raises:
+        typer.Exit: if approval is not given by user.
     """
     # create a runner for provisioning resource with Terraform service.
     template_runner = TemplateRunner()
