@@ -2,7 +2,7 @@
 import json
 import os
 from collections import defaultdict
-from typing import Tuple
+from typing import Dict, Tuple
 
 import typer
 
@@ -210,7 +210,7 @@ class TemplateRunner:
     def _write_outputs_state(self) -> None:
         """Write the outputs of the Terraform deployment to the state JSON file."""
         tf_outputs = self.tfs.terraform_client.output()
-        state_outputs: dict[str, dict[str, str]] = defaultdict(dict)
+        state_outputs: Dict[str, Dict[str, str]] = defaultdict(dict)
 
         for output_name, properties in tf_outputs.items():
             resource_type, flavor, resource_name = self._build_resource_output(

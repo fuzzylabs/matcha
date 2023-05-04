@@ -1,5 +1,5 @@
 """UI print functions."""
-from typing import Optional
+from typing import Dict, Optional
 
 import rich
 from rich.console import Console
@@ -54,12 +54,12 @@ def print_resource_output(
 
 
 def hide_sensitive_in_output(
-    resource_output_dict: dict[str, dict[str, str]]
-) -> dict[str, dict[str, str]]:
+    resource_output_dict: Dict[str, Dict[str, str]]
+) -> Dict[str, Dict[str, str]]:
     """Hide sensitive value in output.
 
     Args:
-        resource_output_dict (dict): all resource outputs in the format of a dictionary.
+        resource_output_dict (Dict[str, Dict[str, str]]): all resource outputs in the format of a dictionary.
 
     Returns:
         str: resource outputs without sensitive value.
