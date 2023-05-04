@@ -43,7 +43,6 @@ def print_resource_output(
     Args:
         resource_output (str): the resource output to be printed.
         output_format (str, optional):  the format of the resource output specified by the user. Defaults to None.
-        show_sensitive (bool): whether to show or hide sensitive output. Show all resource information if true.
     """
     if output_format == "json":
         print_json(resource_output)
