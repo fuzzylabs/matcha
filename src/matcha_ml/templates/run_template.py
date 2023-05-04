@@ -22,7 +22,7 @@ from matcha_ml.cli.ui.status_message_builders import (
     build_status,
     build_substep_success_status,
 )
-from matcha_ml.errors import MatchaTerraformError
+from matcha_ml.errors import MatchaInputError, MatchaTerraformError
 from matcha_ml.services.terraform_service import TerraformService
 
 SPINNER = "dots"
@@ -71,40 +71,6 @@ class TemplateRunner:
                 "verify if it exists."
             )
             raise typer.Exit()
-
-    def _is_approved(self, verb: str) -> bool:
-        """Get approval from user to modify resources on cloud.
-
-        Args:
-            verb (str): the verb to use in the approval message.
-
-        Returns:
-            bool: True if user approves, False otherwise.
-        """
-        summary_message = build_resource_confirmation(
-            header=f"The following resources will be {verb}ed",
-            resources=[
-                ("Resource group", "A resource group"),
-                ("Azure Kubernetes Service (AKS)", "A kubernetes cluster"),
-                (
-                    "Two Storage Containers",
-                    "A storage container for experiment tracking artifacts and a second for model training artifacts",
-                ),
-                (
-                    "Seldon Core",
-                    "A framework for model deployment on top of a kubernetes cluster",
-                ),
-                (
-                    "Azure Container Registry",
-                    "A container registry for storing docker images",
-                ),
-                ("ZenServer", "A zenml server required for remote orchestration"),
-            ],
-            footer=f"{verb.capitalize()}ing the resources may take approximately 20 minutes. May we suggest you grab a cup of {Emojis.MATCHA.value}?",
-        )
-
-        print_status(summary_message)
-        return typer.confirm(f"Are you happy for '{verb}' to run?")
 
     def _initialize_terraform(self) -> None:
         """Run terraform init to initialize Terraform .
@@ -200,6 +166,7 @@ class TemplateRunner:
             print_error(
                 "A valid resource type for the output '{output_name}' does not exist."
             )
+            raise MatchaInputError()
 
         flavour_and_resource_name = output_name[len(resource_type) + 1 :]
 
@@ -251,43 +218,50 @@ class TemplateRunner:
             if ret_code != 0:
                 raise MatchaTerraformError(tf_error=err)
 
-    def provision(self) -> None:
-        """Provision resources required for the deployment.
+    def is_approved(self, verb: str) -> bool:
+        """Get approval from user to modify resources on cloud.
 
-        Raises:
-            typer.Exit: if approval is not given by user.
+        Args:
+            verb (str): the verb to use in the approval message.
+
+        Returns:
+            bool: True if user approves, False otherwise.
         """
+        summary_message = build_resource_confirmation(
+            header=f"The following resources will be {verb}ed",
+            resources=[
+                ("Resource group", "A resource group"),
+                ("Azure Kubernetes Service (AKS)", "A kubernetes cluster"),
+                (
+                    "Two Storage Containers",
+                    "A storage container for experiment tracking artifacts and a second for model training artifacts",
+                ),
+                (
+                    "Seldon Core",
+                    "A framework for model deployment on top of a kubernetes cluster",
+                ),
+                (
+                    "Azure Container Registry",
+                    "A container registry for storing docker images",
+                ),
+                ("ZenServer", "A zenml server required for remote orchestration"),
+            ],
+            footer=f"{verb.capitalize()}ing the resources may take approximately 20 minutes. May we suggest you grab a cup of {Emojis.MATCHA.value}?",
+        )
+
+        print_status(summary_message)
+        return typer.confirm(f"Are you happy for '{verb}' to run?")
+
+    def provision(self) -> None:
+        """Provision resources required for the deployment."""
         self._check_terraform_installation()
         self._validate_terraform_config()
-
-        if self._is_approved(verb="provision"):
-            self._initialize_terraform()
-            self._apply_terraform()
-            self._show_terraform_outputs()
-        else:
-            print_status(
-                build_status(
-                    "You decided to cancel - if you change your mind, then run 'matcha provision' again."
-                )
-            )
-            raise typer.Exit()
+        self._initialize_terraform()
+        self._apply_terraform()
+        self._show_terraform_outputs()
 
     def deprovision(self) -> None:
-        """Destroy the provisioned resources.
-
-        Raises:
-            typer.Exit: if approval is not given by user.
-        """
-        self._check_terraform_installation()
-
+        """Destroy the provisioned resources."""
         self._check_matcha_directory_exists()
-
-        if self._is_approved(verb="destroy"):
-            self._destroy_terraform()
-        else:
-            print_status(
-                build_status(
-                    "You decided to cancel - your resources will remain active! If you change your mind, then run 'matcha destroy' again."
-                )
-            )
-            raise typer.Exit()
+        self._check_terraform_installation()
+        self._destroy_terraform()
