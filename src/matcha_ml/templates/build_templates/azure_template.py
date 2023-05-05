@@ -8,14 +8,15 @@ from typing import List, Optional
 
 import typer
 
+from matcha_ml.cli._validation import check_current_deployment_exists
 from matcha_ml.cli.ui.print_messages import print_status
 from matcha_ml.cli.ui.status_message_builders import (
-    build_resource_confirmation,
     build_status,
     build_step_success_status,
     build_substep_success_status,
 )
 from matcha_ml.errors import MatchaPermissionError
+from matcha_ml.services.matcha_state import MatchaStateService
 
 SUBMODULE_NAMES = [
     "aks",
@@ -56,32 +57,20 @@ def reuse_configuration(path: str) -> bool:
         bool: decision to reuse the existing configuration
     """
     if os.path.exists(path):
-        confirmation_message = build_resource_confirmation(
-            "Matcha has detected that the following resources have already been configured for provisioning",
-            [
-                ("Resource group", "A resource group"),
-                ("Azure Kubernetes Service (AKS)", "A kubernetes cluster"),
-                (
-                    "Two Storage Containers",
-                    "A storage container for experiment tracking artifacts and a second for model training artifacts",
-                ),
-                (
-                    "Seldon Core",
-                    "A framework for model deployment on top of a kubernetes cluster",
-                ),
-                (
-                    "Azure Container Registry",
-                    "A container registry for storing docker images",
-                ),
-                ("ZenServer", "A zenml server required for remote orchestration"),
-            ],
-        )
+        if check_current_deployment_exists():
+            matcha_state_service = MatchaStateService()
+            resource_group_name = matcha_state_service.fetch_resources_from_state_file(
+                "cloud", "resource-group-name"
+            )["cloud"]["resource-group-name"]
+            warning_msg = f"\nWARNING: Matcha has detected that a deployment already exists in Azure with the resource group name '{resource_group_name}'. Use 'matcha destroy' to remove these resources before trying to provision."
+            confirmation_msg = "\nIf you continue, you will create a orphan resource. You should destroy the resources before proceeding.\n\nDo you want to override the existing configuration?"
+        else:
+            warning_msg = "\nMatcha has detected that the you already have resources configured for provisioning."
+            confirmation_msg = "\nIf you choose to override the existing configuration, the existing configuration will be deleted. Otherwise, the configuration will be reused.\n\nDo you want to override the existing configuration?"
 
-        print_status(confirmation_message)
+        print_status(warning_msg)
 
-        return not typer.confirm(
-            "If you choose to override the existing configuration, the existing configuration will be deleted. Otherwise, the configuration will be reused.\n\nDo you want to override the existing configuration?"
-        )
+        return not typer.confirm(confirmation_msg)
     else:
         return False
 

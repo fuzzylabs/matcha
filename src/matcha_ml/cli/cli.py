@@ -5,7 +5,6 @@ import typer
 
 from matcha_ml import __version__
 from matcha_ml.cli._validation import (
-    check_current_deployment_exists,
     prefix_typer_callback,
     region_typer_callback,
 )
@@ -52,10 +51,6 @@ def provision(
     ),
 ) -> None:
     """Provision cloud resources with a template."""
-    if check_current_deployment_exists():
-        print_error(
-            "WARNING: A deployment already exists in Azure, if you continue you'll create a orphan resource - use 'matcha destroy' before trying to provision."
-        )
     provision_resources(location, prefix, password, verbose)
 
 
