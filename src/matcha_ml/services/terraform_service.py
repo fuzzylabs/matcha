@@ -99,9 +99,7 @@ class TerraformService:
             Path: a Path object that represents the path to the terraform.tfstate file
         directory.
         """
-        return Path(
-            os.path.join(self.terraform_client.working_dir, "terraform.tfstate")
-        )
+        return Path(os.path.join(self.config.working_dir, "terraform.tfstate"))
 
     def init(self) -> Tuple[int, str, str]:
         """Run `terraform init` with the initialised Terraform client from the python_terraform module.
