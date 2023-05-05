@@ -86,10 +86,10 @@ def get(
     """
     try:
         resources = core.get(resource_name, property_name)
-    except MatchaError as e:
+    except MatchaInputError as e:
         print_error(str(e))
         raise typer.Exit()
-    except MatchaInputError as e:
+    except MatchaError as e:
         print_error(str(e))
         raise typer.Exit()
 
