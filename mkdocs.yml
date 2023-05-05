@@ -12,6 +12,7 @@ nav:
     - Azure Permissions: 'azure-permissions.md'
     - Cost: 'costings.md'
   - Workflows: 'workflows.md'
+  - Inside Matcha: 'inside-matcha.md'
   - MLOps Principles: 'mlops-principles.md'
 
 theme:
