@@ -24,3 +24,15 @@ Once the provisioning on Azure has completed, information about the resources ar
 The user is now in a position where the provisioned resources can be used.
 
 ## `get`
+
+Through `get`, the user can fetch information about their provisioned resources. In its current form, `get` interacts with the `matcha.state` file. We envision that this will interact with a remote state file, enabling a multi-user shared MLOps environment - this is on our roadmap.
+
+The user can use `get` to configure their workflow, for example, by getting the endpoint for their MLFlow experiment tracker.
+
+## `destroy`
+
+Once the uesr has finished with their provisioned environment, `destroy` enables them to tear down the resources.
+
+It works by calling the `destory` Terraform command vai the `python-terraform` library, which interacts with the configured Terraform files in the `.matcha/` directory.
+
+The files are kept but the `matcha.state` is delted.
