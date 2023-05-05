@@ -8,7 +8,9 @@ Data Scientists and practitioners build ML pipelines and productionize them with
 * A way to track experiments
 * A way to deploy and serve models
 
-There are other capabilities, such as model monitoring, but as a starting point the above would enable a Data Scientist to train, track, and deploy models in the cloud. Having an environment for setting these up is difficult and time consuming.
+The current version of `matcha` provisions the above with the single command, using sensible defaults for the infrastructure.
+
+There are more components that could be added here, for example, managing and versioning datasets, the management of models (registration and governance), and monitoring models. Adding all of these is on our roadmap.
 
 `matcha` uses open source to solve this problem.
 
