@@ -63,11 +63,11 @@ def provision(
 def get(
     resource_name: Optional[str] = typer.Argument(None),
     property_name: Optional[str] = typer.Argument(None),
-    output: str = typer.Option(
+    output: Optional[str] = typer.Option(
         default=None,
         help="The format of your output, e.g., 'json', 'yaml'.",
     ),
-    show_sensitive: bool = typer.Option(
+    show_sensitive: Optional[bool] = typer.Option(
         default=False,
         help="Show hidden sensitive value such as passwords.",
     ),
@@ -77,8 +77,8 @@ def get(
     Args:
         resource_name (Optional[str]): the name of the resource.
         property_name (Optional[str]): the specific property of the resource to return.
-        output (typer.Option): the format of the output specified by the user.
-        show_sensitive (typer.Option): show hidden sensitive resource values when True. Defaults to False.
+        output (Optional[str]): the format of the output specified by the user.
+        show_sensitive (Optional[bool]): show hidden sensitive resource values when True. Defaults to False.
 
     Raises:
         Exit: Exit if matcha.state file does not exist.
