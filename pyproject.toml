@@ -1,9 +1,12 @@
 [tool.poetry]
 name = "matcha-ml"
 version = "0.1.0"
-description = ""
-authors = ["Your Name <you@example.com>"]
+description = "Matcha: Open source tool for provisioning MLOps environments to the cloud."
+authors = ["FuzzyLabs <info@fuzzylabs.ai>"]
 license = "Apache-2.0 license"
+homepage = "http://fuzzylabs.github.io/matcha"
+documentation = "http://fuzzylabs.github.io/matcha"
+repository = "https://github.com/fuzzylabs/matcha/"
 readme = "README.md"
 packages = [{include = "matcha_ml", from = "src"}]
 exclude = [
