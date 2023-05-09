@@ -3,6 +3,7 @@ import glob
 import json
 import os
 from typing import Dict
+from unittest.mock import patch
 
 import pytest
 from typer.testing import CliRunner
@@ -437,20 +438,30 @@ def test_cli_provision_command_with_provisioned_resources(
     with open(os.path.join(destination_path, "dummy.tf"), "a"):
         ...
 
-    # Invoke provision command for a second time, which overwrites the existing .matcha directory and removes the 'dummy.tf' file
-    result = runner.invoke(
-        app,
-        [
-            "provision",
-            "--location",
-            "uksouth",
-            "--prefix",
-            "matcha",
-            "--password",
-            "ninja",
-        ],
-        input="Y\nY\n",
-    )
+    # Mock functions such that a deployment on Azure exists
+    with patch(
+        "matcha_ml.templates.build_templates.azure_template.check_current_deployment_exists"
+    ) as check_deployment_exists, patch(
+        "matcha_ml.templates.build_templates.azure_template.MatchaStateService.fetch_resources_from_state_file"
+    ) as fetch_resources_from_state_file:
+        check_deployment_exists.return_value = True
+        fetch_resources_from_state_file.return_value = {
+            "cloud": {"resource-group-name": "matcha-resources"}
+        }
+        # Invoke provision command for a second time, which overwrites the existing .matcha directory and removes the 'dummy.tf' file
+        result = runner.invoke(
+            app,
+            [
+                "provision",
+                "--location",
+                "uksouth",
+                "--prefix",
+                "matcha",
+                "--password",
+                "ninja",
+            ],
+            input="Y\nY\n",
+        )
 
     # Checks the 'dummy.tf' file is not present within the overwritten .matcha directory
     assert not os.path.exists(os.path.join(destination_path, "dummy.tf"))
@@ -459,4 +470,7 @@ def test_cli_provision_command_with_provisioned_resources(
 
     assert_infrastructure(destination_path, expected_tf_vars)
 
-    assert "Provisioning is complete!" in result.stdout
+    assert (
+        "WARNING: Matcha has detected that a deployment already exists in Azure"
+        in result.stdout
+    )
