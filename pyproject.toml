@@ -6,7 +6,7 @@ authors = ["FuzzyLabs <info@fuzzylabs.ai>"]
 license = "Apache-2.0"
 homepage = "http://fuzzylabs.github.io/matcha"
 documentation = "http://fuzzylabs.github.io/matcha"
-repository = "https://github.com/fuzzylabs/matcha/"
+repository = "https://github.com/fuzzylabs/matcha"
 readme = "README.md"
 keywords = ["production", "mlops", "devops", "machine learning"]
 classifiers = [
@@ -37,8 +37,7 @@ include = [
 
 [tool.poetry.urls]
 "Bug Tracker" = "https://github.com/fuzzylabs/matcha/issues"
-"Source" = "https://github.com/fuzzylabs/matcha/"
-"User Slack community" = "TBD"
+"User Slack community" = "http://TBD"
 
 [tool.poetry.scripts]
 matcha = "matcha_ml.cli.cli:app"
