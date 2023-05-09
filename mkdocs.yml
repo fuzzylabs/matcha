@@ -1,18 +1,18 @@
 site_name: matcha-ml
-site_description: matcha-ml is your one-stop-shop for efficiently provisioning MLOps tooling and for well-structured ML workflows.
+site_description: matcha-ml is your one-stop-shop for efficiently provisioning MLOps tooling.
 
 repo_name: fuzzylabs/matcha-ml
 repo_url: https://github.com/fuzzylabs/matcha
 
 
 nav:
-  - Home:
-    - Oveview: 'index.md'
+  - What's matcha?: 'index.md'
   - Usage:
     - Getting Started: 'getting-started.md'
     - Azure Permissions: 'azure-permissions.md'
     - Cost: 'costings.md'
   - Workflows: 'workflows.md'
+  - Inside Matcha: 'inside-matcha.md'
   - MLOps Principles: 'mlops-principles.md'
 
 theme:

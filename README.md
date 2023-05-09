@@ -1,11 +1,26 @@
-# `matcha` :tea:
+# `matcha` &#127861;
 
-_Brief intro into matcha_
+Welcome to `matcha`, the open source tool for provisioning MLOps environments to the cloud.
 
-Please see the following for more information, including install instructions and documentation:
+Data Scientists and practitioners build ML pipelines and productionize them with the following capabilities:
+
+* A way to run model training pipelines
+* A way to track experiments
+* A way to deploy and serve models
+
+The current version of `matcha` provisions the above with the single command, using sensible defaults for the infrastructure.
+
+There are more components that could be added here, for example, managing and versioning datasets, the management of models (registration and governance), and monitoring models. Adding all of these is on our roadmap.
+
+`matcha` uses open source to solve this problem.
+
+By default, `matcha` will `provision` an MLOps environment to Azure with sensible defaults - enough for you to get going with cloud-based training and deployment. From there, you can use `matcha` to `get` information about your provisioned environment.
+
+Please see the following for more information, including install instructions, documentation, and how you can contribute to `matcha`:
 
 * Getting Started
 * Documentation
+* [Contributing](CONTRIBUTING.md)
 
 ## Licence
 
