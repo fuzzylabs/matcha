@@ -18,8 +18,8 @@ By default, `matcha` will `provision` an MLOps environment to Azure with sensibl
 
 Please see the following for more information, including install instructions, documentation, and how you can contribute to `matcha`:
 
-* Getting Started
-* Documentation
+* [Getting Started](https://fuzzylabs.github.io/matcha/getting-started/)
+* [Documentation](https://fuzzylabs.github.io/matcha/)
 * [Contributing](CONTRIBUTING.md)
 
 ## Licence
