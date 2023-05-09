@@ -51,7 +51,7 @@ azure-mgmt-resource = "^23.0.0"
 azure-mgmt-subscription = "^3.1.1"
 azure-mgmt-authorization = "^3.0.0"
 azure-mgmt-confluent = "^1.0.0"
-pyyaml = "^6.0"
+pyyaml = "^5.4.1"
 
 
 [tool.poetry.group.dev.dependencies]
