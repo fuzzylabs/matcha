@@ -1,4 +1,4 @@
-# `matcha` :tea:
+# `matcha` &#127861;
 
 Welcome to `matcha`, the open source tool for provisioning MLOps environments to the cloud.
 
