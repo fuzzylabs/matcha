@@ -281,7 +281,7 @@ def test_cli_provision_command_with_existing_prefix_name(
     result = runner.invoke(
         app,
         ["provision"],
-        input="N\nuksouth\nrand\nvalid\ndefault\ndefault\n",
+        input="uksouth\nrand\nvalid\ndefault\ndefault\nN\n",
     )
     assert expected_error_message in result.stdout
 
