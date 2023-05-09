@@ -1,6 +1,6 @@
 `matcha` is a tool for provisioning MLOps environments to the cloud.
 
-Jump to [get started](https://fuzzylabs.github.io/matcha/getting-started/) section to help you get started using matcha quickly.
+Jump to [get started](https://fuzzylabs.github.io/matcha/getting-started/) section to help you get started using matcha.
 
 ## Why do you need `matcha`?
 
