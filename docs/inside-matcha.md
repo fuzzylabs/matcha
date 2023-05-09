@@ -34,5 +34,3 @@ The user can use `get` to configure their workflow, for example, by getting the 
 Once the user has finished with their provisioned environment, `destroy` enables them to tear down the resources.
 
 It works by calling the `destroy` Terraform command vai the `python-terraform` library, which interacts with the configured Terraform files in the `.matcha/` directory.
-
-The files are kept but the `matcha.state` is deleted.

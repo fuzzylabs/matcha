@@ -8,7 +8,7 @@ In this example, we'll show you how to use `matcha` to setup a default cloud env
 
 ### What's the benefit of experiment tracking?
 
-If you're reading through our documentation, then it's quite likely that we don't need to sell the benefit of tracking your experiments. Even so, it's worth emphasising. Having experiment tracking means that for each run of your pipeline, its metadata is stored in a central place. See our [MLOps Principles](mlops_principles.md) page for more!
+If you're reading through our documentation, then it's quite likely that we don't need to sell the benefit of tracking your experiments. Even so, it's worth emphasising. Having experiment tracking means that for each run of your pipeline, its metadata is stored in a central place.
 
 ### Pre-requisites
 
