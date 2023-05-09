@@ -3,7 +3,7 @@ name = "matcha-ml"
 version = "0.1.0"
 description = "Matcha: Open source tool for provisioning MLOps environments to the cloud."
 authors = ["FuzzyLabs <info@fuzzylabs.ai>"]
-license = "Apache-2.0 license"
+license = "Apache-2.0"
 homepage = "http://fuzzylabs.github.io/matcha"
 documentation = "http://fuzzylabs.github.io/matcha"
 repository = "https://github.com/fuzzylabs/matcha/"
@@ -17,11 +17,10 @@ classifiers = [
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: Implementation",
     "License :: OSI Approved :: Apache Software License",
+    "Topic :: Software Development",
     "Topic :: Software Development :: Libraries :: Python Modules",
-    "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
 packages = [{include = "matcha_ml", from = "src"}]
 exclude = [
@@ -38,6 +37,8 @@ include = [
 
 [tool.poetry.urls]
 "Bug Tracker" = "https://github.com/fuzzylabs/matcha/issues"
+"Source" = "https://github.com/fuzzylabs/matcha/"
+"User Slack community" = "TBD"
 
 [tool.poetry.scripts]
 matcha = "matcha_ml.cli.cli:app"
