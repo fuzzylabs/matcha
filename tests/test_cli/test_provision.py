@@ -3,18 +3,34 @@ import glob
 import json
 import os
 from typing import Dict
+from unittest.mock import patch
 
 import pytest
 from typer.testing import CliRunner
 
 from matcha_ml.cli._validation import LONGEST_RESOURCE_NAME, MAXIMUM_RESOURCE_NAME_LEN
 from matcha_ml.cli.cli import app
+from matcha_ml.services.terraform_service import TerraformService
 from matcha_ml.templates.build_templates.azure_template import SUBMODULE_NAMES
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 TEMPLATE_DIR = os.path.join(
     BASE_DIR, os.pardir, os.pardir, "src", "matcha_ml", "infrastructure"
 )
+TF_SERVICE_FUNCTION_STUB = "matcha_ml.services.terraform_service.TerraformService"
+
+
+@pytest.fixture(autouse=True)
+def mocked_terraform_service() -> TerraformService:
+    """The TerraformService with mocked variables.
+
+    Returns:
+        TerraformService: the mocked TerraformService.
+    """
+    with patch(f"{TF_SERVICE_FUNCTION_STUB}.check_installation") as check_tf_install:
+        check_tf_install.return_value = True
+
+    yield TerraformService()
 
 
 def assert_infrastructure(destination_path: str, expected_tf_vars: Dict[str, str]):
@@ -401,3 +417,62 @@ def test_cli_provision_command_reuse(runner, matcha_testing_directory):
     }
 
     assert_infrastructure(destination_path, expected_tf_vars)
+
+
+def test_cli_provision_command_with_provisioned_resources(
+    runner, matcha_testing_directory
+):
+    """Test provision command when there are already existing resources deployed.
+
+    Args:
+        runner (CliRunner): typer CLI runner
+        matcha_testing_directory (str): temporary working directory.
+    """
+    os.chdir(matcha_testing_directory)
+
+    # Invoke provision command for the first time which creates the .matcha directory
+    runner.invoke(
+        app,
+        [
+            "provision",
+            "--location",
+            "uksouth",
+            "--prefix",
+            "matcha",
+            "--password",
+            "ninja",
+        ],
+        input="Y\n",
+    )
+
+    destination_path = os.path.join(
+        matcha_testing_directory, ".matcha", "infrastructure"
+    )
+
+    # Touch a 'dummy.tf' file in the infrastructure configuration directory within the .matcha directory
+    with open(os.path.join(destination_path, "dummy.tf"), "a"):
+        ...
+
+    # Invoke provision command for a second time, which overwrites the existing .matcha directory and removes the 'dummy.tf' file
+    result = runner.invoke(
+        app,
+        [
+            "provision",
+            "--location",
+            "uksouth",
+            "--prefix",
+            "matcha",
+            "--password",
+            "ninja",
+        ],
+        input="Y\nY\n",
+    )
+
+    # Checks the 'dummy.tf' file is not present within the overwritten .matcha directory
+    assert not os.path.exists(os.path.join(destination_path, "dummy.tf"))
+
+    expected_tf_vars = {"location": "uksouth", "prefix": "matcha", "password": "ninja"}
+
+    assert_infrastructure(destination_path, expected_tf_vars)
+
+    assert "Provisioning is complete!" in result.stdout
