@@ -125,7 +125,7 @@ def cli(
 
     Run 'matcha <command> --help' for more information on a specific command.
 
-    For more help on how to use matcha, head to https://docs.mlops.wtf
+    For more help on how to use matcha, head to https://fuzzylabs.github.io/matcha/
     """
     pass
 
