@@ -1,6 +1,6 @@
 # Getting Started
 
-This guide will show you how to get up and running with a fully provisioned cloud environment using `matcha` :tea:. We have a number of examples, see [here](https://github.com/fuzzylabs/matcha-examples) for our examples repository.
+This guide will show you how to get up and running with a fully provisioned cloud environment using `matcha` &#127861;. We have a number of examples, see [here](https://github.com/fuzzylabs/matcha-examples) for our examples repository.
 
 ## A movie recommender with experiment tracking
 
