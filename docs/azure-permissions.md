@@ -1,5 +1,6 @@
 # Azure Permissions
 
+
 Before getting started with `matcha`, we need to make sure that you have the correct permissions to provision resources on Azure.
 
 There is a presumption made here that you have an Azure account with an active subscription which has billing enabled. For a guide on how to set that up, see [here](https://learn.microsoft.com/en-us/dynamics-nav/how-to--sign-up-for-a-microsoft-azure-subscription).
