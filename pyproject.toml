@@ -8,7 +8,13 @@ homepage = "http://fuzzylabs.github.io/matcha"
 documentation = "http://fuzzylabs.github.io/matcha"
 repository = "https://github.com/fuzzylabs/matcha/"
 readme = "README.md"
-keywords = ["production", "mlops", "devops"]
+keywords = ["production", "mlops", "devops", "machine learning"]
+classifiers = [
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: Apache Software License",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
 packages = [{include = "matcha_ml", from = "src"}]
 exclude = [
     "docs",
@@ -21,6 +27,9 @@ include = [
     "src/matcha_ml",
     "src/matcha_ml/infrastructure/**",
 ]
+
+[tool.poetry.urls]
+"Bug Tracker" = "https://github.com/fuzzylabs/matcha/issues"
 
 [tool.poetry.scripts]
 matcha = "matcha_ml.cli.cli:app"
