@@ -37,7 +37,6 @@ include = [
 
 [tool.poetry.urls]
 "Bug Tracker" = "https://github.com/fuzzylabs/matcha/issues"
-"User Slack community" = "http://TBD"
 
 [tool.poetry.scripts]
 matcha = "matcha_ml.cli.cli:app"
