@@ -12,7 +12,7 @@ If you're reading through our documentation, then it's quite likely that we don'
 
 ### Pre-requisites
 
-Before trying to provision infrastructure on Azure, `matcha` needs to you to be authenticated and to have the correct permissions for the tools you're wanting to deploy. See our explainer on [Azure Permissions](azure_permissions.md).
+Before trying to provision infrastructure on Azure, `matcha` needs to you to be authenticated and to have the correct permissions for the tools you're wanting to deploy. See our explainer on [Azure Permissions](azure-permissions.md).
 
 Alongside this, you need the Azure CLI installed - see [here](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli) on how to install it
 
@@ -62,7 +62,7 @@ Matcha version: 0.1.0
 
 Now you have your virtual environment configured and `matcha` installed, it's time to provision your Azure environment. For this example, we'll deploy an experimental tracker ([MLflow](https://mlflow.org/)) to Azure. There are other components deployed as part of this, see [here](inside-matcha.md) for a detailed explanation of what `matcha` is doing.
 
-To start, you need to authenticate with Azure (see [pre-requisties](#pre-requisties)):
+To start, you need to authenticate with Azure (see [pre-requisites](#pre-requisites)):
 
 ```bash
 az login
