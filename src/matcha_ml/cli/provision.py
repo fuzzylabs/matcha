@@ -40,18 +40,16 @@ def provision_resources(
     # create a runner for provisioning resource with Terraform service.
     template_runner = TemplateRunner()
 
+    project_directory = os.getcwd()
+    destination = os.path.join(project_directory, ".matcha", "infrastructure")
+    template = os.path.join(os.path.dirname(__file__), os.pardir, "infrastructure")
+
+    if not reuse_configuration(destination):
+        config = build_template_configuration(location, prefix, password)
+        build_template(config, template, destination, verbose)
+
     # initialises the infrastructure provisioning process.
     if template_runner.is_approved(verb="provision"):
-
-        project_directory = os.getcwd()
-        destination = os.path.join(project_directory, ".matcha", "infrastructure")
-
-        template = os.path.join(os.path.dirname(__file__), os.pardir, "infrastructure")
-
-        if not reuse_configuration(destination):
-            config = build_template_configuration(location, prefix, password)
-            build_template(config, template, destination, verbose)
-
         # provision resources by running the template
         template_runner.provision()
         print_status(build_step_success_status("Provisioning is complete!"))

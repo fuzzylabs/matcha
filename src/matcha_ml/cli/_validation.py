@@ -231,7 +231,7 @@ def check_current_deployment_exists() -> bool:
         return True
     else:
         print_error(
-            f"Error, resource group '{resource_group_name}' is currently in a '{rg_state.value}' which is currently not handled by matcha. Please check your resources on Azure."
+            f"Error, resource group '{resource_group_name}' is currently in the state '{rg_state.value}' which is currently not handled by matcha. Please check your resources on Azure."
         )
         return True
 

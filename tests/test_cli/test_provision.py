@@ -3,6 +3,7 @@ import glob
 import json
 import os
 from typing import Dict
+from unittest.mock import patch
 
 import pytest
 from typer.testing import CliRunner
@@ -401,3 +402,75 @@ def test_cli_provision_command_reuse(runner, matcha_testing_directory):
     }
 
     assert_infrastructure(destination_path, expected_tf_vars)
+
+
+def test_cli_provision_command_with_provisioned_resources(
+    runner, matcha_testing_directory
+):
+    """Test provision command when there are already existing resources deployed.
+
+    Args:
+        runner (CliRunner): typer CLI runner
+        matcha_testing_directory (str): temporary working directory.
+    """
+    os.chdir(matcha_testing_directory)
+
+    # Invoke provision command for the first time which creates the .matcha directory
+    runner.invoke(
+        app,
+        [
+            "provision",
+            "--location",
+            "uksouth",
+            "--prefix",
+            "matcha",
+            "--password",
+            "ninja",
+        ],
+        input="Y\n",
+    )
+
+    destination_path = os.path.join(
+        matcha_testing_directory, ".matcha", "infrastructure"
+    )
+
+    # Touch a 'dummy.tf' file in the infrastructure configuration directory within the .matcha directory
+    with open(os.path.join(destination_path, "dummy.tf"), "a"):
+        ...
+
+    # Mock functions such that a deployment on Azure exists
+    with patch(
+        "matcha_ml.templates.build_templates.azure_template.check_current_deployment_exists"
+    ) as check_deployment_exists, patch(
+        "matcha_ml.templates.build_templates.azure_template.MatchaStateService.fetch_resources_from_state_file"
+    ) as fetch_resources_from_state_file:
+        check_deployment_exists.return_value = True
+        fetch_resources_from_state_file.return_value = {
+            "cloud": {"resource-group-name": "matcha-resources"}
+        }
+        # Invoke provision command for a second time, which overwrites the existing .matcha directory and removes the 'dummy.tf' file
+        result = runner.invoke(
+            app,
+            [
+                "provision",
+                "--location",
+                "uksouth",
+                "--prefix",
+                "matcha",
+                "--password",
+                "ninja",
+            ],
+            input="Y\nY\n",
+        )
+
+    # Checks the 'dummy.tf' file is not present within the overwritten .matcha directory
+    assert not os.path.exists(os.path.join(destination_path, "dummy.tf"))
+
+    expected_tf_vars = {"location": "uksouth", "prefix": "matcha", "password": "ninja"}
+
+    assert_infrastructure(destination_path, expected_tf_vars)
+
+    assert (
+        "WARNING: Matcha has detected that a deployment already exists in Azure"
+        in result.stdout
+    )
