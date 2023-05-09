@@ -3,34 +3,18 @@ import glob
 import json
 import os
 from typing import Dict
-from unittest.mock import patch
 
 import pytest
 from typer.testing import CliRunner
 
 from matcha_ml.cli._validation import LONGEST_RESOURCE_NAME, MAXIMUM_RESOURCE_NAME_LEN
 from matcha_ml.cli.cli import app
-from matcha_ml.services.terraform_service import TerraformService
 from matcha_ml.templates.build_templates.azure_template import SUBMODULE_NAMES
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 TEMPLATE_DIR = os.path.join(
     BASE_DIR, os.pardir, os.pardir, "src", "matcha_ml", "infrastructure"
 )
-TF_SERVICE_FUNCTION_STUB = "matcha_ml.services.terraform_service.TerraformService"
-
-
-@pytest.fixture(autouse=True)
-def mocked_terraform_service() -> TerraformService:
-    """The TerraformService with mocked variables.
-
-    Returns:
-        TerraformService: the mocked TerraformService.
-    """
-    with patch(f"{TF_SERVICE_FUNCTION_STUB}.check_installation") as check_tf_install:
-        check_tf_install.return_value = True
-
-    yield TerraformService()
 
 
 def assert_infrastructure(destination_path: str, expected_tf_vars: Dict[str, str]):
