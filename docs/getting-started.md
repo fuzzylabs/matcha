@@ -134,6 +134,8 @@ Experiment tracker
 
 > Note: You can also get these outputs in either json or YAML format using the following: `matcha get --output json`
 
+By default, `matcha` will hide sensitive resource properties. If you need one of these properties, then you can add the `--show-sensitive` flag to your `get` command.
+
 ### Running your recommender
 
 The environment is provisioned, you've got a movie recommender, and you're hyped and ready to go - we hope.
