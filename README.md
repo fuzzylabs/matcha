@@ -1,9 +1,10 @@
 <h1 align="center">
-    `matcha` &#127861;
+    <code>`matcha`</code> &#127861;
 </h1>
 
-![build](https://github.com/fuzzylabs/matcha/actions/workflows/ci.yml/badge.svg)
-
+<p align="center">
+    ![build](https://github.com/fuzzylabs/matcha/actions/workflows/ci.yml/badge.svg)
+</p>
 
 Welcome to `matcha`, the open source tool for provisioning MLOps environments to the cloud.
 
