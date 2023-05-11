@@ -17,8 +17,9 @@
     </a>
 </p>
 
-
-
+<h3 align="center">
+    <p>A tool for provisioning an MLOps environment in 20 minutes</p>
+</h3>
 
 Welcome to `matcha`, the open source tool for provisioning MLOps environments to the cloud.
 
