@@ -10,7 +10,10 @@
         <img alt="License" src="https://img.shields.io/github/license/fuzzylabs/matcha?color=blue">
     </a>
     <a href="https://github.com/fuzzylabs/matcha/releases">
-        <img alt="Release" src="https://img.shields.io/github/v/release/fuzzylabs/matcha">
+        <img alt="Release" src="https://img.shields.io/github/v/release/fuzzylabs/matcha?color=green">
+    </a>
+    <a href="https://pypi.org/project/matcha-ml/">
+        <img alt="Downloads" src="https://img.shields.io/pypi/dm/matcha-ml?color=orange">
     </a>
 </p>
 
