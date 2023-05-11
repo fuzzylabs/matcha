@@ -2,12 +2,13 @@
     <code>`matcha`</code> &#127861;
 </h1>
 
-<!-- <p align="center">
-    ![build](https://github.com/fuzzylabs/matcha/actions/workflows/ci.yml/badge.svg)
-</p> -->
-
 <p align="center">
-    <img alt="Build" src="https://img.shields.io/github/actions/workflow/status/fuzzylabs/matcha/ci.yml">
+    <a href="https://github.com/fuzzylabs/matcha/actions/workflows/ci.yml">
+        <img alt="Build" src="https://img.shields.io/github/actions/workflow/status/fuzzylabs/matcha/ci.yml">
+    </a>
+    <a href="https://github.com/fuzzylabs/matcha/blob/main/LICENSE">
+        <img alt="License" src="https://img.shields.io/github/license/fuzzylabs/matcha?color=blue">
+    </a>
 </p>
 
 
