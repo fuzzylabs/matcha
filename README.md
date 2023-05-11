@@ -1,5 +1,5 @@
 <h1 align="center">
-    <code>`matcha`</code> &#127861;
+    <code>matcha</code> &#127861;
 </h1>
 
 <p align="center">
@@ -8,6 +8,9 @@
     </a>
     <a href="https://github.com/fuzzylabs/matcha/blob/main/LICENSE">
         <img alt="License" src="https://img.shields.io/github/license/fuzzylabs/matcha?color=blue">
+    </a>
+    <a href="https://github.com/fuzzylabs/matcha/releases">
+        <img alt="Release" src="https://img.shields.io/github/v/release/fuzzylabs/matcha">
     </a>
 </p>
 
