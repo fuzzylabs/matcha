@@ -1,6 +1,6 @@
 # 0.2.1
 
-In this release, we introduce `matcha` to the world - an open source tool for provisioning MLOps environments to the cloud. 
+In this release, we introduce `matcha` to the world - an open source tool for provisioning MLOps environments to the cloud.
 
 With this alpha release of `matcha`, you can provision the infrastructure necessary to enable the following capabilities:
 
