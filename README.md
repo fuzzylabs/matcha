@@ -45,7 +45,7 @@ By the end, you'll understand how to use `matcha` and have a fully provisioned m
 
 Want to learn more about `matcha`? See our [documentation](https://mymatcha.ai/) which covers what `matcha` is in more detail, how to use it, what Azure permissions are required, and much more!
 
-## &&#128506;&#65039; Roadmap
+## &#128506;&#65039; Roadmap
 
 Where is `matcha` going? We have a roadmap which shows what we're working on and what is up and coming.
 
