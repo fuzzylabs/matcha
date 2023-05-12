@@ -31,10 +31,6 @@ With a single command and using sensible defaults, Data Scientists and ML practi
 
 &#127861; `matcha` uses open source tools to build this MLOps environment on Azure.
 
-<p align="center">
-GIF
-</p>
-
 ## 	&#128678; Getting Started
 
 Keen to get started with `matcha`? We have a great getting started guide which you can find [here](https://mymatcha.ai/getting-started/).
