@@ -61,7 +61,7 @@ class TerraformService:
 
         return True
 
-    def verify_kubectl_config_file(self):
+    def verify_kubectl_config_file(self) -> None:
         """Checks if kubeconfig is present at location ~/.kube/config.
 
         If not, it creates a empty config file.

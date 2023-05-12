@@ -72,7 +72,7 @@ class TemplateRunner:
             )
             raise typer.Exit()
 
-    def _validate_kubeconfig(self):
+    def _validate_kubeconfig(self) -> None:
         """Check if kubeconfig file exists at location '~/.kube/config', if not create empty config file."""
         self.tfs.verify_kubectl_config_file()
 
