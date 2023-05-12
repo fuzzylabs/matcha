@@ -118,6 +118,32 @@ def test_check_matcha_directory_integrity(tmp_path):
     os.chdir("..")
 
 
+def test_verify_kubectl_config_file(tmpdir: str):
+    """Test whether kubeconfig is present as path ~/.kube/config.
+
+    Args:
+        tmpdir (str): Temporary directory
+    """
+    temp_path = tmpdir.mkdir(".kube").join("config")
+    tmp_config_file_path = os.path.join(os.path.expanduser("~"), temp_path)
+
+    # Check if path to config file does not exists
+    assert not os.path.exists(tmp_config_file_path)
+
+    # Check if config file is not present
+    assert not os.path.isfile(tmp_config_file_path)
+
+    tfs = TerraformService()
+
+    tfs.verify_kubectl_config_file(tmp_config_file_path)
+
+    # Check if path to config file exists
+    assert os.path.exists(tmp_config_file_path)
+
+    # Check if config file is created
+    assert os.path.isfile(tmp_config_file_path)
+
+
 def test_validate_config_exists(terraform_test_config: TerraformConfig):
     """Test service can validate that a config exists.
 
