@@ -61,6 +61,18 @@ class TerraformService:
 
         return True
 
+    def verify_kubectl_config_file(self):
+        """Checks if kubeconfig is present at location ~/.kube/config.
+
+        If not, it creates a empty config file.
+        """
+        kubeconfig_path = os.path.join(os.path.expanduser("~"), ".kube/config")
+
+        if not os.path.exists(kubeconfig_path):
+            os.makedirs(os.path.dirname(kubeconfig_path), exist_ok=True)
+            with open(kubeconfig_path, "a"):
+                pass
+
     def check_matcha_directory_integrity(self) -> bool:
         """Checks the integrity of the .matcha directory.
 
