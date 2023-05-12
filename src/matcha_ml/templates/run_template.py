@@ -193,7 +193,7 @@ class TemplateRunner:
             state_outputs[resource_type].setdefault("flavor", flavor)
             state_outputs[resource_type][resource_name] = properties["value"]
 
-        with open(self.state_file, "a") as fp:
+        with open(self.state_file, "w") as fp:
             json.dump(state_outputs, fp, indent=4)
 
     def _show_terraform_outputs(self) -> None:
