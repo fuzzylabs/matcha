@@ -139,6 +139,9 @@ def region_typer_callback(region: str) -> str:
     Returns:
         str: the region after checks are passed.
     """
+    if not region:
+        return region
+
     try:
         region_validation(region)
     except MatchaInputError as e:
@@ -179,6 +182,8 @@ def prefix_typer_callback(prefix: str) -> str:
     Returns:
         str: if valid, the prefix is returned.
     """
+    if not prefix:
+        return prefix
 
     def _to_lowercase(prefix: str) -> str:
         """Convert the prefix to lowercase (a requirement of Azure).
