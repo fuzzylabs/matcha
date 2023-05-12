@@ -296,12 +296,15 @@ def test_cli_provision_command_with_existing_prefix_name(
     assert expected_error_message in result.stdout
 
 
-def test_cli_provision_command_override(runner, matcha_testing_directory):
+def test_cli_provision_command_override(
+    runner, matcha_testing_directory, mocked_azure_client
+):
     """Test provision command to override the configuration file within the .matcha directory.
 
     Args:
         runner (CliRunner): typer CLI runner
         matcha_testing_directory (str): temporary working directory.
+        mocked_azure_client (AzureClient) : Mocked Azure client
     """
     os.chdir(matcha_testing_directory)
 
@@ -328,6 +331,7 @@ def test_cli_provision_command_override(runner, matcha_testing_directory):
     with open(os.path.join(destination_path, "dummy.tf"), "a"):
         ...
 
+    mocked_azure_client.resource_group_state.return_value = None
     # Invoke provision command for a second time, which overwrites the existing .matcha directory and removes the 'dummy.tf' file
     runner.invoke(
         app,
