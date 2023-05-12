@@ -35,40 +35,28 @@ With a single command and using sensible defaults, Data Scientists and ML practi
 GIF
 </p>
 
-## Getting Started
+## 	&#128678; Getting Started
 
-## Documentation
+Keen to get started with `matcha`? We have a great getting started guide which you can find [here](https://mymatcha.ai/getting-started/).
 
-## Roadmap
+By the end, you'll understand how to use `matcha` and have a fully provisioned movie recommendation system in Azure, ready to serve some movie ratings!
 
-## Contributing
+## &#128214; Documentation
 
-## License
+Want to learn more about `matcha`? See our [documentation](https://mymatcha.ai/) which covers what `matcha` is in more detail, how to use it, what Azure permissions are required, and much more!
+
+## &&#128506;&#65039; Roadmap
+
+Where is `matcha` going? We have a roadmap which shows what we're working on and what is up and coming.
+
+We want you to contribute to this! Is there a feature that you think is missing? Add this to the roadmap and help us prioritise what is useful to you, the community.
+
+## &#128079; Contributing
+
+`matcha` at its very core is open source and we're eager for you to get involved whether through raising issues or by opening a PR.
+
+We have an in-depth [contributing](CONTRIBUTING.md) guide which will describe how to do all of this.
+
+## &#128220; License
 
 This library is released under the Apache License. See [LICENSE](LICENSE).
-
-<!-- Welcome to `matcha`, the open source tool for provisioning MLOps environments to the cloud.
-
-Data Scientists and practitioners build ML pipelines and productionize them with the following capabilities:
-
-* A way to run model training pipelines
-* A way to track experiments
-* A way to deploy and serve models
-
-The current version of `matcha` provisions the above with a single command, using sensible defaults for the infrastructure.
-
-More components could be added here, for example, managing and versioning datasets, managing models (registration and governance), and monitoring models. Adding all of these is on our roadmap.
-
-`matcha` uses open source to solve this problem.
-
-By default, `matcha` will `provision` an MLOps environment to Azure with sensible defaults - enough for you to get going with cloud-based training and deployment. From there, you can use `matcha` to `get` information about your provisioned environment.
-
-Please see the following for more information, including install instructions, documentation, and how you can contribute to `matcha`:
-
-* [Getting Started](https://fuzzylabs.github.io/matcha/getting-started/)
-* [Documentation](https://fuzzylabs.github.io/matcha/)
-* [Contributing](CONTRIBUTING.md)
-
-## Licence
-
-This library is released under the Apache License. See [LICENSE](LICENSE). -->
