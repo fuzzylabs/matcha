@@ -21,6 +21,14 @@
     <p>A tool for provisioning an MLOps environment in 20 minutes</p>
 </h3>
 
+&#127861; `matcha` is the open source tool for provisioning MLOps environments to the cloud.
+
+With a single command and using sensible defaults, Data Scientists and ML practitioners are provided with the following capabilities:
+
+* &#127939; A way to run model training.
+* &#128099; A way to track experiments.
+* &#127869;&#65039; A way to deploy and serve models.
+
 Welcome to `matcha`, the open source tool for provisioning MLOps environments to the cloud.
 
 Data Scientists and practitioners build ML pipelines and productionize them with the following capabilities:
