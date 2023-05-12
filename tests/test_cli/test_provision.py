@@ -50,6 +50,16 @@ def assert_infrastructure(destination_path: str, expected_tf_vars: Dict[str, str
 
     assert tf_vars == expected_tf_vars
 
+    # Check that matcha state file exists and content is equal/correct
+    state_file_path = os.path.join(destination_path, "matcha.state")
+    assert os.path.exists(state_file_path)
+
+    with open(state_file_path) as f:
+        tf_vars = json.load(f)
+
+    _ = expected_tf_vars.pop("password", None)
+    assert tf_vars == expected_tf_vars
+
 
 def test_cli_provision_command_help(runner: CliRunner):
     """Test cli for provision command help.

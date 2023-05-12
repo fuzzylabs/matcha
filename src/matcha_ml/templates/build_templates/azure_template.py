@@ -175,8 +175,15 @@ def build_template(
             print_status(build_substep_success_status("Configuration was copied"))
 
         configuration_destination = os.path.join(destination, "terraform.tfvars.json")
+        statefile_destination = os.path.join(destination, "matcha.state")
+
+        config_dict = dataclasses.asdict(config)
         with open(configuration_destination, "w") as f:
-            json.dump(dataclasses.asdict(config), f)
+            json.dump(config_dict, f)
+
+        _ = config_dict.pop("password", None)
+        with open(statefile_destination, "w") as f:
+            json.dump(config_dict, f)
 
         if verbose:
             print_status(build_substep_success_status("Template variables were added."))
