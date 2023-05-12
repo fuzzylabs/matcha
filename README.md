@@ -47,7 +47,7 @@ Want to learn more about `matcha`? See our [documentation](https://mymatcha.ai/)
 
 ## &#128506;&#65039; Roadmap
 
-Where is `matcha` going? We have a roadmap which shows what we're working on and what is up and coming.
+Where is `matcha` going? We have a [roadmap](https://matcha.hellonext.co/) which shows what we're working on and what is up and coming.
 
 We want you to contribute to this! Is there a feature that you think is missing? Add this to the roadmap and help us prioritise what is useful to you, the community.
 
