@@ -18,10 +18,10 @@
 </p>
 
 <h3 align="center">
-    <p>A tool for provisioning an MLOps environment in 20 minutes</p>
+    <p>A tool for provisioning an MLOps environment on Azure in 20 minutes</p>
 </h3>
 
-&#127861; `matcha` is the open source tool for provisioning MLOps environments to the cloud.
+&#127861; `matcha` is the open source tool for provisioning MLOps environments to Azure
 
 With a single command and using sensible defaults, Data Scientists and ML practitioners are provided with the following capabilities:
 
@@ -29,7 +29,25 @@ With a single command and using sensible defaults, Data Scientists and ML practi
 * &#128099; A way to track experiments.
 * &#127869;&#65039; A way to deploy and serve models.
 
-Welcome to `matcha`, the open source tool for provisioning MLOps environments to the cloud.
+&#127861; `matcha` uses open source tools to build this MLOps environment on Azure.
+
+<p align="center">
+GIF
+</p>
+
+## Getting Started
+
+## Documentation
+
+## Roadmap
+
+## Contributing
+
+## License
+
+This library is released under the Apache License. See [LICENSE](LICENSE).
+
+<!-- Welcome to `matcha`, the open source tool for provisioning MLOps environments to the cloud.
 
 Data Scientists and practitioners build ML pipelines and productionize them with the following capabilities:
 
@@ -53,4 +71,4 @@ Please see the following for more information, including install instructions, d
 
 ## Licence
 
-This library is released under the Apache License. See [LICENSE](LICENSE).
+This library is released under the Apache License. See [LICENSE](LICENSE). -->
