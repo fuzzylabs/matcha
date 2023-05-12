@@ -20,6 +20,12 @@ def destroy_resources() -> None:
     # create a runner for deprovisioning resource with Terraform service.
     template_runner = TemplateRunner()
 
+    if not check_current_deployment_exists():
+        print_error(
+            "Error - you cannot destroy resources that have not been provisioned yet."
+        )
+        raise typer.Exit()
+
     if template_runner.is_approved(verb="destroy"):
         # deprovision the resources
         template_runner.deprovision()
