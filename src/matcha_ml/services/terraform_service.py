@@ -65,7 +65,7 @@ class TerraformService:
         """Checks if kubeconfig is present at location ~/.kube/config.
 
         Args:
-            config_path (str): Path to location of kubeconfig
+            config_path (str): Relative path to location of kubeconfig
 
         If not, it creates a empty config file.
         """
