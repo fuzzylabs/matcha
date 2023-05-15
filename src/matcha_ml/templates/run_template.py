@@ -193,7 +193,14 @@ class TemplateRunner:
             state_outputs[resource_type].setdefault("flavor", flavor)
             state_outputs[resource_type][resource_name] = properties["value"]
 
-        # Read and update the matcha state file with new provisioned resources.
+        self._update_state_file(state_outputs)
+
+    def _update_state_file(self, state_outputs: dict) -> None:
+        """Read and update the matcha state file with new provisioned resources.
+
+        Args:
+            state_outputs (dict): Dictionary containing outputs to be written to state file.
+        """
         with open(self.state_file, "r") as fp:
             out_data = json.load(fp)
         out_data.update(state_outputs)
