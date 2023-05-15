@@ -216,6 +216,8 @@ def prefix_typer_callback(prefix: str) -> str:
 def check_current_deployment_exists() -> bool:
     """Checks the current deployment using the .matcha directory current contents if it exists.
 
+    Specifically, it checks whether the resource group exists on Azure.
+
     Returns:
         bool: True if a deployment currently exists, else False.
     """
