@@ -1,5 +1,5 @@
 <h1 align="center">
-    ![matcha](docs/img/logo.png)
+    <img src="docs/img/logo.png"></img>
 </h1>
 
 <p align="center">
