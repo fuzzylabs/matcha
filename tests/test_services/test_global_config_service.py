@@ -1,10 +1,12 @@
 """Tests for Global Config Service."""
 import os
+from stat import S_IREAD
 from unittest import mock
 
 import pytest
 import yaml
 
+from matcha_ml.errors import MatchaPermissionError
 from matcha_ml.services.global_config_service import GlobalConfigurationService
 
 INTERNAL_FUNCTION_STUB = (
@@ -15,7 +17,7 @@ INTERNAL_FUNCTION_STUB = (
 @pytest.fixture(autouse=True)
 def teardown_singleton():
     """Tears down the singleton before each test case by clearing the current object."""
-    GlobalConfigurationService.clear()
+    GlobalConfigurationService._instance = None
 
 
 def test_class_is_singleton(matcha_testing_directory):
@@ -36,8 +38,6 @@ def test_class_is_singleton(matcha_testing_directory):
         second_instance = GlobalConfigurationService()
         assert first_instance is second_instance
 
-        first_instance._instance = None
-
 
 def test_new_config_file_creation(matcha_testing_directory):
     """Tests that a new file is created if it does not exist when the global config object is instantiated.
@@ -55,7 +55,7 @@ def test_new_config_file_creation(matcha_testing_directory):
         file_path.return_value = config_file_path
 
         assert not os.path.exists(config_file_path)
-        GlobalConfigurationService()
+        _ = GlobalConfigurationService()
         assert os.path.exists(config_file_path)
 
 
@@ -120,3 +120,28 @@ def test_opt_out(matcha_testing_directory):
 
         assert config_instance.config_file.get("analytics_opt_out") is True
         assert config_instance.analytics_opt_out is True
+
+
+# test write permissions
+
+
+def test_config_file_write_permissions(matcha_testing_directory):
+    """Tests the permissions error thrown where the user does not have permission to write a global config file.
+
+    Args:
+        matcha_testing_directory (str): Mock testing directory location for the GlobalConfig file to be located
+    """
+    config_file_path = os.path.join(
+        matcha_testing_directory, ".matcha-ml", "config.yaml"
+    )
+    with mock.patch(
+        f"{INTERNAL_FUNCTION_STUB}.default_config_file_path",
+        new_callable=mock.PropertyMock,
+    ) as file_path:
+        file_path.return_value = config_file_path
+
+        # Alters the permissions on the testing directory to be read-only
+        os.chmod(matcha_testing_directory, S_IREAD)
+
+        with pytest.raises(MatchaPermissionError):
+            _ = GlobalConfigurationService()

@@ -1,10 +1,11 @@
 """Global config service for creating and modifying a users global config files."""
 import os
-import threading
 import uuid
 from typing import Any, Dict, Optional
 
 import yaml
+
+from matcha_ml.errors import MatchaPermissionError
 
 
 class GlobalConfigurationService:
@@ -13,7 +14,6 @@ class GlobalConfigurationService:
     _instance: Optional["GlobalConfigurationService"] = None
     _user_id: Optional[str] = None
     _analytics_opt_out: bool = False
-    _lock = threading.Lock()
 
     def __new__(cls) -> "GlobalConfigurationService":
         """Singleton class definition.
@@ -22,18 +22,16 @@ class GlobalConfigurationService:
             GlobalConfigurationService: Already existing initialised object, otherwise a new singleton object
         """
         if cls._instance is None:
-            with cls._lock:
-                if not cls._instance:
-                    cls._instance = super().__new__(cls)
-                    # Check if config.yaml file exists and read in variables to the class
-                    if os.path.exists(str(cls._instance.default_config_file_path)):
-                        cls._instance._read_global_config(
-                            str(cls._instance.default_config_file_path)
-                        )
-                    else:
-                        cls._instance._create_global_config(
-                            config_file_path=str(cls._instance.default_config_file_path)
-                        )
+            cls._instance = super().__new__(cls)
+            # Check if config.yaml file exists and read in variables to the class
+            if os.path.exists(str(cls._instance.default_config_file_path)):
+                cls._instance._read_global_config(
+                    str(cls._instance.default_config_file_path)
+                )
+            else:
+                cls._instance._create_global_config(
+                    config_file_path=str(cls._instance.default_config_file_path)
+                )
 
         return cls._instance
 
@@ -61,7 +59,13 @@ class GlobalConfigurationService:
         }
 
         # Create the '.matcha-ml' config directory
-        os.makedirs(os.path.dirname(config_file_path), exist_ok=True)
+        try:
+            os.makedirs(os.path.dirname(config_file_path), exist_ok=True)
+        except PermissionError:
+            raise MatchaPermissionError(
+                f"Error - You do not have permission to write the configuration. Check if you have write permissions for '{config_file_path}'"
+            )
+
         # Create config file and populate with the current class variables
         with open(config_file_path, "w") as file:
             yaml.dump(data, file)
@@ -77,13 +81,9 @@ class GlobalConfigurationService:
             "analytics_opt_out": self._analytics_opt_out,
         }
 
-        with open(config_file_path) as file:
+        with open(config_file_path, "r+") as file:
             yaml_data = yaml.safe_load(file)
-
-        yaml_data.update(data)
-
-        # Create config file and populate with the current class variables
-        with open(config_file_path, "w") as file:
+            yaml_data.update(data)
             yaml.dump(yaml_data, file)
 
     def opt_out_of_analytics(self) -> None:
@@ -137,8 +137,3 @@ class GlobalConfigurationService:
             config_contents = dict(yaml.safe_load(f))
 
         return config_contents
-
-    @classmethod
-    def clear(cls) -> None:
-        """Method to clear the singleton class."""
-        cls._instance = None
