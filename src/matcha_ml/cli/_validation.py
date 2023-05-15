@@ -226,10 +226,6 @@ def check_current_deployment_exists() -> bool:
         data = json.load(f)
 
     # Check if resource-group-name is present in matcha.state file
-    if "cloud" in data:
-        resource_group_name = data["cloud"]["resource-group-name"]
-
-    # Alternate way to fetch resource-group-name from matcha.state file incase provision fails
     if "prefix" in data:
         resource_group_name = data["prefix"] + "-resources"
 
