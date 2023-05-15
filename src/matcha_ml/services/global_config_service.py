@@ -7,42 +7,25 @@ import yaml
 
 
 class GlobalConfigurationService:
-    """_summary_."""
+    """A Global Config Service for interacting and updating a users global config file."""
 
     _instance: Optional["GlobalConfigurationService"] = None
     user_id: Optional[str] = None
-    analytics_opt_in: Optional[bool] = True
+    analytics_opt_out: Optional[bool] = False
     _config_file_path: Optional[str] = None
     __initialized: bool = False
 
     def __init__(self) -> None:
-        """_summary_."""
+        """Constructor for the GlobalConfiguration Service.
+
+        Checks if a GlobalConfig under the users home directory exists and creates one if it does not exist.
+        """
         if self.__initialized is False:
             # Check if config.yaml file exists and read in variables to the class
-            self._config_file_path = os.path.join(
-                self.default_config_directory(), "config.yaml"
-            )
-
-            if os.path.exists(self._config_file_path):
-                with open(self._config_file_path) as file:
-                    yaml_data = yaml.safe_load(file)
-                self.user_id = yaml_data.get("user_id")
-                self.analytics_opt_in = yaml_data.get("analytics_opt_in")
+            if os.path.exists(self.default_config_file_path):
+                self._read_global_config(self.default_config_file_path)
             else:
-                # Set variables
-                self.user_id = str(uuid.uuid4())
-                self.analytics_opt_in = True
-
-                data = {
-                    "user_id": self.user_id,
-                    "analytics_opt_in": self.analytics_opt_in,
-                }
-
-                # Create the '.matcha-ml' config directory
-                os.makedirs(os.path.dirname(self._config_file_path), exist_ok=True)
-                # Create config file and populate with the current class variables
-                with open(self._config_file_path, "w") as file:
-                    yaml.dump(data, file)
+                self._create_global_config(self.default_config_file_path)
 
     def __new__(cls) -> "GlobalConfigurationService":
         """Singleton class definition.
@@ -57,23 +40,65 @@ class GlobalConfigurationService:
 
         return cls._instance
 
-    def analytics_opt_out(self) -> None:
-        """Opt out of analytic collection."""
-        self.analytics_opt_in = False
-        # UPDATE CONFIG FILE
+    def _read_global_config(self, config_file_path: str) -> None:
+        """Reads the global config yaml file.
 
-    @staticmethod
-    def default_config_directory() -> str:
-        """Path to the default global configuration directory.
-
-        Returns:
-            The default global configuration directory.
+        Args:
+            config_file_path (str): Path to users global config file
         """
-        home_path = os.path.expanduser("~")
-        return os.path.join(home_path, ".matcha-ml")
+        with open(config_file_path) as file:
+            yaml_data = yaml.safe_load(file)
+            self.user_id = yaml_data.get("user_id")
+            self.analytics_opt_out = yaml_data.get("analytics_opt_out")
 
-    @staticmethod
-    def default_config_file_path() -> str:
+    def _create_global_config(self, config_file_path: str) -> None:
+        """Creates a new global config yaml file.
+
+        Args:
+            config_file_path (str): Path to users global config file
+        """
+        # Set variables
+        self.user_id = str(uuid.uuid4())
+        self.analytics_opt_out = False
+
+        data = {
+            "user_id": self.user_id,
+            "analytics_opt_out": self.analytics_opt_out,
+        }
+
+        # Create the '.matcha-ml' config directory
+        os.makedirs(os.path.dirname(config_file_path), exist_ok=True)
+        # Create config file and populate with the current class variables
+        with open(config_file_path, "w") as file:
+            yaml.dump(data, file)
+
+    def _update_global_config(self, config_file_path: str) -> None:
+        """Updates an existing global config file.
+
+        Args:
+            config_file_path (str): _description_
+        """
+        data = {
+            "user_id": self.user_id,
+            "analytics_opt_out": self.analytics_opt_out,
+        }
+
+        with open(config_file_path) as file:
+            yaml_data = yaml.safe_load(file)
+
+        yaml_data.update(data)
+
+        # Create config file and populate with the current class variables
+        with open(config_file_path, "w") as file:
+            yaml.dump(yaml_data, file)
+
+    def opt_out_of_analytics(self) -> None:
+        """Opt out of analytic collection."""
+        self.analytics_opt_out = True
+        self._update_global_config(self.default_config_file_path)
+
+    @property
+    def default_config_file_path(self) -> str:
         """Path to the default global configuration file.
 
         Returns:
@@ -89,19 +114,7 @@ class GlobalConfigurationService:
         Returns:
             Dict[str, Any]: the user config file in the format of a dictionary.
         """
-        with open(self.default_config_file_path()) as f:
-            self._config = dict(yaml.safe_load(f))
+        with open(self.default_config_file_path) as f:
+            config_contents = dict(yaml.safe_load(f))
 
-        return self._config
-
-    # @config_file.setter(fset)
-    # def config_file(self) -> Dict[str, Any]:
-    #     """Getter of the config file.
-
-    #     Returns:
-    #         Dict[str, Any]: the user config file in the format of a dictionary.
-    #     """
-    #     with open(self.default_config_file_path()) as f:
-    #         self._config = dict(yaml.safe_load(f))
-
-    #     return self._config
+        return config_contents
