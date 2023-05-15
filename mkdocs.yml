@@ -1,26 +1,25 @@
-site_name: matcha-ml
-site_description: matcha-ml is your one-stop-shop for efficiently provisioning MLOps tooling.
+site_name: "Open source MLOPs on Azure in one step"
+site_description: provision your MLOPs stack to Azure in one step
 
 repo_name: fuzzylabs/matcha-ml
 repo_url: https://github.com/fuzzylabs/matcha
 
-
 nav:
-  - What's matcha?: 'index.md'
-  - Usage:
-    - Getting Started: 'getting-started.md'
+  - Introduction: 'index.md'
+  - Getting started:
+    - Deploying your first model: 'getting-started.md'
+  - Concepts:
+    - Workflows: 'workflows.md'
     - Azure Permissions: 'azure-permissions.md'
-    - Cost: 'costings.md'
-  - Workflows: 'workflows.md'
+    - Azure Costs: 'costings.md'
   - Inside Matcha: 'inside-matcha.md'
 
 theme:
   name: material
   features:
     - content.code.copy
-    - navigation.tabs
     - navigation.top
-  logo: img/favicon.png
+  logo: img/logo.png
   favicon: img/favicon.png
 
 
@@ -40,8 +39,11 @@ extra:
     - icon: fontawesome/brands/linkedin
       link: https://www.linkedin.com/company/fuzzy-labs/
       name: Fuzzy Labs on LinkedIn
+    - icon: fontawesome/brands/twitter
+      link: https://www.twitter.com/fuzzylabsai/
+      name: Fuzzy Labs on Twitter
 
 extra_css:
   - css/extra.css
 
-copyright: Copyright &copy; Fuzzy Labs Ltd
+copyright: Copyright &copy; <a href="https://fuzzylabs.ai">Fuzzy Labs Ltd</a>
