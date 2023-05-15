@@ -4,7 +4,7 @@ from typing import Optional
 import typer
 
 from matcha_ml import __version__
-from matcha_ml.cli.analytics import analytics_opt_out
+from matcha_ml.cli import analytics
 from matcha_ml.cli._validation import (
     prefix_typer_callback,
     region_typer_callback,
@@ -24,6 +24,13 @@ from matcha_ml.core import core
 from matcha_ml.errors import MatchaError, MatchaInputError
 
 app = typer.Typer(no_args_is_help=True, pretty_exceptions_show_locals=False)
+
+# Create a group for all subcommands for analytics
+app.add_typer(
+    analytics.app,
+    name="analytics",
+    help="Analytics command to opt-out of collecting analytics.",
+)
 
 
 @app.command()
@@ -95,12 +102,6 @@ def get(
 def destroy() -> None:
     """Destroy the provisioned cloud resources. It will destroy the resource group even if resources are provisioned inside the group."""
     destroy_resources()
-
-
-@app.command()
-def opt_out() -> None:
-    """Opt-out of gathering analytics."""
-    analytics_opt_out()
 
 
 def version_callback(value: bool) -> None:
