@@ -1,5 +1,6 @@
 """Global config service for creating and modifying a users global config files."""
 import os
+import threading
 import uuid
 from typing import Any, Dict, Optional
 
@@ -12,20 +13,7 @@ class GlobalConfigurationService:
     _instance: Optional["GlobalConfigurationService"] = None
     _user_id: Optional[str] = None
     _analytics_opt_out: bool = False
-    _config_file_path: Optional[str] = None
-    __initialized: bool = False
-
-    def __init__(self) -> None:
-        """Constructor for the GlobalConfiguration Service.
-
-        Checks if a GlobalConfig under the users home directory exists and creates one if it does not exist.
-        """
-        if self.__initialized is False:
-            # Check if config.yaml file exists and read in variables to the class
-            if os.path.exists(self.default_config_file_path):
-                self._read_global_config(self.default_config_file_path)
-            else:
-                self._create_global_config(self.default_config_file_path)
+    _lock = threading.Lock()
 
     def __new__(cls) -> "GlobalConfigurationService":
         """Singleton class definition.
@@ -34,9 +22,18 @@ class GlobalConfigurationService:
             GlobalConfigurationService: Already existing initialised object, otherwise a new singleton object
         """
         if cls._instance is None:
-            cls._instance = super().__new__(cls)
-        else:
-            cls.__initialized = True
+            with cls._lock:
+                if not cls._instance:
+                    cls._instance = super().__new__(cls)
+                    # Check if config.yaml file exists and read in variables to the class
+                    if os.path.exists(str(cls._instance.default_config_file_path)):
+                        cls._instance._read_global_config(
+                            str(cls._instance.default_config_file_path)
+                        )
+                    else:
+                        cls._instance._create_global_config(
+                            config_file_path=str(cls._instance.default_config_file_path)
+                        )
 
         return cls._instance
 
@@ -49,7 +46,7 @@ class GlobalConfigurationService:
         with open(config_file_path) as file:
             yaml_data = yaml.safe_load(file)
             self._user_id = yaml_data.get("user_id")
-            self._analytics_opt_out = yaml_data.get("analytics_opt_out")
+            self._analytics_opt_out = yaml_data.get("analytics_opt_out") == "True"
 
     def _create_global_config(self, config_file_path: str) -> None:
         """Creates a new global config yaml file.
@@ -138,5 +135,11 @@ class GlobalConfigurationService:
         """
         with open(self.default_config_file_path) as f:
             config_contents = dict(yaml.safe_load(f))
+            print(config_contents)
 
         return config_contents
+
+    @classmethod
+    def clear(cls) -> None:
+        """Method to clear the singleton class."""
+        cls._instance = None
