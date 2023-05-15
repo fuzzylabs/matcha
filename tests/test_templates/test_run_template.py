@@ -67,6 +67,7 @@ def expected_outputs_show_sensitive() -> Dict[str, Dict[str, str]]:
             "flavor": "azure",
             "registry-url": "azure_container_registry",
         },
+        "id": {"matchaid": "matcha_id_test_value"},
     }
 
     return outputs
@@ -98,6 +99,7 @@ def expected_outputs_hide_sensitive() -> dict:
             "flavor": "azure",
             "registry-url": "azure_container_registry",
         },
+        "id": {"matchaid": "matcha_id_test_value"},
     }
     return outputs
 
@@ -289,7 +291,9 @@ def test_write_outputs_state(
     template_runner.tfs.terraform_client.output = MagicMock(wraps=mock_output)
 
     with does_not_raise():
-        template_runner._write_outputs_state()
+        with mock.patch("uuid.uuid4") as uuid4:
+            uuid4.return_value = "matcha_id_test_value"
+            template_runner._write_outputs_state()
         with open(terraform_test_config.state_file) as f:
             assert json.load(f) == expected_outputs_show_sensitive
 
