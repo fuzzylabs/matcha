@@ -216,6 +216,8 @@ def prefix_typer_callback(prefix: str) -> str:
 def check_current_deployment_exists() -> bool:
     """Checks the current deployment using the .matcha directory current contents if it exists.
 
+    Specifically, it checks whether the resource group exists on Azure.
+
     Returns:
         bool: True if a deployment currently exists, else False.
     """
@@ -225,20 +227,24 @@ def check_current_deployment_exists() -> bool:
     with open(MATCHA_STATE_DIR) as f:
         data = json.load(f)
 
-    resource_group_name = data["cloud"]["resource-group-name"]
+    # Check if resource-group-name is present in matcha.state file
+    if "prefix" in data:
+        resource_group_name = data["prefix"] + "-resources"
 
-    client = get_azure_client()
-    rg_state = client.resource_group_state(resource_group_name)
+        client = get_azure_client()
+        rg_state = client.resource_group_state(resource_group_name)
 
-    if rg_state is None:
-        return False
-    elif rg_state == ProvisionState.SUCCEEDED:
-        return True
+        if rg_state is None:
+            return False
+        elif rg_state == ProvisionState.SUCCEEDED:
+            return True
+        else:
+            print_error(
+                f"Error, resource group '{resource_group_name}' is currently in the state '{rg_state.value}' which is currently not handled by matcha. Please check your resources on Azure."
+            )
+            return True
     else:
-        print_error(
-            f"Error, resource group '{resource_group_name}' is currently in the state '{rg_state.value}' which is currently not handled by matcha. Please check your resources on Azure."
-        )
-        return True
+        return False
 
 
 def get_command_validation(argument: str, valid_options: List[str], noun: str) -> None:
