@@ -41,8 +41,10 @@ def provision_resources(
     template_runner = TemplateRunner()
 
     project_directory = os.getcwd()
-    destination = os.path.join(project_directory, ".matcha", "infrastructure")
-    template = os.path.join(os.path.dirname(__file__), os.pardir, "infrastructure")
+    destination = os.path.join(project_directory, ".matcha", "infrastructure/resources")
+    template = os.path.join(
+        os.path.dirname(__file__), os.pardir, "infrastructure/resources"
+    )
 
     if not reuse_configuration(destination):
         config = build_template_configuration(location, prefix, password)

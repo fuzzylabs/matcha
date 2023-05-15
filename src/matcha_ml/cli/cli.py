@@ -8,8 +8,6 @@ from matcha_ml.cli._validation import (
     prefix_typer_callback,
     region_typer_callback,
 )
-from matcha_ml.cli.destroy import destroy_resources
-from matcha_ml.cli.provision import provision_resources
 from matcha_ml.cli.ui.print_messages import (
     print_error,
     print_resource_output,
@@ -51,7 +49,8 @@ def provision(
     ),
 ) -> None:
     """Provision cloud resources with a template."""
-    provision_resources(location, prefix, password, verbose)
+    core.provision_state_storage(location)
+    # provision_resources(location, prefix, password, verbose)
 
 
 @app.command(help="Get information for the provisioned resources.")
@@ -96,9 +95,13 @@ def get(
 
 
 @app.command()
-def destroy() -> None:
+def destroy(
+    full: Optional[str] = typer.Argument(None),
+) -> None:
     """Destroy the provisioned cloud resources."""
-    destroy_resources()
+    # destroy_resources()
+    if full:
+        core.deprovision_state_storage()
 
 
 def version_callback(value: bool) -> None:

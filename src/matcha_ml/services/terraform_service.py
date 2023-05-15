@@ -13,7 +13,7 @@ class TerraformConfig:
     """Configuration required for terraform."""
 
     # Path to terraform template are stored
-    working_dir: str = os.path.join(os.getcwd(), ".matcha", "infrastructure")
+    working_dir: str = os.path.join(os.getcwd(), ".matcha", "infrastructure/resources")
 
     # state file to store output after terraform apply
     state_file: str = os.path.join(working_dir, "matcha.state")
@@ -30,7 +30,9 @@ class TerraformService:
     """TerraformService class to provision and deprovision resources."""
 
     # configuration required for terraform
-    config: TerraformConfig = TerraformConfig()
+    def __init__(self, terraform_config: TerraformConfig):
+        """Constructor for the TerraformService class."""
+        self.config = terraform_config
 
     # terraform client
     _terraform_client: Optional[python_terraform.Terraform] = None
