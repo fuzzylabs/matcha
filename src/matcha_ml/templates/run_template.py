@@ -197,8 +197,19 @@ class TemplateRunner:
         # Create a unique matcha state identifier
         state_outputs["id"] = {"matchaid": str(uuid.uuid4())}
 
+        self._update_state_file(state_outputs)
+
+    def _update_state_file(self, state_outputs: Dict[str, Dict[str, str]]) -> None:
+        """Read and update the matcha state file with new provisioned resources.
+
+        Args:
+            state_outputs (Dict[str, Dict[str, str]]): Dictionary containing outputs to be written to state file.
+        """
+        with open(self.state_file) as fp:
+            out_data = json.load(fp)
+        out_data.update(state_outputs)
         with open(self.state_file, "w") as fp:
-            json.dump(state_outputs, fp, indent=4)
+            json.dump(out_data, fp, indent=4)
 
     def _show_terraform_outputs(self) -> None:
         """Print the terraform outputs from state file."""
