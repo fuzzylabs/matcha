@@ -1,36 +1,47 @@
-`matcha` is a tool for provisioning MLOps environments to the cloud.
+# Introduction<br/><small><small>Welcome to Matcha! :tea:</small></small>
 
-Jump to [get started](https://fuzzylabs.github.io/matcha/getting-started/) section to help you get started using matcha.
+If you train machine learning models, then you know the challenge of going from _experiment_ to _production_. There's a vast range of tools that promise to help, from experiment tracking through to model deployment, but setting these up requires a lot of time and cloud engineering knowledge.
 
-## Why do you need `matcha`?
+**Matcha removes the complexity of provisioning your machine learning infrastructure**. With one step, you'll have a complete _machine learning operations (MLOPs)_ stack up and running in your Microsoft® Azure cloud environment. This means you'll be able to track your experiments, train your models, as well as deploy and serve those models.
 
-Many proprietary MLOps platforms try to be an all-in-one solution, taking care of each stage in a machine learning model’s life cycle, from experimentation, to continuous training, deployment, and monitoring. More often than not, these come with vendor lock-in, inflexibility, and suffer from being a _jack of all trades, master of none._
+Under the hood, Matcha leverages a number of other open souce tools: we use MLFlow to track experiments, Seldon to serve models, and Kubernetes for model training workloads, as well as for hosting everything else. Matcha's job is to bring together the best MLOps tooling, and set them up for you, so you can focus on training models.
 
-One alternative to this would be to build your own MLOps environment by selecting and combining individual open-source tools. Typically, each of these tools are good at one specific thing, though building a complete pipeline can be complex and time consuming. Broadly, there are a few components which you'll need for an MLOps solution:
+Along with setting up your infrastructure, Matcha comes with a set of well-engineered examples, covering common machine learning use-cases. These examples will help you make the most out of Matcha.
 
-* An environment in which to do Machine Learning efficiently.
-* The ability to hook that environment up to your ML workflow.
-* Knowledge around what best practise looks like for MLOps.
+![Diagram illustrating how Matcha provisions a stack of MLOPs tools on top of Kubernetes](img/stack-diagram.png)
 
-`matcha` seeks to address these, and we want to provide our users with the ability to:
+# Who is Matcha for?
 
-1. Get up and running with an MLOps environment where models can be trained and deployed, using only open source technologies.
-2. Link your provisioned MLOps environment to your ML workflow.
+Matcha is for data scientists, machine learning engineers, and anybody who trains machine learning models. If you're using Azure, and want an intuitive way to deploy machine learning infrastructure, Matcha is for you.
 
-## Sensible defaults
+# How do I get started?
 
-The components of the environment that you might want to deploy could differ depending on your workflow. In most cases, however, the environment is broadly the same for most Machine Learning tasks and is usually composed of the following:
+If you're new to Matcha, the best place to start is [our guide to deploying your first model](getting-started.md).
 
-* A way to run model training.
-* A way to track experiments.
-* A way to deploy and serve models.
+If you're happy with the basics, then you might want to dive into our [Matcha examples](https://github.com/fuzzylabs/matcha-examples) on Github. More advanced users may be interested in learning [how Matcha works](inside-matcha.md) inside.
 
-The current version of `matcha` provisions the above with the single command, using sensible defaults for the infrastructure.
+# Why use Matcha?
 
-There are more components that could be added here, for example, managing and versioning datasets, the management of models (registration and governance), and monitoring models. Adding all of these is on our roadmap.
+These days there are lots of MLOPs platforms and tools to choose from, and you might wonder what's different about Matcha.
 
-## Where do I go from here?
+To begin with, it's important to say that Matcha isn't a _platform_, so it's not directly comparable to something like the Azure Machine Learning Platform, or Amazon Sagemaker. Platforms try to offer an all-in-one solution, but we see two problems with platforms: firstly, you're locked in to a particular vendor, and secondly they suffer from being a _jack of all trades, master of none_.
 
-Hopefully we've convinced you just how awesome `matcha` is. Now, you're probably wondering where on earth to go next?
+Open source is the solution. In designing Matcha, we've hand-picked existing tools that each do _one thing well_. Matcha's job is to deploy and manage those tools on your behalf, but there's nothing proprietory in how we do that, so you'll never be locked in.
 
-We've got that covered! We have a [getting started](getting-started.md) guide which will show you how to use `matcha` to provision an environment on Azure and then how to use `matcha` to hook that environment up to a pre-built recommendation workflow.
+# The Matcha roadmap
+
+We've put a lot of thought into what our users — data scientists, ML engineers, etc — need from their infrastructure, and we came up with 5 key pieces of functionality that are absolute musts:
+
+* A place to track, version, and manage datasets.
+* A place to track experiments and models assets.
+* Scalable compute for running training workloads, with the option to use GPUs.
+* Somewhere to deploy and serve models in a way that scales with your application needs.
+* The ability to monitor models for things like drift and bias.
+
+Matcha is still in alpha release, and we don't support everything on that list yet. We support experiment tracking, training, and deployment, with plans to add data versioning and monitoring later.
+
+We very much welcome input on our roadmap from our early users. You can view the roadmap [here](https://matcha.hellonext.co/roadmap).
+
+# Who maintains Matcha?
+
+Matcha is an open source project maintained by [Fuzzy Labs](https://fuzzylabs.ai), and released under the Apache 2.0 license. The greatest strength of open source is community, and we encourage our users to contribute back to the project through ideas, pull requests, and bug reports. To help out, see out [guide for contributors](https://github.com/fuzzylabs/matcha/blob/main/CONTRIBUTING.md).
