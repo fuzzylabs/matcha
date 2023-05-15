@@ -193,8 +193,12 @@ class TemplateRunner:
             state_outputs[resource_type].setdefault("flavor", flavor)
             state_outputs[resource_type][resource_name] = properties["value"]
 
+        # Read and update the matcha state file with new provisioned resources.
+        with open(self.state_file, "r") as fp:
+            out_data = json.load(fp)
+        out_data.update(state_outputs)
         with open(self.state_file, "w") as fp:
-            json.dump(state_outputs, fp, indent=4)
+            json.dump(out_data, fp, indent=4)
 
     def _show_terraform_outputs(self) -> None:
         """Print the terraform outputs from state file."""
