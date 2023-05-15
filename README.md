@@ -26,7 +26,7 @@ If you train machine learning models, then you know the challenge of going from 
 **Matcha removes the complexity of provisioning your machine learning infrastructure**. With one step, you'll have a complete _machine learning operations (MLOPs)_ stack up and running in your Microsoft® Azure cloud environment. This means you'll be able to track your experiments, train your models, as well as deploy and serve those models.
 
 <div align="center">
-    <img src="docs/img/matcha-provision.gif" width="200">
+    <img src="docs/img/matcha-provision.gif" width="200" style="max-width: 200px"></img>
 </div>
 
 # &#127861; Who is Matcha for?
