@@ -122,9 +122,6 @@ def test_opt_out(matcha_testing_directory):
         assert config_instance.analytics_opt_out is True
 
 
-# test write permissions
-
-
 def test_config_file_write_permissions(matcha_testing_directory):
     """Tests the permissions error thrown where the user does not have permission to write a global config file.
 
