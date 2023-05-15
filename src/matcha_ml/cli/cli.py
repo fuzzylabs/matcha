@@ -8,6 +8,7 @@ from matcha_ml.cli._validation import (
     prefix_typer_callback,
     region_typer_callback,
 )
+from matcha_ml.cli.provision import provision_resources
 from matcha_ml.cli.ui.print_messages import (
     print_error,
     print_resource_output,
@@ -50,7 +51,7 @@ def provision(
 ) -> None:
     """Provision cloud resources with a template."""
     core.provision_state_storage(location)
-    # provision_resources(location, prefix, password, verbose)
+    provision_resources(location, prefix, password, verbose)
 
 
 @app.command(help="Get information for the provisioned resources.")

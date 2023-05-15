@@ -2,7 +2,7 @@
 resource "azurerm_storage_account" "statestorageaccount" {
   name                = "remotestatestacc"
   resource_group_name = "remote-state-storage-resources"
-  location            = "ukwest"
+  location            = var.location
 
   account_tier                    = "Standard"
   account_kind                    = "StorageV2"

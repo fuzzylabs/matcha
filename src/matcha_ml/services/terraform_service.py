@@ -16,10 +16,16 @@ class TerraformConfig:
     working_dir: str = os.path.join(os.getcwd(), ".matcha", "infrastructure/resources")
 
     # state file to store output after terraform apply
-    state_file: str = os.path.join(working_dir, "matcha.state")
+    @property
+    def state_file(self) -> str:
+        """The path to the state file."""
+        return os.path.join(self.working_dir, "matcha.state")
 
     # variables file
-    var_file: str = os.path.join(working_dir, "terraform.tfvars.json")
+    @property
+    def var_file(self) -> str:
+        """The path to the variables file."""
+        return os.path.join(self.working_dir, "terraform.tfvars.json")
 
     # if set to False terraform output will be printed to stdout/stderr
     # else no output will be printed and (ret_code, out, err) tuple will be returned

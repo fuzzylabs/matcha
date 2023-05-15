@@ -80,7 +80,6 @@ class TemplateRunner:
         Raises:
             MatchaTerraformError: if 'terraform init' failed.
         """
-        print(self.tfs.config.working_dir)
         with Spinner("Initializing"):
             ret_code, _, err = self.tfs.init()
 

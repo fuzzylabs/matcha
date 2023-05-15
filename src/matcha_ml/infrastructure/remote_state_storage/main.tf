@@ -3,15 +3,16 @@ provider "azurerm" {
 }
 
 module "resource_group" {
-    source = "./resource_group"
+  source = "./resource_group"
+
+  location = var.location
 }
 
 module "storage" {
-    source = "./storage"
+  source = "./storage"
 
-    # otehrwise the module will be created before resource group is ready
-    depends_on = [ module.resource_group ]
-    
+  # otehrwise the module will be created before resource group is ready
+  depends_on = [ module.resource_group ]
 
-    # location = var.location
+  location = var.location
 }

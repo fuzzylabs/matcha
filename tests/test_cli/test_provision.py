@@ -87,7 +87,7 @@ def test_cli_provision_command(
     assert result.exit_code == 0
 
     destination_path = os.path.join(
-        matcha_testing_directory, ".matcha", "infrastructure"
+        matcha_testing_directory, ".matcha", "infrastructure/resources"
     )
 
     expected_tf_vars = {
@@ -130,7 +130,7 @@ def test_cli_provision_command_with_args(
     assert result.exit_code == 0
 
     destination_path = os.path.join(
-        matcha_testing_directory, ".matcha", "infrastructure"
+        matcha_testing_directory, ".matcha", "infrastructure/resources"
     )
 
     expected_tf_vars = {"location": "uksouth", "prefix": "matcha", "password": "ninja"}
@@ -156,7 +156,7 @@ def test_cli_provision_command_with_prefix(runner, matcha_testing_directory):
     assert result.exit_code == 0
 
     destination_path = os.path.join(
-        matcha_testing_directory, ".matcha", "infrastructure"
+        matcha_testing_directory, ".matcha", "infrastructure/resources"
     )
 
     expected_tf_vars = {
@@ -184,7 +184,7 @@ def test_cli_provision_command_with_default_prefix(runner, matcha_testing_direct
     assert result.exit_code == 0
 
     destination_path = os.path.join(
-        matcha_testing_directory, ".matcha", "infrastructure"
+        matcha_testing_directory, ".matcha", "infrastructure/resources"
     )
 
     expected_tf_vars = {
@@ -311,7 +311,7 @@ def test_cli_provision_command_override(runner, matcha_testing_directory):
     )
 
     destination_path = os.path.join(
-        matcha_testing_directory, ".matcha", "infrastructure"
+        matcha_testing_directory, ".matcha", "infrastructure/resources"
     )
 
     # Touch a 'dummy.tf' file in the infrastructure configuration directory within the .matcha directory
@@ -378,7 +378,7 @@ def test_cli_provision_command_reuse(runner, matcha_testing_directory):
     )
 
     destination_path = os.path.join(
-        matcha_testing_directory, ".matcha", "infrastructure"
+        matcha_testing_directory, ".matcha", "infrastructure/resources"
     )
 
     # Touch a 'dummy.tf' file in the infrastructure configuration directory within the .matcha directory
@@ -431,7 +431,7 @@ def test_cli_provision_command_with_provisioned_resources(
     )
 
     destination_path = os.path.join(
-        matcha_testing_directory, ".matcha", "infrastructure"
+        matcha_testing_directory, ".matcha", "infrastructure/resources"
     )
 
     # Touch a 'dummy.tf' file in the infrastructure configuration directory within the .matcha directory
