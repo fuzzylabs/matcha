@@ -10,8 +10,8 @@ class GlobalConfigurationService:
     """A Global Config Service for interacting and updating a users global config file."""
 
     _instance: Optional["GlobalConfigurationService"] = None
-    user_id: Optional[str] = None
-    analytics_opt_out: Optional[bool] = False
+    _user_id: Optional[str] = None
+    _analytics_opt_out: bool = False
     _config_file_path: Optional[str] = None
     __initialized: bool = False
 
@@ -48,8 +48,8 @@ class GlobalConfigurationService:
         """
         with open(config_file_path) as file:
             yaml_data = yaml.safe_load(file)
-            self.user_id = yaml_data.get("user_id")
-            self.analytics_opt_out = yaml_data.get("analytics_opt_out")
+            self._user_id = yaml_data.get("user_id")
+            self._analytics_opt_out = yaml_data.get("analytics_opt_out")
 
     def _create_global_config(self, config_file_path: str) -> None:
         """Creates a new global config yaml file.
@@ -57,13 +57,10 @@ class GlobalConfigurationService:
         Args:
             config_file_path (str): Path to users global config file
         """
-        # Set variables
-        self.user_id = str(uuid.uuid4())
-        self.analytics_opt_out = False
-
+        # Generate a new unique user ID
         data = {
             "user_id": self.user_id,
-            "analytics_opt_out": self.analytics_opt_out,
+            "analytics_opt_out": self._analytics_opt_out,
         }
 
         # Create the '.matcha-ml' config directory
@@ -79,8 +76,8 @@ class GlobalConfigurationService:
             config_file_path (str): _description_
         """
         data = {
-            "user_id": self.user_id,
-            "analytics_opt_out": self.analytics_opt_out,
+            "user_id": self._user_id,
+            "analytics_opt_out": self._analytics_opt_out,
         }
 
         with open(config_file_path) as file:
@@ -94,8 +91,33 @@ class GlobalConfigurationService:
 
     def opt_out_of_analytics(self) -> None:
         """Opt out of analytic collection."""
-        self.analytics_opt_out = True
+        self._analytics_opt_out = True
         self._update_global_config(self.default_config_file_path)
+
+    def opt_in_to_analytics(self) -> None:
+        """Opt in to analytic collection."""
+        self._analytics_opt_out = False
+        self._update_global_config(self.default_config_file_path)
+
+    @property
+    def user_id(self) -> str:
+        """User ID getter.
+
+        Returns:
+            str: Unqiue user ID string
+        """
+        if self._user_id is None:
+            self._user_id = str(uuid.uuid4())
+        return self._user_id
+
+    @property
+    def analytics_opt_out(self) -> bool:
+        """Analytics opt out getter.
+
+        Returns:
+            bool: User is opted out of analytic data collection bool.
+        """
+        return self._analytics_opt_out
 
     @property
     def default_config_file_path(self) -> str:
