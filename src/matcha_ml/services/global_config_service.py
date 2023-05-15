@@ -135,7 +135,6 @@ class GlobalConfigurationService:
         """
         with open(self.default_config_file_path) as f:
             config_contents = dict(yaml.safe_load(f))
-            print(config_contents)
 
         return config_contents
 
