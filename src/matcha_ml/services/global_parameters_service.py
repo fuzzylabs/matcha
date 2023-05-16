@@ -8,21 +8,21 @@ import yaml
 from matcha_ml.errors import MatchaPermissionError
 
 
-class GlobalConfigurationService:
-    """A Global Config Service for interacting and updating a users global config file.
+class GlobalParameters:
+    """A Global parameters service for interacting and updating a users global config file.
 
     Users are opted-in for analytics data collection by default.
     """
 
-    _instance: Optional["GlobalConfigurationService"] = None
+    _instance: Optional["GlobalParameters"] = None
     _user_id: Optional[str] = None
     _analytics_opt_out: bool = False
 
-    def __new__(cls) -> "GlobalConfigurationService":
+    def __new__(cls) -> "GlobalParameters":
         """Singleton class definition.
 
         Returns:
-            GlobalConfigurationService: Already existing initialised object, otherwise a new singleton object
+            GlobalParameters: Already existing initialised object, otherwise a new singleton object
         """
         if cls._instance is None:
             cls._instance = super().__new__(cls)

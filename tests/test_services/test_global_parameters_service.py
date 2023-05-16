@@ -7,21 +7,19 @@ import pytest
 import yaml
 
 from matcha_ml.errors import MatchaPermissionError
-from matcha_ml.services.global_config_service import GlobalConfigurationService
+from matcha_ml.services.global_parameters_service import GlobalParameters
 
-INTERNAL_FUNCTION_STUB = (
-    "matcha_ml.services.global_config_service.GlobalConfigurationService"
-)
+INTERNAL_FUNCTION_STUB = "matcha_ml.services.global_parameters_service.GlobalParameters"
 
 
 @pytest.fixture(autouse=True)
 def teardown_singleton():
     """Tears down the singleton before each test case by clearing the current object."""
-    GlobalConfigurationService._instance = None
+    GlobalParameters._instance = None
 
 
 def test_class_is_singleton(matcha_testing_directory):
-    """Tests that the GlobalConfigurationService is correctly implemented as a singleton.
+    """Tests that the GlobalParameters is correctly implemented as a singleton.
 
     Args:
         matcha_testing_directory (str): Mock testing directory location for the GlobalConfig file to be located
@@ -34,8 +32,8 @@ def test_class_is_singleton(matcha_testing_directory):
             os.path.join(str(matcha_testing_directory), ".matcha-ml", "config.yaml")
         )
 
-        first_instance = GlobalConfigurationService()
-        second_instance = GlobalConfigurationService()
+        first_instance = GlobalParameters()
+        second_instance = GlobalParameters()
         assert first_instance is second_instance
 
 
@@ -55,7 +53,7 @@ def test_new_config_file_creation(matcha_testing_directory):
         file_path.return_value = config_file_path
 
         assert not os.path.exists(config_file_path)
-        _ = GlobalConfigurationService()
+        _ = GlobalParameters()
         assert os.path.exists(config_file_path)
 
 
@@ -86,7 +84,7 @@ def test_existing_config_file(matcha_testing_directory):
     ) as file_path:
         file_path.return_value = config_file_path
 
-        config_instance = GlobalConfigurationService()
+        config_instance = GlobalParameters()
         assert config_instance.config_file == {
             "user_id": "TestID",
             "analytics_opt_out": False,
@@ -111,7 +109,7 @@ def test_opt_out(matcha_testing_directory):
     ) as file_path:
         file_path.return_value = config_file_path
 
-        config_instance = GlobalConfigurationService()
+        config_instance = GlobalParameters()
 
         assert config_instance.config_file.get("analytics_opt_out") is False
         assert config_instance.analytics_opt_out is False
@@ -141,4 +139,4 @@ def test_config_file_write_permissions(matcha_testing_directory):
         os.chmod(matcha_testing_directory, S_IREAD)
 
         with pytest.raises(MatchaPermissionError):
-            _ = GlobalConfigurationService()
+            _ = GlobalParameters()
