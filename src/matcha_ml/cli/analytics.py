@@ -11,6 +11,7 @@ app = typer.Typer()
 @app.command()
 def opt_out():
     """Opt-out of collecting analytics."""
+    print("We respect your privacy. No analytics data will be collected.")
     return GlobalParameters().opt_out_of_analytics()
 
 
