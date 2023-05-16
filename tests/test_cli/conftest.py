@@ -3,7 +3,10 @@ from unittest.mock import patch
 
 import pytest
 
-from matcha_ml.templates.run_template import TemplateRunner
+from matcha_ml.templates.run_state_storage_template import (
+    TemplateRunner as StateStorageTemplateRunner,
+)
+from matcha_ml.templates.run_template import TemplateRunner as AzureTemplateRunner
 
 INTERNAL_FUNCTION_STUBS = [
     "matcha_ml.cli.provision.TemplateRunner",
@@ -12,7 +15,7 @@ INTERNAL_FUNCTION_STUBS = [
 
 
 @pytest.fixture(scope="class", autouse=True)
-def mocked_resource_template_runner() -> TemplateRunner:
+def mocked_resource_template_runner() -> AzureTemplateRunner:
     """The Template Runner with mocked variables.
 
     Returns:
@@ -35,11 +38,11 @@ def mocked_resource_template_runner() -> TemplateRunner:
         check_tf_install.return_value = None
         validate_tf_config.return_value = None
 
-        yield TemplateRunner()
+        yield AzureTemplateRunner()
 
 
 @pytest.fixture(scope="class", autouse=True)
-def mocked_state_storage_template_runner() -> TemplateRunner:
+def mocked_state_storage_template_runner() -> StateStorageTemplateRunner:
     """The Template Runner with mocked variables.
 
     Returns:
@@ -59,4 +62,4 @@ def mocked_state_storage_template_runner() -> TemplateRunner:
         check_tf_install.return_value = None
         validate_tf_config.return_value = None
 
-        yield TemplateRunner()
+        yield StateStorageTemplateRunner()
