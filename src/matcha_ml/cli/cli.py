@@ -92,7 +92,7 @@ def get(
 
 @app.command()
 def destroy() -> None:
-    """Destroy the provisioned cloud resources."""
+    """Destroy the provisioned cloud resources. It will destroy the resource group even if resources are provisioned inside the group."""
     destroy_resources()
 
 
