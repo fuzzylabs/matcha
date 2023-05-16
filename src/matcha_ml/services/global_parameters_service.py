@@ -47,7 +47,7 @@ class GlobalParameters:
         # Generate a new unique user ID
         data = {
             "user_id": self.user_id,
-            "analytics_opt_out": self._analytics_opt_out,
+            "analytics_opt_out": self.analytics_opt_out,
         }
 
         # Create the '.matcha-ml' config directory
@@ -66,7 +66,7 @@ class GlobalParameters:
         """Updates an existing config file with the global parameters."""
         data = {
             "user_id": self.user_id,
-            "analytics_opt_out": self._analytics_opt_out,
+            "analytics_opt_out": self.analytics_opt_out,
         }
 
         with open(self.default_config_file_path) as file:
