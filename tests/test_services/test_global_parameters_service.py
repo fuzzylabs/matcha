@@ -117,7 +117,7 @@ def test_opt_out(matcha_testing_directory):
         assert config_instance.config_file.get("analytics_opt_out") is False
         assert config_instance.analytics_opt_out is False
 
-        config_instance.opt_out_of_analytics()
+        config_instance.update_analytics_state(disable=True)
 
         assert config_instance.config_file.get("analytics_opt_out") is True
         assert config_instance.analytics_opt_out is True
