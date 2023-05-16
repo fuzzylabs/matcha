@@ -67,6 +67,8 @@ def expected_outputs_show_sensitive() -> Dict[str, Dict[str, str]]:
             "flavor": "azure",
             "registry-url": "azure_container_registry",
         },
+        "prefix": "random",
+        "location": "uksouth",
     }
 
     return outputs
@@ -98,6 +100,8 @@ def expected_outputs_hide_sensitive() -> dict:
             "flavor": "azure",
             "registry-url": "azure_container_registry",
         },
+        "prefix": "random",
+        "location": "uksouth",
     }
     return outputs
 
@@ -116,6 +120,13 @@ def terraform_test_config(matcha_testing_directory: str) -> TerraformConfig:
         matcha_testing_directory, ".matcha", "infrastructure", "resources"
     )
     os.makedirs(infrastructure_directory, exist_ok=True)
+
+    # Create a dummy matcha state file
+    matcha_state_file = os.path.join(infrastructure_directory, "matcha.state")
+    dummy_data = {"prefix": "random", "location": "uksouth"}
+    with open(matcha_state_file, "w") as fp:
+        json.dump(dummy_data, fp)
+
     return TerraformConfig(working_dir=infrastructure_directory)
 
 
