@@ -1,4 +1,19 @@
 """Remote state manager module."""
+import dataclasses
+
+
+@dataclasses.dataclass
+class RemoteStateBucketConfig:
+    """Dataclass to store state bucket configuration."""
+
+    container_name: str
+
+
+@dataclasses.dataclass
+class RemoteStateConfig:
+    """Dataclass to store remote state configuration."""
+
+    remote_state_bucket: RemoteStateBucketConfig
 
 
 class RemoteStateManager:
