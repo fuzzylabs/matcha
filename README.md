@@ -62,3 +62,7 @@ We have an in-depth [contributing](CONTRIBUTING.md) guide which will describe ho
 ## &#128220; License
 
 This library is released under the Apache License. See [LICENSE](LICENSE).
+
+# &#129309; Acknowledgements
+
+Thank you to [ZenML](https://zenml.io/home) for their contributions and inspiration through their stack recipes.
