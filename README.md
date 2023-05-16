@@ -67,4 +67,4 @@ This library is released under the Apache License. See [LICENSE](LICENSE).
 
 # &#129309; Acknowledgements
 
-Thank you to [ZenML](https://zenml.io/home) for their contributions and inspiration through their stack recipes.
+Thank you to [ZenML](https://zenml.io/home) for their contributions and inspiration through their [stack recipes](https://github.com/zenml-io/mlops-stacks).
