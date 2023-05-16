@@ -1,5 +1,5 @@
-site_name: "Open source MLOPs on Azure in one step"
-site_description: provision your MLOPs stack to Azure in one step
+site_name: "Open source MLOps on Azure in one step"
+site_description: provision your MLOps stack to Azure in one step
 
 repo_name: fuzzylabs/matcha-ml
 repo_url: https://github.com/fuzzylabs/matcha

@@ -36,7 +36,7 @@ python3 -m venv venv
 source venv/bin/activate
 ```
 
-Now, let's install `matcha`:
+Now, let's install Matcha:
 
 ```bash
 pip install matcha-ml
@@ -60,7 +60,7 @@ Using the Azure CLI, you will need to authenticate:
 az login
 ```
 
-> Note: you'll need certain permissions in order for `matcha` to work. If you're unsure, you can just run `matcha` and it will tell you if you're missing any permissions. For specifics around permissions, please see our explainer on [Azure Permissions](azure-permissions.md).
+> Note: you'll need certain permissions in order for Matcha to work. If you're unsure, you can just run Matcha and it will tell you if you're missing any permissions. For specifics around permissions, please see our explainer on [Azure Permissions](azure-permissions.md).
 
 Next, let's provision:
 
@@ -68,11 +68,11 @@ Next, let's provision:
 matcha provision
 ```
 
-Initially, `matcha` will ask you a few questions about how you'd like your infrastructure to be set up. Specifically, it will ask for a _name_ for your infrastructure, a _region_ to deploy it to, and a password. After that, it will go ahead of provision infrastructure.
+Initially, Matcha will ask you a few questions about how you'd like your infrastructure to be set up. Specifically, it will ask for a _name_ for your infrastructure, a _region_ to deploy it to, and a password. After that, it will go ahead of provision infrastructure.
 
 > Note: provisioning can take up to 20 minutes.
 
-Once provisioning is completed, you can query `matcha`, using the `get` command:
+Once provisioning is completed, you can query Matcha, using the `get` command:
 
 ```bash
 matcha get
@@ -130,15 +130,25 @@ Experiment tracker
 
 > Note: You can also get these outputs in either json or YAML format using the following: `matcha get --output json`
 
-By default, `matcha` will hide sensitive resource properties. If you need one of these properties, then you can add the `--show-sensitive` flag to your `get` command.
+By default, Matcha will hide sensitive resource properties. If you need one of these properties, then you can add the `--show-sensitive` flag to your `get` command.
 
 # Training a model
 
-To train the model, you'll need to do two things
+To train the model, you need to do two things.
+
+## Setting up
+
+Before training the model, you'll need to configure your workflow with the provisioned resources. We've written a bash script which automatically gets all the information needed to do the setup and links it to the recommendation workflow:
 
 ```bash
 ./setup.sh
 ```
+
+> Note: You could do this yourself manually by making use of the `matcha get` command.
+
+## Training
+
+Once `setup.sh` has finished, do the following to train your recommendation model using the resources you've provisioned:
 
 ```bash
 python run.py --train
@@ -148,7 +158,7 @@ From here, you'll be able to visit your experiment tracker and see the runs stor
 
 # Destroying
 
-The final thing you'll want to do is decomission the infrastructure that `matcha` has set up during this guide. `matcha` includes a `destroy` command which will remove everything that has been provisioned, which avoids running up an Azure bill!
+The final thing you'll want to do is decomission the infrastructure that Matcha has set up during this guide. Matcha includes a `destroy` command which will remove everything that has been provisioned, which avoids running up an Azure bill!
 
 ```bash
 matcha destroy

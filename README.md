@@ -23,7 +23,7 @@
 
 If you train machine learning models, then you know the challenge of going from _experiment_ to _production_. There's a vast range of tools that promise to help, from experiment tracking through to model deployment, but setting these up requires a lot of time and cloud engineering knowledge.
 
-**Matcha removes the complexity of provisioning your machine learning infrastructure**. With one step, you'll have a complete _machine learning operations (MLOPs)_ stack up and running in your Microsoft® Azure cloud environment. This means you'll be able to track your experiments, train your models, as well as deploy and serve those models.
+**Matcha removes the complexity of provisioning your machine learning infrastructure**. With one step, you'll have a complete _machine learning operations (MLOps)_ stack up and running in your Microsoft® Azure cloud environment. This means you'll be able to track your experiments, train your models, as well as deploy and serve those models.
 
 <div align="center">
     <img src="docs/img/matcha-provision.gif"></img>
@@ -39,7 +39,7 @@ If you're new to Matcha, the best place to start is [our guide to deploying your
 
 ## &#128214; Documentation
 
-The full `matcha` documentation can be found at [mymatcha.ai](https://mymatcha.ai). This covers what `matcha` is in more detail, how to use it, what Azure permissions are required, and how Matcha works internally.
+The full Matcha documentation can be found at [mymatcha.ai](https://mymatcha.ai). This covers what Matcha is in more detail, how to use it, what Azure permissions are required, and how Matcha works internally.
 
 ## &#128506;&#65039; Roadmap
 
