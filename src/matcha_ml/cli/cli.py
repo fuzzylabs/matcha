@@ -25,11 +25,11 @@ from matcha_ml.errors import MatchaError, MatchaInputError
 
 app = typer.Typer(no_args_is_help=True, pretty_exceptions_show_locals=False)
 
-# Create a group for all subcommands for analytics
+# Create a group for all subcommands for analytics command
 app.add_typer(
     analytics.app,
     name="analytics",
-    help="Analytics command to opt-out of collecting analytics.",
+    help="Analytics command to opt-out/opt-in of collecting analytics.",
 )
 
 
