@@ -43,3 +43,5 @@ Matcha is still in alpha release, and we don't support everything on that list y
 # Who maintains Matcha?
 
 Matcha is an open source project maintained by [Fuzzy Labs](https://fuzzylabs.ai), and released under the Apache 2.0 license. The greatest strength of open source is community, and we encourage our users to contribute back to the project through ideas, pull requests, and bug reports. To help out, see out [guide for contributors](https://github.com/fuzzylabs/matcha/blob/main/CONTRIBUTING.md).
+
+> Note: Matcha is still in alpha release. While we've worked hard to ensure there are no defects, there's a small chance that you'll find a bug or something that hasn't been documented as well as it could be. If that happens, we'd really value your feedback, which you can send by submitting an [issue](https://github.com/fuzzylabs/matcha/issues/new/choose) to Matcha on Github.

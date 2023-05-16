@@ -55,9 +55,11 @@ Matcha is still in alpha release, and we don't support everything on that list y
 
 ## &#128079; Contributing
 
-`matcha` at its very core is open source and we're eager for you to get involved whether through raising issues or by opening a PR.
+Matcha at its very core is open source and we're eager for you to get involved whether through raising issues or by opening a PR.
 
 We have an in-depth [contributing](CONTRIBUTING.md) guide which will describe how to do all of this.
+
+> Note: Matcha is still in alpha release. While we've worked hard to ensure there are no defects, there's a small chance that you'll find a bug or something that hasn't been documented as well as it could be. If that happens, we'd really value your feedback, which you can send by submitting an [issue](https://github.com/fuzzylabs/matcha/issues/new/choose) to Matcha on Github.
 
 ## &#128220; License
 

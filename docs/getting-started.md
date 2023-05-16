@@ -22,6 +22,8 @@ Before diving into this guide, you'll need to install a couple of other things.
 
 Matcha has an [examples repository](https://github.com/fuzzylabs/matcha-examples) on Github, and that's what we'll be working from in this guide. There are a number of different examples in that repository, but we'll focus on the movie recommender example. Note, however, that all the examples have been designed to work in much the same way as this one.
 
+> Note: Matcha is still in alpha release. While we've worked hard to ensure there are no defects, there's a small chance that you'll find a bug or something that hasn't been documented as well as it could be. If that happens, we'd really value your feedback, which you can send by submitting an [issue](https://github.com/fuzzylabs/matcha/issues/new/choose) to Matcha on Github.
+
 Start by cloning the examples repository:
 
 ```bash
