@@ -29,7 +29,7 @@ app = typer.Typer(no_args_is_help=True, pretty_exceptions_show_locals=False)
 app.add_typer(
     analytics.app,
     name="analytics",
-    help="Analytics command to opt-out/opt-in of collecting analytics.",
+    help="Enable or disable the collection anonymous of usage data (enabled by default).",
 )
 
 

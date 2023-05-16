@@ -10,15 +10,17 @@ app = typer.Typer()
 
 @app.command()
 def opt_out() -> None:
-    """Opt-out of collecting analytics."""
-    print("We respect your privacy. No analytics data will be collected.")
+    """Disable the collection of anonymous usage data."""
+    print(
+        "Data collection has been turned off and no data will be collected - you can turn this back on by running the command: 'matcha analytics opt-in'"
+    )
     return GlobalParameters().opt_out_of_analytics()
 
 
 @app.command()
 def opt_in() -> None:
-    """Opt-in for collecting analytics."""
+    """Enable the collection of anonymous usage data (enabled by default)."""
     print(
-        "Thank you for allowing matcha to collect analytics data. This is very helpful!"
+        "Thank you for enabling data collection, this helps us improve matcha and anonymously understand how people are using the tool."
     )
     return GlobalParameters().opt_in_to_analytics()
