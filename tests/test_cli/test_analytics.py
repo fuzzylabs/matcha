@@ -1,10 +1,11 @@
 """Test suite testing command for opting out of analytics."""
-from typing import Dict, Union
 import os
+from typing import Dict, Union
+from unittest import mock
+
 import pytest
 import yaml
 
-from unittest import mock
 from matcha_ml.cli.cli import app
 from matcha_ml.services.global_parameters_service import GlobalParameters
 
@@ -31,7 +32,7 @@ def test_opt_out_subcommand(
     runner,
     matcha_testing_directory: str,
     expected_configuration: Dict[str, Union[str, bool]],
-):
+) -> None:
     """Test opt-out command works.
 
     Args:
@@ -74,7 +75,7 @@ def test_opt_in_subcommand(
     runner,
     matcha_testing_directory: str,
     expected_configuration: Dict[str, Union[str, bool]],
-):
+) -> None:
     """Test opt-in command works.
 
     Args:
