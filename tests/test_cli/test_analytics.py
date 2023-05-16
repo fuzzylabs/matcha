@@ -19,6 +19,11 @@ def teardown_singleton():
 
 @pytest.fixture
 def expected_configuration() -> Dict[str, Union[str, bool]]:
+    """Pytest fixture to return expected configuration.
+
+    Returns:
+        Dict[str, Union[str, bool]]: Dictionary containing expected configuration
+    """
     return {"analytics_opt_out": False, "user_id": "dummy_user_id"}
 
 
