@@ -44,7 +44,7 @@ class GlobalConfigurationService:
             yaml_data = yaml.safe_load(file)
 
         self._user_id = yaml_data.get("user_id")
-        self._analytics_opt_out = yaml_data.get("analytics_opt_out") == "True"
+        self._analytics_opt_out = yaml_data.get("analytics_opt_out")
 
     def _create_global_config(self) -> None:
         """Creates a new global config yaml file.
