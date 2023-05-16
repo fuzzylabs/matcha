@@ -1,82 +1,78 @@
-# Getting Started
+# Deploying your first model with Matcha
 
-This guide will show you how to get up and running with a fully provisioned cloud environment using `matcha` :tea:. We have a number of examples, see [here](https://github.com/fuzzylabs/matcha-examples) for our examples repository.
+In this guide, we'll walk you through how to provision your first machine learning infrastructure to Azure, and then use that infrastructure to train and deploy a model.
 
-## A movie recommender with experiment tracking
+The model we're using in this guide is a movie recommender. We picked this because it's one that's quick to get up and running for beginners. The movie recommender is one of a number of example workflows that we've made available on Github. You can view all our examples [here](https://github.com/fuzzylabs/matcha-examples).
 
-In this example, we'll show you how to use `matcha` to setup a default cloud environment on Azure and hook up a movie recommendation pipeline to run on that environment.
+# Pre-requisites
 
-### What's the benefit of experiment tracking?
+## An Azure cloud environment
 
-If you're reading through our documentation, then it's quite likely that we don't need to sell the benefit of tracking your experiments. Even so, it's worth emphasising. Having experiment tracking means that for each run of your pipeline, its metadata is stored in a central place.
+Matcha uses Azure to provision your infrastructure, so first you'll need to have set up a [Microsoft® Azure account](https://azure.com).
 
-### Pre-requisites
+## Tools you'll need
 
-Before trying to provision infrastructure on Azure, `matcha` needs to you to be authenticated and to have the correct permissions for the tools you're wanting to deploy. See our explainer on [Azure Permissions](azure-permissions.md).
+Before diving into this guide, you'll need to install a couple of other things.
 
-Alongside this, you need the Azure CLI installed - see [here](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli) on how to install it
+* Python 3.8 or newer, along with Virtual Env and PIP.
+* The Azure command line tool. Instructions on installing this can be found [here](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli).
+* Terraform. We use this to provision services inside Azure. You'll find installation instructions for your platform [here](https://developer.hashicorp.com/terraform/downloads?product_intent=terraform). We recommend version 1.4 or newer.
 
-### Getting Setup
+# The movie recommender
 
-Let's start with logging into Azure (make sure you've followed the steps above to install the Azure CLI):
+Matcha has an [examples repository](https://github.com/fuzzylabs/matcha-examples) on Github, and that's what we'll be working from in this guide. There are a number of different examples in that repository, but we'll focus on the movie recommender example. Note, however, that all the examples have been designed to work in much the same way as this one.
 
-```bash
-az login
-```
-
-Clone our examples repository:
+Start by cloning the examples repository:
 
 ```bash
-git clone git@github.com:fuzzylabs/matcha-examples.git
+git clone https://github.com/fuzzylabs/matcha-examples.git
 ```
 
-Move into the recommendation example directory:
+Then, enter the `recommendation` directory and set up your Python environment:
 
 ```bash
 cd recommendation
-```
-
-Create a virtual environment:
-
-```bash
 python3 -m venv venv
 source venv/bin/activate
 ```
 
-> There is a requirement for the Python version being used in this example to be 3.8+. We recommended making use of [`pyenv`](https://github.com/pyenv/pyenv) to manage your versions.
-
-Install `matcha`:
+Now, let's install `matcha`:
 
 ```bash
 pip install matcha-ml
 ```
 
-Test that your installation is working by running:
+You can test that your installation is working by running
 
 ```bash
-$ matcha --version
-Matcha version: 0.1.0
+matcha --version
 ```
 
-### Provisioning your Azure environment with `matcha`
+Which should reply with something like `Matcha version: <version number>`.
 
-Now you have your virtual environment configured and `matcha` installed, it's time to provision your Azure environment. For this example, we'll deploy an experimental tracker ([MLflow](https://mlflow.org/)) to Azure. There are other components deployed as part of this, see [here](inside-matcha.md) for a detailed explanation of what `matcha` is doing.
+Now you're ready to provision your infrastructure.
 
-To start, you need to authenticate with Azure (see [pre-requisites](#pre-requisites)):
+# Provisioning
+
+Using the Azure CLI, you will need to authenticate:
 
 ```bash
 az login
 ```
 
-`matcha` has a set of sensible defaults for the infrastructure that it'll provision for you.
+> Note: you'll need certain permissions in order for `matcha` to work. If you're unsure, you can just run `matcha` and it will tell you if you're missing any permissions. For specifics around permissions, please see our explainer on [Azure Permissions](azure-permissions.md).
 
-To provision an experiment tracker using `matcha`, run the following command (you'll be asked a series of questions which helps `matcha` personalise the environment to you):
+Next, let's provision:
 
 ```bash
 matcha provision
 ```
 
-Once `provision` has finished it's thing, you can use the following command to inspect the resources that have been provisioned for you:
+Initially, `matcha` will ask you a few questions about how you'd like your infrastructure to be set up. Specifically, it will ask for a _name_ for your infrastructure, a _region_ to deploy it to, and a password. After that, it will go ahead of provision infrastructure.
+
+> Note: provisioning can take up to 20 minutes.
+
+Once provisioning is completed, you can query `matcha`, using the `get` command:
 
 ```bash
 matcha get
@@ -116,7 +112,7 @@ Pipeline
    - storage-path: az://<path>
 ```
 
-You can then use `get` to inspect specific resources, for example:
+You can also use `get` to inspect specific resources, for example:
 
 ```bash
 matcha get experiment-tracker
@@ -136,11 +132,13 @@ Experiment tracker
 
 By default, `matcha` will hide sensitive resource properties. If you need one of these properties, then you can add the `--show-sensitive` flag to your `get` command.
 
-### Running your recommender
+# Training a model
 
-The environment is provisioned, you've got a movie recommender, and you're hyped and ready to go - we hope.
+To train the model, you'll need to do two things
 
-Running the following command will run the recommendation pipeline locally (using ZenML), but the metadata associated with it (e.g., the RMSE performance metric) will be stored in your deployed experiment tracker:
+```bash
+./setup.sh
+```
 
 ```bash
 python run.py --train
@@ -148,11 +146,9 @@ python run.py --train
 
 From here, you'll be able to visit your experiment tracker and see the runs stored there.
 
-### Releasing Resources
+# Destroying
 
-Even though we've chosen sensible a default configuration for you, leaving the resources you've provisioned in this example running in the cloud is going to run up a bill.
-
-To release the resources that you've provisioned in this example, run the following command:
+The final thing you'll want to do is decomission the infrastructure that `matcha` has set up during this guide. `matcha` includes a `destroy` command which will remove everything that has been provisioned, which avoids running up an Azure bill!
 
 ```bash
 matcha destroy
