@@ -65,7 +65,7 @@ class GlobalParameters:
     def _update_global_config(self) -> None:
         """Updates an existing config file with the global parameters."""
         data = {
-            "user_id": self._user_id,
+            "user_id": self.user_id,
             "analytics_opt_out": self._analytics_opt_out,
         }
 
