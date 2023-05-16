@@ -81,9 +81,12 @@ class GlobalParameters:
             "analytics_opt_out": self._analytics_opt_out,
         }
 
-        with open(self.default_config_file_path, "r+") as file:
+        with open(self.default_config_file_path) as file:
             yaml_data = yaml.safe_load(file)
-            yaml_data.update(data)
+
+        yaml_data.update(data)
+
+        with open(self.default_config_file_path, "w") as file:
             yaml.dump(yaml_data, file)
 
     def opt_out_of_analytics(self) -> None:
