@@ -28,29 +28,25 @@ class GlobalConfigurationService:
             cls._instance = super().__new__(cls)
             # Check if config.yaml file exists and read in variables to the class
             if os.path.exists(cls._instance.default_config_file_path):
-                cls._instance._read_global_config(
-                    cls._instance.default_config_file_path
-                )
+                cls._instance._read_global_config()
             else:
-                cls._instance._create_global_config(
-                    config_file_path=cls._instance.default_config_file_path
-                )
+                cls._instance._create_global_config()
 
         return cls._instance
 
-    def _read_global_config(self, config_file_path: str) -> None:
+    def _read_global_config(self) -> None:
         """Reads the global config yaml file.
 
         Args:
             config_file_path (str): Path to users global config file
         """
-        with open(config_file_path) as file:
+        with open(self.default_config_file_path) as file:
             yaml_data = yaml.safe_load(file)
 
         self._user_id = yaml_data.get("user_id")
         self._analytics_opt_out = yaml_data.get("analytics_opt_out") == "True"
 
-    def _create_global_config(self, config_file_path: str) -> None:
+    def _create_global_config(self) -> None:
         """Creates a new global config yaml file.
 
         Args:
@@ -64,17 +60,17 @@ class GlobalConfigurationService:
 
         # Create the '.matcha-ml' config directory
         try:
-            os.makedirs(os.path.dirname(config_file_path), exist_ok=True)
+            os.makedirs(os.path.dirname(self.default_config_file_path), exist_ok=True)
         except PermissionError:
             raise MatchaPermissionError(
-                f"Error - You do not have permission to write the configuration. Check if you have write permissions for '{config_file_path}'"
+                f"Error - You do not have permission to write the configuration. Check if you have write permissions for '{self.default_config_file_path}'"
             )
 
         # Create config file and populate with the current class variables
-        with open(config_file_path, "w") as file:
+        with open(self.default_config_file_path, "w") as file:
             yaml.dump(data, file)
 
-    def _update_global_config(self, config_file_path: str) -> None:
+    def _update_global_config(self) -> None:
         """Updates an existing global config file.
 
         Args:
@@ -85,7 +81,7 @@ class GlobalConfigurationService:
             "analytics_opt_out": self._analytics_opt_out,
         }
 
-        with open(config_file_path, "r+") as file:
+        with open(self.default_config_file_path, "r+") as file:
             yaml_data = yaml.safe_load(file)
             yaml_data.update(data)
             yaml.dump(yaml_data, file)
@@ -93,12 +89,12 @@ class GlobalConfigurationService:
     def opt_out_of_analytics(self) -> None:
         """Opt out of analytic collection."""
         self._analytics_opt_out = True
-        self._update_global_config(self.default_config_file_path)
+        self._update_global_config()
 
     def opt_in_to_analytics(self) -> None:
         """Opt in to analytic collection."""
         self._analytics_opt_out = False
-        self._update_global_config(self.default_config_file_path)
+        self._update_global_config()
 
     @property
     def user_id(self) -> str:
