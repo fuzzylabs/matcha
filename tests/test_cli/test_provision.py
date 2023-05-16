@@ -83,20 +83,33 @@ def test_cli_provision_command(
     result = runner.invoke(
         app, ["provision"], input="uksouth\nmatcha\ndefault\ndefault\nY\n"
     )
+
     # Exit code 0 means there was no error
     assert result.exit_code == 0
 
-    destination_path = os.path.join(
+    state_storage_destination_path = os.path.join(
+        matcha_testing_directory, ".matcha", "infrastructure/remote_state_storage"
+    )
+
+    resources_destination_path = os.path.join(
         matcha_testing_directory, ".matcha", "infrastructure/resources"
     )
 
-    expected_tf_vars = {
+    state_storage_expected_tf_vars = {
+        "location": "uksouth",
+        "prefix": "matcha",
+    }
+
+    resources_expected_tf_vars = {
         "location": "uksouth",
         "prefix": "matcha",
         "password": "default",
     }
 
-    assert_infrastructure(destination_path, expected_tf_vars)
+    assert_infrastructure(
+        state_storage_destination_path, state_storage_expected_tf_vars
+    )
+    assert_infrastructure(resources_destination_path, resources_expected_tf_vars)
 
 
 def test_cli_provision_command_with_args(
@@ -129,13 +142,29 @@ def test_cli_provision_command_with_args(
     # Exit code 0 means there was no error
     assert result.exit_code == 0
 
-    destination_path = os.path.join(
+    state_storage_destination_path = os.path.join(
+        matcha_testing_directory, ".matcha", "infrastructure/remote_state_storage"
+    )
+
+    resources_destination_path = os.path.join(
         matcha_testing_directory, ".matcha", "infrastructure/resources"
     )
 
-    expected_tf_vars = {"location": "uksouth", "prefix": "matcha", "password": "ninja"}
+    state_storage_expected_tf_vars = {
+        "location": "uksouth",
+        "prefix": "matcha",
+    }
 
-    assert_infrastructure(destination_path, expected_tf_vars)
+    resources_expected_tf_vars = {
+        "location": "uksouth",
+        "prefix": "matcha",
+        "password": "ninja",
+    }
+
+    assert_infrastructure(
+        state_storage_destination_path, state_storage_expected_tf_vars
+    )
+    assert_infrastructure(resources_destination_path, resources_expected_tf_vars)
 
 
 def test_cli_provision_command_with_prefix(runner, matcha_testing_directory):
@@ -155,17 +184,29 @@ def test_cli_provision_command_with_prefix(runner, matcha_testing_directory):
     # Exit code 0 means there was no error
     assert result.exit_code == 0
 
-    destination_path = os.path.join(
+    state_storage_destination_path = os.path.join(
+        matcha_testing_directory, ".matcha", "infrastructure/remote_state_storage"
+    )
+
+    resources_destination_path = os.path.join(
         matcha_testing_directory, ".matcha", "infrastructure/resources"
     )
 
-    expected_tf_vars = {
+    state_storage_expected_tf_vars = {
+        "location": "uksouth",
+        "prefix": "coffee",
+    }
+
+    resources_expected_tf_vars = {
         "location": "uksouth",
         "prefix": "coffee",
         "password": "default",
     }
 
-    assert_infrastructure(destination_path, expected_tf_vars)
+    assert_infrastructure(
+        state_storage_destination_path, state_storage_expected_tf_vars
+    )
+    assert_infrastructure(resources_destination_path, resources_expected_tf_vars)
 
 
 def test_cli_provision_command_with_default_prefix(runner, matcha_testing_directory):
@@ -183,17 +224,29 @@ def test_cli_provision_command_with_default_prefix(runner, matcha_testing_direct
     # Exit code 0 means there was no error
     assert result.exit_code == 0
 
-    destination_path = os.path.join(
+    state_storage_destination_path = os.path.join(
+        matcha_testing_directory, ".matcha", "infrastructure/remote_state_storage"
+    )
+
+    resources_destination_path = os.path.join(
         matcha_testing_directory, ".matcha", "infrastructure/resources"
     )
 
-    expected_tf_vars = {
+    state_storage_expected_tf_vars = {
+        "location": "uksouth",
+        "prefix": "matcha",
+    }
+
+    resources_expected_tf_vars = {
         "location": "uksouth",
         "prefix": "matcha",
         "password": "default",
     }
 
-    assert_infrastructure(destination_path, expected_tf_vars)
+    assert_infrastructure(
+        state_storage_destination_path, state_storage_expected_tf_vars
+    )
+    assert_infrastructure(resources_destination_path, resources_expected_tf_vars)
 
 
 def test_cli_provision_command_with_verbose_arg(
@@ -310,12 +363,20 @@ def test_cli_provision_command_override(runner, matcha_testing_directory):
         input="Y\n",
     )
 
-    destination_path = os.path.join(
+    state_storage_destination_path = os.path.join(
+        matcha_testing_directory, ".matcha", "infrastructure/remote_state_storage"
+    )
+
+    resources_destination_path = os.path.join(
         matcha_testing_directory, ".matcha", "infrastructure/resources"
     )
 
-    # Touch a 'dummy.tf' file in the infrastructure configuration directory within the .matcha directory
-    with open(os.path.join(destination_path, "dummy.tf"), "a"):
+    # Touch a 'dummy.tf' file in the infrastructure configuration directory within the .matcha/remote_state_storage directory
+    with open(os.path.join(state_storage_destination_path, "dummy.tf"), "a"):
+        ...
+
+    # Touch a 'dummy.tf' file in the infrastructure configuration directory within the .matcha/resources directory
+    with open(os.path.join(resources_destination_path, "dummy.tf"), "a"):
         ...
 
     # Invoke provision command for a second time, which overwrites the existing .matcha directory and removes the 'dummy.tf' file
@@ -333,12 +394,27 @@ def test_cli_provision_command_override(runner, matcha_testing_directory):
         input="Y\nY\n",
     )
 
-    # Checks the 'dummy.tf' file is not present within the overwritten .matcha directory
-    assert not os.path.exists(os.path.join(destination_path, "dummy.tf"))
+    # Checks the 'dummy.tf' file is not present within the overwritten .matcha/remote_state_storage directory
+    assert not os.path.exists(os.path.join(state_storage_destination_path, "dummy.tf"))
 
-    expected_tf_vars = {"location": "uksouth", "prefix": "matcha", "password": "ninja"}
+    # Checks the 'dummy.tf' file is not present within the overwritten .matcha/resources directory
+    assert not os.path.exists(os.path.join(resources_destination_path, "dummy.tf"))
 
-    assert_infrastructure(destination_path, expected_tf_vars)
+    state_storage_expected_tf_vars = {
+        "location": "uksouth",
+        "prefix": "matcha",
+    }
+
+    resources_expected_tf_vars = {
+        "location": "uksouth",
+        "prefix": "matcha",
+        "password": "ninja",
+    }
+
+    assert_infrastructure(
+        state_storage_destination_path, state_storage_expected_tf_vars
+    )
+    assert_infrastructure(resources_destination_path, resources_expected_tf_vars)
 
 
 def test_cli_provision_command_with_password_mismatch(runner, matcha_testing_directory):
@@ -377,12 +453,12 @@ def test_cli_provision_command_reuse(runner, matcha_testing_directory):
         input="default\ndefault\nY\n",
     )
 
-    destination_path = os.path.join(
+    resources_destination_path = os.path.join(
         matcha_testing_directory, ".matcha", "infrastructure/resources"
     )
 
     # Touch a 'dummy.tf' file in the infrastructure configuration directory within the .matcha directory
-    with open(os.path.join(destination_path, "dummy.tf"), "a"):
+    with open(os.path.join(resources_destination_path, "dummy.tf"), "a"):
         ...
 
     # Invoke provision command for a second time, electing to reuse the existing .matcha directory and therefore retain the 'dummy.tf' file
@@ -393,15 +469,15 @@ def test_cli_provision_command_reuse(runner, matcha_testing_directory):
     )
 
     # Checks the 'dummy.tf' file is present within the reused .matcha directory
-    assert os.path.exists(os.path.join(destination_path, "dummy.tf"))
+    assert os.path.exists(os.path.join(resources_destination_path, "dummy.tf"))
 
-    expected_tf_vars = {
+    resources_expected_tf_vars = {
         "location": "uksouth",
         "prefix": "matcha",
         "password": "default",
     }
 
-    assert_infrastructure(destination_path, expected_tf_vars)
+    assert_infrastructure(resources_destination_path, resources_expected_tf_vars)
 
 
 def test_cli_provision_command_with_provisioned_resources(
@@ -430,12 +506,12 @@ def test_cli_provision_command_with_provisioned_resources(
         input="Y\n",
     )
 
-    destination_path = os.path.join(
+    resources_destination_path = os.path.join(
         matcha_testing_directory, ".matcha", "infrastructure/resources"
     )
 
     # Touch a 'dummy.tf' file in the infrastructure configuration directory within the .matcha directory
-    with open(os.path.join(destination_path, "dummy.tf"), "a"):
+    with open(os.path.join(resources_destination_path, "dummy.tf"), "a"):
         ...
 
     # Mock functions such that a deployment on Azure exists
@@ -464,11 +540,15 @@ def test_cli_provision_command_with_provisioned_resources(
         )
 
     # Checks the 'dummy.tf' file is not present within the overwritten .matcha directory
-    assert not os.path.exists(os.path.join(destination_path, "dummy.tf"))
+    assert not os.path.exists(os.path.join(resources_destination_path, "dummy.tf"))
 
-    expected_tf_vars = {"location": "uksouth", "prefix": "matcha", "password": "ninja"}
+    resources_expected_tf_vars = {
+        "location": "uksouth",
+        "prefix": "matcha",
+        "password": "ninja",
+    }
 
-    assert_infrastructure(destination_path, expected_tf_vars)
+    assert_infrastructure(resources_destination_path, resources_expected_tf_vars)
 
     assert (
         "WARNING: Matcha has detected that a deployment already exists in Azure"

@@ -113,14 +113,10 @@ def terraform_test_config(matcha_testing_directory: str) -> TerraformConfig:
         TerraformConfig: test terraform config
     """
     infrastructure_directory = os.path.join(
-        matcha_testing_directory, ".matcha", "infrastructure"
+        matcha_testing_directory, ".matcha", "infrastructure", "resources"
     )
     os.makedirs(infrastructure_directory, exist_ok=True)
-    return TerraformConfig(
-        working_dir=infrastructure_directory,
-        state_file=os.path.join(infrastructure_directory, "matcha.state"),
-        var_file=os.path.join(infrastructure_directory, "terraform.tfvars.json"),
-    )
+    return TerraformConfig(working_dir=infrastructure_directory)
 
 
 @pytest.fixture

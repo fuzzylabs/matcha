@@ -48,8 +48,11 @@ def provision(
 ) -> None:
     """Provision cloud resources with a template."""
     remote_state_manager = RemoteStateManager()
-    remote_state_manager.provision_state_storage(location, prefix)
+    location, prefix = remote_state_manager.fill_provision_variables(
+        location=location, prefix=prefix
+    )
 
+    remote_state_manager.provision_state_storage(location, prefix)
     provision_resources(location, prefix, password, verbose)
 
 
