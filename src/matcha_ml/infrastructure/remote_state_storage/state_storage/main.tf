@@ -1,7 +1,7 @@
 # create a storage account
 resource "azurerm_storage_account" "statestorageaccount" {
-  name                = "remotestatestacc"
-  resource_group_name = "remote-state-storage-resources"
+  name                = "${var.prefix}statestacc"
+  resource_group_name = var.resource_group_name
   location            = var.location
 
   account_tier                    = "Standard"
@@ -14,7 +14,7 @@ resource "azurerm_storage_account" "statestorageaccount" {
 
 # create a storage container inside created storage account
 resource "azurerm_storage_container" "statestoragecontainer" {
-  name                  = "remote-state-store"
+  name                  = "${var.prefix}statestore"
   storage_account_name  = azurerm_storage_account.statestorageaccount.name
   container_access_type = "container"
 }

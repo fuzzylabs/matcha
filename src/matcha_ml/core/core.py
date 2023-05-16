@@ -3,17 +3,8 @@ import os
 from typing import Dict, Optional
 
 from matcha_ml.cli._validation import get_command_validation
-from matcha_ml.cli.ui.print_messages import print_status
-from matcha_ml.cli.ui.status_message_builders import (
-    build_step_success_status,
-)
 from matcha_ml.errors import MatchaError
 from matcha_ml.state import MatchaStateService
-from matcha_ml.templates.build_templates.state_storage_template import (
-    build_template,
-    build_template_configuration,
-)
-from matcha_ml.templates.run_state_storage_template import TemplateRunner
 
 
 def get(
@@ -59,36 +50,3 @@ def get(
     )
 
     return result
-
-
-def provision_state_storage(location: str, verbose: Optional[bool] = False) -> None:
-    """Provision the state bucket using templates.
-
-    Args:
-        location (str): location of where this bucket will be provisioned
-        verbose (Optional[bool], optional): additional output is show when True. Defaults to False.
-    """
-    template_runner = TemplateRunner()
-
-    project_directory = os.getcwd()
-    destination = os.path.join(
-        project_directory, ".matcha", "infrastructure/remote_state_storage"
-    )
-    template = os.path.join(
-        os.path.dirname(__file__), os.pardir, "infrastructure/remote_state_storage"
-    )
-
-    config = build_template_configuration(location)
-    build_template(config, template, destination, verbose)
-
-    template_runner.provision()
-    print_status(build_step_success_status("Provisioning is complete!"))
-
-
-def deprovision_state_storage() -> None:
-    """Destroy the state bucket provisioned."""
-    # create a runner for deprovisioning resource with Terraform service.
-    template_runner = TemplateRunner()
-
-    template_runner.deprovision()
-    print_status(build_step_success_status("Destroying state bucket is complete!"))

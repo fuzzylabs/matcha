@@ -1,4 +1,4 @@
 resource "azurerm_resource_group" "main" {
-  name     = "remote-state-storage-resources"
+  name     = "${var.prefix}-resources"
   location = var.location
 }

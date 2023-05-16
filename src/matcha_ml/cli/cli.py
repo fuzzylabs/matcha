@@ -8,6 +8,7 @@ from matcha_ml.cli._validation import (
     prefix_typer_callback,
     region_typer_callback,
 )
+from matcha_ml.cli.destroy import destroy_resources
 from matcha_ml.cli.provision import provision_resources
 from matcha_ml.cli.ui.print_messages import (
     print_error,
@@ -20,6 +21,7 @@ from matcha_ml.cli.ui.resource_message_builders import (
 )
 from matcha_ml.core import core
 from matcha_ml.errors import MatchaError, MatchaInputError
+from matcha_ml.state.remote_state_manager import RemoteStateManager
 
 app = typer.Typer(no_args_is_help=True, pretty_exceptions_show_locals=False)
 
@@ -45,7 +47,9 @@ def provision(
     ),
 ) -> None:
     """Provision cloud resources with a template."""
-    core.provision_state_storage(location)
+    remote_state_manager = RemoteStateManager()
+    remote_state_manager.provision_state_storage(location, prefix)
+
     provision_resources(location, prefix, password, verbose)
 
 
@@ -95,9 +99,11 @@ def destroy(
     full: Optional[str] = typer.Argument(None),
 ) -> None:
     """Destroy the provisioned cloud resources."""
-    # destroy_resources()
+    remote_state_manager = RemoteStateManager()
+
+    destroy_resources()
     if full:
-        core.deprovision_state_storage()
+        remote_state_manager.deprovision_state_storage()
 
 
 def version_callback(value: bool) -> None:

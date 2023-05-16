@@ -16,7 +16,7 @@ from matcha_ml.errors import MatchaPermissionError
 
 SUBMODULE_NAMES = [
     "resource_group",
-    "storage",
+    "state_storage",
 ]
 ALLOWED_EXTENSIONS = ["tf", "yaml", "tpl"]
 
@@ -25,22 +25,24 @@ ALLOWED_EXTENSIONS = ["tf", "yaml", "tpl"]
 class TemplateVariables:
     """Terraform template variables."""
 
-    # Azure location in which all resources will be provisioned
+    # Azure location in which the remote state bucket will be provisioned
     location: str
 
+    # Prefix used for the resource group
+    prefix: str
 
-def build_template_configuration(location: str) -> TemplateVariables:
+
+def build_template_configuration(location: str, prefix: str) -> TemplateVariables:
     """Ask for variables and build the configuration.
 
     Args:
         location (str): Azure location in which all resources will be provisioned.
         prefix (str): Prefix used for all resources.
-        password (str): Password for ZenServer.
 
     Returns:
         TemplateVariables: Terraform variables required by a template
     """
-    return TemplateVariables(location=location)
+    return TemplateVariables(location=location, prefix=prefix)
 
 
 def copy_files(files: List[str], destination: str, sub_folder_path: str = "") -> None:
