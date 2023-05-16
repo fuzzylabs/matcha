@@ -14,16 +14,15 @@ None of the data we collect will be personally identifiable.
 
 ## How we collect analytics
 
-Transparently. It’s important that everything we do, and everything we collect, is done so with the informed consent of our users. If ever something seems unclear, please get in touch. We’d love to chat.
-
-What analytics we collect
-
 We collect a variety of data from a number of different sources:
 
-- pip download data
-- direct developer to user conversations
 - *anonymized* analytics from within the `matcha` tool
+- pip download data
+- GitHub usage data
+- direct developer to user conversations
 
+
+All data we collect will be stored securely and used only for the reasons stated above.
 
 ## `matcha` tool analytics
 
@@ -34,9 +33,11 @@ For each command that is run (e.g. `matcha provision`)
 2. The timestamp of when the command was run
 3. An anonymous random user ID, this is used to correctly identify the current number of users of our tool
 4. An anonymous random state ID associated with your current `matcha.state` file
-5. The type of operating system used e.g. `linux` or `darwin`
+5. The type of operating system used e.g. '`linux`' or '`darwin`', this is used to see what support is required for different operating systems
 
-## Opting out
+# Opting out
+
+Please note that you are **automatically opted-in** to usage analytics collection.
 
 You can **opt-out** of in-tool usage analytics by running the CLI tool command:
 
