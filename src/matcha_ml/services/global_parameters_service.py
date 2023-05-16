@@ -1,4 +1,4 @@
-"""Global config service for creating and modifying a users global config files."""
+"""Global parameter service for creating and modifying a users global config files."""
 import os
 import uuid
 from typing import Any, Dict, Optional
@@ -35,7 +35,7 @@ class GlobalParameters:
         return cls._instance
 
     def _read_global_config(self) -> None:
-        """Reads the global config yaml file.
+        """Reads the config yaml file containing the global parameters.
 
         Args:
             config_file_path (str): Path to users global config file
@@ -47,7 +47,7 @@ class GlobalParameters:
         self._analytics_opt_out = yaml_data.get("analytics_opt_out")
 
     def _create_global_config(self) -> None:
-        """Creates a new global config yaml file.
+        """Creates a new config yaml file containing the global parameters.
 
         Args:
             config_file_path (str): Path to users global config file
@@ -71,7 +71,7 @@ class GlobalParameters:
             yaml.dump(data, file)
 
     def _update_global_config(self) -> None:
-        """Updates an existing global config file.
+        """Updates an existing config file with the global parameters.
 
         Args:
             config_file_path (str): Path to users global config file
@@ -118,7 +118,7 @@ class GlobalParameters:
 
     @property
     def default_config_file_path(self) -> str:
-        """Path to the default global configuration file.
+        """Path to the default configuration file containing the global parameters.
 
         Returns:
             The default global configuration directory.
