@@ -168,7 +168,6 @@ You might wonder why this setup step is necessary, and what it's doing. While yo
 ## Training
 
 Once the setup script completes, you're ready to train the model:
->>>>>>> Stashed changes
 
 ```bash
 python run.py --train

@@ -4,6 +4,8 @@ If you train machine learning models, then you know the challenge of going from 
 
 **Matcha removes the complexity of provisioning your machine learning infrastructure**. With one step, you'll have a complete _machine learning operations (MLOps)_ stack up and running in your Microsoft® Azure cloud environment. This means you'll be able to track your experiments, train your models, as well as deploy and serve those models.
 
+![Animation of Matcha provision](img/matcha-provision.gif)
+
 Under the hood, Matcha leverages a number of other open souce tools: we use MLFlow to track experiments, Seldon to serve models, ZenML for orchestration, and Kubernetes for model training workloads, as well as for hosting everything else. Matcha's job is to bring together the best MLOps tooling, and set them up for you, so you can focus on training models.
 
 Along with setting up your infrastructure, Matcha comes with a set of well-engineered examples, covering common machine learning use-cases. These examples will help you make the most out of Matcha.
