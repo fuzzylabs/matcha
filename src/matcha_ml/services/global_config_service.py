@@ -9,7 +9,10 @@ from matcha_ml.errors import MatchaPermissionError
 
 
 class GlobalConfigurationService:
-    """A Global Config Service for interacting and updating a users global config file."""
+    """A Global Config Service for interacting and updating a users global config file.
+
+    Users are opted-in for analytics data collection by default.
+    """
 
     _instance: Optional["GlobalConfigurationService"] = None
     _user_id: Optional[str] = None
@@ -24,13 +27,13 @@ class GlobalConfigurationService:
         if cls._instance is None:
             cls._instance = super().__new__(cls)
             # Check if config.yaml file exists and read in variables to the class
-            if os.path.exists(str(cls._instance.default_config_file_path)):
+            if os.path.exists(cls._instance.default_config_file_path):
                 cls._instance._read_global_config(
-                    str(cls._instance.default_config_file_path)
+                    cls._instance.default_config_file_path
                 )
             else:
                 cls._instance._create_global_config(
-                    config_file_path=str(cls._instance.default_config_file_path)
+                    config_file_path=cls._instance.default_config_file_path
                 )
 
         return cls._instance
@@ -43,8 +46,9 @@ class GlobalConfigurationService:
         """
         with open(config_file_path) as file:
             yaml_data = yaml.safe_load(file)
-            self._user_id = yaml_data.get("user_id")
-            self._analytics_opt_out = yaml_data.get("analytics_opt_out") == "True"
+
+        self._user_id = yaml_data.get("user_id")
+        self._analytics_opt_out = yaml_data.get("analytics_opt_out") == "True"
 
     def _create_global_config(self, config_file_path: str) -> None:
         """Creates a new global config yaml file.
@@ -74,7 +78,7 @@ class GlobalConfigurationService:
         """Updates an existing global config file.
 
         Args:
-            config_file_path (str): _description_
+            config_file_path (str): Path to users global config file
         """
         data = {
             "user_id": self._user_id,
