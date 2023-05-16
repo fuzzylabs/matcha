@@ -80,9 +80,10 @@ def test_opt_in_subcommand(
     config_file_path = os.path.join(
         matcha_testing_directory, ".matcha-ml", "config.yaml"
     )
-    print(config_file_path)
+
     # Check if config file is not present
     assert not os.path.exists(config_file_path)
+
     with mock.patch(
         f"{INTERNAL_FUNCTION_STUB}.default_config_file_path",
         new_callable=mock.PropertyMock,
