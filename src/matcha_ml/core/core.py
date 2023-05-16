@@ -8,7 +8,7 @@ from matcha_ml.cli.ui.status_message_builders import (
     build_step_success_status,
 )
 from matcha_ml.errors import MatchaError
-from matcha_ml.services.matcha_state import MatchaStateService
+from matcha_ml.state import MatchaStateService
 from matcha_ml.templates.build_templates.state_storage_template import (
     build_template,
     build_template_configuration,

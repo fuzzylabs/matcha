@@ -27,22 +27,17 @@ app = typer.Typer(no_args_is_help=True, pretty_exceptions_show_locals=False)
 @app.command()
 def provision(
     location: str = typer.Option(
-        None,
-        prompt="What region should your resources be provisioned in (e.g., 'ukwest')?",
         callback=region_typer_callback,
+        default="",
         help="The region where your resources will be provisioned, e.g., 'ukwest'",
     ),
     prefix: str = typer.Option(
-        prompt="Your resources need a name (an alphanumerical prefix; 3-11 character limit), what should matcha call them?",
         callback=prefix_typer_callback,
-        default="matcha",
+        default="",
         help="A unique prefix for your resources.",
     ),
     password: str = typer.Option(
-        default=None,
-        prompt="Set a password for your deployment server",
-        confirmation_prompt=True,
-        hide_input=True,
+        default="",
         help="A password for the deployment server",
     ),
     verbose: Optional[bool] = typer.Option(

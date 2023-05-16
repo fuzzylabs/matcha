@@ -73,6 +73,14 @@ class TemplateRunner:
             )
             raise typer.Exit()
 
+    def _validate_kubeconfig(self, base_path: str = ".kube/config") -> None:
+        """Check if kubeconfig file exists at location '~/.kube/config', if not create empty config file.
+
+        Args:
+            base_path (str): Relative path to location of kubeconfig
+        """
+        self.tfs.verify_kubectl_config_file(base_path)
+
     def _initialize_terraform(self) -> None:
         """Run terraform init to initialize Terraform .
 
@@ -254,6 +262,7 @@ class TemplateRunner:
         """Provision resources required for the deployment."""
         self._check_terraform_installation()
         self._validate_terraform_config()
+        self._validate_kubeconfig(base_path=".kube/config")
         self._initialize_terraform()
         self._apply_terraform()
         self._show_terraform_outputs()
