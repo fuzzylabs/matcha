@@ -35,11 +35,7 @@ class GlobalParameters:
         return cls._instance
 
     def _read_global_config(self) -> None:
-        """Reads the config yaml file containing the global parameters.
-
-        Args:
-            config_file_path (str): Path to users global config file
-        """
+        """Reads the config yaml file containing the global parameters."""
         with open(self.default_config_file_path) as file:
             yaml_data = yaml.safe_load(file)
 
@@ -47,11 +43,7 @@ class GlobalParameters:
         self._analytics_opt_out = yaml_data.get("analytics_opt_out")
 
     def _create_global_config(self) -> None:
-        """Creates a new config yaml file containing the global parameters.
-
-        Args:
-            config_file_path (str): Path to users global config file
-        """
+        """Creates a new config yaml file containing the global parameters."""
         # Generate a new unique user ID
         data = {
             "user_id": self.user_id,
@@ -71,11 +63,7 @@ class GlobalParameters:
             yaml.dump(data, file)
 
     def _update_global_config(self) -> None:
-        """Updates an existing config file with the global parameters.
-
-        Args:
-            config_file_path (str): Path to users global config file
-        """
+        """Updates an existing config file with the global parameters."""
         data = {
             "user_id": self._user_id,
             "analytics_opt_out": self._analytics_opt_out,
