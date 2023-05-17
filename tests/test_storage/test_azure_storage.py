@@ -40,24 +40,27 @@ def test_upload_file(mock_blob_service, matcha_testing_directory):
     mock_blob_client.upload_blob.assert_called_once()
 
 
-# def test_upload_folder(mock_blob_service, matcha_testing_directory):
-#     """_summary_
+def test_upload_folder(mock_blob_service, matcha_testing_directory):
+    """_summary_
 
-#     Args:
-#         mock_blob_service (_type_): _description_
-#         matcha_testing_directory (_type_): _description_
-#     """
-#     for i in range(1, 3):
-#         tmp_file = os.path.join(matcha_testing_directory, f"temp{i}.txt")
-#         with open(tmp_file, "w"):
-#             pass
+    Args:
+        mock_blob_service (_type_): _description_
+        matcha_testing_directory (_type_): _description_
+    """
+    for i in range(1, 3):
+        tmp_file = os.path.join(matcha_testing_directory, f"temp{i}.txt")
+        with open(tmp_file, "w"):
+            pass
 
-#     mock_container_client = mock_blob_service.get_container_client.return_value
-#     mock_blob_client = mock_container_client.get_blob_client.return_value
-#     mock_az_storage = AzureStorage("test-storage")
-#     mock_az_storage.upload_folder(matcha_testing_directory)
+    mock_container_client = mock_blob_service.get_container_client.return_value
+    mock_blob_client = mock_container_client.get_blob_client.return_value
+    mock_az_storage = AzureStorage("test-storage")
+    mock_az_storage.container_client = mock_container_client
+    mock_az_storage.upload_folder(matcha_testing_directory)
 
-#     mock_blob_client.upload_blob.assert_called()
+    mock_blob_client.upload_blob.assert_called()
+
+    assert mock_blob_client.upload_blob.call_count == 2
 
 
 def test_download_file(mock_blob_service, matcha_testing_directory):
