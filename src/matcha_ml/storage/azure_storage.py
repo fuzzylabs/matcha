@@ -15,7 +15,7 @@ class AzureStorage:
 
         Args:
             blob_client (ContainerClient): Container client
-            src_file (str): Path to upload the file to.
+            src_file (str): Path to upload the file from.
         """
         with open(src_file, "wb") as blob_data:
             blob_client.upload_blob(blob_data)
@@ -34,7 +34,8 @@ class AzureStorage:
         for root, _, filenames in os.walk(src_folder_path):
             for filename in filenames:
                 file_path = os.path.join(root, filename)
-                self.upload_file(container_client, file_path)
+                blob_client = container_client.get_blob_client(blob=file_path)
+                self.upload_file(blob_client, file_path)
 
     def download_file(self, blob_client: ContainerClient, destination_file: str):
         """Download a file from Azure Storage Container.
