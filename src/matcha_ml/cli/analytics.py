@@ -12,7 +12,7 @@ app = typer.Typer()
 def opt_out() -> None:
     """Disable the collection of anonymous usage data."""
     print(
-        "Data collection has been turned off and no data will be collected - you can turn this back on by running the command: matcha analytics opt-in"
+        "Data collection has been turned off and no data will be collected - you can turn this back on by running the command: ;matcha analytics opt-in'"
     )
     return GlobalParameters().update_analytics_state(disable=True)
 
