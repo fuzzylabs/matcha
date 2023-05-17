@@ -52,6 +52,8 @@ azure-mgmt-subscription = "^3.1.1"
 azure-mgmt-authorization = "^3.0.0"
 azure-mgmt-confluent = "^1.0.0"
 pyyaml = "^5.4.1"
+dataclasses-json = "^0.5.7"
+azure-storage-blob = "^12.16.0"
 
 
 [tool.poetry.group.dev.dependencies]
