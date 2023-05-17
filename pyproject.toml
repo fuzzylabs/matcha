@@ -142,6 +142,7 @@ exclude = '''
 
 [[tool.mypy.overrides]]
 module = [
-    "python_terraform.*"
+    "python_terraform.*",
+    "segment.*"
 ]
 ignore_missing_imports = true
