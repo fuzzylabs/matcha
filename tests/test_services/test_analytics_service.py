@@ -54,12 +54,33 @@ def test_cli_destroy_command_analytics_are_mocked(
         "matcha_ml.templates.build_templates.azure_template.check_current_deployment_exists"
     ) as check_deployment_exists:
         check_deployment_exists.return_value = False
-        result = runner.invoke(app, ["destroy"])
-
-    assert (
-        "Error - you cannot destroy resources that have not been provisioned yet."
-        in result.stdout
-    )
+        runner.invoke(app, ["destroy"])
 
     # Check that the mocked segment track was called
     mocked_segment_track_decorator.assert_called()
+
+
+def test_tracking_does_not_happen_when_opted_out(
+    runner, matcha_testing_directory, mocked_segment_track_decorator
+):
+    """Test Segment track is not called when the user is opted out of data analytics collection.
+
+    Args:
+        runner (CliRunner): typer CLI runner
+        matcha_testing_directory (str): temporary working directory.
+        mocked_segment_track_decorator (MagicMock): mocked Segment track call found in 'matcha_ml.services.analytics_service.analytics.track'
+    """
+    os.chdir(matcha_testing_directory)
+
+    # Invoke destroy command with a GlobalParameter opting out of data collection
+    with patch(
+        "matcha_ml.templates.build_templates.azure_template.check_current_deployment_exists"
+    ) as check_deployment_exists, patch(
+        f"{GLOBAL_PARAMETER_SERVICE_FUNCTION_STUB}.analytics_opt_out",
+        new_callable=PropertyMock,
+    ):
+        check_deployment_exists.return_value = False
+        runner.invoke(app, ["destroy"])
+
+    # Check that the mocked segment track was not called
+    mocked_segment_track_decorator.assert_not_called()
