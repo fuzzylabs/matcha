@@ -11,7 +11,7 @@ def test_cli_destroy_command_help(runner):
     Args:
         runner (CliRunner): typer CLI runner
     """
-    # Invoke provision command
+    # Invoke destroy command
     result = runner.invoke(app, ["destroy", "--help"])
 
     # Exit code 0 means there was no error
@@ -32,7 +32,7 @@ def test_cli_destroy_command_with_no_provisioned_resources(
     """
     os.chdir(matcha_testing_directory)
 
-    # Invoke provision command
+    # Invoke destroy command
     with patch(
         "matcha_ml.templates.build_templates.azure_template.check_current_deployment_exists"
     ) as check_deployment_exists:

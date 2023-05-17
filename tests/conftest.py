@@ -1,8 +1,7 @@
 """Reusable fixtures."""
-import os
 import tempfile
 from typing import Iterator
-from unittest.mock import MagicMock, PropertyMock, patch
+from unittest.mock import MagicMock, patch
 
 import pytest
 from azure.mgmt.confluent.models._confluent_management_client_enums import (
@@ -11,7 +10,6 @@ from azure.mgmt.confluent.models._confluent_management_client_enums import (
 from typer.testing import CliRunner
 
 from matcha_ml.services import AzureClient
-from matcha_ml.services.global_parameters_service import GlobalParameters
 
 INTERNAL_FUNCTION_STUB = "matcha_ml.services.AzureClient"
 
@@ -77,36 +75,6 @@ def mocked_azure_client_components(mocked_azure_client):
             return_value=({"rand-resources"})
         )
         yield mock
-
-
-GLOBAL_PARAMETER_SERVICE_FUNCTION_STUB = (
-    "matcha_ml.services.analytics_service.GlobalParameters"
-)
-
-
-@pytest.fixture(autouse=True)
-def mocked_global_parameters_service(matcha_testing_directory):
-    """Mocked global parameters service.
-
-    Args:
-        matcha_testing_directory (str): Temporary directory for testing.
-
-    Yields:
-        GlobalParameters: GlobalParameters object with mocked properties.
-    """
-    with patch(
-        f"{GLOBAL_PARAMETER_SERVICE_FUNCTION_STUB}.default_config_file_path",
-        new_callable=PropertyMock,
-    ) as file_path, patch(
-        f"{GLOBAL_PARAMETER_SERVICE_FUNCTION_STUB}.user_id",
-        new_callable=PropertyMock,
-    ) as user_id:
-        file_path.return_value = str(
-            os.path.join(str(matcha_testing_directory), ".matcha-ml", "config.yaml")
-        )
-        user_id.return_value = "TestUserID"
-
-        yield GlobalParameters()
 
 
 @pytest.fixture(autouse=True)
