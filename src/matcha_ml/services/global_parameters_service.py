@@ -19,7 +19,7 @@ class GlobalParameters:
     _analytics_opt_out: bool = False
 
     def __new__(cls) -> "GlobalParameters":
-        """Singleton class definition.
+        """Creates a singleton instance of the GlobalParameters class.
 
         Returns:
             GlobalParameters: Already existing initialised object, otherwise a new singleton object
