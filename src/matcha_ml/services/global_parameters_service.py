@@ -47,7 +47,7 @@ class GlobalParameters:
         # Generate a new unique user ID
         data = {
             "user_id": self.user_id,
-            "analytics_opt_out": self._analytics_opt_out,
+            "analytics_opt_out": self.analytics_opt_out,
         }
 
         # Create the '.matcha-ml' config directory
@@ -66,25 +66,19 @@ class GlobalParameters:
         """Updates an existing config file with the global parameters."""
         data = {
             "user_id": self.user_id,
-            "analytics_opt_out": self._analytics_opt_out,
+            "analytics_opt_out": self.analytics_opt_out,
         }
 
-        with open(self.default_config_file_path) as file:
-            yaml_data = yaml.safe_load(file)
-
-        yaml_data.update(data)
-
         with open(self.default_config_file_path, "w") as file:
-            yaml.dump(yaml_data, file)
+            yaml.dump(data, file)
 
-    def opt_out_of_analytics(self) -> None:
-        """Opt out of analytic collection."""
-        self._analytics_opt_out = True
-        self._update_global_config()
+    def update_analytics_state(self, disable: bool) -> None:
+        """Opt in or out of analytic collection.
 
-    def opt_in_to_analytics(self) -> None:
-        """Opt in to analytic collection."""
-        self._analytics_opt_out = False
+        Args:
+            disable (bool): Whether to disable analytics (True) or enable analytics (False)
+        """
+        self._analytics_opt_out = disable
         self._update_global_config()
 
     @property

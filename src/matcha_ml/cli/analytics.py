@@ -14,7 +14,7 @@ def opt_out() -> None:
     print(
         "Data collection has been turned off and no data will be collected - you can turn this back on by running the command: matcha analytics opt-in"
     )
-    return GlobalParameters().opt_out_of_analytics()
+    return GlobalParameters().update_analytics_state(disable=True)
 
 
 @app.command()
@@ -23,4 +23,4 @@ def opt_in() -> None:
     print(
         "Thank you for enabling data collection, this helps us improve matcha and anonymously understand how people are using the tool."
     )
-    return GlobalParameters().opt_in_to_analytics()
+    return GlobalParameters().update_analytics_state(disable=False)
