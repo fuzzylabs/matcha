@@ -5,7 +5,7 @@ from segment import analytics
 
 from matcha_ml.services.global_parameters_service import GlobalParameters
 
-analytics.write_key = "A34pcHvmJcQKKjGtcmR5TR2jEthHCeUE"
+analytics.write_key = "qwBKAvY6MEUvv5XIs4rE07ohf5neT3sx"
 
 
 def track(event_name: str):
