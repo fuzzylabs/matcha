@@ -58,6 +58,9 @@ class AzureStorage:
         Args:
             dest_folder_path (str): Path to folder to download all the files
         """
+        if not os.path.exists(dest_folder_path):
+            os.makedirs(dest_folder_path, exist_ok=True)
+
         for blob in self.container_client.list_blobs():
             blob_client = self.container_client.get_blob_client(blob.name)
             filename = blob.name.split("/")[-1]
