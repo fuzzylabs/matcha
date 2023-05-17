@@ -72,15 +72,6 @@ class GlobalParameters:
         with open(self.default_config_file_path, "w") as file:
             yaml.dump(data, file)
 
-    def update_analytics_state(self, disable: bool) -> None:
-        """Opt in or out of analytic collection.
-
-        Args:
-            disable (bool): Whether to disable analytics (True) or enable analytics (False)
-        """
-        self._analytics_opt_out = disable
-        self._update_global_config()
-
     @property
     def user_id(self) -> str:
         """User ID getter.
@@ -100,6 +91,11 @@ class GlobalParameters:
             bool: User is opted out of analytic data collection bool.
         """
         return self._analytics_opt_out
+
+    @analytics_opt_out.setter
+    def analytics_opt_out(self, value: bool) -> None:
+        self._analytics_opt_out = value
+        self._update_global_config()
 
     @property
     def default_config_file_path(self) -> str:
