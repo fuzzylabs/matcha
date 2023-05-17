@@ -94,6 +94,11 @@ class GlobalParameters:
 
     @analytics_opt_out.setter
     def analytics_opt_out(self, value: bool) -> None:
+        """Opt in or out of analytic collection.
+
+        Args:
+            value (bool): Whether to disable analytics (True) or enable analytics (False)
+        """
         self._analytics_opt_out = value
         self._update_global_config()
 
