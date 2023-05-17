@@ -41,14 +41,14 @@ class AzureStorage:
                 blob_client = self.container_client.get_blob_client(blob=file_path)
                 self.upload_file(blob_client, file_path)
 
-    def download_file(self, blob_client: ContainerClient, destination_file: str):
+    def download_file(self, blob_client: ContainerClient, dest_file: str):
         """Download a file from Azure Storage Container.
 
         Args:
             blob_client (ContainerClient): Container client
-            destination_file (str): Path to download the file to.
+            dest_file (str): Path to download the file to.
         """
-        with open(destination_file, "wb") as my_blob:
+        with open(dest_file, "wb") as my_blob:
             blob_data = blob_client.download_blob()
             blob_data.readinto(my_blob)
 
