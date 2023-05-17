@@ -195,7 +195,7 @@ class TemplateRunner:
             state_outputs[resource_type][resource_name] = properties["value"]
 
         # Create a unique matcha state identifier
-        state_outputs["id"] = {"matchaid": str(uuid.uuid4())}
+        state_outputs["id"] = {"matcha_uuid": str(uuid.uuid4())}
 
         self._update_state_file(state_outputs)
 
