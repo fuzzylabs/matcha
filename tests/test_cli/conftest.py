@@ -61,4 +61,4 @@ def mocked_global_parameters_service(matcha_testing_directory):
         )
         user_id.return_value = "TestUserID"
 
-        yield GlobalParameters()
+        yield GlobalParameters
