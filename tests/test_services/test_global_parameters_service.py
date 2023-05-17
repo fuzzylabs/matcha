@@ -36,6 +36,9 @@ def test_class_is_singleton(matcha_testing_directory):
         second_instance = GlobalParameters()
         assert first_instance is second_instance
 
+        assert first_instance.user_id is second_instance.user_id
+        assert first_instance.analytics_opt_out is second_instance.analytics_opt_out
+
 
 def test_new_config_file_creation(matcha_testing_directory):
     """Tests that a new file is created if it does not exist when the global config object is instantiated.
@@ -114,7 +117,7 @@ def test_opt_out(matcha_testing_directory):
         assert config_instance.config_file.get("analytics_opt_out") is False
         assert config_instance.analytics_opt_out is False
 
-        config_instance.opt_out_of_analytics()
+        config_instance.update_analytics_state(disable=True)
 
         assert config_instance.config_file.get("analytics_opt_out") is True
         assert config_instance.analytics_opt_out is True
