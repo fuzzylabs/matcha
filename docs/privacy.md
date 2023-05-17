@@ -16,7 +16,7 @@ None of the data we collect will be personally identifiable.
 
 We collect a variety of data from a number of different sources:
 
-- *anonymized* analytics from within the `matcha` tool
+- *anonymized* analytics from within the Matcha tool
 - pip download data
 - GitHub usage data
 - direct developer to user conversations
@@ -24,7 +24,7 @@ We collect a variety of data from a number of different sources:
 
 All data we collect will be stored securely and used only for the reasons stated above.
 
-## `matcha` tool analytics
+## Matcha tool analytics
 
 Within the tool we currently collect:
 
