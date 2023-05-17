@@ -79,8 +79,6 @@ def mocked_azure_client_components(mocked_azure_client):
         yield mock
 
 
-# GLOBAL_PARAMETER_SERVICE_FUNCTION_STUB = "matcha_ml.services.global_parameters_service.GlobalParameters"
-# GLOBAL_PARAMETER_SERVICE_FUNCTION_STUB = "matcha_ml.cli.cli.GlobalParameters"
 GLOBAL_PARAMETER_SERVICE_FUNCTION_STUB = (
     "matcha_ml.services.analytics_service.GlobalParameters"
 )
