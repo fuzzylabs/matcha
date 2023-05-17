@@ -77,6 +77,7 @@ def test_existing_config_file(matcha_testing_directory):
 
     # Create the '.matcha-ml' config directory
     os.makedirs(os.path.dirname(config_file_path), exist_ok=True)
+
     # Create config file and populate with the current class variables
     with open(config_file_path, "w") as file:
         yaml.dump(data, file)
