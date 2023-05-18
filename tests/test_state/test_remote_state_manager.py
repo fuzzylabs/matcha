@@ -37,7 +37,9 @@ def remote_state_config() -> RemoteStateConfig:
     """
     return RemoteStateConfig(
         remote_state_bucket=RemoteStateBucketConfig(
-            account_name="test-account", container_name="test-container"
+            account_name="test-account",
+            container_name="test-container",
+            client_id="test-client-id",
         )
     )
 

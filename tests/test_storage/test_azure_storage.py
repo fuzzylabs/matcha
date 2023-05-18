@@ -13,7 +13,7 @@ def test_container_exists():
             mock_client_instance.get_container_client.return_value
         )
         mock_container_client_instance.exists.return_value = True
-        azure_storage = AzureStorage("testaccount")
+        azure_storage = AzureStorage("testaccount", "testclientid")
         assert azure_storage.container_exists("testcontainer")
 
 
@@ -26,5 +26,5 @@ def test_container_does_not_exist():
             mock_client_instance.get_container_client.return_value
         )
         mock_container_client_instance.exists.return_value = False
-        azure_storage = AzureStorage("testaccount")
+        azure_storage = AzureStorage("testaccount", "testclientid")
         assert not azure_storage.container_exists("testcontainer")
