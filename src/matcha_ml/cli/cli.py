@@ -21,6 +21,7 @@ from matcha_ml.cli.ui.resource_message_builders import (
 )
 from matcha_ml.core import core
 from matcha_ml.errors import MatchaError, MatchaInputError
+from matcha_ml.state import RemoteStateManager
 
 app = typer.Typer(no_args_is_help=True, pretty_exceptions_show_locals=False)
 
@@ -71,9 +72,17 @@ def get(
         show_sensitive (Optional[bool]): show hidden sensitive resource values when True. Defaults to False.
 
     Raises:
+        Exit: Exit if matcha remote state has not been provisioned.
         Exit: Exit if matcha.state file does not exist.
         Exit: Exit if resource type or property does not exist in matcha.state.
     """
+    remote_state = RemoteStateManager()
+    if not remote_state.is_state_provisioned():
+        print_error(
+            "Error - matcha state has not been initialized, nothing to destroy."
+        )
+        raise typer.Exit()
+
     try:
         resources = core.get(resource_name, property_name)
     except MatchaInputError as e:

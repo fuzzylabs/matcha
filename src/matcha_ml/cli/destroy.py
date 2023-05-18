@@ -7,6 +7,7 @@ from matcha_ml.cli.ui.status_message_builders import (
     build_status,
     build_step_success_status,
 )
+from matcha_ml.state import RemoteStateManager
 from matcha_ml.templates.run_template import TemplateRunner
 
 
@@ -14,9 +15,17 @@ def destroy_resources() -> None:
     """Destroy resources.
 
     Raises:
+        typer.Exit: Exit if matcha remote state has not been provisioned.
         typer.Exit: if an existing deployment does not exist.
         typer.Exit: if approval is not given by user.
     """
+    remote_state = RemoteStateManager()
+    if not remote_state.is_state_provisioned():
+        print_error(
+            "Error - matcha state has not been initialized, nothing to destroy."
+        )
+        raise typer.Exit()
+
     # create a runner for deprovisioning resource with Terraform service.
     template_runner = TemplateRunner()
 
