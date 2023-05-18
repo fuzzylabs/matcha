@@ -1,4 +1,4 @@
-"""Tests for Global Config Service."""
+"""Tests for Global Parameters Service."""
 import os
 from stat import S_IREAD
 from unittest import mock
@@ -22,7 +22,7 @@ def test_class_is_singleton(matcha_testing_directory):
     """Tests that the GlobalParameters is correctly implemented as a singleton.
 
     Args:
-        matcha_testing_directory (str): Mock testing directory location for the GlobalConfig file to be located
+        matcha_testing_directory (str): Mock testing directory location for the config file to be located
     """
     with mock.patch(
         f"{INTERNAL_FUNCTION_STUB}.default_config_file_path",
@@ -41,10 +41,10 @@ def test_class_is_singleton(matcha_testing_directory):
 
 
 def test_new_config_file_creation(matcha_testing_directory):
-    """Tests that a new file is created if it does not exist when the global config object is instantiated.
+    """Tests that a new file is created if it does not exist when the global parameters object is instantiated.
 
     Args:
-        matcha_testing_directory (str): Mock testing directory location for the GlobalConfig file to be located
+        matcha_testing_directory (str): Mock testing directory location for the config file to be located
     """
     config_file_path = os.path.join(
         matcha_testing_directory, ".matcha-ml", "config.yaml"
@@ -61,10 +61,10 @@ def test_new_config_file_creation(matcha_testing_directory):
 
 
 def test_existing_config_file(matcha_testing_directory):
-    """Tests that the class variables are updated when there is an existing global config file.
+    """Tests that the class variables are updated when there is an existing config file.
 
     Args:
-        matcha_testing_directory (str): Mock testing directory location for the GlobalConfig file to be located
+        matcha_testing_directory (str): Mock testing directory location for the config file to be located
     """
     config_file_path = os.path.join(
         matcha_testing_directory, ".matcha-ml", "config.yaml"
@@ -101,7 +101,7 @@ def test_opt_out(matcha_testing_directory):
     """Tests that the opt out function changes the class variables and the global config file.
 
     Args:
-        matcha_testing_directory (str): Mock testing directory location for the GlobalConfig file to be located
+        matcha_testing_directory (str): Mock testing directory location for the Global Parameteres file to be located
     """
     config_file_path = os.path.join(
         matcha_testing_directory, ".matcha-ml", "config.yaml"
@@ -125,10 +125,10 @@ def test_opt_out(matcha_testing_directory):
 
 
 def test_config_file_write_permissions(matcha_testing_directory):
-    """Tests the permissions error thrown where the user does not have permission to write a global config file.
+    """Tests the permissions error thrown where the user does not have permission to write a config file.
 
     Args:
-        matcha_testing_directory (str): Mock testing directory location for the GlobalConfig file to be located
+        matcha_testing_directory (str): Mock testing directory location for the config file to be located
     """
     config_file_path = os.path.join(
         matcha_testing_directory, ".matcha-ml", "config.yaml"
