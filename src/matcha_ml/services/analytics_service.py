@@ -29,7 +29,7 @@ def track(event_name: str) -> Callable[..., Any]:
         """Decorator function.
 
         Args:
-            func (_type_): _description_
+            func (Callable[..., Any]): The function that is being decorated
         """
 
         def inner(*args: Any, **kwargs: Any) -> None:
