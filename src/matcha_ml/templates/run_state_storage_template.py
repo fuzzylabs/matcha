@@ -1,5 +1,7 @@
 """Run terraform templates to provision and deprovision state bucket resource."""
+import json
 import os
+from typing import Dict
 
 import typer
 
@@ -11,6 +13,7 @@ from matcha_ml.cli.ui.print_messages import (
 from matcha_ml.cli.ui.spinner import Spinner
 from matcha_ml.cli.ui.status_message_builders import (
     build_status,
+    build_step_success_status,
     build_substep_success_status,
 )
 from matcha_ml.errors import MatchaTerraformError
@@ -26,6 +29,7 @@ class TemplateRunner:
         )
     )
     tfs: TerraformService = TerraformService(terraform_config)
+    bucket_config_file = os.path.join(tfs.config.working_dir, "state_bucket.config")
 
     def _check_terraform_installation(self) -> None:
         """Checks if terraform is installed on the host system.
@@ -110,7 +114,23 @@ class TemplateRunner:
         )
 
     def _write_bucket_config(self) -> None:
-        ...
+        """Write the outputs of the Terraform deployed state storage to a bucket config file."""
+        tf_outputs = self.tfs.terraform_client.output()
+        bucket_configs: Dict[str, Dict[str, str]] = {}
+        bucket_configs.setdefault("remote_state_storage", {})
+
+        for output_name, properties in tf_outputs.items():
+            property_name = output_name.replace("remote_state_storage_", "")
+            bucket_configs["remote_state_storage"][property_name] = properties["value"]
+
+        with open(self.bucket_config_file, "w") as f:
+            json.dump(bucket_configs, f, indent=4)
+
+        print_status(
+            build_step_success_status(
+                f"The remote state storage configuration is written to {self.bucket_config_file}"
+            )
+        )
 
     def _destroy_terraform(self) -> None:
         """Destroy the provisioned resources.
@@ -135,6 +155,7 @@ class TemplateRunner:
         self._validate_terraform_config()
         self._initialize_terraform()
         self._apply_terraform()
+        self._write_bucket_config()
 
     def deprovision(self) -> None:
         """Destroy the provisioned resources."""
