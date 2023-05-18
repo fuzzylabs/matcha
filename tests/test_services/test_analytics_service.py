@@ -59,16 +59,17 @@ def test_segment_track_recieves_the_correct_arguments(
     # Check that the mocked segment track was called
     mocked_segment_track_decorator.assert_called()
 
+    tracked_arguments = mocked_segment_track_decorator.call_args.args
     # Check that the Segment track arguments are as expected
-    assert "TestUserID" in mocked_segment_track_decorator.call_args.args
-    assert "destroy" in mocked_segment_track_decorator.call_args.args
-    assert "destroy" in mocked_segment_track_decorator.call_args.args
+    assert "TestUserID" in tracked_arguments
+    assert "destroy" in tracked_arguments
+    assert "destroy" in tracked_arguments
     assert {
         "time_taken",
         "error_type",
         "command_succeeded",
         "matcha_state_uuid",
-    } == set(mocked_segment_track_decorator.call_args.args[2].keys())
+    } == set(tracked_arguments[2].keys())
 
 
 def test_tracking_does_not_happen_when_opted_out(
