@@ -4,6 +4,7 @@ from typing import Optional
 import typer
 
 from matcha_ml import __version__
+from matcha_ml.cli import analytics
 from matcha_ml.cli._validation import (
     prefix_typer_callback,
     region_typer_callback,
@@ -23,6 +24,13 @@ from matcha_ml.core import core
 from matcha_ml.errors import MatchaError, MatchaInputError
 
 app = typer.Typer(no_args_is_help=True, pretty_exceptions_show_locals=False)
+
+# Create a group for all subcommands for analytics command
+app.add_typer(
+    analytics.app,
+    name="analytics",
+    help="Enable or disable the collection of anonymous usage data (enabled by default).",
+)
 
 
 @app.command()
@@ -92,7 +100,7 @@ def get(
 
 @app.command()
 def destroy() -> None:
-    """Destroy the provisioned cloud resources."""
+    """Destroy the provisioned cloud resources. It will destroy the resource group even if resources are provisioned inside the group."""
     destroy_resources()
 
 
