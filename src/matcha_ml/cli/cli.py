@@ -22,6 +22,7 @@ from matcha_ml.cli.ui.resource_message_builders import (
 )
 from matcha_ml.core import core
 from matcha_ml.errors import MatchaError, MatchaInputError
+from matcha_ml.services.analytics_service import AnalyticsEvent, track
 
 app = typer.Typer(no_args_is_help=True, pretty_exceptions_show_locals=False)
 
@@ -34,6 +35,7 @@ app.add_typer(
 
 
 @app.command()
+@track(event_name=AnalyticsEvent.PROVISION)
 def provision(
     location: str = typer.Option(
         callback=region_typer_callback,
@@ -58,6 +60,7 @@ def provision(
 
 
 @app.command(help="Get information for the provisioned resources.")
+@track(event_name=AnalyticsEvent.GET)
 def get(
     resource_name: Optional[str] = typer.Argument(None),
     property_name: Optional[str] = typer.Argument(None),
@@ -99,6 +102,7 @@ def get(
 
 
 @app.command()
+@track(event_name=AnalyticsEvent.DESTROY)
 def destroy() -> None:
     """Destroy the provisioned cloud resources. It will destroy the resource group even if resources are provisioned inside the group."""
     destroy_resources()

@@ -20,6 +20,7 @@ class AnalyticsEvent(str, Enum):
 
     PROVISION = "provision"
     DESTROY = "destroy"
+    GET = "get"
 
 
 def track(event_name: AnalyticsEvent) -> Callable[..., Any]:

@@ -7,11 +7,9 @@ from matcha_ml.cli.ui.status_message_builders import (
     build_status,
     build_step_success_status,
 )
-from matcha_ml.services.analytics_service import AnalyticsEvent, track
 from matcha_ml.templates.run_template import TemplateRunner
 
 
-@track(event_name=AnalyticsEvent.DESTROY)
 def destroy_resources() -> None:
     """Destroy resources.
 

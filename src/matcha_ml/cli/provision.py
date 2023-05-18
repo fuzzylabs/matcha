@@ -10,7 +10,6 @@ from matcha_ml.cli.ui.status_message_builders import (
     build_status,
     build_step_success_status,
 )
-from matcha_ml.services.analytics_service import AnalyticsEvent, track
 from matcha_ml.templates.build_templates.azure_template import (
     build_template,
     build_template_configuration,
@@ -60,7 +59,6 @@ def fill_provision_variables(
     return location, prefix, password
 
 
-@track(event_name=AnalyticsEvent.PROVISION)
 def provision_resources(
     location: str,
     prefix: str,
