@@ -6,7 +6,16 @@ az_connection_string = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
 
 
 class AzureStorage:
+    storage_container_name: str
+    blob_service_client: BlobServiceClient = None
+    container_client: ContainerClient = None
+
     def __init__(self, storage_container_name: str) -> None:
+        """Initialize AzureStorage.
+
+        Args:
+            storage_container_name (str): Name of the storage container
+        """
         self.storage_container_name = storage_container_name
 
         # Create the BlobServiceClient object
