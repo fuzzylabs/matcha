@@ -1,4 +1,5 @@
 """The analytics service interface."""
+import functools
 from enum import Enum
 from time import time
 from typing import Any, Callable, Optional
@@ -32,6 +33,7 @@ def track(event_name: str) -> Callable[..., Any]:
             func (Callable[..., Any]): The function that is being decorated
         """
 
+        @functools.wraps(func)
         def inner(*args: Any, **kwargs: Any) -> None:
             """Inner decorator function."""
             ts = time()
