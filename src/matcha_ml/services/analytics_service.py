@@ -1,4 +1,5 @@
 """The analytics service interface."""
+from enum import Enum
 from time import time
 from typing import Any, Callable, Optional
 
@@ -8,6 +9,13 @@ from matcha_ml.services.global_parameters_service import GlobalParameters
 from matcha_ml.services.matcha_state import MatchaStateService
 
 analytics.write_key = "qwBKAvY6MEUvv5XIs4rE07ohf5neT3sx"
+
+
+class AnalyticsEvent(str, Enum):
+    """Analytics event enum class."""
+
+    PROVISION = "provision"
+    DESTROY = "destroy"
 
 
 def track(event_name: str) -> Callable[..., Any]:
