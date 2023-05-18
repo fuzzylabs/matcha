@@ -225,14 +225,17 @@ def test_initialize_terraform(capsys: SysCapture, template_runner: TemplateRunne
 
 
 def test_check_matcha_directory_exists(
-    capsys: SysCapture, template_runner: TemplateRunner
+    capsys: SysCapture, template_runner: TemplateRunner, matcha_testing_directory: str
 ):
     """Test if service exit as expected and print out the expected error message when required files does not exists.
 
     Args:
         capsys (SysCapture): fixture to capture stdout and stderr
         template_runner (TemplateRunner): a TemplateRunner object instance
+        matcha_testing_directory (str): the test directory
     """
+    os.chdir(matcha_testing_directory)
+
     template_runner.tfs.check_matcha_directory_exists = MagicMock(return_value=False)
     template_runner.tfs.check_matcha_directory_integrity = MagicMock(return_value=False)
 

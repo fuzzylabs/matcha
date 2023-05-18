@@ -109,6 +109,9 @@ class TemplateRunner:
             )
         )
 
+    def _write_bucket_config(self) -> None:
+        ...
+
     def _destroy_terraform(self) -> None:
         """Destroy the provisioned resources.
 
