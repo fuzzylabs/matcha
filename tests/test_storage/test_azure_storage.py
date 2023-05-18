@@ -11,10 +11,10 @@ STORAGE_FUNCTION_STUB = "matcha_ml.storage.azure_storage"
 
 @pytest.fixture
 def mock_blob_service() -> BlobServiceClient:
-    """_summary_
+    """Pytest fixture for mocking a blob service client.
 
     Yields:
-        BlobServiceClient: _description_
+        BlobServiceClient: Mocked blob service client
     """
     with patch(
         f"{STORAGE_FUNCTION_STUB}.BlobServiceClient.from_connection_string"
