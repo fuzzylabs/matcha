@@ -1,7 +1,6 @@
 """Run terraform templates to provision and deprovision state bucket resource."""
-import json
 import os
-from typing import Dict
+from typing import Tuple
 
 import typer
 
@@ -13,7 +12,6 @@ from matcha_ml.cli.ui.print_messages import (
 from matcha_ml.cli.ui.spinner import Spinner
 from matcha_ml.cli.ui.status_message_builders import (
     build_status,
-    build_step_success_status,
     build_substep_success_status,
 )
 from matcha_ml.errors import MatchaTerraformError
@@ -29,7 +27,6 @@ class TemplateRunner:
         )
     )
     tfs: TerraformService = TerraformService(terraform_config)
-    bucket_config_file = os.path.join(tfs.config.working_dir, "state_bucket.config")
 
     def _check_terraform_installation(self) -> None:
         """Checks if terraform is installed on the host system.
@@ -113,24 +110,25 @@ class TemplateRunner:
             )
         )
 
-    def _write_bucket_config(self) -> None:
-        """Write the outputs of the Terraform deployed state storage to a bucket config file."""
+    def _get_terraform_output(self) -> Tuple[str, str]:
+        """Return the account name and the container name from terraform output.
+
+        Returns:
+            Tuple[str, str]: account name and the container name.
+        """
         tf_outputs = self.tfs.terraform_client.output()
-        bucket_configs: Dict[str, Dict[str, str]] = {}
-        bucket_configs.setdefault("remote_state_storage", {})
+
+        account_name = ""
+        container_name = ""
 
         for output_name, properties in tf_outputs.items():
             property_name = output_name.replace("remote_state_storage_", "")
-            bucket_configs["remote_state_storage"][property_name] = properties["value"]
+            if property_name == "account_name":
+                account_name = properties["value"]
+            else:
+                container_name = properties["value"]
 
-        with open(self.bucket_config_file, "w") as f:
-            json.dump(bucket_configs, f, indent=4)
-
-        print_status(
-            build_step_success_status(
-                f"The remote state storage configuration is written to {self.bucket_config_file}"
-            )
-        )
+        return account_name, container_name
 
     def _destroy_terraform(self) -> None:
         """Destroy the provisioned resources.
@@ -149,13 +147,14 @@ class TemplateRunner:
             if ret_code != 0:
                 raise MatchaTerraformError(tf_error=err)
 
-    def provision(self) -> None:
+    def provision(self) -> Tuple[str, str]:
         """Provision the azure storage bucket for remote state management."""
         self._check_terraform_installation()
         self._validate_terraform_config()
         self._initialize_terraform()
         self._apply_terraform()
-        self._write_bucket_config()
+
+        return self._get_terraform_output()
 
     def deprovision(self) -> None:
         """Destroy the provisioned resources."""

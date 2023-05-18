@@ -1,5 +1,6 @@
 """Test for interacting with terraform service to run the state storage template."""
 import os
+from typing import Callable, Dict, Union
 from unittest import mock
 from unittest.mock import MagicMock
 
@@ -10,6 +11,40 @@ from _pytest.capture import SysCapture
 from matcha_ml.errors import MatchaTerraformError
 from matcha_ml.services.terraform_service import TerraformConfig
 from matcha_ml.templates.run_state_storage_template import TemplateRunner
+
+
+@pytest.fixture
+def mock_output() -> Callable[[str, bool], Union[str, Dict[str, str]]]:
+    """Fixture for mocking the terraform output.
+
+    Returns:
+        Callable[[str, bool], Union[str, Dict[str, str]]]: the expected value based on the key
+    """
+
+    def output() -> str:
+        terraform_outputs = {
+            "remote_state_storage_account_name": {"value": "test_account_name"},
+            "remote_state_storage_container_name": {"value": "test_container_name"},
+        }
+        return terraform_outputs
+
+    return output
+
+
+@pytest.fixture
+def expected_bucket_config() -> dict:
+    """The expected output generated for the config file when a state bucket is provisioned.
+
+    Returns:
+        dict: the expected output
+    """
+    outputs = {
+        "remote_state_storage": {
+            "account_name": "test_account_name",
+            "container_name": "test_container_name",
+        }
+    }
+    return outputs
 
 
 @pytest.fixture

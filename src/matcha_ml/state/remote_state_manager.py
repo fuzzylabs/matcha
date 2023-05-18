@@ -1,11 +1,10 @@
 """Remote state manager module."""
 import dataclasses
 import os
-from typing import Optional, Tuple
+from typing import Optional
 
-import typer
+from dataclasses_json import DataClassJsonMixin
 
-from matcha_ml.cli._validation import prefix_typer_callback, region_typer_callback
 from matcha_ml.cli.ui.print_messages import print_status
 from matcha_ml.cli.ui.status_message_builders import (
     build_step_success_status,
@@ -18,14 +17,16 @@ from matcha_ml.templates.run_state_storage_template import TemplateRunner
 
 
 @dataclasses.dataclass
-class RemoteStateBucketConfig:
+class RemoteStateBucketConfig(DataClassJsonMixin):
     """Dataclass to store state bucket configuration."""
+
+    account_name: str
 
     container_name: str
 
 
 @dataclasses.dataclass
-class RemoteStateConfig:
+class RemoteStateConfig(DataClassJsonMixin):
     """Dataclass to store remote state configuration."""
 
     remote_state_bucket: RemoteStateBucketConfig
@@ -40,35 +41,6 @@ class RemoteStateManager:
     def __init__(self) -> None:
         """Initialise Remote State Manager."""
         ...
-
-    def fill_provision_variables(
-        self,
-        location: str,
-        prefix: str,
-    ) -> Tuple[str, str]:
-        """Prompt for the provision variables if they were not provided.
-
-        Args:
-            location (str): Azure location in which all resources will be provisioned, or empty string to fill in.
-            prefix (str): Prefix used for all resources, or empty string to fill in.
-
-        Returns:
-            Tuple[str, str]: A tuple of location and prefix which were filled in
-        """
-        if not location:
-            location = typer.prompt(
-                default=None,
-                text="What region should your resources be provisioned in (e.g., 'ukwest')?",
-                value_proc=region_typer_callback,
-            )
-        if not prefix:
-            prefix = typer.prompt(
-                text="Your resources need a name (an alphanumerical prefix; 3-11 character limit), what should matcha call them?",
-                default="matcha",
-                value_proc=prefix_typer_callback,
-            )
-
-        return location, prefix
 
     def provision_state_storage(
         self, location: str, prefix: str, verbose: Optional[bool] = False
@@ -90,11 +62,12 @@ class RemoteStateManager:
             os.path.dirname(__file__), os.pardir, "infrastructure/remote_state_storage"
         )
 
-        location, prefix = self.fill_provision_variables(location, prefix)
         config = build_template_configuration(location, prefix)
         build_template(config, template, destination, verbose)
 
-        template_runner.provision()
+        account_name, container_name = template_runner.provision()
+        self._write_matcha_config(account_name, container_name)
+
         print_status(build_step_success_status("Provisioning is complete!"))
 
     def deprovision_state_storage(self) -> None:
@@ -104,3 +77,30 @@ class RemoteStateManager:
 
         template_runner.deprovision()
         print_status(build_step_success_status("Destroying state bucket is complete!"))
+
+    def _write_matcha_config(self, account_name: str, container_name: str) -> None:
+        """Write the outputs of the Terraform deployed state storage to a bucket config file.
+
+        Args:
+            account_name (str): the storage account name of the remote state storage provisioned.
+            container_name (str): the container name of the remote state storage provisioned.
+        """
+        config_file_path = os.path.join(os.getcwd(), "matcha.config.json")
+
+        remote_state_bucket_config = RemoteStateBucketConfig(
+            account_name=account_name, container_name=container_name
+        )
+        remote_state_config = RemoteStateConfig(
+            remote_state_bucket=remote_state_bucket_config
+        )
+
+        matcha_config = remote_state_config.to_json(indent=4)
+
+        with open(config_file_path, "w") as f:
+            f.write(matcha_config)
+
+        print_status(
+            build_step_success_status(
+                f"The matcha configuration is written to {config_file_path}"
+            )
+        )
