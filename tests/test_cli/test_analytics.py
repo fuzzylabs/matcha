@@ -110,3 +110,18 @@ def test_opt_in_subcommand(
     # Check the contents of the config file match
     with open(config_file_path) as f:
         assert dict(yaml.safe_load(f)) == expected_configuration
+
+
+def test_cli__analytics_command_no_args(runner):
+    """Test cli analytics command when no argument passed."""
+    # Invoke analytics with no argument
+    result = runner.invoke(app, ["analytics"])
+
+    # Exit code 0 means there was no error
+    assert result.exit_code == 0
+
+    # Assert if particular string in present in output
+    assert (
+        "Enable or disable the collection of anonymous usage data (enabled by default)."
+        in result.stdout
+    )
