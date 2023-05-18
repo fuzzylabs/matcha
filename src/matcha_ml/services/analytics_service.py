@@ -34,28 +34,29 @@ def track(event_name: str) -> Callable[..., Any]:
         """
 
         @functools.wraps(func)
-        def inner(*args: Any, **kwargs: Any) -> Optional[Any]:
+        def inner(*args: Any, **kwargs: Any) -> Any:
             """Inner decorator function."""
-            ts = time()
-            error_code = None
-            result = None
-            try:
-                result = func(*args, **kwargs)
-            except Exception as e:
-                error_code = e
-            te = time()
-
             global_params = GlobalParameters()
-            matcha_state_service = MatchaStateService()
-
-            # Get the matcha.state UUID if it exists
-            matcha_state_uuid: Optional[str] = None
-            if matcha_state_service.check_state_file_exists():
-                matcha_state_id_dict = matcha_state_service.state_file.get("id")
-                if matcha_state_id_dict:
-                    matcha_state_uuid = matcha_state_id_dict.get("matcha_uuid")
 
             if not global_params.analytics_opt_out:
+                ts = time()
+                error_code = None
+                result = None
+                try:
+                    result = func(*args, **kwargs)
+                except Exception as e:
+                    error_code = e
+                te = time()
+
+                matcha_state_service = MatchaStateService()
+
+                # Get the matcha.state UUID if it exists
+                matcha_state_uuid: Optional[str] = None
+                if matcha_state_service.check_state_file_exists():
+                    matcha_state_id_dict = matcha_state_service.state_file.get("id")
+                    if matcha_state_id_dict:
+                        matcha_state_uuid = matcha_state_id_dict.get("matcha_uuid")
+
                 analytics.track(
                     global_params.user_id,
                     event_name,
@@ -66,6 +67,8 @@ def track(event_name: str) -> Callable[..., Any]:
                         "matcha_state_uuid": matcha_state_uuid,
                     },
                 )
+            else:
+                result = func(*args, **kwargs)
 
             return result
 
