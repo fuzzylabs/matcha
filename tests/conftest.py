@@ -48,13 +48,16 @@ def mocked_azure_client() -> AzureClient:
     ) as sub, patch(f"{INTERNAL_FUNCTION_STUB}.fetch_resource_groups") as rg, patch(
         f"{INTERNAL_FUNCTION_STUB}.resource_group_state"
     ) as rg_state, patch(
-        f"{INTERNAL_FUNCTION_STUB}._check_required_role_assignments"
+        f"{INTERNAL_FUNCTION_STUB}._fetch_user_roles"
     ) as roles:
         auth.return_value = True
         sub.return_value = "id"
         rg.return_value = None
         rg_state.return_value = ProvisionState.SUCCEEDED
-        roles.return_value = True
+        roles.return_value = [
+            "/subscriptions/id/providers/Microsoft.Authorization/roleDefinitions/8e3af657-a8ff-443c-a75c-2fe8c4bcb635",
+            "/subscriptions/id/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c",
+        ]
 
         yield AzureClient()
 
