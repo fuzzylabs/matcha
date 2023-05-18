@@ -66,3 +66,19 @@ class RemoteStateManager:
             bool: True if the remote state is provisioned.
         """
         return False
+
+    def provision_state_storage(
+        self, location: str, prefix: str, verbose: Optional[bool] = False
+    ) -> None:
+        """Provision the state bucket using templates.
+
+        Args:
+            location (str): location of where this bucket will be provisioned
+            prefix (str): Prefix used for all resources, or empty string to fill in.
+            verbose (Optional[bool], optional): additional output is show when True. Defaults to False.
+        """
+        ...
+
+    def deprovision_state_storage(self) -> None:
+        """Destroy the state bucket provisioned."""
+        ...
