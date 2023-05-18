@@ -63,7 +63,6 @@ def test_segment_track_recieves_the_correct_arguments(
     # Check that the Segment track arguments are as expected
     assert "TestUserID" in tracked_arguments
     assert "destroy" in tracked_arguments
-    assert "destroy" in tracked_arguments
     assert {
         "time_taken",
         "error_type",
