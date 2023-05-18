@@ -1,4 +1,7 @@
-"""The analytics service interface."""
+"""The analytics service interface.
+
+This approach to collecting usage data was inspired by ZenML; source: https://github.com/zenml-io/zenml/blob/main/src/zenml/utils/analytics_utils.py
+"""
 import functools
 from enum import Enum
 from time import time
