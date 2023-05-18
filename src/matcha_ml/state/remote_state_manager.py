@@ -1,6 +1,7 @@
 """Remote state manager module."""
+import contextlib
 import dataclasses
-from typing import Optional
+from typing import Iterator, Optional
 
 from dataclasses_json import DataClassJsonMixin
 
@@ -13,9 +14,14 @@ DEFAULT_CONFIG_NAME = "matcha.config.json"
 class RemoteStateBucketConfig(DataClassJsonMixin):
     """Dataclass to store state bucket configuration."""
 
+    # Azure storage account name
     account_name: str
 
+    # Azure storage container name
     container_name: str
+
+    # Azure Managed Identity client ID
+    client_id: str
 
 
 @dataclasses.dataclass
@@ -46,7 +52,7 @@ class RemoteStateManager:
         """
         return RemoteStateConfig(
             remote_state_bucket=RemoteStateBucketConfig(
-                account_name="", container_name=""
+                account_name="", container_name="", client_id=""
             )
         )
 
@@ -57,7 +63,7 @@ class RemoteStateManager:
         Returns:
             AzureStorage: to interact with blob storage on Azure
         """
-        return AzureStorage("")
+        return AzureStorage("", "")
 
     def is_state_provisioned(self) -> bool:
         """Check if remote state has been provisioned.
@@ -82,3 +88,20 @@ class RemoteStateManager:
     def deprovision_state_storage(self) -> None:
         """Destroy the state bucket provisioned."""
         ...
+
+    def download(self) -> None:
+        """Download the remote state into the local matcha state directory."""
+        ...
+
+    def upload(self) -> None:
+        """Upload the local matcha state to the remote state storage."""
+        ...
+
+    @contextlib.contextmanager
+    def use_remote_state(self) -> Iterator[None]:
+        """Context manager to use remote state.
+
+        Downloads the state before executing the code.
+        Upload the state when context is finished.
+        """
+        yield
