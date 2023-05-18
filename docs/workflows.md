@@ -1,6 +1,6 @@
 # :building_construction: MLOps Workflows
 
-`matcha` is a tool for provisioning MLOps environments to the cloud and to give you some examples of how to use `matcha` in a practical setting, we've created a set of example workflows.
+Matcha is a tool for provisioning MLOps environments to the cloud and to give you some examples of how to use `matcha` in a practical setting, we've created a set of example workflows.
 
 You can find them [here](https://github.com/fuzzylabs/matcha-examples).
 

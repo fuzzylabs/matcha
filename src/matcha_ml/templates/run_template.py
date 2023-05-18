@@ -1,6 +1,7 @@
 """Run terraform templates to provision and deprovision resources."""
 import json
 import os
+import uuid
 from collections import defaultdict
 from typing import Dict, Tuple
 
@@ -193,6 +194,9 @@ class TemplateRunner:
             )
             state_outputs[resource_type].setdefault("flavor", flavor)
             state_outputs[resource_type][resource_name] = properties["value"]
+
+        # Create a unique matcha state identifier
+        state_outputs["id"] = {"matcha_uuid": str(uuid.uuid4())}
 
         self._update_state_file(state_outputs)
 
