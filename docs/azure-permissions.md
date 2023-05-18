@@ -1,14 +1,14 @@
 # Azure Permissions
 
-Before getting started with `matcha`, we need to make sure that you have the correct permissions to provision resources on Azure.
+Before getting started with Matcha, we need to make sure that you have the correct permissions to provision resources on Azure.
 
 There is a presumption made here that you have an Azure account with an active subscription which has billing enabled. For a guide on how to set that up, see [here](https://learn.microsoft.com/en-us/dynamics-nav/how-to--sign-up-for-a-microsoft-azure-subscription).
 
-## Why does `matcha` require certain permissions?
+## Why does Matcha require certain permissions?
 
-As a provisioning tool, `matcha` interacts with Azure on your behalf, hiding away the complexities of standing up resources. To do the provisioning, `matcha` issues commands through your Azure account and to do that, your account needs to have the correct permissions enabled within a subscription.
+As a provisioning tool, Matcha interacts with Azure on your behalf, hiding away the complexities of standing up resources. To do the provisioning, Matcha issues commands through your Azure account and to do that, your account needs to have the correct permissions enabled within a subscription.
 
-## What permissions does `matcha` require?
+## What permissions does Matcha require?
 
 In its current form, the following Azure permissions are required:
 

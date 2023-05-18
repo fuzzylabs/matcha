@@ -36,7 +36,6 @@ def destroy_resources() -> None:
         raise typer.Exit()
 
     if template_runner.is_approved(verb="destroy"):
-
         # deprovision the resources
         template_runner.deprovision()
         print_status(build_step_success_status("Destroying resources is complete!"))

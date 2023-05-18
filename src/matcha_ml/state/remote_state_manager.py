@@ -1,7 +1,8 @@
 """Remote state manager module."""
+import contextlib
 import dataclasses
 import os.path
-from typing import Optional
+from typing import Iterator, Optional
 
 from dataclasses_json import DataClassJsonMixin
 
@@ -15,9 +16,14 @@ DEFAULT_CONFIG_NAME = "matcha.config.json"
 class RemoteStateBucketConfig(DataClassJsonMixin):
     """Dataclass to store state bucket configuration."""
 
+    # Azure storage account name
     account_name: str
 
+    # Azure storage container name
     container_name: str
+
+    # Azure Managed Identity client ID
+    client_id: str
 
 
 @dataclasses.dataclass
@@ -75,7 +81,8 @@ class RemoteStateManager:
         if self._azure_storage is None:
             try:
                 self._azure_storage = AzureStorage(
-                    self.configuration.remote_state_bucket.account_name
+                    self.configuration.remote_state_bucket.account_name,
+                    self.configuration.remote_state_bucket.client_id,
                 )
             except Exception as e:
                 raise MatchaError(f"Error while creating Azure Storage client: {e}")
@@ -100,3 +107,36 @@ class RemoteStateManager:
             return False
 
         return True
+
+    def provision_state_storage(
+        self, location: str, prefix: str, verbose: Optional[bool] = False
+    ) -> None:
+        """Provision the state bucket using templates.
+
+        Args:
+            location (str): location of where this bucket will be provisioned
+            prefix (str): Prefix used for all resources, or empty string to fill in.
+            verbose (Optional[bool], optional): additional output is show when True. Defaults to False.
+        """
+        ...
+
+    def deprovision_state_storage(self) -> None:
+        """Destroy the state bucket provisioned."""
+        ...
+
+    def download(self) -> None:
+        """Download the remote state into the local matcha state directory."""
+        ...
+
+    def upload(self) -> None:
+        """Upload the local matcha state to the remote state storage."""
+        ...
+
+    @contextlib.contextmanager
+    def use_remote_state(self) -> Iterator[None]:
+        """Context manager to use remote state.
+
+        Downloads the state before executing the code.
+        Upload the state when context is finished.
+        """
+        yield

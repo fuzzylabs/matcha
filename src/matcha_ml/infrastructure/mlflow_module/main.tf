@@ -18,6 +18,7 @@ resource "helm_release" "mlflow_tracking" {
     type  = "auto"
   }
 
+  # Derived from ZenML's stack recipes; source: https://github.com/zenml-io/mlops-stacks/blob/8eb06596bf836d3a3dd2634fbc7f2b5687421811/aws-minimal/mlflow-module/mlflow.tf#L39
   # set values for Azure Blob Storage
   set {
     name  = "artifactRoot.azureBlob.enabled"
