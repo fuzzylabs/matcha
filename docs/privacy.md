@@ -1,8 +1,6 @@
-# Privacy Statement
+# Why we collect usage data
 
 Matcha is an open-source MLOps tool created and maintained by a global team of passionate engineers at Fuzzy Labs. We, alongside the broader Matcha community, seek to continuously enhance Matcha, and analytics are an important piece in shaping our efforts.
-
-## Why we collect analytics
 
 Our goal is to build a tool that is as useful, and as usable, as possible. In order to achieve this, it’s important that we’re able to understand how Matcha is used in the hands of our community.
 
@@ -11,18 +9,6 @@ Analytics and community engagement are vital in shaping the evolution of Matcha.
 Not only do analytics allow us to build a user-informed roadmap for future features, but they also enable up to attract partnerships and community engagement that will support and accelerate this development.
 
 None of the data we collect will be personally identifiable.
-
-## How we collect analytics
-
-We collect a variety of data from a number of different sources:
-
-- *anonymized* analytics from within the Matcha tool
-- pip download data
-- GitHub usage data
-- direct developer to user conversations
-
-
-All data we collect will be stored securely and used only for the reasons stated above.
 
 ## Matcha tool analytics
 
@@ -33,7 +19,7 @@ For each command that is run (e.g. `matcha provision`)
 2. The timestamp of when the command was run
 3. An anonymous random user ID, this is used to correctly identify the current number of users of our tool
 4. An anonymous random state ID associated with your current `matcha.state` file
-5. The type of operating system used e.g. '`linux`' or '`darwin`', this is used to see what support is required for different operating systems
+5. The names of any exceptions thrown during the command, this does not include the associated exception message
 
 # Opting out
 

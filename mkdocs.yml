@@ -13,7 +13,7 @@ nav:
     - Cost: 'costings.md'
   - Workflows: 'workflows.md'
   - Inside Matcha: 'inside-matcha.md'
-  - Privacy Statement: 'privacy.md'
+  - Why we collect usage data: 'privacy.md'
 
 theme:
   name: material
