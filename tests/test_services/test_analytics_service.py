@@ -37,10 +37,10 @@ def mocked_global_parameters_service(matcha_testing_directory):
         yield GlobalParameters()
 
 
-def test_cli_destroy_command_analytics_are_mocked(
+def test_segment_track_recieves_the_correct_arguments(
     runner, matcha_testing_directory, mocked_segment_track_decorator
 ):
-    """Test no external api calls are sent with Segment.
+    """Test no the Segment track function recieves the expected arguments when a user is opted in to analytics.
 
     Args:
         runner (CliRunner): typer CLI runner
@@ -58,6 +58,17 @@ def test_cli_destroy_command_analytics_are_mocked(
 
     # Check that the mocked segment track was called
     mocked_segment_track_decorator.assert_called()
+
+    # Check that the Segment track arguments are as expected
+    assert "TestUserID" in mocked_segment_track_decorator.call_args.args
+    assert "destroy" in mocked_segment_track_decorator.call_args.args
+    assert "destroy" in mocked_segment_track_decorator.call_args.args
+    assert {
+        "time_taken",
+        "error_type",
+        "command_succeeded",
+        "matcha_state_uuid",
+    } == set(mocked_segment_track_decorator.call_args.args[2].keys())
 
 
 def test_tracking_does_not_happen_when_opted_out(

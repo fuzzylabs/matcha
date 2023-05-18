@@ -19,7 +19,7 @@ class AnalyticsEvent(str, Enum):
     DESTROY = "destroy"
 
 
-def track(event_name: str) -> Callable[..., Any]:
+def track(event_name: AnalyticsEvent) -> Callable[..., Any]:
     """Track decorator for tracking user analytics with Segment.
 
     Args:
@@ -59,7 +59,7 @@ def track(event_name: str) -> Callable[..., Any]:
 
                 analytics.track(
                     global_params.user_id,
-                    event_name,
+                    event_name.value,
                     {
                         "time_taken": te - ts,
                         "error_type": f"{error_code.__class__}.{error_code.__class__.__name__}",
