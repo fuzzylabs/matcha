@@ -6,7 +6,7 @@ from unittest.mock import patch
 from matcha_ml.storage.azure_storage import AzureStorage
 from azure.storage.blob import BlobProperties, BlobServiceClient
 
-STORAGE_FUNCTION_STUB = "matcha_ml.storage.azure_storage"
+CLASS_STUB = "matcha_ml.storage.azure_storage"
 
 
 @pytest.fixture
@@ -16,7 +16,7 @@ def mock_blob_service() -> BlobServiceClient:
     Yields:
         BlobServiceClient: Mocked blob service client
     """
-    with patch(f"{STORAGE_FUNCTION_STUB}.BlobServiceClient") as mock_blob_service:
+    with patch(f"{CLASS_STUB}.BlobServiceClient") as mock_blob_service:
         yield mock_blob_service
 
 
