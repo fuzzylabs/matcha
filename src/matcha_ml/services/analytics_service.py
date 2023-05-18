@@ -34,12 +34,13 @@ def track(event_name: str) -> Callable[..., Any]:
         """
 
         @functools.wraps(func)
-        def inner(*args: Any, **kwargs: Any) -> None:
+        def inner(*args: Any, **kwargs: Any) -> Optional[Any]:
             """Inner decorator function."""
             ts = time()
             error_code = None
+            result = None
             try:
-                func(*args, **kwargs)
+                result = func(*args, **kwargs)
             except Exception as e:
                 error_code = e
             te = time()
@@ -65,6 +66,8 @@ def track(event_name: str) -> Callable[..., Any]:
                         "matcha_state_uuid": matcha_state_uuid,
                     },
                 )
+
+            return result
 
         return inner
 
