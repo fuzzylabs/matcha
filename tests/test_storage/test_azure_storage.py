@@ -1,10 +1,11 @@
 """Test suite to mock testing for AzureStorage class."""
-import pytest
 import os
 from unittest.mock import patch
 
-from matcha_ml.storage.azure_storage import AzureStorage
+import pytest
 from azure.storage.blob import BlobProperties, BlobServiceClient
+
+from matcha_ml.storage.azure_storage import AzureStorage
 
 CLASS_STUB = "matcha_ml.storage.azure_storage"
 
@@ -77,7 +78,9 @@ def test_upload_folder(
         mock_blob_client.upload_blob.assert_called()
 
         # Check if upload_blob function is called exactly twice
-        assert mock_blob_client.upload_blob.call_count == 2
+        assert mock_blob_client.upload_blob.call_count == len(
+            os.listdir(matcha_testing_directory)
+        )
 
 
 def test_download_file(mock_blob_service, matcha_testing_directory):
@@ -138,4 +141,6 @@ def test_download_folder(
         mock_blob_client.download_blob.assert_called()
 
         # Check if download_blob function is called exactly twice
-        assert mock_blob_client.download_blob.call_count == 2
+        assert mock_blob_client.download_blob.call_count == len(
+            os.listdir(matcha_testing_directory)
+        )
