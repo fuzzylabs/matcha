@@ -7,3 +7,7 @@ output "remote_state_storage_container_name" {
   description = "The Azure Blob Storage Container path for remote matcha state"
   value       = module.state_storage.blobstorage_container_path
 }
+
+output "client_id" {
+  value = module.managed_identity.client_id
+} 

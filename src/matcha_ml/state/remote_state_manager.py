@@ -106,8 +106,8 @@ class RemoteStateManager:
         config = build_template_configuration(location, prefix)
         build_template(config, template, destination, verbose)
 
-        account_name, container_name = template_runner.provision()
-        self._write_matcha_config(account_name, container_name)
+        account_name, container_name, client_id = template_runner.provision()
+        self._write_matcha_config(account_name, container_name, client_id)
 
         print_status(build_step_success_status("Provisioning is complete!"))
 
@@ -119,17 +119,22 @@ class RemoteStateManager:
         template_runner.deprovision()
         print_status(build_step_success_status("Destroying state bucket is complete!"))
 
-    def _write_matcha_config(self, account_name: str, container_name: str) -> None:
+    def _write_matcha_config(
+        self, account_name: str, container_name: str, client_id: str
+    ) -> None:
         """Write the outputs of the Terraform deployed state storage to a bucket config file.
 
         Args:
             account_name (str): the storage account name of the remote state storage provisioned.
             container_name (str): the container name of the remote state storage provisioned.
+            client_id (str): Azure client ID.
         """
         config_file_path = os.path.join(os.getcwd(), "matcha.config.json")
 
         remote_state_bucket_config = RemoteStateBucketConfig(
-            account_name=account_name, container_name=container_name
+            account_name=account_name,
+            container_name=container_name,
+            client_id=client_id,
         )
         remote_state_config = RemoteStateConfig(
             remote_state_bucket=remote_state_bucket_config

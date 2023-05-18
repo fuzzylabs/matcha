@@ -110,25 +110,28 @@ class TemplateRunner:
             )
         )
 
-    def _get_terraform_output(self) -> Tuple[str, str]:
+    def _get_terraform_output(self) -> Tuple[str, str, str]:
         """Return the account name and the container name from terraform output.
 
         Returns:
-            Tuple[str, str]: account name and the container name.
+            Tuple[str, str]: account name, the container name and azure client id.
         """
         tf_outputs = self.tfs.terraform_client.output()
 
         account_name = ""
         container_name = ""
+        client_id = ""
 
         for output_name, properties in tf_outputs.items():
             property_name = output_name.replace("remote_state_storage_", "")
             if property_name == "account_name":
                 account_name = properties["value"]
-            else:
+            elif property_name == "container_name":
                 container_name = properties["value"]
+            elif property_name == "client_id":
+                client_id = properties["value"]
 
-        return account_name, container_name
+        return account_name, container_name, client_id
 
     def _destroy_terraform(self) -> None:
         """Destroy the provisioned resources.
@@ -147,7 +150,7 @@ class TemplateRunner:
             if ret_code != 0:
                 raise MatchaTerraformError(tf_error=err)
 
-    def provision(self) -> Tuple[str, str]:
+    def provision(self) -> Tuple[str, str, str]:
         """Provision the azure storage bucket for remote state management."""
         self._check_terraform_installation()
         self._validate_terraform_config()

@@ -17,6 +17,7 @@ from matcha_ml.errors import MatchaPermissionError
 SUBMODULE_NAMES = [
     "resource_group",
     "state_storage",
+    "managed_identity",
 ]
 ALLOWED_EXTENSIONS = ["tf", "yaml", "tpl"]
 
