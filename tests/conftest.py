@@ -16,7 +16,7 @@ INTERNAL_FUNCTION_STUB = "matcha_ml.services.AzureClient"
 
 
 @pytest.fixture
-def runner():
+def runner() -> CliRunner:
     """A fixture for cli runner."""
     return CliRunner()
 
