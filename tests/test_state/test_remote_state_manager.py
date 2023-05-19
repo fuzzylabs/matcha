@@ -132,7 +132,7 @@ def test_deprovision_state_storage(capsys: SysCapture) -> None:
         capsys (SysCapture): fixture to capture stdout and stderr
     """
     with patch(
-        "matcha_ml.templates.run_state_storage_template.TemplateRunner._destroy_terraform"
+        "matcha_ml.templates.run_state_storage_template.TemplateRunner.deprovision"
     ) as destroy:
         destroy.return_value = None
         remote_state_manager = RemoteStateManager()

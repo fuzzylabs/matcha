@@ -229,6 +229,7 @@ def test_provision(template_runner: TemplateRunner):
     template_runner._validate_terraform_config = MagicMock()
     template_runner._initialize_terraform = MagicMock()
     template_runner._apply_terraform = MagicMock()
+    template_runner._get_terraform_output = MagicMock()
 
     with mock.patch("typer.confirm") as mock_confirm:
         mock_confirm.return_value = False
@@ -240,6 +241,7 @@ def test_provision(template_runner: TemplateRunner):
         template_runner.provision()
         template_runner._initialize_terraform.assert_called()
         template_runner._apply_terraform.assert_called()
+        template_runner._get_terraform_output.assert_called()
 
 
 def test_deprovision(template_runner: TemplateRunner):
