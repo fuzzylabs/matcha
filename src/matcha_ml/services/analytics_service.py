@@ -27,7 +27,7 @@ def track(event_name: AnalyticsEvent) -> Callable[..., Any]:
     """Track decorator for tracking user analytics with Segment.
 
     Args:
-        event_name (str): Name of the command or event being called, e.g. 'provision'
+        event_name (AnalyticsEvent): Name of the command or event being called, e.g. 'provision'
     """
 
     def decorator(func: Callable[..., Any]) -> Callable[..., Any]:
