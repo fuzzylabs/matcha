@@ -141,7 +141,7 @@ class TemplateRunner:
         """
         print()
         print_status(
-            build_status(f"{Emojis.WAITING.value} Destroying your resources...")
+            build_status(f"{Emojis.WAITING.value} Destroying remote state management")
         )
         print()
         with Spinner("Destroying"):

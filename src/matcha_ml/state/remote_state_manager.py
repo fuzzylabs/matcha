@@ -117,7 +117,9 @@ class RemoteStateManager:
         template_runner = TemplateRunner()
 
         template_runner.deprovision()
-        print_status(build_step_success_status("Destroying state bucket is complete!"))
+        print_status(
+            build_step_success_status("Destroying remote state management is complete!")
+        )
 
     def _write_matcha_config(
         self, account_name: str, container_name: str, client_id: str

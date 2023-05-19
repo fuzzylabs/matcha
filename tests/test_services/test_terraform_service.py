@@ -88,13 +88,17 @@ def test_check_matcha_directory_exists(
     os.chdir("..")
 
 
-def test_check_matcha_directory_does_not_exist(terraform_test_config: TerraformConfig):
+def test_check_matcha_directory_does_not_exist(
+    tmp_path: str, terraform_test_config: TerraformConfig
+):
     """Test service returns False if .matcha file does not exists within current working directory.
 
     Args:
         tmp_path (str): Pytest temporary path fixture for testing.
         terraform_test_config (TerraformConfig): test terraform service config.
     """
+    os.chdir(tmp_path)
+
     tfs = TerraformService(terraform_test_config)
 
     with mock.patch("python_terraform.Terraform") as mock_tf:

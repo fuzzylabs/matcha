@@ -5,15 +5,35 @@ import os
 from typing import Dict
 from unittest.mock import patch
 
-import typer
+import pytest
+from _pytest.capture import SysCapture
 
-from matcha_ml.state.remote_state_manager import RemoteStateManager
+from matcha_ml.state.remote_state_manager import (
+    RemoteStateManager,
+)
 from matcha_ml.templates.build_templates.state_storage_template import SUBMODULE_NAMES
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 TEMPLATE_DIR = os.path.join(
     BASE_DIR, os.pardir, os.pardir, "src", "matcha_ml", "infrastructure"
 )
+
+
+@pytest.fixture
+def expected_matcha_config() -> Dict[str, Dict[str, str]]:
+    """A fixture for the expected configuration for testing whether configs are generated as expected.
+
+    Returns:
+        Dict[str, Dict[str, str]]: the expected matcha configuration.
+    """
+    config = {
+        "remote_state_bucket": {
+            "account_name": "test_account_name",
+            "container_name": "test_container_name",
+            "client_id": "test_client_id",
+        }
+    }
+    return config
 
 
 def assert_infrastructure(
@@ -52,30 +72,29 @@ def assert_infrastructure(
     assert tf_vars == expected_tf_vars
 
 
-def test_fill_provision_variables():
-    """Test whether the fill_provision_variables function returns the expected value based on inputs."""
-    remote_state_manager = RemoteStateManager()
+def assert_matcha_config(
+    project_root_path: str,
+    expected_config: Dict[str, Dict[str, str]],
+):
+    """Assert if the matcha configuration is valid.
 
-    expected_location = "test_location"
-    expected_prefix = "test_prefix"
+    Args:
+        project_root_path (str): the root of the project, where the matcha configuration should live
+        expected_config (Dict[str, Dict[str, str]]): expected matcha configurations
+    """
+    # Check that Terraform variables file exists and content is equal/correct
+    matcha_config_file_path = os.path.join(project_root_path, "matcha.config.json")
+    assert os.path.exists(matcha_config_file_path)
 
-    location, prefix = remote_state_manager.fill_provision_variables(
-        "test_location", "test_prefix"
-    )
+    with open(matcha_config_file_path) as f:
+        matcha_config = json.load(f)
 
-    assert location == expected_location
-    assert prefix == expected_prefix
-
-    with patch.object(
-        typer, "prompt", side_effect=[expected_location, expected_prefix]
-    ):
-        location, prefix = remote_state_manager.fill_provision_variables("", "")
-
-    assert location == expected_location
-    assert prefix == expected_prefix
+    assert matcha_config == expected_config
 
 
-def test_provision_state_storage(matcha_testing_directory):
+def test_provision_state_storage(
+    matcha_testing_directory: str, expected_matcha_config: Dict[str, Dict[str, str]]
+):
     """Test that provision_state_storage behaves as expected.
 
     We do not want to provision any resources in real environment.
@@ -83,6 +102,7 @@ def test_provision_state_storage(matcha_testing_directory):
 
     Args:
         matcha_testing_directory (str): temporary working directory for tests.
+        expected_matcha_config (Dict[str, Dict[str, str]]): the expected matcha config.
     """
     os.chdir(matcha_testing_directory)
     remote_state_manager = RemoteStateManager()
@@ -101,3 +121,45 @@ def test_provision_state_storage(matcha_testing_directory):
     assert_infrastructure(
         state_storage_destination_path, state_storage_expected_tf_vars
     )
+
+    assert_matcha_config(matcha_testing_directory, expected_matcha_config)
+
+
+def test_deprovision_state_storage(capsys: SysCapture) -> None:
+    """Test whether deprovision state storage behaves as expected.
+
+    Args:
+        capsys (SysCapture): fixture to capture stdout and stderr
+    """
+    with patch(
+        "matcha_ml.templates.run_state_storage_template.TemplateRunner._destroy_terraform"
+    ) as destroy:
+        destroy.return_value = None
+        remote_state_manager = RemoteStateManager()
+
+        remote_state_manager.deprovision_state_storage()
+
+        captured = capsys.readouterr()
+
+        expected_output = "Destroying remote state management is complete!"
+
+        assert expected_output in captured.out
+
+
+def test_write_matcha_config(
+    matcha_testing_directory: str, expected_matcha_config: Dict[str, Dict[str, str]]
+):
+    """Test whether the write_matcha_config() function is able to write the expected config to the expected destination.
+
+    Args:
+        matcha_testing_directory (str): temporary working directory for tests.
+        expected_matcha_config (Dict[str, Dict[str, str]]): the expected matcha config.
+    """
+    os.chdir(matcha_testing_directory)
+    remote_state_manager = RemoteStateManager()
+
+    remote_state_manager._write_matcha_config(
+        "test_account_name", "test_container_name", "test_client_id"
+    )
+
+    assert_matcha_config(matcha_testing_directory, expected_matcha_config)

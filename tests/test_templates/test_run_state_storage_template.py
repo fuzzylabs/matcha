@@ -199,7 +199,7 @@ def test_destroy_terraform(capsys: SysCapture, template_runner: TemplateRunner):
     """
     template_runner.tfs.destroy = MagicMock(return_value=(0, "", ""))
 
-    expected = "Destroying your resources"
+    expected = "Destroying remote state management"
 
     template_runner._destroy_terraform()
 
