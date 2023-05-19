@@ -1,112 +1,94 @@
 """Test suite testing command for opting out of analytics."""
-import os
-from typing import Dict, Union
-from unittest import mock
+from unittest.mock import patch
 
-import pytest
-import yaml
+from typer.testing import CliRunner
 
 from matcha_ml.cli.cli import app
-from matcha_ml.services.global_parameters_service import GlobalParameters
 
-INTERNAL_FUNCTION_STUB = "matcha_ml.services.global_parameters_service.GlobalParameters"
-
-
-@pytest.fixture(autouse=True)
-def teardown_singleton():
-    """Tears down the singleton before each test case by clearing the current object."""
-    GlobalParameters._instance = None
+INTERNAL_FUNCTION_STUB = "matcha_ml.core.core"
 
 
-@pytest.fixture
-def expected_configuration() -> Dict[str, Union[str, bool]]:
-    """Pytest fixture to return expected configuration.
-
-    Returns:
-        Dict[str, Union[str, bool]]: Dictionary containing expected configuration
-    """
-    return {"analytics_opt_out": False, "user_id": "dummy_user_id"}
-
-
-def test_opt_out_subcommand(
-    runner,
-    matcha_testing_directory: str,
-    expected_configuration: Dict[str, Union[str, bool]],
-) -> None:
-    """Test opt-out command works.
+def test_cli_analytics_command_help(runner: CliRunner) -> None:
+    """Test cli for analytics command help.
 
     Args:
-        runner: Mock runner
-        matcha_testing_directory (str): Temp directory
-        expected_configuration (Dict[str, Union[str, bool]]): Dictionary containing expected configuration
+        runner (CliRunner): typer CLI runner
     """
-    config_file_path = os.path.join(
-        matcha_testing_directory, ".matcha-ml", "config.yaml"
+    # Invoke analytics command with help option
+    result = runner.invoke(app, ["analytics", "--help"])
+
+    # Exit code 0 means there was no error
+    assert result.exit_code == 0
+
+    # Assert string is present in cli output
+    assert (
+        "Enable or disable the collection of anonymous usage data (enabled by default)."
+        in result.stdout
     )
 
-    expected_configuration["analytics_opt_out"] = True
 
-    # Check if config file is not present
-    assert not os.path.exists(config_file_path)
-
-    with mock.patch(
-        f"{INTERNAL_FUNCTION_STUB}.default_config_file_path",
-        new_callable=mock.PropertyMock,
-    ) as file_path, mock.patch(
-        f"{INTERNAL_FUNCTION_STUB}.user_id",
-        new_callable=mock.PropertyMock,
-    ) as uid:
-        file_path.return_value = config_file_path
-        uid.return_value = "dummy_user_id"
-        result = runner.invoke(app, ["analytics", "opt-out"])
-
-        # Check if running command is success
-        assert result.exit_code == 0
-
-    # Check if config file is present
-    assert os.path.exists(config_file_path)
-
-    # Check the contents of the config file match
-    with open(config_file_path) as f:
-        assert dict(yaml.safe_load(f)) == expected_configuration
-
-
-def test_opt_in_subcommand(
-    runner,
-    matcha_testing_directory: str,
-    expected_configuration: Dict[str, Union[str, bool]],
-) -> None:
-    """Test opt-in command works.
+def test_cli_analytics_command_default_help(runner: CliRunner) -> None:
+    """Test cli for analytics command help.
 
     Args:
-        runner: Mock runner
-        matcha_testing_directory (str): Temp directory
-        expected_configuration (Dict[str, Union[str, bool]]): Dictionary containing expected configuration
+        runner (CliRunner): typer CLI runner
     """
-    config_file_path = os.path.join(
-        matcha_testing_directory, ".matcha-ml", "config.yaml"
+    # Invoke analytics command with no option
+    result = runner.invoke(app, ["analytics"])
+
+    # Exit code 0 means there was no error
+    assert result.exit_code == 0
+
+    # Assert string is present in cli output
+    assert (
+        "Enable or disable the collection of anonymous usage data (enabled by default)."
+        in result.stdout
     )
 
-    # Check if config file is not present
-    assert not os.path.exists(config_file_path)
 
-    with mock.patch(
-        f"{INTERNAL_FUNCTION_STUB}.default_config_file_path",
-        new_callable=mock.PropertyMock,
-    ) as file_path, mock.patch(
-        f"{INTERNAL_FUNCTION_STUB}.user_id",
-        new_callable=mock.PropertyMock,
-    ) as uid:
-        file_path.return_value = config_file_path
-        uid.return_value = "dummy_user_id"
+def test_cli_analytics_opt_in(runner: CliRunner) -> None:
+    """Test cli for analytic command opt-in.
+
+    Args:
+        runner (CliRunner): typer CLI runner
+    """
+    with patch(f"{INTERNAL_FUNCTION_STUB}.analytics_opt_in") as mocked_opt_in:
+
+        # Invoke analytics command and opt-in sub-command
         result = runner.invoke(app, ["analytics", "opt-in"])
 
-        # Check if running command is success
+        # Exit code 0 means there was no error
         assert result.exit_code == 0
 
-    # Check if config file is present
-    assert os.path.exists(config_file_path)
+        #  Assert string in present in cli output
+        assert (
+            "Thank you for enabling data collection, this helps us improve matcha and anonymously understand how people are using the tool."
+            in result.stdout
+        )
 
-    # Check the contents of the config file match
-    with open(config_file_path) as f:
-        assert dict(yaml.safe_load(f)) == expected_configuration
+        # Assert core.analytics_opt_out is called
+        mocked_opt_in.assert_called_once()
+
+
+def test_cli_analytics_opt_out(runner: CliRunner) -> None:
+    """Test cli for analytic command opt-out.
+
+    Args:
+        runner (CliRunner): typer CLI runner
+    """
+    with patch(f"{INTERNAL_FUNCTION_STUB}.analytics_opt_out") as mocked_opt_out:
+
+        # Invoke analytics command and opt-in sub-command
+        result = runner.invoke(app, ["analytics", "opt-out"])
+
+        # Exit code 0 means there was no error
+        assert result.exit_code == 0
+
+        #  Assert string in present in cli output
+        assert (
+            "Data collection has been turned off and no data will be collected - you can turn this back on by running the command: 'matcha analytics opt-in'."
+            in result.stdout
+        )
+
+        # Assert core.analytics_opt_out is called
+        mocked_opt_out.assert_called_once()
