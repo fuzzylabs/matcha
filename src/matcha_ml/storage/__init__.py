@@ -1,4 +1,4 @@
-# """Storage sub-module."""
-# from .azure_storage import AzureStorage
+"""Storage sub-module."""
+from .azure_storage import AzureStorage
 
-# __all__ = ["AzureStorage"]
+__all__ = ["AzureStorage"]

@@ -5,7 +5,7 @@ from typing import Iterator, Optional
 
 from dataclasses_json import DataClassJsonMixin
 
-from matcha_ml.storage.azure_storage import AzureStorage
+from matcha_ml.storage import AzureStorage
 
 DEFAULT_CONFIG_NAME = "matcha.config.json"
 
@@ -89,13 +89,27 @@ class RemoteStateManager:
         """Destroy the state bucket provisioned."""
         ...
 
-    def download(self) -> None:
-        """Download the remote state into the local matcha state directory."""
-        ...
+    def download(self, dest_folder_path: str) -> None:
+        """Download the remote state into the local matcha state directory.
 
-    def upload(self) -> None:
-        """Upload the local matcha state to the remote state storage."""
-        ...
+        Args:
+            dest_folder_path (str): Path to local matcha state directory
+        """
+        self.azure_storage.download_folder(
+            container_name=self.configuration.remote_state_bucket.container_name,
+            dest_folder_path=dest_folder_path,
+        )
+
+    def upload(self, local_folder_path: str) -> None:
+        """Upload the local matcha state to the remote state storage.
+
+        Args:
+            local_folder_path (str): Path to local matcha state directory
+        """
+        self.azure_storage.upload_folder(
+            container_name=self.configuration.remote_state_bucket.container_name,
+            src_folder_path=local_folder_path,
+        )
 
     @contextlib.contextmanager
     def use_remote_state(self) -> Iterator[None]:

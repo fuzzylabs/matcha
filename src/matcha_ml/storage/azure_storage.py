@@ -9,7 +9,7 @@ from matcha_ml.services.azure_service import AzureClient
 class AzureStorage:
     """Class to interact with Azure blob storage."""
 
-    az_client: AzureClient = AzureClient()
+    az_client: AzureClient
     blob_service_client: BlobServiceClient
 
     def __init__(self, account_name: str, resource_group_name: str) -> None:
@@ -19,6 +19,7 @@ class AzureStorage:
             account_name (str): Azure storage account name
             resource_group_name (str): Name of resource group containing given account name
         """
+        self.az_client = AzureClient()
         _conn_str = self.az_client.fetch_connection_string(
             storage_account_name=account_name, resource_group_name=resource_group_name
         )
