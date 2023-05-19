@@ -10,6 +10,7 @@ from azure.mgmt.confluent.models._confluent_management_client_enums import (
 from typer.testing import CliRunner
 
 from matcha_ml.services import AzureClient
+from matcha_ml.services.azure_service import ROLE_ID_MAPPING
 
 INTERNAL_FUNCTION_STUB = "matcha_ml.services.AzureClient"
 
@@ -55,8 +56,8 @@ def mocked_azure_client() -> AzureClient:
         rg.return_value = None
         rg_state.return_value = ProvisionState.SUCCEEDED
         roles.return_value = [
-            "/subscriptions/id/providers/Microsoft.Authorization/roleDefinitions/8e3af657-a8ff-443c-a75c-2fe8c4bcb635",
-            "/subscriptions/id/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c",
+            f"/subscriptions/id/providers/Microsoft.Authorization/roleDefinitions/{ROLE_ID_MAPPING['Owner']}",
+            f"/subscriptions/id/providers/Microsoft.Authorization/roleDefinitions/{ROLE_ID_MAPPING['Contributor']}",
         ]
 
         yield AzureClient()

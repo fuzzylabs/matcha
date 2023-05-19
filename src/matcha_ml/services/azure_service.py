@@ -122,7 +122,7 @@ class AzureClient:
             )
         except HttpResponseError:
             raise MatchaError(
-                "unable to get a response from Azure - make sure you have a stable connection."
+                "Error - unable to get a response from Azure, make sure you have a stable connection."
             )
 
         roles = [

@@ -7,8 +7,6 @@ from matcha_ml.errors import MatchaPermissionError
 from matcha_ml.services import AzureClient
 from matcha_ml.services.azure_service import ACCEPTED_ROLE_CONFIGURATIONS
 
-CLASS_STUB = "matcha_ml.services.azure_service"
-
 
 def test_is_valid_region_valid_input(mocked_azure_client: AzureClient):
     """Test that the is_valid_region function produces the correct result with valid input.
