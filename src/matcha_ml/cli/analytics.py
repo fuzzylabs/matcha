@@ -5,7 +5,7 @@ from rich import print
 from matcha_ml.services.global_parameters_service import GlobalParameters
 
 # create a typer app to group all analytics subcommands
-app = typer.Typer(no_args_is_help=True)
+app = typer.Typer(no_args_is_help=True, pretty_exceptions_show_locals=False)
 
 
 @app.command()
