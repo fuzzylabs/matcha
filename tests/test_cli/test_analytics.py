@@ -9,7 +9,7 @@ INTERNAL_FUNCTION_STUB = "matcha_ml.core.core"
 
 
 def test_cli_analytics_command_help_option(runner: CliRunner) -> None:
-    """Test cli for analytics command help.
+    """Tests the --help option for the cli analytics command.
 
     Args:
         runner (CliRunner): typer CLI runner
@@ -28,7 +28,7 @@ def test_cli_analytics_command_help_option(runner: CliRunner) -> None:
 
 
 def test_cli_analytics_command_defaults_to_help(runner: CliRunner) -> None:
-    """Test cli for analytics command help.
+    """Tests the cli analytics command defaults to the --help option when no sub-commands, options or arguments are passed.
 
     Args:
         runner (CliRunner): typer CLI runner
@@ -47,7 +47,7 @@ def test_cli_analytics_command_defaults_to_help(runner: CliRunner) -> None:
 
 
 def test_cli_analytics_opt_in_command(runner: CliRunner) -> None:
-    """Test cli for analytic command opt-in.
+    """Tests the cli functionality for the --opt-in command.
 
     Args:
         runner (CliRunner): typer CLI runner
@@ -71,7 +71,7 @@ def test_cli_analytics_opt_in_command(runner: CliRunner) -> None:
 
 
 def test_cli_analytics_opt_out_command(runner: CliRunner) -> None:
-    """Test cli for analytic command opt-out.
+    """Tests the cli functionality for the --opt-out command.
 
     Args:
         runner (CliRunner): typer CLI runner
