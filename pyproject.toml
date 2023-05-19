@@ -54,6 +54,7 @@ azure-mgmt-confluent = "^1.0.0"
 pyyaml = "^5.4.1"
 azure-storage-blob = "^12.16.0"
 types-pyyaml = "^6.0.12.9"
+azure-mgmt-storage = "^21.0.0"
 
 
 [tool.poetry.group.dev.dependencies]

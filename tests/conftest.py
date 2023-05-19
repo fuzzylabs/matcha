@@ -49,12 +49,15 @@ def mocked_azure_client() -> AzureClient:
         f"{INTERNAL_FUNCTION_STUB}.resource_group_state"
     ) as rg_state, patch(
         f"{INTERNAL_FUNCTION_STUB}._check_required_role_assignments"
-    ) as roles:
+    ) as roles, patch(
+        f"{INTERNAL_FUNCTION_STUB}.fetch_connection_string"
+    ) as conn_str:
         auth.return_value = True
         sub.return_value = "id"
         rg.return_value = None
         rg_state.return_value = ProvisionState.SUCCEEDED
         roles.return_value = True
+        conn_str.return_value = "mock-conn-str"
 
         yield AzureClient()
 

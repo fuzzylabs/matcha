@@ -12,12 +12,17 @@ CLASS_STUB = "matcha_ml.storage.azure_storage"
 
 @pytest.fixture
 def mock_blob_service() -> BlobServiceClient:
-    """Pytest fixture for mocking a blob service client.
+    """Pytest fixture for mocking a blob service client and connection string.
 
     Yields:
         BlobServiceClient: Mocked blob service client
     """
-    with patch(f"{CLASS_STUB}.BlobServiceClient") as mock_blob_service:
+    with patch(
+        f"{CLASS_STUB}.BlobServiceClient.from_connection_string"
+    ) as mock_blob_service, patch(
+        f"{CLASS_STUB}.AzureClient.fetch_connection_string"
+    ) as mock_conn_str:
+        mock_conn_str.return_value = "mock-conn-str"
         yield mock_blob_service
 
 
@@ -40,7 +45,7 @@ def test_upload_file(
     # Mock blob client
     mock_blob_client = mock_container_client.get_blob_client.return_value
 
-    mock_az_storage = AzureStorage("testaccount")
+    mock_az_storage = AzureStorage("testaccount", "test-rg")
     mock_az_storage.upload_file(mock_blob_client, test_file_path)
 
     # Check if upload_blob function is called exactly once
@@ -68,7 +73,7 @@ def test_upload_folder(
     # Mock blob client
     mock_blob_client = mock_container_client.get_blob_client.return_value
 
-    mock_az_storage = AzureStorage("testaccount")
+    mock_az_storage = AzureStorage("testaccount", "test-rg")
     # Mock _get_container_client function of AzureStorage class
     with patch.object(AzureStorage, "_get_container_client") as mock_fn:
         mock_fn.return_value = mock_container_client
@@ -98,7 +103,7 @@ def test_download_file(mock_blob_service, matcha_testing_directory):
     # Mock blob client
     mock_blob_client = mock_container_client.get_blob_client.return_value
 
-    mock_az_storage = AzureStorage("testaccount")
+    mock_az_storage = AzureStorage("testaccount", "test-rg")
     mock_az_storage.download_file(mock_blob_client, test_file_path)
 
     # Check if download_blob function is called exactly once
@@ -131,7 +136,7 @@ def test_download_folder(
         BlobProperties(name=n) for n in os.listdir(matcha_testing_directory)
     ]
 
-    mock_az_storage = AzureStorage("testaccount")
+    mock_az_storage = AzureStorage("testaccount", "test-rg")
     # Mock _get_container_client function of AzureStorage class
     with patch.object(AzureStorage, "_get_container_client") as mock_fn:
         mock_fn.return_value = mock_container_client

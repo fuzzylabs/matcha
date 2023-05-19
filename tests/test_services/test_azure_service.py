@@ -44,3 +44,13 @@ def test_is_valid_resource_group_invalid_input(mocked_azure_client):
         return_value=({"rand-prod-resources"})
     )
     assert not mocked_azure_client.is_valid_resource_group("rand-prod")
+
+
+def test_fetch_connection_string_function(mocked_azure_client):
+    """Test that the fetch_connection_string function produces the correct connection string.
+
+    Args:
+        mocked_azure_client (AzureClient): the mocked AzureClient
+    """
+    conn_str = mocked_azure_client.fetch_connection_string("testaccname", "test-rg")
+    assert conn_str == "mock-conn-str"

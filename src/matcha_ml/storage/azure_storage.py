@@ -1,30 +1,29 @@
 """Functions for uploading and downloading files to Azure storage bucket."""
 import os
 
-from azure.core.credentials import TokenCredential
-from azure.identity import DefaultAzureCredential
 from azure.storage.blob import BlobClient, BlobServiceClient, ContainerClient
+
+from matcha_ml.services.azure_service import AzureClient
 
 
 class AzureStorage:
     """Class to interact with Azure blob storage."""
 
-    account_name: str
-    _account_url: str
-    _credentials: TokenCredential
+    az_client: AzureClient = AzureClient()
     blob_service_client: BlobServiceClient
 
-    def __init__(self, account_name: str) -> None:
+    def __init__(self, account_name: str, resource_group_name: str) -> None:
         """Initialize Azure Storage.
 
         Args:
             account_name (str): Azure storage account name
+            resource_group_name (str): Name of resource group containing given account name
         """
-        self.account_name = account_name
-        self._account_url = f"https://{account_name}.blob.core.windows.net"
-        self._credentials = DefaultAzureCredential()
-        self.blob_service_client = BlobServiceClient(
-            account_url=self._account_url, credential=self._credentials
+        _conn_str = self.az_client.fetch_connection_string(
+            storage_account_name=account_name, resource_group_name=resource_group_name
+        )
+        self.blob_service_client = BlobServiceClient.from_connection_string(
+            conn_str=_conn_str
         )
 
     def _get_container_client(self, container_name: str) -> ContainerClient:
@@ -101,3 +100,12 @@ class AzureStorage:
             if not os.path.exists(os.path.dirname(file_path)):
                 os.makedirs(os.path.dirname(file_path), exist_ok=True)
             self.download_file(blob_client, file_path)
+
+
+if __name__ == "__main__":
+    container_name = "firstazstcont"
+    azst = AzureStorage("firstazstacc", "test-rg")
+
+    print(azst.container_exists(container_name))
+    # azst.upload_folder(container_name, ".matcha")
+    azst.download_folder(container_name, ".matcha")

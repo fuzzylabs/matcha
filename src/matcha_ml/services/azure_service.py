@@ -15,6 +15,7 @@ from azure.mgmt.resource import (
     SubscriptionClient,
 )
 from azure.mgmt.resource.resources.models import ResourceGroup
+from azure.mgmt.storage import StorageManagementClient
 
 from matcha_ml.errors import MatchaAuthenticationError, MatchaPermissionError
 
@@ -149,6 +150,46 @@ class AzureClient:
             }
 
             return self._resource_groups
+
+    def fetch_storage_access_key(
+        self, resource_group_name: str, storage_account_name: str
+    ) -> str:
+        """Fetches one of the storage account's access key from Azure and returns it.
+
+        Args:
+            resource_group_name (str): Name of resource group
+            storage_account_name (str): Name of storage account
+
+        Returns:
+            str: One of the acccess key corresponding to storage account
+        """
+        self._storage_client = StorageManagementClient(
+            self._credential, str(self.subscription_id)
+        )
+        keys = self._storage_client.storage_accounts.list_keys(
+            resource_group_name=resource_group_name,
+            account_name=storage_account_name,
+        )
+        return str(keys.keys[0].value)
+
+    def fetch_connection_string(
+        self, resource_group_name: str, storage_account_name: str
+    ) -> str:
+        """Fetches and creates a connection string for a storage account.
+
+        Args:
+            resource_group_name (str): Name of resource group
+            storage_account_name (str): Name of storage account
+
+        Returns:
+            str: A connection string for given storage account
+        """
+        access_key = self.fetch_storage_access_key(
+            resource_group_name=resource_group_name,
+            storage_account_name=storage_account_name,
+        )
+        connection_string = f"DefaultEndpointsProtocol=https;EndpointSuffix=core.windows.net;AccountName={storage_account_name};AccountKey={access_key}"
+        return connection_string
 
     def fetch_resource_group_names(self) -> Set[str]:
         """Fetch the resource group names for the current subscription_id.

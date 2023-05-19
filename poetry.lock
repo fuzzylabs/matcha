@@ -118,6 +118,23 @@ azure-mgmt-core = ">=1.3.2,<2.0.0"
 isodate = ">=0.6.1,<1.0.0"
 
 [[package]]
+name = "azure-mgmt-storage"
+version = "21.0.0"
+description = "Microsoft Azure Storage Management Client Library for Python"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "azure-mgmt-storage-21.0.0.zip", hash = "sha256:6eb13eeecf89195b2b5f47be0679e3f27888efd7bd2132eec7ebcbce75cb1377"},
+    {file = "azure_mgmt_storage-21.0.0-py3-none-any.whl", hash = "sha256:89d644c6192118b0b097deaa9c4925832d8f7ea4693d38d5fce3f0125b43a1c5"},
+]
+
+[package.dependencies]
+azure-common = ">=1.1,<2.0"
+azure-mgmt-core = ">=1.3.2,<2.0.0"
+msrest = ">=0.7.1"
+
+[[package]]
 name = "azure-mgmt-subscription"
 version = "3.1.1"
 description = "Microsoft Azure Subscription Management Client Library for Python"
@@ -1614,4 +1631,4 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "60beae1890176841c3100ac970369a25bf5fc165e2087e98ba395e5bdecc5dac"
+content-hash = "86f952277a44f96f82428bafde6ea3b80d228cd6207901c911114d60b1e6451d"
