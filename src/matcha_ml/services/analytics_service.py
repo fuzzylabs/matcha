@@ -4,7 +4,7 @@ This approach to collecting usage data was inspired by ZenML; source: https://gi
 """
 import functools
 from enum import Enum
-from time import time
+from time import perf_counter
 from typing import Any, Callable, Optional
 
 from segment import analytics
@@ -43,14 +43,14 @@ def track(event_name: AnalyticsEvent) -> Callable[..., Any]:
             global_params = GlobalParameters()
 
             if not global_params.analytics_opt_out:
-                ts = time()
+                ts = perf_counter()
                 error_code = None
                 result = None
                 try:
                     result = func(*args, **kwargs)
                 except Exception as e:
                     error_code = e
-                te = time()
+                te = perf_counter()
 
                 matcha_state_service = MatchaStateService()
 
