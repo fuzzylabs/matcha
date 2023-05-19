@@ -100,12 +100,3 @@ class AzureStorage:
             if not os.path.exists(os.path.dirname(file_path)):
                 os.makedirs(os.path.dirname(file_path), exist_ok=True)
             self.download_file(blob_client, file_path)
-
-
-if __name__ == "__main__":
-    container_name = "firstazstcont"
-    azst = AzureStorage("firstazstacc", "test-rg")
-
-    print(azst.container_exists(container_name))
-    # azst.upload_folder(container_name, ".matcha")
-    azst.download_folder(container_name, ".matcha")
