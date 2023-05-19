@@ -151,3 +151,4 @@ def build_template(
             f"The configuration template was written to {destination}"
         )
     )
+    print()
