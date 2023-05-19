@@ -1,4 +1,4 @@
-"""Functions for uploading and downloading files to Azure storage bucket."""
+"""Class to interact with Azure Storage."""
 import os
 
 from azure.storage.blob import BlobClient, BlobServiceClient, ContainerClient
