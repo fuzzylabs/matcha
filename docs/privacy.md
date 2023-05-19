@@ -8,7 +8,7 @@ Analytics and community engagement are vital in shaping the evolution of Matcha.
 
 Not only do analytics allow us to build a user-informed roadmap for future features, but they also enable up to attract partnerships and community engagement that will support and accelerate this development.
 
-None of the data we collect will be personally identifiable.
+All data collected is fully anonymised.
 
 ## Matcha tool analytics
 
