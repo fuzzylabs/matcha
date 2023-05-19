@@ -20,8 +20,8 @@ class RemoteStateBucketConfig(DataClassJsonMixin):
     # Azure storage container name
     container_name: str
 
-    # Azure Managed Identity client ID
-    client_id: str
+    # Name of resource group
+    resource_group: str
 
 
 @dataclasses.dataclass
@@ -52,7 +52,7 @@ class RemoteStateManager:
         """
         return RemoteStateConfig(
             remote_state_bucket=RemoteStateBucketConfig(
-                account_name="", container_name="", client_id=""
+                account_name="", container_name="", resource_group=""
             )
         )
 
@@ -63,7 +63,7 @@ class RemoteStateManager:
         Returns:
             AzureStorage: to interact with blob storage on Azure
         """
-        return AzureStorage("", "")
+        return AzureStorage(account_name=, "")
 
     def is_state_provisioned(self) -> bool:
         """Check if remote state has been provisioned.

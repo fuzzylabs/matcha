@@ -44,7 +44,7 @@ class AzureStorage:
             container_name (str): Azure storage container name
 
         Returns:
-            bool: does container exist
+            bool: does container exist.
         """
         container_client = self._get_container_client(container_name)
         return container_client.exists()
@@ -54,7 +54,7 @@ class AzureStorage:
 
         Args:
             blob_client (BlobClient): Container client
-            src_file (str): Path to upload the file from.
+            src_file (str): Path to upload the file from
         """
         with open(src_file, "rb") as blob_data:
             blob_client.upload_blob(data=blob_data)
@@ -79,7 +79,7 @@ class AzureStorage:
 
         Args:
             blob_client (BlobClient): Container client
-            dest_file (str): Path to download the file to.
+            dest_file (str): Path to download the file to
         """
         with open(dest_file, "wb") as my_blob:
             blob_data = blob_client.download_blob()
