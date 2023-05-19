@@ -13,7 +13,7 @@ nav:
     - Azure Permissions: 'azure-permissions.md'
     - Azure Costs: 'costings.md'
   - Inside Matcha:
-    - How Matcha works: 'inside-matcha.md'
+    - How does Matcha work: 'inside-matcha.md'
     - Why we collect usage data: 'privacy.md'
 
 
