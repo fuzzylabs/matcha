@@ -47,7 +47,7 @@ def test_cli_analytics_command_defaults_to_help(runner: CliRunner) -> None:
 
 
 def test_cli_analytics_opt_in_command(runner: CliRunner) -> None:
-    """Tests the cli functionality for the --opt-in command.
+    """Tests the cli functionality for the opt-in command.
 
     Args:
         runner (CliRunner): typer CLI runner
@@ -71,7 +71,7 @@ def test_cli_analytics_opt_in_command(runner: CliRunner) -> None:
 
 
 def test_cli_analytics_opt_out_command(runner: CliRunner) -> None:
-    """Tests the cli functionality for the --opt-out command.
+    """Tests the cli functionality for the opt-out command.
 
     Args:
         runner (CliRunner): typer CLI runner
