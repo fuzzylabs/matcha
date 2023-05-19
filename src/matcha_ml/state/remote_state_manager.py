@@ -5,7 +5,7 @@ from typing import Iterator, Optional
 
 from dataclasses_json import DataClassJsonMixin
 
-from matcha_ml.storage import AzureStorage
+from matcha_ml.storage.azure_storage import AzureStorage
 
 DEFAULT_CONFIG_NAME = "matcha.config.json"
 
@@ -63,7 +63,7 @@ class RemoteStateManager:
         Returns:
             AzureStorage: to interact with blob storage on Azure
         """
-        return AzureStorage(account_name=, "")
+        return AzureStorage("", "")
 
     def is_state_provisioned(self) -> bool:
         """Check if remote state has been provisioned.
