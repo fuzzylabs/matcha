@@ -51,7 +51,8 @@ class RemoteStateManager:
 
     def __init__(self, config_path: Optional[str] = None) -> None:
         """Initialise Remote State Manager."""
-        ...
+        if config_path:
+            self.config_path = os.path.join(config_path, "matcha.config.json")
 
     @property
     def configuration(self) -> RemoteStateConfig:
@@ -131,8 +132,6 @@ class RemoteStateManager:
             container_name (str): the container name of the remote state storage provisioned.
             client_id (str): Azure client ID.
         """
-        config_file_path = os.path.join(os.getcwd(), "matcha.config.json")
-
         remote_state_bucket_config = RemoteStateBucketConfig(
             account_name=account_name,
             container_name=container_name,
@@ -144,12 +143,12 @@ class RemoteStateManager:
 
         matcha_config = remote_state_config.to_json(indent=4)
 
-        with open(config_file_path, "w") as f:
+        with open(self.config_path, "w") as f:
             f.write(matcha_config)
 
         print_status(
             build_step_success_status(
-                f"The matcha configuration is written to {config_file_path}"
+                f"The matcha configuration is written to {self.config_path}"
             )
         )
 

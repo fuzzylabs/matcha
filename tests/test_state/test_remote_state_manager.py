@@ -105,7 +105,7 @@ def test_provision_state_storage(
         expected_matcha_config (Dict[str, Dict[str, str]]): the expected matcha config.
     """
     os.chdir(matcha_testing_directory)
-    remote_state_manager = RemoteStateManager()
+    remote_state_manager = RemoteStateManager(matcha_testing_directory)
 
     remote_state_manager.provision_state_storage("uksouth", "matcha")
 
@@ -156,7 +156,7 @@ def test_write_matcha_config(
         expected_matcha_config (Dict[str, Dict[str, str]]): the expected matcha config.
     """
     os.chdir(matcha_testing_directory)
-    remote_state_manager = RemoteStateManager()
+    remote_state_manager = RemoteStateManager(matcha_testing_directory)
 
     remote_state_manager._write_matcha_config(
         "test_account_name", "test_container_name", "test_client_id"

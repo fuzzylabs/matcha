@@ -1,4 +1,5 @@
 """Matcha CLI."""
+import os
 from typing import Optional
 
 import typer
@@ -55,7 +56,7 @@ def provision(
     ),
 ) -> None:
     """Provision cloud resources with a template."""
-    remote_state_manager = RemoteStateManager()
+    remote_state_manager = RemoteStateManager(os.getcwd())
     location, prefix, _ = fill_provision_variables(
         location=location, prefix=prefix, password="temp"
     )
