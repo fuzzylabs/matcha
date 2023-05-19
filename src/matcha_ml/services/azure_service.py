@@ -109,7 +109,7 @@ class AzureClient:
             MatchaError: when the role assignments for a subscription can't be fetched from Azure, likely a connection issue.
 
         Returns:
-            list[str]: the roles that the user has.
+            List[str]: the roles that the user has.
         """
         self._authorization_client = AuthorizationManagementClient(
             self._credential, self.subscription_id
