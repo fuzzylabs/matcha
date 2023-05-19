@@ -10,7 +10,6 @@ module "resource_group" {
   source = "./resource_group"
 
   prefix   = var.prefix
-  location = var.location
 }
 
 module "storage" {

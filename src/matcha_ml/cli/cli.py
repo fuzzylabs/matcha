@@ -114,6 +114,7 @@ def destroy(
     remote_state_manager = RemoteStateManager()
 
     destroy_resources()
+
     if full:
         remote_state_manager.deprovision_state_storage()
 
