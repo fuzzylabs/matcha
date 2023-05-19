@@ -1,8 +1,10 @@
 """Reusable fixtures for test_cli."""
-from unittest.mock import patch
+import os
+from unittest.mock import PropertyMock, patch
 
 import pytest
 
+from matcha_ml.services.global_parameters_service import GlobalParameters
 from matcha_ml.templates.run_state_storage_template import (
     TemplateRunner as StateStorageTemplateRunner,
 )
@@ -12,6 +14,10 @@ INTERNAL_FUNCTION_STUBS = [
     "matcha_ml.cli.provision.TemplateRunner",
     "matcha_ml.state.remote_state_manager.TemplateRunner",
 ]
+
+GLOBAL_PARAMETER_SERVICE_FUNCTION_STUB = (
+    "matcha_ml.services.analytics_service.GlobalParameters"
+)
 
 
 @pytest.fixture(scope="class", autouse=True)
@@ -70,3 +76,28 @@ def mocked_state_storage_template_runner() -> StateStorageTemplateRunner:
         )
 
         yield StateStorageTemplateRunner()
+
+
+@pytest.fixture(autouse=True)
+def mocked_global_parameters_service(matcha_testing_directory):
+    """Mocked global parameters service.
+
+    Args:
+        matcha_testing_directory (str): Temporary directory for testing.
+
+    Yields:
+        GlobalParameters: GlobalParameters object with mocked properties.
+    """
+    with patch(
+        f"{GLOBAL_PARAMETER_SERVICE_FUNCTION_STUB}.default_config_file_path",
+        new_callable=PropertyMock,
+    ) as file_path, patch(
+        f"{GLOBAL_PARAMETER_SERVICE_FUNCTION_STUB}.user_id",
+        new_callable=PropertyMock,
+    ) as user_id:
+        file_path.return_value = str(
+            os.path.join(str(matcha_testing_directory), ".matcha-ml", "config.yaml")
+        )
+        user_id.return_value = "TestUserID"
+
+        yield GlobalParameters

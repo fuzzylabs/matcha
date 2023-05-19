@@ -71,7 +71,7 @@ def test_existing_config_file(matcha_testing_directory):
     )
 
     data = {
-        "user_id": "TestID",
+        "user_id": "TestUserID",
         "analytics_opt_out": False,
     }
 
@@ -90,10 +90,10 @@ def test_existing_config_file(matcha_testing_directory):
 
         config_instance = GlobalParameters()
         assert config_instance.config_file == {
-            "user_id": "TestID",
+            "user_id": "TestUserID",
             "analytics_opt_out": False,
         }
-        assert config_instance.user_id == "TestID"
+        assert config_instance.user_id == "TestUserID"
         assert config_instance.analytics_opt_out is False
 
 
