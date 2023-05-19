@@ -1,18 +1,18 @@
-"""Tests for Terraform Service."""
+"""Tests for Matcha State Service."""
 import json
 import os
 
 import pytest
 
-from matcha_ml.services.matcha_state import MatchaStateService
+from matcha_ml.state import MatchaStateService
 
 
 @pytest.fixture
 def matcha_state_service() -> MatchaStateService:
-    """Return a template runner object instance for test.
+    """Return a matcha state service object instance for test.
 
     Returns:
-        TemplateRunner: a TemplateRunner object instance.
+        MatchaStateService: a MatchaStateService object instance.
     """
     return MatchaStateService()
 

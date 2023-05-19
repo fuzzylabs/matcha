@@ -5,6 +5,7 @@ from unittest import mock
 
 import pytest
 import yaml
+from typer.testing import CliRunner
 
 from matcha_ml.cli.cli import app
 from matcha_ml.services.global_parameters_service import GlobalParameters
@@ -29,14 +30,14 @@ def expected_configuration() -> Dict[str, Union[str, bool]]:
 
 
 def test_opt_out_subcommand(
-    runner,
+    runner: CliRunner,
     matcha_testing_directory: str,
     expected_configuration: Dict[str, Union[str, bool]],
 ) -> None:
     """Test opt-out command works.
 
     Args:
-        runner: Mock runner
+        runner (CliRuner): Mock runner
         matcha_testing_directory (str): Temp directory
         expected_configuration (Dict[str, Union[str, bool]]): Dictionary containing expected configuration
     """
@@ -72,14 +73,14 @@ def test_opt_out_subcommand(
 
 
 def test_opt_in_subcommand(
-    runner,
+    runner: CliRunner,
     matcha_testing_directory: str,
     expected_configuration: Dict[str, Union[str, bool]],
 ) -> None:
     """Test opt-in command works.
 
     Args:
-        runner: Mock runner
+        runner (CliRuner): Mock runner
         matcha_testing_directory (str): Temp directory
         expected_configuration (Dict[str, Union[str, bool]]): Dictionary containing expected configuration
     """
@@ -110,3 +111,22 @@ def test_opt_in_subcommand(
     # Check the contents of the config file match
     with open(config_file_path) as f:
         assert dict(yaml.safe_load(f)) == expected_configuration
+
+
+def test_cli_analytics_command_no_args(runner: CliRunner) -> None:
+    """Test CLI analytics command displays the help message when no arguments are passed.
+
+    Args:
+        runner (CliRuner): Mock runner
+    """
+    # Invoke analytics with no argument
+    result = runner.invoke(app, ["analytics"])
+
+    # Exit code 0 means there was no error
+    assert result.exit_code == 0
+
+    # Assert if particular string in present in output
+    assert (
+        "Enable or disable the collection of anonymous usage data (enabled by default)."
+        in result.stdout
+    )

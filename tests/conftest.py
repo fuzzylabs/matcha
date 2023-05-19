@@ -1,4 +1,5 @@
 """Reusable fixtures."""
+import os
 import tempfile
 from typing import Iterator
 from unittest.mock import MagicMock, patch
@@ -15,7 +16,7 @@ INTERNAL_FUNCTION_STUB = "matcha_ml.services.AzureClient"
 
 
 @pytest.fixture
-def runner():
+def runner() -> CliRunner:
     """A fixture for cli runner."""
     return CliRunner()
 
@@ -28,11 +29,15 @@ def matcha_testing_directory() -> Iterator[str]:
         str: a path to temporary directory for storing and moving files from tests.
     """
     temp_dir = tempfile.TemporaryDirectory()
+    original_working_directory = (
+        os.getcwd()
+    )  # save in case a test changes to temp directory which will be deleted
 
     # tests are executed at this point
     yield temp_dir.name
 
     # delete temp folder
+    os.chdir(original_working_directory)  # restore original working directory
     temp_dir.cleanup()
 
 
