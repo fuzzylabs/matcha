@@ -11,12 +11,13 @@ from azure.mgmt.confluent.models._confluent_management_client_enums import (
 from typer.testing import CliRunner
 
 from matcha_ml.services import AzureClient
+from matcha_ml.services.azure_service import ROLE_ID_MAPPING
 
 INTERNAL_FUNCTION_STUB = "matcha_ml.services.AzureClient"
 
 
 @pytest.fixture
-def runner():
+def runner() -> CliRunner:
     """A fixture for cli runner."""
     return CliRunner()
 
@@ -53,13 +54,16 @@ def mocked_azure_client() -> AzureClient:
     ) as sub, patch(f"{INTERNAL_FUNCTION_STUB}.fetch_resource_groups") as rg, patch(
         f"{INTERNAL_FUNCTION_STUB}.resource_group_state"
     ) as rg_state, patch(
-        f"{INTERNAL_FUNCTION_STUB}._check_required_role_assignments"
+        f"{INTERNAL_FUNCTION_STUB}._fetch_user_roles"
     ) as roles:
         auth.return_value = True
         sub.return_value = "id"
         rg.return_value = None
         rg_state.return_value = ProvisionState.SUCCEEDED
-        roles.return_value = True
+        roles.return_value = [
+            f"/subscriptions/id/providers/Microsoft.Authorization/roleDefinitions/{ROLE_ID_MAPPING['Owner']}",
+            f"/subscriptions/id/providers/Microsoft.Authorization/roleDefinitions/{ROLE_ID_MAPPING['Contributor']}",
+        ]
 
         yield AzureClient()
 

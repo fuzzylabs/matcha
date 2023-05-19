@@ -1,3 +1,9 @@
+# 0.2.3
+
+&#128293; This version contains a quick fix for an import error caused by an old version of `urllib3`
+
+See all changes here: [v0.2.2...v0.2.3](https://github.com/fuzzylabs/matcha/compare/v0.2.2...v0.2.3)
+
 # 0.2.2
 
 This release includes documentation changes and bug fixes (detailed below) prior to the public announcement.
