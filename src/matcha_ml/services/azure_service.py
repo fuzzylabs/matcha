@@ -1,6 +1,6 @@
 """The Azure Service interface."""
 from subprocess import DEVNULL
-from typing import Dict, Optional, Set, cast
+from typing import Dict, List, Optional, Set, cast
 
 import jwt
 from azure.core.credentials import AccessToken
@@ -102,7 +102,7 @@ class AzureClient:
 
         return user_object_id
 
-    def _fetch_user_roles(self) -> list[str]:
+    def _fetch_user_roles(self) -> List[str]:
         """Fetch the Azure roles for the user.
 
         Raises:
@@ -126,7 +126,7 @@ class AzureClient:
             )
 
         roles = [
-            x.role_definition_id
+            str(x.role_definition_id)
             for x in role_assignments
             if x.principal_id == principal_id
         ]
