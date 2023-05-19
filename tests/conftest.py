@@ -84,3 +84,18 @@ def mocked_azure_client_components(mocked_azure_client):
             return_value=({"rand-resources"})
         )
         yield mock
+
+
+@pytest.fixture(autouse=True)
+def mocked_segment_track_decorator():
+    """Mock for Segment track.
+
+    Yields:
+        MagicMock: Mocked segment track function.
+    """
+    with patch(
+        "matcha_ml.services.analytics_service.analytics.track"
+    ) as track_analytics:
+        track_analytics.return_value = None
+
+        yield track_analytics
