@@ -8,7 +8,7 @@ from matcha_ml.cli.cli import app
 INTERNAL_FUNCTION_STUB = "matcha_ml.core.core"
 
 
-def test_cli_analytics_command_help(runner: CliRunner) -> None:
+def test_cli_analytics_command_help_option(runner: CliRunner) -> None:
     """Test cli for analytics command help.
 
     Args:
@@ -27,7 +27,7 @@ def test_cli_analytics_command_help(runner: CliRunner) -> None:
     )
 
 
-def test_cli_analytics_command_default_help(runner: CliRunner) -> None:
+def test_cli_analytics_command_defaults_to_help(runner: CliRunner) -> None:
     """Test cli for analytics command help.
 
     Args:
@@ -46,7 +46,7 @@ def test_cli_analytics_command_default_help(runner: CliRunner) -> None:
     )
 
 
-def test_cli_analytics_opt_in(runner: CliRunner) -> None:
+def test_cli_analytics_opt_in_command(runner: CliRunner) -> None:
     """Test cli for analytic command opt-in.
 
     Args:
@@ -70,7 +70,7 @@ def test_cli_analytics_opt_in(runner: CliRunner) -> None:
         mocked_opt_in.assert_called_once()
 
 
-def test_cli_analytics_opt_out(runner: CliRunner) -> None:
+def test_cli_analytics_opt_out_command(runner: CliRunner) -> None:
     """Test cli for analytic command opt-out.
 
     Args:
