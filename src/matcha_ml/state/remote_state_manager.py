@@ -5,6 +5,7 @@ from typing import Iterator, Optional
 
 from dataclasses_json import DataClassJsonMixin
 
+from matcha_ml.errors import MatchaError
 from matcha_ml.storage import AzureStorage
 
 DEFAULT_CONFIG_NAME = "matcha.config.json"
@@ -60,10 +61,24 @@ class RemoteStateManager:
     def azure_storage(self) -> AzureStorage:
         """Azure Storage property.
 
+        If it was not initialized before, it will be initialized
+
         Returns:
             AzureStorage: to interact with blob storage on Azure
+
+        Raises:
+            MatchaError: if Azure Storage client failed to create
         """
-        return AzureStorage("", "")
+        if self._azure_storage is None:
+            try:
+                self._azure_storage = AzureStorage(
+                    self.configuration.remote_state_bucket.account_name,
+                    self.configuration.remote_state_bucket.resource_group,
+                )
+            except Exception as e:
+                raise MatchaError(f"Error while creating Azure Storage client: {e}")
+
+        return self._azure_storage
 
     def is_state_provisioned(self) -> bool:
         """Check if remote state has been provisioned.
