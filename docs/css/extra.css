@@ -1,5 +1,6 @@
 :root {
-    --md-primary-fg-color: #0d1117
+    --md-primary-fg-color: #0d1117;
+    --md-typeset-a-color: #2ab70a;
 }
 
 header footer {
