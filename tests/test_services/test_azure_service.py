@@ -92,11 +92,27 @@ def test_check_required_role_assignments_incorrect_permissions(
     ]
 
 
+def test_fetch_storage_access_key(mocked_azure_client):
+    """Test that the fetch_storage_access_key function produces the access key.
+
+    Args:
+        mocked_azure_client (AzureClient): the mocked AzureClient
+    """
+    access_key_str = mocked_azure_client.fetch_storage_access_key(
+        "testaccname", "test-rg"
+    )
+    assert access_key_str == "key"
+
+
 def test_fetch_connection_string_function(mocked_azure_client):
     """Test that the fetch_connection_string function produces the correct connection string.
 
     Args:
         mocked_azure_client (AzureClient): the mocked AzureClient
     """
-    conn_str = mocked_azure_client.fetch_connection_string("testaccname", "test-rg")
-    assert conn_str == "mock-conn-str"
+    rg = "test-rg"
+    expected_access_key = "key"
+    expected_conn_string = f"DefaultEndpointsProtocol=https;EndpointSuffix=core.windows.net;AccountName={rg};AccountKey={expected_access_key}"
+
+    conn_str = mocked_azure_client.fetch_connection_string("testaccname", rg)
+    assert conn_str == expected_conn_string
