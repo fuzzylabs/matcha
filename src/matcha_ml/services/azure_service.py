@@ -183,7 +183,7 @@ class AzureClient:
             storage_account_name (str): Name of storage account
 
         Returns:
-            str: One of the acccess key corresponding to storage account
+            str: One of the access key corresponding to storage account
         """
         self._storage_client = StorageManagementClient(
             self._credential, str(self.subscription_id)
