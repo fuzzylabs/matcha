@@ -251,7 +251,6 @@ class TemplateRunner:
         summary_message = build_resource_confirmation(
             header=f"The following resources will be {verb}ed",
             resources=[
-                ("Resource group", "A resource group"),
                 ("Azure Kubernetes Service (AKS)", "A kubernetes cluster"),
                 (
                     "Two Storage Containers",
