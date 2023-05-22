@@ -8,9 +8,7 @@ from unittest.mock import patch
 import pytest
 from _pytest.capture import SysCapture
 
-from matcha_ml.state.remote_state_manager import (
-    RemoteStateManager,
-)
+from matcha_ml.state.remote_state_manager import DEFAULT_CONFIG_NAME, RemoteStateManager
 from matcha_ml.templates.build_templates.state_storage_template import SUBMODULE_NAMES
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -105,7 +103,9 @@ def test_provision_state_storage(
         expected_matcha_config (Dict[str, Dict[str, str]]): the expected matcha config.
     """
     os.chdir(matcha_testing_directory)
-    remote_state_manager = RemoteStateManager(matcha_testing_directory)
+    remote_state_manager = RemoteStateManager(
+        os.path.join(matcha_testing_directory, DEFAULT_CONFIG_NAME)
+    )
 
     remote_state_manager.provision_state_storage("uksouth", "matcha")
 
@@ -156,7 +156,9 @@ def test_write_matcha_config(
         expected_matcha_config (Dict[str, Dict[str, str]]): the expected matcha config.
     """
     os.chdir(matcha_testing_directory)
-    remote_state_manager = RemoteStateManager(matcha_testing_directory)
+    remote_state_manager = RemoteStateManager(
+        os.path.join(matcha_testing_directory, DEFAULT_CONFIG_NAME)
+    )
 
     remote_state_manager._write_matcha_config(
         "test_account_name", "test_container_name", "test_client_id"

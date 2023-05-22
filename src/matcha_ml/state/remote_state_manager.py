@@ -50,9 +50,16 @@ class RemoteStateManager:
     config_path: str
 
     def __init__(self, config_path: Optional[str] = None) -> None:
-        """Initialise Remote State Manager."""
-        if config_path:
-            self.config_path = os.path.join(config_path, "matcha.config.json")
+        """Initialise Remote State Manager.
+
+        Args:
+            config_path (Optional[str]): optional configuration file path
+
+        """
+        if config_path is not None:
+            self.config_path = config_path
+        else:
+            self.config_path = os.path.join(os.getcwd(), DEFAULT_CONFIG_NAME)
 
     @property
     def configuration(self) -> RemoteStateConfig:
