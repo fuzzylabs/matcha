@@ -182,8 +182,9 @@ def build_template(
             json.dump(config_dict, f)
 
         _ = config_dict.pop("password", None)
+        initial_state_file_dict = {"cloud": config_dict}
         with open(state_file_destination, "w") as f:
-            json.dump(config_dict, f)
+            json.dump(initial_state_file_dict, f)
 
         if verbose:
             print_status(build_substep_success_status("Template variables were added."))
