@@ -9,7 +9,7 @@ from matcha_ml.cli._validation import (
     region_typer_callback,
 )
 from matcha_ml.cli.destroy import destroy_resources
-from matcha_ml.cli.provision import fill_provision_variables, provision_resources
+from matcha_ml.cli.provision import provision_resources
 from matcha_ml.cli.ui.print_messages import (
     print_error,
     print_resource_output,
@@ -55,12 +55,6 @@ def provision(
     ),
 ) -> None:
     """Provision cloud resources with a template."""
-    remote_state_manager = RemoteStateManager()
-    location, prefix, _ = fill_provision_variables(
-        location=location, prefix=prefix, password="temp"
-    )
-
-    remote_state_manager.provision_state_storage(location, prefix)
     provision_resources(location, prefix, password, verbose)
 
 
@@ -93,9 +87,7 @@ def get(
     """
     remote_state = RemoteStateManager()
     if not remote_state.is_state_provisioned():
-        print_error(
-            "Error - matcha state has not been initialized, nothing to destroy."
-        )
+        print_error("Error - matcha state has not been initialized, nothing to get.")
         raise typer.Exit()
 
     try:

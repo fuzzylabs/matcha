@@ -18,6 +18,16 @@ TEMPLATE_DIR = os.path.join(
 )
 
 
+@pytest.fixture(autouse=True)
+def mock_provisioned_remote_state():
+    """Mock remote state manager to have state provisioned."""
+    with patch(
+        "matcha_ml.cli.provision.RemoteStateManager.is_state_provisioned"
+    ) as mock_is_state_provisioned:
+        mock_is_state_provisioned.return_value = False
+        yield
+
+
 def assert_infrastructure(
     destination_path: str,
     expected_tf_vars: Dict[str, str],
@@ -382,17 +392,9 @@ def test_cli_provision_command_override(
         input="Y\n",
     )
 
-    state_storage_destination_path = os.path.join(
-        matcha_testing_directory, ".matcha", "infrastructure", "remote_state_storage"
-    )
-
     resources_destination_path = os.path.join(
         matcha_testing_directory, ".matcha", "infrastructure", "resources"
     )
-
-    # Touch a 'dummy.tf' file in the infrastructure configuration directory within the .matcha/remote_state_storage directory
-    with open(os.path.join(state_storage_destination_path, "dummy.tf"), "a"):
-        ...
 
     # Touch a 'dummy.tf' file in the infrastructure configuration directory within the .matcha/resources directory
     with open(os.path.join(resources_destination_path, "dummy.tf"), "a"):
@@ -414,16 +416,8 @@ def test_cli_provision_command_override(
         input="Y\nY\n",
     )
 
-    # Checks the 'dummy.tf' file is not present within the overwritten .matcha/remote_state_storage directory
-    assert not os.path.exists(os.path.join(state_storage_destination_path, "dummy.tf"))
-
     # Checks the 'dummy.tf' file is not present within the overwritten .matcha/resources directory
     assert not os.path.exists(os.path.join(resources_destination_path, "dummy.tf"))
-
-    state_storage_expected_tf_vars = {
-        "location": "uksouth",
-        "prefix": "matcha",
-    }
 
     resources_expected_tf_vars = {
         "location": "uksouth",
@@ -431,9 +425,6 @@ def test_cli_provision_command_override(
         "password": "ninja",
     }
 
-    assert_infrastructure(
-        state_storage_destination_path, state_storage_expected_tf_vars, False
-    )
     assert_infrastructure(resources_destination_path, resources_expected_tf_vars)
 
 

@@ -112,7 +112,7 @@ def copy_files(files: List[str], destination: str, sub_folder_path: str = "") ->
 def build_template(
     config: TemplateVariables,
     template_src: str,
-    destination: str = ".matcha/infrastructure",
+    destination: str = ".matcha/infrastructure/resources",
     verbose: Optional[bool] = False,
 ) -> None:
     """Build and copy the template to the project directory.

@@ -5,7 +5,7 @@ output "storage_container_name" {
 
 output "blobstorage_container_path" {
   description = "The Azure Blob Storage Container path for storing your artifacts"
-  value       = "az://${azurerm_storage_container.statestoragecontainer.name}"
+  value       = "${azurerm_storage_container.statestoragecontainer.name}"
 }
 
 output "storage_account_name" {
