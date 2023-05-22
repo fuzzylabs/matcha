@@ -1,10 +1,12 @@
 """Remote state manager module."""
 import contextlib
 import dataclasses
+import os.path
 from typing import Iterator, Optional
 
 from dataclasses_json import DataClassJsonMixin
 
+from matcha_ml.errors import MatchaError
 from matcha_ml.storage import AzureStorage
 
 DEFAULT_CONFIG_NAME = "matcha.config.json"
@@ -37,11 +39,37 @@ class RemoteStateManager:
     This class is used to interact with the remote Matcha state.
     """
 
+    _azure_storage: Optional[AzureStorage] = None
+
     config_path: str
 
     def __init__(self, config_path: Optional[str] = None) -> None:
-        """Initialise Remote State Manager."""
-        ...
+        """Initialise Remote State Manager.
+
+        Args:
+            config_path (Optional[str]): optional configuration file path
+        """
+        if config_path is not None:
+            self.config_path = config_path
+        else:
+            self.config_path = os.path.join(os.getcwd(), DEFAULT_CONFIG_NAME)
+
+    def _configuration_file_exists(self) -> bool:
+        """Check if the remote state configuration file exists.
+
+        Returns:
+            bool: True, if the configuration file exists
+        """
+        return os.path.exists(self.config_path)
+
+    def _load_configuration(self) -> RemoteStateConfig:
+        """Load configuration file.
+
+        Returns:
+            RemoteStateConfig: remote state configuration
+        """
+        with open(self.config_path) as f:
+            return RemoteStateConfig.from_json(f.read())
 
     @property
     def configuration(self) -> RemoteStateConfig:
@@ -49,29 +77,64 @@ class RemoteStateManager:
 
         Returns:
             RemoteStateConfig: configuration read from the file system
+
+        Raises:
+            MatchaError: if configuration file failed to load.
         """
-        return RemoteStateConfig(
-            remote_state_bucket=RemoteStateBucketConfig(
-                account_name="", container_name="", client_id=""
-            )
-        )
+        try:
+            return self._load_configuration()
+        except Exception as e:
+            raise MatchaError(f"Error while loading state configuration: {e}")
 
     @property
     def azure_storage(self) -> AzureStorage:
         """Azure Storage property.
 
+        If it was not initialized before, it will be initialized
+
         Returns:
             AzureStorage: to interact with blob storage on Azure
-        """
-        return AzureStorage("", "")
 
-    def is_state_provisioned(self) -> bool:
-        """Check if remote state has been provisioned.
+        Raises:
+            MatchaError: if Azure Storage client failed to create
+        """
+        if self._azure_storage is None:
+            try:
+                self._azure_storage = AzureStorage(
+                    self.configuration.remote_state_bucket.account_name,
+                    self.configuration.remote_state_bucket.client_id,
+                )
+            except Exception as e:
+                raise MatchaError(f"Error while creating Azure Storage client: {e}")
+
+        return self._azure_storage
+
+    def _bucket_exists(self, container_name: str) -> bool:
+        """Check if a bucket for remote state management exists.
+
+        Args:
+            container_name: Azure Storage container name
 
         Returns:
-            bool: True if the remote state is provisioned.
+            bool: True, if the bucket exists
         """
-        return False
+        return self.azure_storage.container_exists(container_name)
+
+    def is_state_provisioned(self) -> bool:
+        """Check if remote state has already been provisioned.
+
+        Returns:
+            bool: is state provisioned
+        """
+        if not self._configuration_file_exists():
+            return False
+
+        if not self._bucket_exists(
+            self.configuration.remote_state_bucket.container_name
+        ):
+            return False
+
+        return True
 
     def provision_state_storage(
         self, location: str, prefix: str, verbose: Optional[bool] = False
