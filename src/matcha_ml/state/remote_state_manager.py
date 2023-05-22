@@ -1,6 +1,7 @@
 """Remote state manager module."""
 import contextlib
 import dataclasses
+import os.path
 from typing import Iterator, Optional
 
 from dataclasses_json import DataClassJsonMixin
@@ -21,8 +22,8 @@ class RemoteStateBucketConfig(DataClassJsonMixin):
     # Azure storage container name
     container_name: str
 
-    # Name of resource group
-    resource_group: str
+    # Azure resource group name
+    resource_group_name: str
 
 
 @dataclasses.dataclass
@@ -43,8 +44,32 @@ class RemoteStateManager:
     config_path: str
 
     def __init__(self, config_path: Optional[str] = None) -> None:
-        """Initialise Remote State Manager."""
-        ...
+        """Initialise Remote State Manager.
+
+        Args:
+            config_path (Optional[str]): optional configuration file path
+        """
+        if config_path is not None:
+            self.config_path = config_path
+        else:
+            self.config_path = os.path.join(os.getcwd(), DEFAULT_CONFIG_NAME)
+
+    def _configuration_file_exists(self) -> bool:
+        """Check if the remote state configuration file exists.
+
+        Returns:
+            bool: True, if the configuration file exists
+        """
+        return os.path.exists(self.config_path)
+
+    def _load_configuration(self) -> RemoteStateConfig:
+        """Load configuration file.
+
+        Returns:
+            RemoteStateConfig: remote state configuration
+        """
+        with open(self.config_path) as f:
+            return RemoteStateConfig.from_json(f.read())
 
     @property
     def configuration(self) -> RemoteStateConfig:
@@ -52,12 +77,14 @@ class RemoteStateManager:
 
         Returns:
             RemoteStateConfig: configuration read from the file system
+
+        Raises:
+            MatchaError: if configuration file failed to load.
         """
-        return RemoteStateConfig(
-            remote_state_bucket=RemoteStateBucketConfig(
-                account_name="", container_name="", resource_group=""
-            )
-        )
+        try:
+            return self._load_configuration()
+        except Exception as e:
+            raise MatchaError(f"Error while loading state configuration: {e}")
 
     @property
     def azure_storage(self) -> AzureStorage:
@@ -75,20 +102,39 @@ class RemoteStateManager:
             try:
                 self._azure_storage = AzureStorage(
                     account_name=self.configuration.remote_state_bucket.account_name,
-                    resource_group_name=self.configuration.remote_state_bucket.resource_group,
+                    resource_group_name=self.configuration.remote_state_bucket.resource_group_name,
                 )
             except Exception as e:
                 raise MatchaError(f"Error while creating Azure Storage client: {e}")
 
         return self._azure_storage
 
-    def is_state_provisioned(self) -> bool:
-        """Check if remote state has been provisioned.
+    def _bucket_exists(self, container_name: str) -> bool:
+        """Check if a bucket for remote state management exists.
+
+        Args:
+            container_name: Azure Storage container name
 
         Returns:
-            bool: True if the remote state is provisioned.
+            bool: True, if the bucket exists
         """
-        return False
+        return self.azure_storage.container_exists(container_name)
+
+    def is_state_provisioned(self) -> bool:
+        """Check if remote state has already been provisioned.
+
+        Returns:
+            bool: is state provisioned
+        """
+        if not self._configuration_file_exists():
+            return False
+
+        if not self._bucket_exists(
+            self.configuration.remote_state_bucket.container_name
+        ):
+            return False
+
+        return True
 
     def provision_state_storage(
         self, location: str, prefix: str, verbose: Optional[bool] = False

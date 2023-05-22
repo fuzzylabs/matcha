@@ -2,7 +2,18 @@
 import os
 from unittest.mock import patch
 
+import pytest
+
 from matcha_ml.cli.cli import app
+
+
+@pytest.fixture(autouse=True)
+def mock_provisioned_remote_state():
+    """Mock remote state manager to have state provisioned."""
+    with patch("matcha_ml.cli.destroy.RemoteStateManager") as mock_state_manager_class:
+        mock_state_manager = mock_state_manager_class.return_value
+        mock_state_manager.is_state_provisioned.return_value = True
+        yield
 
 
 def test_cli_destroy_command_help(runner):

@@ -57,6 +57,52 @@ def test_upload_file(
     mock_blob_client.upload_blob.assert_called_once()
 
 
+def test_container_exists(
+    mock_blob_service: BlobServiceClient, mocked_azure_client: AzureClient
+):
+    """Test that the method returns True when a container exists.
+
+    Args:
+        mock_blob_service (BlobServiceClient): Mocked blob service client
+        mocked_azure_client (AzureClient): mocked azure client
+    """
+
+    # Mock container client
+    mock_container_client = mock_blob_service.get_container_client.return_value
+
+    # Mock blob client
+    mock_blob_client = mock_container_client.get_blob_client.return_value
+
+    mock_blob_client.exists.return_value = True
+
+    mock_az_storage = AzureStorage("testaccount", "test-rg")
+    mock_az_storage.az_client = mocked_azure_client
+    assert mock_az_storage.container_exists("testcontainer")
+
+
+def test_container_does_not_exists(
+    mock_blob_service: BlobServiceClient, mocked_azure_client: AzureClient
+):
+    """Test that the method returns False when a container does not exist.
+
+    Args:
+        mock_blob_service (BlobServiceClient): Mocked blob service client
+        mocked_azure_client (AzureClient): mocked azure client
+    """
+
+    # Mock container client
+    mock_container_client = mock_blob_service.get_container_client.return_value
+
+    # Mock blob client
+    mock_blob_client = mock_container_client.get_blob_client.return_value
+
+    mock_blob_client.exists.return_value = False
+
+    mock_az_storage = AzureStorage("testaccount", "test-rg")
+    mock_az_storage.az_client = mocked_azure_client
+    assert mock_az_storage.container_exists("testcontainer")
+
+
 def test_upload_folder(
     mock_blob_service: BlobServiceClient,
     matcha_testing_directory: str,

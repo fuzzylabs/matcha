@@ -45,7 +45,7 @@ class AzureStorage:
             container_name (str): Azure storage container name
 
         Returns:
-            bool: does container exist.
+            bool: does container exist
         """
         container_client = self._get_container_client(container_name)
         return container_client.exists()
