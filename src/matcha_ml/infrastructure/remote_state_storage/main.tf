@@ -19,14 +19,3 @@ module "state_storage" {
   location            = var.location
   prefix              = var.prefix
 }
-
-module "managed_identity" {
-  source = "./managed_identity"
-
-  # otehrwise the module will be created before resource group is ready
-  depends_on = [module.resource_group]
-
-  resource_group_name = module.resource_group.name
-  location            = var.location
-  prefix              = var.prefix
-}
