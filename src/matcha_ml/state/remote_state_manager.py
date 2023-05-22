@@ -1,7 +1,7 @@
 """Remote state manager module."""
 import contextlib
 import dataclasses
-import os.path
+import os
 from typing import Iterator, Optional
 
 from dataclasses_json import DataClassJsonMixin

@@ -66,7 +66,6 @@ def test_container_exists(
         mock_blob_service (BlobServiceClient): Mocked blob service client
         mocked_azure_client (AzureClient): mocked azure client
     """
-
     # Mock container client
     mock_container_client = mock_blob_service.get_container_client.return_value
 
@@ -89,7 +88,6 @@ def test_container_does_not_exists(
         mock_blob_service (BlobServiceClient): Mocked blob service client
         mocked_azure_client (AzureClient): mocked azure client
     """
-
     # Mock container client
     mock_container_client = mock_blob_service.get_container_client.return_value
 
