@@ -51,7 +51,7 @@ def expected_matcha_config() -> Dict[str, Dict[str, str]]:
         "remote_state_bucket": {
             "account_name": "test-account",
             "container_name": "test-container",
-            "client_id": "test-client-id",
+            "resource_group_name": "test-rg",
         }
     }
     return config
@@ -240,7 +240,7 @@ def test_write_matcha_config(
     )
 
     remote_state_manager._write_matcha_config(
-        "test-account", "test-container", "test-client-id"
+        "test-account", "test-container", "test-rg"
     )
 
     assert_matcha_config(matcha_testing_directory, expected_matcha_config)

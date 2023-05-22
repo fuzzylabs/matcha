@@ -33,7 +33,7 @@ def mocked_state_storage_template_runner() -> StateStorageTemplateRunner:
         get.return_value = (
             "test-account",
             "test-container",
-            "test-client-id",
+            "test-rg",
         )
 
         yield StateStorageTemplateRunner()
