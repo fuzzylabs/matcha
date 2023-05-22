@@ -228,8 +228,8 @@ def check_current_deployment_exists() -> bool:
         data = json.load(f)
 
     # Check if resource-group-name is present in matcha.state file
-    if "prefix" in data:
-        resource_group_name = data["prefix"] + "-resources"
+    if data.get("cloud") is not None and "prefix" in data.get("cloud"):
+        resource_group_name = data["cloud"]["resource-group-name"]
 
         client = get_azure_client()
         rg_state = client.resource_group_state(resource_group_name)

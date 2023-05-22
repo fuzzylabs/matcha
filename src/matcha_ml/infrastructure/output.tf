@@ -56,5 +56,16 @@ output "model_deployer_seldon_base_url" {
 }
 
 output "cloud_azure_resource_group_name" {
+  description = "The full name of the resource group"
   value = module.resource_group.name
+}
+
+output "cloud_azure_prefix" {
+  description = "The prefix for the resource group"
+  value = var.prefix
+}
+
+output "cloud_azure_location" {
+  description = "The Azure location of the resource group"
+  value = var.location
 }
