@@ -14,11 +14,7 @@ from matcha_ml.cli.ui.status_message_builders import (
 )
 from matcha_ml.errors import MatchaPermissionError
 
-SUBMODULE_NAMES = [
-    "resource_group",
-    "state_storage",
-    "managed_identity",
-]
+SUBMODULE_NAMES = ["resource_group", "state_storage"]
 ALLOWED_EXTENSIONS = ["tf", "yaml", "tpl"]
 
 

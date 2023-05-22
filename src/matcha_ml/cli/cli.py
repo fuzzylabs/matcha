@@ -111,7 +111,10 @@ def get(
 def destroy(
     full: Optional[str] = typer.Argument(None),
 ) -> None:
-    """Destroy the provisioned cloud resources."""
+    """Destroy the provisioned cloud resources.
+
+    When `full` is passed to the command, it will destroy the resource group even if resources are provisioned inside the group.
+    """
     remote_state_manager = RemoteStateManager()
 
     destroy_resources()

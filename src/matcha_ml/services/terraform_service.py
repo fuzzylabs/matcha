@@ -13,7 +13,9 @@ class TerraformConfig:
     """Configuration required for terraform."""
 
     # Path to terraform template are stored
-    working_dir: str = os.path.join(os.getcwd(), ".matcha", "infrastructure/resources")
+    working_dir: str = os.path.join(
+        os.getcwd(), ".matcha", "infrastructure", "resources"
+    )
 
     # state file to store output after terraform apply
     @property

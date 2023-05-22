@@ -6,5 +6,5 @@ variable "location" {
 variable "prefix" {
   description = "A prefix used for the resource group name"
   type        = string
-  # default     = "matcha"
+  default     = "matcha"
 }
