@@ -20,6 +20,7 @@ from matcha_ml.state import MatchaStateService
 
 SUBMODULE_NAMES = [
     "aks",
+    "resource_group",
     "mlflow_module",
     "storage",
     "seldon",
