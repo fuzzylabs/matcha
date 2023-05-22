@@ -10,7 +10,7 @@ from matcha_ml.cli.ui.status_message_builders import (
     build_status,
     build_step_success_status,
 )
-from matcha_ml.state.remote_state_manager import RemoteStateManager
+from matcha_ml.state import RemoteStateManager
 from matcha_ml.templates.build_templates.azure_template import (
     build_template,
     build_template_configuration,

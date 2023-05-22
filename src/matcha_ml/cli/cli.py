@@ -22,7 +22,7 @@ from matcha_ml.cli.ui.resource_message_builders import (
 from matcha_ml.core import core
 from matcha_ml.errors import MatchaError, MatchaInputError
 from matcha_ml.services.analytics_service import AnalyticsEvent, track
-from matcha_ml.state.remote_state_manager import RemoteStateManager
+from matcha_ml.state import RemoteStateManager
 
 app = typer.Typer(no_args_is_help=True, pretty_exceptions_show_locals=False)
 analytics_app = typer.Typer(no_args_is_help=True, pretty_exceptions_show_locals=False)
