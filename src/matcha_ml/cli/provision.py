@@ -76,13 +76,21 @@ def provision_resources(
     Raises:
         typer.Exit: if approval is not given by user.
     """
+    # remote_state = RemoteStateManager()
+
+    # if not remote_state.is_state_provisioned():
+    #     # TODO provision remote state here
+    #     ...
+
     # create a runner for provisioning resource with Terraform service.
     template_runner = TemplateRunner()
 
     project_directory = os.getcwd()
-    destination = os.path.join(project_directory, ".matcha", "infrastructure/resources")
+    destination = os.path.join(
+        project_directory, ".matcha", "infrastructure", "resources"
+    )
     template = os.path.join(
-        os.path.dirname(__file__), os.pardir, "infrastructure/resources"
+        os.path.dirname(__file__), os.pardir, "infrastructure", "resources"
     )
 
     if not reuse_configuration(destination):

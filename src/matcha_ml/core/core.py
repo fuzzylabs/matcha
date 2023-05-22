@@ -4,7 +4,8 @@ from typing import Dict, Optional
 
 from matcha_ml.cli._validation import get_command_validation
 from matcha_ml.errors import MatchaError
-from matcha_ml.state import MatchaStateService
+from matcha_ml.services.global_parameters_service import GlobalParameters
+from matcha_ml.state.matcha_state import MatchaStateService
 
 
 def get(
@@ -50,3 +51,13 @@ def get(
     )
 
     return result
+
+
+def analytics_opt_out() -> None:
+    """Disable the collection of anonymous usage data."""
+    GlobalParameters().analytics_opt_out = True
+
+
+def analytics_opt_in() -> None:
+    """Enable the collection of anonymous usage data (enabled by default)."""
+    GlobalParameters().analytics_opt_out = False

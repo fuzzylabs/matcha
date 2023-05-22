@@ -4,7 +4,6 @@ from typing import Optional
 import typer
 
 from matcha_ml import __version__
-from matcha_ml.cli import analytics
 from matcha_ml.cli._validation import (
     prefix_typer_callback,
     region_typer_callback,
@@ -26,10 +25,9 @@ from matcha_ml.services.analytics_service import AnalyticsEvent, track
 from matcha_ml.state.remote_state_manager import RemoteStateManager
 
 app = typer.Typer(no_args_is_help=True, pretty_exceptions_show_locals=False)
-
-# Create a group for all subcommands for analytics command
+analytics_app = typer.Typer(no_args_is_help=True, pretty_exceptions_show_locals=False)
 app.add_typer(
-    analytics.app,
+    analytics_app,
     name="analytics",
     help="Enable or disable the collection of anonymous usage data (enabled by default).",
 )
@@ -89,9 +87,17 @@ def get(
         show_sensitive (Optional[bool]): show hidden sensitive resource values when True. Defaults to False.
 
     Raises:
+        Exit: Exit if matcha remote state has not been provisioned.
         Exit: Exit if matcha.state file does not exist.
         Exit: Exit if resource type or property does not exist in matcha.state.
     """
+    remote_state = RemoteStateManager()
+    if not remote_state.is_state_provisioned():
+        print_error(
+            "Error - matcha state has not been initialized, nothing to destroy."
+        )
+        raise typer.Exit()
+
     try:
         resources = core.get(resource_name, property_name)
     except MatchaInputError as e:
@@ -149,6 +155,24 @@ def cli(
     For more help on how to use matcha, head to https://fuzzylabs.github.io/matcha/
     """
     pass
+
+
+@analytics_app.command()
+def opt_out() -> None:
+    """Disable the collection of anonymous usage data."""
+    print(
+        "Data collection has been turned off and no data will be collected - you can turn this back on by running the command: 'matcha analytics opt-in'."
+    )
+    core.analytics_opt_out()
+
+
+@analytics_app.command()
+def opt_in() -> None:
+    """Enable the collection of anonymous usage data (enabled by default)."""
+    print(
+        "Thank you for enabling data collection, this helps us improve matcha and anonymously understand how people are using the tool."
+    )
+    core.analytics_opt_in()
 
 
 if __name__ == "__main__":

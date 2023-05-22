@@ -31,9 +31,9 @@ def mocked_state_storage_template_runner() -> StateStorageTemplateRunner:
         check_tf_install.return_value = None
         validate_tf_config.return_value = None
         get.return_value = (
-            "test_account_name",
-            "test_container_name",
-            "test_client_id",
+            "test-account",
+            "test-container",
+            "test-client-id",
         )
 
         yield StateStorageTemplateRunner()

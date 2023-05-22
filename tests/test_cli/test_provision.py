@@ -104,11 +104,11 @@ def test_cli_provision_command(
     assert result.exit_code == 0
 
     state_storage_destination_path = os.path.join(
-        matcha_testing_directory, ".matcha", "infrastructure/remote_state_storage"
+        matcha_testing_directory, ".matcha", "infrastructure", "remote_state_storage"
     )
 
     resources_destination_path = os.path.join(
-        matcha_testing_directory, ".matcha", "infrastructure/resources"
+        matcha_testing_directory, ".matcha", "infrastructure", "resources"
     )
 
     state_storage_expected_tf_vars = {
@@ -159,11 +159,11 @@ def test_cli_provision_command_with_args(
     assert result.exit_code == 0
 
     state_storage_destination_path = os.path.join(
-        matcha_testing_directory, ".matcha", "infrastructure/remote_state_storage"
+        matcha_testing_directory, ".matcha", "infrastructure", "remote_state_storage"
     )
 
     resources_destination_path = os.path.join(
-        matcha_testing_directory, ".matcha", "infrastructure/resources"
+        matcha_testing_directory, ".matcha", "infrastructure", "resources"
     )
 
     state_storage_expected_tf_vars = {
@@ -201,11 +201,11 @@ def test_cli_provision_command_with_prefix(runner, matcha_testing_directory):
     assert result.exit_code == 0
 
     state_storage_destination_path = os.path.join(
-        matcha_testing_directory, ".matcha", "infrastructure/remote_state_storage"
+        matcha_testing_directory, ".matcha", "infrastructure", "remote_state_storage"
     )
 
     resources_destination_path = os.path.join(
-        matcha_testing_directory, ".matcha", "infrastructure/resources"
+        matcha_testing_directory, ".matcha", "infrastructure", "resources"
     )
 
     state_storage_expected_tf_vars = {
@@ -241,11 +241,11 @@ def test_cli_provision_command_with_default_prefix(runner, matcha_testing_direct
     assert result.exit_code == 0
 
     state_storage_destination_path = os.path.join(
-        matcha_testing_directory, ".matcha", "infrastructure/remote_state_storage"
+        matcha_testing_directory, ".matcha", "infrastructure", "remote_state_storage"
     )
 
     resources_destination_path = os.path.join(
-        matcha_testing_directory, ".matcha", "infrastructure/resources"
+        matcha_testing_directory, ".matcha", "infrastructure", "resources"
     )
 
     state_storage_expected_tf_vars = {
@@ -383,11 +383,11 @@ def test_cli_provision_command_override(
     )
 
     state_storage_destination_path = os.path.join(
-        matcha_testing_directory, ".matcha", "infrastructure/remote_state_storage"
+        matcha_testing_directory, ".matcha", "infrastructure", "remote_state_storage"
     )
 
     resources_destination_path = os.path.join(
-        matcha_testing_directory, ".matcha", "infrastructure/resources"
+        matcha_testing_directory, ".matcha", "infrastructure", "resources"
     )
 
     # Touch a 'dummy.tf' file in the infrastructure configuration directory within the .matcha/remote_state_storage directory
@@ -474,7 +474,7 @@ def test_cli_provision_command_reuse(runner, matcha_testing_directory):
     )
 
     resources_destination_path = os.path.join(
-        matcha_testing_directory, ".matcha", "infrastructure/resources"
+        matcha_testing_directory, ".matcha", "infrastructure", "resources"
     )
 
     # Touch a 'dummy.tf' file in the infrastructure configuration directory within the .matcha directory
@@ -527,7 +527,7 @@ def test_cli_provision_command_with_provisioned_resources(
     )
 
     resources_destination_path = os.path.join(
-        matcha_testing_directory, ".matcha", "infrastructure/resources"
+        matcha_testing_directory, ".matcha", "infrastructure", "resources"
     )
 
     # Touch a 'dummy.tf' file in the infrastructure configuration directory within the .matcha directory
