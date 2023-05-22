@@ -10,6 +10,7 @@ from _pytest.capture import SysCapture
 
 from matcha_ml.state.remote_state_manager import DEFAULT_CONFIG_NAME, RemoteStateManager
 from matcha_ml.templates.build_templates.state_storage_template import SUBMODULE_NAMES
+from matcha_ml.templates.run_state_storage_template import TemplateRunner
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 TEMPLATE_DIR = os.path.join(
@@ -142,6 +143,9 @@ def test_deprovision_state_storage(capsys: SysCapture) -> None:
         captured = capsys.readouterr()
 
         expected_output = "Destroying remote state management is complete!"
+
+        template_runner = TemplateRunner()
+        template_runner.deprovision.assert_called()
 
         assert expected_output in captured.out
 
