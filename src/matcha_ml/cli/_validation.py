@@ -229,12 +229,9 @@ def check_current_deployment_exists() -> bool:
 
     resource_group_name = None
 
-    # Check if resource-group-name is present in matcha.state file
+    # Check if a resource group name prefix is present in matcha.state file
     if data.get("cloud") is not None and "prefix" in data.get("cloud"):
-        resource_group_name = data["cloud"]["resource-group-name"]
-    # Check if resource prefix is present in pre-deployment matcha.state file
-    elif "prefix" in data:
-        resource_group_name = data["prefix"] + "-resources"
+        resource_group_name = data["cloud"]["prefix"] + "-resources"
     else:
         return False
 

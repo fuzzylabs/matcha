@@ -70,7 +70,8 @@ def assert_infrastructure(destination_path: str, expected_tf_vars: Dict[str, str
         tf_vars = json.load(f)
 
     _ = expected_tf_vars.pop("password", None)
-    assert tf_vars == expected_tf_vars
+    expected_matcha_state_vars = {"cloud": expected_tf_vars}
+    assert tf_vars == expected_matcha_state_vars
 
 
 def test_build_template(matcha_testing_directory, template_src_path):
