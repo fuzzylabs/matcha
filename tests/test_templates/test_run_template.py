@@ -25,6 +25,9 @@ def mock_output() -> Callable[[str, bool], Union[str, Dict[str, str]]]:
 
     def output() -> str:
         terraform_outputs = {
+            "cloud_azure_resource_group_name": {
+                "value": "random-resources",
+            },
             "experiment_tracker_mlflow_tracking_url": {"value": "mlflow_test_url"},
             "pipeline_zenml_connection_string": {
                 "value": "zenml_test_connection_string"
@@ -49,6 +52,12 @@ def expected_outputs_show_sensitive() -> Dict[str, Dict[str, str]]:
         dict: expected output
     """
     outputs = {
+        "cloud": {
+            "flavor": "azure",
+            "resource-group-name": "random-resources",
+            "location": "uksouth",
+            "prefix": "random",
+        },
         "experiment-tracker": {
             "flavor": "mlflow",
             "tracking-url": "mlflow_test_url",
@@ -121,7 +130,7 @@ def terraform_test_config(matcha_testing_directory: str) -> TerraformConfig:
 
     # Create a dummy matcha state file
     matcha_state_file = os.path.join(infrastructure_directory, "matcha.state")
-    dummy_data = {"prefix": "random", "location": "uksouth"}
+    dummy_data = {"cloud": {"prefix": "random", "location": "uksouth"}}
     with open(matcha_state_file, "w") as fp:
         json.dump(dummy_data, fp)
 

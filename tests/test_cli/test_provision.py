@@ -461,7 +461,7 @@ def test_cli_provision_command_with_provisioned_resources(
     ) as fetch_resources_from_state_file:
         check_deployment_exists.return_value = True
         fetch_resources_from_state_file.return_value = {
-            "cloud": {"resource-group-name": "matcha-resources"}
+            "cloud": {"resource-group-name": "matcha-resources", "prefix": "matcha"}
         }
         # Invoke provision command for a second time, which overwrites the existing .matcha directory and removes the 'dummy.tf' file
         result = runner.invoke(
