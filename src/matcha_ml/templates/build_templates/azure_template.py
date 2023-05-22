@@ -60,8 +60,8 @@ def reuse_configuration(path: str) -> bool:
         if check_current_deployment_exists():
             matcha_state_service = MatchaStateService()
             resource_group_name = matcha_state_service.fetch_resources_from_state_file(
-                "cloud", "resource-group-name"
-            )["cloud"]["resource-group-name"]
+                "cloud", "prefix"
+            )["cloud"]["prefix"]
             warning_msg = f"\nWARNING: Matcha has detected that a deployment already exists in Azure with the resource group name '{resource_group_name}'. Use 'matcha destroy' to remove these resources before trying to provision."
             confirmation_msg = "\nIf you continue, you will create a orphan resource. You should destroy the resources before proceeding.\n\nDo you want to override the existing configuration?"
         else:
