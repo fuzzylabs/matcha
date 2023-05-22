@@ -45,7 +45,6 @@ matcha = "matcha_ml.cli.cli:app"
 python = "^3.8"
 typer = {extras = ["all"], version = "^0.7.0"}
 python-terraform = "^0.10.1"
-
 azure-identity = "^1.12.0"
 azure-mgmt-resource = "^23.0.0"
 azure-mgmt-subscription = "^3.1.1"
@@ -54,9 +53,11 @@ azure-mgmt-confluent = "^1.0.0"
 pyyaml = "^5.4.1"
 types-pyyaml = "^6.0.12.9"
 segment-analytics-python = "^2.2.2"
+azure-mgmt-storage = "^21.0.0"
 dataclasses-json = "^0.5.7"
 azure-storage-blob = "^12.16.0"
 urllib3 = "1.26.6"
+types-urllib3 = "^1.26.25.13"
 
 
 [tool.poetry.group.dev.dependencies]

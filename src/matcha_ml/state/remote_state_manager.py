@@ -1,7 +1,7 @@
 """Remote state manager module."""
 import contextlib
 import dataclasses
-import os.path
+import os
 from typing import Iterator, Optional
 
 from dataclasses_json import DataClassJsonMixin
@@ -22,8 +22,8 @@ class RemoteStateBucketConfig(DataClassJsonMixin):
     # Azure storage container name
     container_name: str
 
-    # Azure Managed Identity client ID
-    client_id: str
+    # Azure resource group name
+    resource_group_name: str
 
 
 @dataclasses.dataclass
@@ -101,8 +101,8 @@ class RemoteStateManager:
         if self._azure_storage is None:
             try:
                 self._azure_storage = AzureStorage(
-                    self.configuration.remote_state_bucket.account_name,
-                    self.configuration.remote_state_bucket.client_id,
+                    account_name=self.configuration.remote_state_bucket.account_name,
+                    resource_group_name=self.configuration.remote_state_bucket.resource_group_name,
                 )
             except Exception as e:
                 raise MatchaError(f"Error while creating Azure Storage client: {e}")
@@ -152,13 +152,27 @@ class RemoteStateManager:
         """Destroy the state bucket provisioned."""
         ...
 
-    def download(self) -> None:
-        """Download the remote state into the local matcha state directory."""
-        ...
+    def download(self, dest_folder_path: str) -> None:
+        """Download the remote state into the local matcha state directory.
 
-    def upload(self) -> None:
-        """Upload the local matcha state to the remote state storage."""
-        ...
+        Args:
+            dest_folder_path (str): Path to local matcha state directory
+        """
+        self.azure_storage.download_folder(
+            container_name=self.configuration.remote_state_bucket.container_name,
+            dest_folder_path=dest_folder_path,
+        )
+
+    def upload(self, local_folder_path: str) -> None:
+        """Upload the local matcha state to the remote state storage.
+
+        Args:
+            local_folder_path (str): Path to local matcha state directory
+        """
+        self.azure_storage.upload_folder(
+            container_name=self.configuration.remote_state_bucket.container_name,
+            src_folder_path=local_folder_path,
+        )
 
     @contextlib.contextmanager
     def use_remote_state(self) -> Iterator[None]:
