@@ -114,13 +114,13 @@ class TemplateRunner:
         """Return the account name and the container name from terraform output.
 
         Returns:
-            Tuple[str, str]: account name, the container name and azure client id.
+            Tuple[str, str]: account name, the container name and azure resource_group_name.
         """
         tf_outputs = self.tfs.terraform_client.output()
 
         account_name = ""
         container_name = ""
-        client_id = ""
+        resource_group_name = ""
 
         for output_name, properties in tf_outputs.items():
             property_name = output_name.replace("remote_state_storage_", "")
@@ -128,10 +128,10 @@ class TemplateRunner:
                 account_name = properties["value"]
             elif property_name == "container_name":
                 container_name = properties["value"]
-            elif property_name == "client_id":
-                client_id = properties["value"]
+            elif property_name == "resource_group_name":
+                resource_group_name = properties["value"]
 
-        return account_name, container_name, client_id
+        return account_name, container_name, resource_group_name
 
     def _destroy_terraform(self) -> None:
         """Destroy the provisioned resources.

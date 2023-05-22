@@ -31,8 +31,8 @@ class RemoteStateBucketConfig(DataClassJsonMixin):
     # Azure storage container name
     container_name: str
 
-    # Azure Managed Identity client ID
-    client_id: str
+    # Azure resource group name
+    resource_group_name: str
 
 
 @dataclasses.dataclass
@@ -110,8 +110,8 @@ class RemoteStateManager:
         if self._azure_storage is None:
             try:
                 self._azure_storage = AzureStorage(
-                    self.configuration.remote_state_bucket.account_name,
-                    self.configuration.remote_state_bucket.client_id,
+                    account_name=self.configuration.remote_state_bucket.account_name,
+                    resource_group_name=self.configuration.remote_state_bucket.resource_group_name,
                 )
             except Exception as e:
                 raise MatchaError(f"Error while creating Azure Storage client: {e}")
@@ -171,8 +171,8 @@ class RemoteStateManager:
         config = build_template_configuration(location, prefix)
         build_template(config, template, destination, verbose)
 
-        account_name, container_name, client_id = template_runner.provision()
-        self._write_matcha_config(account_name, container_name, client_id)
+        account_name, container_name, resource_group_name = template_runner.provision()
+        self._write_matcha_config(account_name, container_name, resource_group_name)
 
         print_status(build_step_success_status("Provisioning is complete!"))
 
@@ -187,19 +187,19 @@ class RemoteStateManager:
         )
 
     def _write_matcha_config(
-        self, account_name: str, container_name: str, client_id: str
+        self, account_name: str, container_name: str, resource_group_name: str
     ) -> None:
         """Write the outputs of the Terraform deployed state storage to a bucket config file.
 
         Args:
             account_name (str): the storage account name of the remote state storage provisioned.
             container_name (str): the container name of the remote state storage provisioned.
-            client_id (str): Azure client ID.
+            resource_group_name (str): Azure client ID.
         """
         remote_state_bucket_config = RemoteStateBucketConfig(
             account_name=account_name,
             container_name=container_name,
-            client_id=client_id,
+            resource_group_name=resource_group_name,
         )
         remote_state_config = RemoteStateConfig(
             remote_state_bucket=remote_state_bucket_config
@@ -216,13 +216,27 @@ class RemoteStateManager:
             )
         )
 
-    def download(self) -> None:
-        """Download the remote state into the local matcha state directory."""
-        ...
+    def download(self, dest_folder_path: str) -> None:
+        """Download the remote state into the local matcha state directory.
 
-    def upload(self) -> None:
-        """Upload the local matcha state to the remote state storage."""
-        ...
+        Args:
+            dest_folder_path (str): Path to local matcha state directory
+        """
+        self.azure_storage.download_folder(
+            container_name=self.configuration.remote_state_bucket.container_name,
+            dest_folder_path=dest_folder_path,
+        )
+
+    def upload(self, local_folder_path: str) -> None:
+        """Upload the local matcha state to the remote state storage.
+
+        Args:
+            local_folder_path (str): Path to local matcha state directory
+        """
+        self.azure_storage.upload_folder(
+            container_name=self.configuration.remote_state_bucket.container_name,
+            src_folder_path=local_folder_path,
+        )
 
     @contextlib.contextmanager
     def use_remote_state(self) -> Iterator[None]:
