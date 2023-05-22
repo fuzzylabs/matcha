@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "matcha-ml"
-version = "0.2.2"
-description = "Matcha: A open source tool for provisioning MLOps environments to the cloud."
+version = "0.2.3"
+description = "Matcha: An open source tool for provisioning MLOps environments to the cloud."
 authors = ["FuzzyLabs <info@fuzzylabs.ai>"]
 license = "Apache-2.0"
 homepage = "http://fuzzylabs.github.io/matcha"
@@ -55,7 +55,9 @@ types-pyyaml = "^6.0.12.9"
 azure-mgmt-storage = "^21.0.0"
 dataclasses-json = "^0.5.7"
 azure-storage-blob = "^12.16.0"
+segment-analytics-python = "^2.2.2"
 urllib3 = "1.26.6"
+
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.1.1"
@@ -143,6 +145,7 @@ exclude = '''
 
 [[tool.mypy.overrides]]
 module = [
-    "python_terraform.*"
+    "python_terraform.*",
+    "segment.*"
 ]
 ignore_missing_imports = true

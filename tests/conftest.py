@@ -11,12 +11,13 @@ from azure.mgmt.confluent.models._confluent_management_client_enums import (
 from typer.testing import CliRunner
 
 from matcha_ml.services import AzureClient
+from matcha_ml.services.azure_service import ROLE_ID_MAPPING
 
 INTERNAL_FUNCTION_STUB = "matcha_ml.services.AzureClient"
 
 
 @pytest.fixture
-def runner():
+def runner() -> CliRunner:
     """A fixture for cli runner."""
     return CliRunner()
 
@@ -53,7 +54,7 @@ def mocked_azure_client() -> AzureClient:
     ) as sub, patch(f"{INTERNAL_FUNCTION_STUB}.fetch_resource_groups") as rg, patch(
         f"{INTERNAL_FUNCTION_STUB}.resource_group_state"
     ) as rg_state, patch(
-        f"{INTERNAL_FUNCTION_STUB}._check_required_role_assignments"
+        f"{INTERNAL_FUNCTION_STUB}._fetch_user_roles"
     ) as roles, patch(
         f"{INTERNAL_FUNCTION_STUB}.fetch_connection_string"
     ) as conn_str:
@@ -61,7 +62,10 @@ def mocked_azure_client() -> AzureClient:
         sub.return_value = "id"
         rg.return_value = None
         rg_state.return_value = ProvisionState.SUCCEEDED
-        roles.return_value = True
+        roles.return_value = [
+            f"/subscriptions/id/providers/Microsoft.Authorization/roleDefinitions/{ROLE_ID_MAPPING['Owner']}",
+            f"/subscriptions/id/providers/Microsoft.Authorization/roleDefinitions/{ROLE_ID_MAPPING['Contributor']}",
+        ]
         conn_str.return_value = "mock-conn-str"
 
         yield AzureClient()
@@ -83,3 +87,18 @@ def mocked_azure_client_components(mocked_azure_client):
             return_value=({"rand-resources"})
         )
         yield mock
+
+
+@pytest.fixture(autouse=True)
+def mocked_segment_track_decorator():
+    """Mock for Segment track.
+
+    Yields:
+        MagicMock: Mocked segment track function.
+    """
+    with patch(
+        "matcha_ml.services.analytics_service.analytics.track"
+    ) as track_analytics:
+        track_analytics.return_value = None
+
+        yield track_analytics

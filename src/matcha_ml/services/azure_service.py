@@ -1,10 +1,10 @@
 """The Azure Service interface."""
 from subprocess import DEVNULL
-from typing import Dict, Optional, Set, cast
+from typing import Dict, List, Optional, Set, cast
 
 import jwt
 from azure.core.credentials import AccessToken
-from azure.core.exceptions import ClientAuthenticationError
+from azure.core.exceptions import ClientAuthenticationError, HttpResponseError
 from azure.identity import AzureCliCredential, CredentialUnavailableError
 from azure.mgmt.authorization import AuthorizationManagementClient
 from azure.mgmt.confluent.models._confluent_management_client_enums import (  # type: ignore [import]
@@ -17,7 +17,11 @@ from azure.mgmt.resource import (
 from azure.mgmt.resource.resources.models import ResourceGroup
 from azure.mgmt.storage import StorageManagementClient
 
-from matcha_ml.errors import MatchaAuthenticationError, MatchaPermissionError
+from matcha_ml.errors import (
+    MatchaAuthenticationError,
+    MatchaError,
+    MatchaPermissionError,
+)
 
 ROLE_ID_MAPPING = {
     "Owner": "8e3af657-a8ff-443c-a75c-2fe8c4bcb635",
@@ -99,6 +103,37 @@ class AzureClient:
 
         return user_object_id
 
+    def _fetch_user_roles(self) -> List[str]:
+        """Fetch the Azure roles for the user.
+
+        Raises:
+            MatchaError: when the role assignments for a subscription can't be fetched from Azure, likely a connection issue.
+
+        Returns:
+            List[str]: the roles that the user has.
+        """
+        self._authorization_client = AuthorizationManagementClient(
+            self._credential, self.subscription_id
+        )
+        principal_id = self._get_principal_id()
+
+        try:
+            role_assignments = (
+                self._authorization_client.role_assignments.list_for_subscription()
+            )
+        except HttpResponseError:
+            raise MatchaError(
+                "Error - unable to get a response from Azure, make sure you have a stable connection."
+            )
+
+        roles = [
+            str(x.role_definition_id)
+            for x in role_assignments
+            if x.principal_id == principal_id
+        ]
+
+        return roles
+
     def _check_required_role_assignments(self) -> bool:
         """Check if the user has one of the required sets of roles.
 
@@ -107,28 +142,15 @@ class AzureClient:
 
         Raises:
             MatchaPermissionError: when the user does not have required roles
-
         """
-        self._authorization_client = AuthorizationManagementClient(
-            self._credential, self.subscription_id
-        )
-        principal_id = self._get_principal_id()
-        role_assignments = (
-            self._authorization_client.role_assignments.list_for_subscription()
-        )
-        roles = [
-            x.role_definition_id
-            for x in role_assignments
-            if x.principal_id == principal_id
-        ]
-
         for role_configuration in ACCEPTED_ROLE_CONFIGURATIONS:
             expected_roles = [
                 f"/subscriptions/{self.subscription_id}/providers/Microsoft.Authorization/roleDefinitions/{ROLE_ID_MAPPING[role]}"
                 for role in role_configuration
             ]
-            if all([role in roles for role in expected_roles]):
+            if all([role in self._fetch_user_roles() for role in expected_roles]):
                 return True
+
         raise MatchaPermissionError(
             f"Error - Matcha detected that you do not have the appropriate role-based permissions on Azure to run this action. You need one of the following role configurations: {ACCEPTED_ROLE_CONFIGURATIONS} note: list items containing multiple roles require all of the listed roles."
         )

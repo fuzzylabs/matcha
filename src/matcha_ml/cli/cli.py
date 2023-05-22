@@ -4,7 +4,6 @@ from typing import Optional
 import typer
 
 from matcha_ml import __version__
-from matcha_ml.cli import analytics
 from matcha_ml.cli._validation import (
     prefix_typer_callback,
     region_typer_callback,
@@ -22,18 +21,19 @@ from matcha_ml.cli.ui.resource_message_builders import (
 )
 from matcha_ml.core import core
 from matcha_ml.errors import MatchaError, MatchaInputError
+from matcha_ml.services.analytics_service import AnalyticsEvent, track
 
 app = typer.Typer(no_args_is_help=True, pretty_exceptions_show_locals=False)
-
-# Create a group for all subcommands for analytics command
+analytics_app = typer.Typer(no_args_is_help=True, pretty_exceptions_show_locals=False)
 app.add_typer(
-    analytics.app,
+    analytics_app,
     name="analytics",
     help="Enable or disable the collection of anonymous usage data (enabled by default).",
 )
 
 
 @app.command()
+@track(event_name=AnalyticsEvent.PROVISION)
 def provision(
     location: str = typer.Option(
         callback=region_typer_callback,
@@ -58,6 +58,7 @@ def provision(
 
 
 @app.command(help="Get information for the provisioned resources.")
+@track(event_name=AnalyticsEvent.GET)
 def get(
     resource_name: Optional[str] = typer.Argument(None),
     property_name: Optional[str] = typer.Argument(None),
@@ -99,6 +100,7 @@ def get(
 
 
 @app.command()
+@track(event_name=AnalyticsEvent.DESTROY)
 def destroy() -> None:
     """Destroy the provisioned cloud resources. It will destroy the resource group even if resources are provisioned inside the group."""
     destroy_resources()
@@ -131,6 +133,24 @@ def cli(
     For more help on how to use matcha, head to https://fuzzylabs.github.io/matcha/
     """
     pass
+
+
+@analytics_app.command()
+def opt_out() -> None:
+    """Disable the collection of anonymous usage data."""
+    print(
+        "Data collection has been turned off and no data will be collected - you can turn this back on by running the command: 'matcha analytics opt-in'."
+    )
+    core.analytics_opt_out()
+
+
+@analytics_app.command()
+def opt_in() -> None:
+    """Enable the collection of anonymous usage data (enabled by default)."""
+    print(
+        "Thank you for enabling data collection, this helps us improve matcha and anonymously understand how people are using the tool."
+    )
+    core.analytics_opt_in()
 
 
 if __name__ == "__main__":

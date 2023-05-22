@@ -6,6 +6,7 @@ import pytest
 from azure.storage.blob import BlobProperties, BlobServiceClient
 
 from matcha_ml.storage.azure_storage import AzureStorage
+from matcha_ml.services.azure_service import AzureClient
 
 CLASS_STUB = "matcha_ml.storage.azure_storage"
 
@@ -27,13 +28,16 @@ def mock_blob_service() -> BlobServiceClient:
 
 
 def test_upload_file(
-    mock_blob_service: BlobServiceClient, matcha_testing_directory: str
+    mock_blob_service: BlobServiceClient,
+    matcha_testing_directory: str,
+    mocked_azure_client: AzureClient,
 ):
     """Test AzureStorage upload file function.
 
     Args:
         mock_blob_service (BlobServiceClient): Mocked blob service client
         matcha_testing_directory (str): Temporary directory
+        mocked_azure_client (AzureClient): mocked azure client
     """
     test_file_path = os.path.join(matcha_testing_directory, "temp.txt")
     with open(test_file_path, "w"):
@@ -46,6 +50,7 @@ def test_upload_file(
     mock_blob_client = mock_container_client.get_blob_client.return_value
 
     mock_az_storage = AzureStorage("testaccount", "test-rg")
+    mock_az_storage.az_client = mocked_azure_client
     mock_az_storage.upload_file(mock_blob_client, test_file_path)
 
     # Check if upload_blob function is called exactly once
@@ -53,13 +58,16 @@ def test_upload_file(
 
 
 def test_upload_folder(
-    mock_blob_service: BlobServiceClient, matcha_testing_directory: str
+    mock_blob_service: BlobServiceClient,
+    matcha_testing_directory: str,
+    mocked_azure_client: AzureClient,
 ):
     """Test AzureStorage upload folder function.
 
     Args:
         mock_blob_service (BlobServiceClient): Mocked blob service client
         matcha_testing_directory (str): Temporary directory
+        mocked_azure_client (AzureClient): mocked azure client
     """
     # Create temp files inside temp directory
     for i in range(1, 3):
@@ -74,6 +82,7 @@ def test_upload_folder(
     mock_blob_client = mock_container_client.get_blob_client.return_value
 
     mock_az_storage = AzureStorage("testaccount", "test-rg")
+    mock_az_storage.az_client = mocked_azure_client
     # Mock _get_container_client function of AzureStorage class
     with patch.object(AzureStorage, "_get_container_client") as mock_fn:
         mock_fn.return_value = mock_container_client
@@ -88,12 +97,17 @@ def test_upload_folder(
         )
 
 
-def test_download_file(mock_blob_service, matcha_testing_directory):
+def test_download_file(
+    mock_blob_service: BlobServiceClient,
+    matcha_testing_directory: str,
+    mocked_azure_client: AzureClient,
+):
     """Test AzureStorage download file function.
 
     Args:
-        mock_blob_service (_type_): Mocked blob service client
+        mock_blob_service (BlobServiceClient): Mocked blob service client
         matcha_testing_directory (str): Temporary directory
+        mocked_azure_client (AzureClient): mocked azure client
     """
     test_file_path = os.path.join(matcha_testing_directory, "temp.txt")
 
@@ -104,6 +118,7 @@ def test_download_file(mock_blob_service, matcha_testing_directory):
     mock_blob_client = mock_container_client.get_blob_client.return_value
 
     mock_az_storage = AzureStorage("testaccount", "test-rg")
+    mock_az_storage.az_client = mocked_azure_client
     mock_az_storage.download_file(mock_blob_client, test_file_path)
 
     # Check if download_blob function is called exactly once
@@ -111,13 +126,16 @@ def test_download_file(mock_blob_service, matcha_testing_directory):
 
 
 def test_download_folder(
-    mock_blob_service: BlobServiceClient, matcha_testing_directory: str
+    mock_blob_service: BlobServiceClient,
+    matcha_testing_directory: str,
+    mocked_azure_client: AzureClient,
 ):
     """Test AzureStorage download folder function.
 
     Args:
         mock_blob_service (BlobServiceClient): Mocked blob service client
         matcha_testing_directory (str): Temporary directory
+        mocked_azure_client (AzureClient): mocked azure client
     """
     # Create temp files inside temp directory
     for i in range(1, 3):
@@ -137,6 +155,7 @@ def test_download_folder(
     ]
 
     mock_az_storage = AzureStorage("testaccount", "test-rg")
+    mock_az_storage.az_client = mocked_azure_client
     # Mock _get_container_client function of AzureStorage class
     with patch.object(AzureStorage, "_get_container_client") as mock_fn:
         mock_fn.return_value = mock_container_client
