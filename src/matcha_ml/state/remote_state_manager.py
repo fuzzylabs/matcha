@@ -105,10 +105,13 @@ class RemoteStateManager:
 
         project_directory = os.getcwd()
         destination = os.path.join(
-            project_directory, ".matcha", "infrastructure/remote_state_storage"
+            project_directory, ".matcha", "infrastructure", "remote_state_storage"
         )
         template = os.path.join(
-            os.path.dirname(__file__), os.pardir, "infrastructure/remote_state_storage"
+            os.path.dirname(__file__),
+            os.pardir,
+            "infrastructure",
+            "remote_state_storage",
         )
 
         config = build_template_configuration(location, prefix)
