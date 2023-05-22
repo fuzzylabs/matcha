@@ -5,8 +5,8 @@ from unittest.mock import patch
 import pytest
 from azure.storage.blob import BlobProperties, BlobServiceClient
 
-from matcha_ml.storage.azure_storage import AzureStorage
 from matcha_ml.services.azure_service import AzureClient
+from matcha_ml.storage.azure_storage import AzureStorage
 
 CLASS_STUB = "matcha_ml.storage.azure_storage"
 

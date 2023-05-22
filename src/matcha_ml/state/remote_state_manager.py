@@ -38,6 +38,8 @@ class RemoteStateManager:
     This class is used to interact with the remote Matcha state.
     """
 
+    _azure_storage: Optional[AzureStorage] = None
+
     config_path: str
 
     def __init__(self, config_path: Optional[str] = None) -> None:
@@ -72,8 +74,8 @@ class RemoteStateManager:
         if self._azure_storage is None:
             try:
                 self._azure_storage = AzureStorage(
-                    self.configuration.remote_state_bucket.account_name,
-                    self.configuration.remote_state_bucket.resource_group,
+                    account_name=self.configuration.remote_state_bucket.account_name,
+                    resource_group_name=self.configuration.remote_state_bucket.resource_group,
                 )
             except Exception as e:
                 raise MatchaError(f"Error while creating Azure Storage client: {e}")

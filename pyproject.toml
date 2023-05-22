@@ -57,6 +57,7 @@ dataclasses-json = "^0.5.7"
 azure-storage-blob = "^12.16.0"
 segment-analytics-python = "^2.2.2"
 urllib3 = "1.26.6"
+types-urllib3 = "^1.26.25.13"
 
 
 [tool.poetry.group.dev.dependencies]
