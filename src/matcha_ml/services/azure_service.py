@@ -182,16 +182,24 @@ class AzureClient:
             resource_group_name (str): Name of resource group
             storage_account_name (str): Name of storage account
 
+        Raises:
+            MatchaError: When the access keys for a storage account can't be fetched from Azure.
+
         Returns:
             str: One of the acccess key corresponding to storage account
         """
         self._storage_client = StorageManagementClient(
             self._credential, str(self.subscription_id)
         )
-        keys = self._storage_client.storage_accounts.list_keys(
-            resource_group_name=resource_group_name,
-            account_name=storage_account_name,
-        )
+        try:
+            keys = self._storage_client.storage_accounts.list_keys(
+                resource_group_name=resource_group_name,
+                account_name=storage_account_name,
+            )
+        except Exception:
+            raise MatchaError(
+                "Error - Unable to get storage account keys. Please check if resource group and storage account name exists."
+            )
         return str(keys.keys[0].value)
 
     def fetch_connection_string(
