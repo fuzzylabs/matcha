@@ -188,6 +188,7 @@ class AzureClient:
         Returns:
             str: One of the acccess key corresponding to storage account
         """
+        keys = None
         self._storage_client = StorageManagementClient(
             self._credential, str(self.subscription_id)
         )
@@ -217,6 +218,7 @@ class AzureClient:
         Returns:
             str: A connection string for given storage account
         """
+        connection_string = ""
         try:
             access_key = self.fetch_storage_access_key(
                 resource_group_name=resource_group_name,
