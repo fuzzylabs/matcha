@@ -1,4 +1,4 @@
-# :thinking: Inside Matcha
+# :thinking: How does Matcha work?
 
 Matcha is a tool which will provision an MLOps environment for you to use. To do that, we make use of various open source tools and libraries. Here, we'll provide a deep dive into how Matcha actually works.
 
