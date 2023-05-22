@@ -51,9 +51,19 @@ class RemoteStateManager:
             self.config_path = os.path.join(os.getcwd(), DEFAULT_CONFIG_NAME)
 
     def _configuration_file_exists(self) -> bool:
+        """Check if the remote state configuration file exists.
+
+        Returns:
+            bool: True, if the configuration file exists
+        """
         return os.path.exists(self.config_path)
 
     def _load_configuration(self) -> RemoteStateConfig:
+        """Load configuration file.
+
+        Returns:
+            RemoteStateConfig: remote state configuration
+        """
         with open(self.config_path) as f:
             return RemoteStateConfig.from_json(f.read())
 
@@ -63,6 +73,9 @@ class RemoteStateManager:
 
         Returns:
             RemoteStateConfig: configuration read from the file system
+
+        Raises:
+            MatchaError: if configuration file failed to load.
         """
         try:
             return self._load_configuration()
@@ -77,6 +90,9 @@ class RemoteStateManager:
 
         Returns:
             AzureStorage: to interact with blob storage on Azure
+
+        Raises:
+            MatchaError: if Azure Storage client failed to create
         """
         if self._azure_storage is None:
             try:
@@ -90,6 +106,14 @@ class RemoteStateManager:
         return self._azure_storage
 
     def _bucket_exists(self, container_name: str) -> bool:
+        """Check if a bucket for remote state management exists.
+
+        Args:
+            container_name: Azure Storage container name
+
+        Returns:
+            bool: True, if the bucket exists
+        """
         return self.azure_storage.container_exists(container_name)
 
     def is_state_provisioned(self) -> bool:
