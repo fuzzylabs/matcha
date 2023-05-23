@@ -48,6 +48,7 @@ class AzureStorage:
             bool: does container exist
         """
         container_client = self._get_container_client(container_name)
+
         return container_client.exists()
 
     def upload_file(self, blob_client: BlobClient, src_file: str) -> None:

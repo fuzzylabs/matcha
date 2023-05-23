@@ -87,9 +87,7 @@ def get(
     """
     remote_state = RemoteStateManager()
     if not remote_state.is_state_provisioned():
-        print_error(
-            "Error - matcha state has not been initialized, nothing to destroy."
-        )
+        print_error("Error - matcha state has not been initialized, nothing to get.")
         raise typer.Exit()
 
     try:
@@ -110,9 +108,19 @@ def get(
 
 @app.command()
 @track(event_name=AnalyticsEvent.DESTROY)
-def destroy() -> None:
-    """Destroy the provisioned cloud resources. It will destroy the resource group even if resources are provisioned inside the group."""
+def destroy(
+    full: Optional[str] = typer.Argument(
+        default=None,
+        help="When the full command is specified, the resource group and all its provisioned resources will be destroyed together.",
+    ),
+) -> None:
+    """Destroy the provisioned cloud resources."""
+    remote_state_manager = RemoteStateManager()
+
     destroy_resources()
+
+    if full:
+        remote_state_manager.deprovision_state_storage()
 
 
 def version_callback(value: bool) -> None:

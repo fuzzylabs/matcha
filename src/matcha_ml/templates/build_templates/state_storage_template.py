@@ -1,4 +1,4 @@
-"""Build a template for provisioning resources on Azure using terraform files."""
+"""Build a template for provisioning remote state storage on Azure using terraform files."""
 import dataclasses
 import glob
 import json
@@ -6,9 +6,6 @@ import os
 from shutil import copy, rmtree
 from typing import List, Optional
 
-import typer
-
-from matcha_ml.cli._validation import check_current_deployment_exists
 from matcha_ml.cli.ui.print_messages import print_status
 from matcha_ml.cli.ui.status_message_builders import (
     build_status,
@@ -16,20 +13,8 @@ from matcha_ml.cli.ui.status_message_builders import (
     build_substep_success_status,
 )
 from matcha_ml.errors import MatchaPermissionError
-from matcha_ml.state import MatchaStateService
 
-SUBMODULE_NAMES = [
-    "aks",
-    "resource_group",
-    "mlflow_module",
-    "storage",
-    "seldon",
-    "zenml_storage",
-    "zen_server",
-    "azure_container_registry",
-    "zen_server/zenml_helm",
-    "zen_server/zenml_helm/templates",
-]
+SUBMODULE_NAMES = ["resource_group", "state_storage"]
 ALLOWED_EXTENSIONS = ["tf", "yaml", "tpl"]
 
 
@@ -37,58 +22,24 @@ ALLOWED_EXTENSIONS = ["tf", "yaml", "tpl"]
 class TemplateVariables:
     """Terraform template variables."""
 
-    # Azure location in which all resources will be provisioned
+    # Azure location in which the remote state bucket will be provisioned
     location: str
 
-    # Prefix used for all resources
+    # Prefix used for the resource group
     prefix: str
 
-    # Password for ZenServer
-    password: str
 
-
-def reuse_configuration(path: str) -> bool:
-    """Check if a configuration already exists, and prompt user to override or reuse it.
-
-    Args:
-        path (str): path to the infrastructure configuration
-
-    Returns:
-        bool: decision to reuse the existing configuration
-    """
-    if os.path.exists(path):
-        if check_current_deployment_exists():
-            matcha_state_service = MatchaStateService()
-            resource_group_name = matcha_state_service.fetch_resources_from_state_file(
-                "cloud", "resource-group-name"
-            )["cloud"]["resource-group-name"]
-            warning_msg = f"\nWARNING: Matcha has detected that a deployment already exists in Azure with the resource group name '{resource_group_name}'. Use 'matcha destroy' to remove these resources before trying to provision."
-            confirmation_msg = "\nIf you continue, you will create a orphan resource. You should destroy the resources before proceeding.\n\nDo you want to override the existing configuration?"
-        else:
-            warning_msg = "\nMatcha has detected that the you already have resources configured for provisioning."
-            confirmation_msg = "\nIf you choose to override the existing configuration, the existing configuration will be deleted. Otherwise, the configuration will be reused.\n\nDo you want to override the existing configuration?"
-
-        print_status(warning_msg)
-
-        return not typer.confirm(confirmation_msg)
-    else:
-        return False
-
-
-def build_template_configuration(
-    location: str, prefix: str, password: str
-) -> TemplateVariables:
+def build_template_configuration(location: str, prefix: str) -> TemplateVariables:
     """Ask for variables and build the configuration.
 
     Args:
         location (str): Azure location in which all resources will be provisioned.
         prefix (str): Prefix used for all resources.
-        password (str): Password for ZenServer.
 
     Returns:
         TemplateVariables: Terraform variables required by a template
     """
-    return TemplateVariables(location=location, prefix=prefix, password=password)
+    return TemplateVariables(location=location, prefix=prefix)
 
 
 def copy_files(files: List[str], destination: str, sub_folder_path: str = "") -> None:
@@ -112,7 +63,7 @@ def copy_files(files: List[str], destination: str, sub_folder_path: str = "") ->
 def build_template(
     config: TemplateVariables,
     template_src: str,
-    destination: str = ".matcha/infrastructure/resources",
+    destination: str = ".matcha/infrastructure/remote_state_storage",
     verbose: Optional[bool] = False,
 ) -> None:
     """Build and copy the template to the project directory.
@@ -175,15 +126,8 @@ def build_template(
             print_status(build_substep_success_status("Configuration was copied"))
 
         configuration_destination = os.path.join(destination, "terraform.tfvars.json")
-        state_file_destination = os.path.join(destination, "matcha.state")
-
-        config_dict = dataclasses.asdict(config)
         with open(configuration_destination, "w") as f:
-            json.dump(config_dict, f)
-
-        _ = config_dict.pop("password", None)
-        with open(state_file_destination, "w") as f:
-            json.dump(config_dict, f)
+            json.dump(dataclasses.asdict(config), f)
 
         if verbose:
             print_status(build_substep_success_status("Template variables were added."))
@@ -203,3 +147,4 @@ def build_template(
             f"The configuration template was written to {destination}"
         )
     )
+    print()

@@ -28,7 +28,7 @@ def mock_state_file(matcha_testing_directory: str):
     """
     os.chdir(matcha_testing_directory)
 
-    matcha_infrastructure_dir = os.path.join(".matcha", "infrastructure")
+    matcha_infrastructure_dir = os.path.join(".matcha", "infrastructure", "resources")
     os.makedirs(matcha_infrastructure_dir)
 
     state_file_resources = {
@@ -133,7 +133,9 @@ def test_cli_get_command_with_no_state_file(runner: CliRunner):
     Args:
         runner (CliRunner): typer CLI runner
     """
-    state_file_path = os.path.join(".matcha", "infrastructure", "matcha.state")
+    state_file_path = os.path.join(
+        ".matcha", "infrastructure", "resources", "matcha.state"
+    )
     os.remove(state_file_path)
 
     # Invoke get command
