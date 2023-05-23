@@ -10,6 +10,7 @@ from matcha_ml.cli.ui.status_message_builders import (
     build_status,
     build_step_success_status,
 )
+from matcha_ml.state import RemoteStateManager
 from matcha_ml.templates.build_templates.azure_template import (
     build_template,
     build_template_configuration,
@@ -76,17 +77,30 @@ def provision_resources(
     Raises:
         typer.Exit: if approval is not given by user.
     """
+    remote_state_manager = RemoteStateManager()
+
+    if not remote_state_manager.is_state_provisioned():
+        location, prefix, _ = fill_provision_variables(
+            location=location, prefix=prefix, password="temp"
+        )
+        remote_state_manager.provision_state_storage(location, prefix)
+
     # create a runner for provisioning resource with Terraform service.
     template_runner = TemplateRunner()
 
     project_directory = os.getcwd()
-    destination = os.path.join(project_directory, ".matcha", "infrastructure")
-    template = os.path.join(os.path.dirname(__file__), os.pardir, "infrastructure")
+    destination = os.path.join(
+        project_directory, ".matcha", "infrastructure", "resources"
+    )
+    template = os.path.join(
+        os.path.dirname(__file__), os.pardir, "infrastructure", "resources"
+    )
 
     if not reuse_configuration(destination):
         location, prefix, password = fill_provision_variables(
             location, prefix, password
         )
+
         config = build_template_configuration(location, prefix, password)
         build_template(config, template, destination, verbose)
 

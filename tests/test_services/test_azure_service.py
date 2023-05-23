@@ -5,7 +5,10 @@ import pytest
 
 from matcha_ml.errors import MatchaPermissionError
 from matcha_ml.services import AzureClient
-from matcha_ml.services.azure_service import ACCEPTED_ROLE_CONFIGURATIONS
+from matcha_ml.services.azure_service import (
+    ACCEPTED_ROLE_CONFIGURATIONS,
+    ROLE_ID_MAPPING,
+)
 
 
 def test_is_valid_region_valid_input(mocked_azure_client: AzureClient):
@@ -81,3 +84,35 @@ def test_check_required_role_assignments_incorrect_permissions(
         str(err.value)
         == f"Error - Matcha detected that you do not have the appropriate role-based permissions on Azure to run this action. You need one of the following role configurations: {ACCEPTED_ROLE_CONFIGURATIONS} note: list items containing multiple roles require all of the listed roles."
     )
+
+    # Set back correct roles such that this mocked client can be reused
+    mocked_azure_client._fetch_user_roles.return_value = [
+        f"/subscriptions/id/providers/Microsoft.Authorization/roleDefinitions/{ROLE_ID_MAPPING['Owner']}",
+        f"/subscriptions/id/providers/Microsoft.Authorization/roleDefinitions/{ROLE_ID_MAPPING['Contributor']}",
+    ]
+
+
+def test_fetch_storage_access_key(mocked_azure_client):
+    """Test that the fetch_storage_access_key function produces the access key.
+
+    Args:
+        mocked_azure_client (AzureClient): the mocked AzureClient
+    """
+    access_key_str = mocked_azure_client.fetch_storage_access_key(
+        "testaccname", "test-rg"
+    )
+    assert access_key_str == "key"
+
+
+def test_fetch_connection_string_function(mocked_azure_client):
+    """Test that the fetch_connection_string function produces the correct connection string.
+
+    Args:
+        mocked_azure_client (AzureClient): the mocked AzureClient
+    """
+    rg = "test-rg"
+    expected_access_key = "key"
+    expected_conn_string = f"DefaultEndpointsProtocol=https;EndpointSuffix=core.windows.net;AccountName={rg};AccountKey={expected_access_key}"
+
+    conn_str = mocked_azure_client.fetch_connection_string("testaccname", rg)
+    assert conn_str == expected_conn_string
