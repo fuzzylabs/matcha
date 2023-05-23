@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "matcha-ml"
-version = "0.2.3"
+version = "0.2.4"
 description = "Matcha: An open source tool for provisioning MLOps environments to the cloud."
 authors = ["FuzzyLabs <info@fuzzylabs.ai>"]
 license = "Apache-2.0"
@@ -58,6 +58,7 @@ dataclasses-json = "^0.5.7"
 azure-storage-blob = "^12.16.0"
 urllib3 = "1.26.6"
 types-urllib3 = "^1.26.25.13"
+requests = "^2.31.0"
 
 
 [tool.poetry.group.dev.dependencies]
