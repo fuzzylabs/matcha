@@ -1,6 +1,7 @@
 """Build a template for provisioning resources on Azure using terraform files."""
 import json
 import os
+from typing import Optional
 
 import typer
 
@@ -75,7 +76,7 @@ class AzureTemplate(BaseTemplate):
         config: TemplateVariables,
         template_src: str,
         destination: str,
-        verbose: bool | None = False,
+        verbose: Optional[bool] = False,
     ) -> None:
         """Builds a template using the provided configuration and copies it to the destination.
 
@@ -83,8 +84,7 @@ class AzureTemplate(BaseTemplate):
             config (TemplateVariables): variables to apply to the template.
             template_src (str): path of the template to use.
             destination (str): destination path to write template to.
-            verbose (bool, optional): additional output is shown when True. Defaults to False.
-
+            verbose (Optional[bool]): additional output is shown when True. Defaults to False.
         """
         super().build_template(config, template_src, destination, verbose)
 
