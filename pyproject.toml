@@ -58,6 +58,7 @@ dataclasses-json = "^0.5.7"
 azure-storage-blob = "^12.16.0"
 urllib3 = "1.26.6"
 types-urllib3 = "^1.26.25.13"
+requests = "2.31.0"
 
 
 [tool.poetry.group.dev.dependencies]
