@@ -76,9 +76,6 @@ def expected_outputs_show_sensitive() -> Dict[str, Dict[str, str]]:
             "flavor": "azure",
             "registry-url": "azure_container_registry",
         },
-        "id": {"matcha_uuid": "matcha_id_test_value"},
-        "prefix": "random",
-        "location": "uksouth",
     }
 
     return outputs
@@ -110,9 +107,6 @@ def expected_outputs_hide_sensitive() -> dict:
             "flavor": "azure",
             "registry-url": "azure_container_registry",
         },
-        "id": {"matcha_uuid": "matcha_id_test_value"},
-        "prefix": "random",
-        "location": "uksouth",
     }
     return outputs
 
