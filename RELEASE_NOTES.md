@@ -1,3 +1,9 @@
+# 0.2.4
+
+&#128293; This version contains a hot fix for matcha get command, so it does not throw an error when run without arguments.
+
+See all changes here: [v0.2.3...v0.2.4](https://github.com/fuzzylabs/matcha/compare/v0.2.3...v0.2.4)
+
 # 0.2.3
 
 &#128293; This version contains a quick fix for an import error caused by an old version of `urllib3`
