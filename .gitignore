@@ -323,6 +323,3 @@ pip-selfcheck.json
 
 # ruff cache
 .ruff_cache
-
-#matcha config
-matcha.config.json

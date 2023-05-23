@@ -2,21 +2,11 @@
 import json
 import os
 from typing import Dict, List
-from unittest.mock import patch
 
 import pytest
 from typer.testing import CliRunner
 
 from matcha_ml.cli.cli import app
-
-
-@pytest.fixture(autouse=True)
-def mock_provisioned_remote_state():
-    """Mock remote state manager to have state provisioned."""
-    with patch("matcha_ml.cli.cli.RemoteStateManager") as mock_state_manager_class:
-        mock_state_manager = mock_state_manager_class.return_value
-        mock_state_manager.is_state_provisioned.return_value = True
-        yield
 
 
 @pytest.fixture(autouse=True)
@@ -28,7 +18,7 @@ def mock_state_file(matcha_testing_directory: str):
     """
     os.chdir(matcha_testing_directory)
 
-    matcha_infrastructure_dir = os.path.join(".matcha", "infrastructure", "resources")
+    matcha_infrastructure_dir = os.path.join(".matcha", "infrastructure")
     os.makedirs(matcha_infrastructure_dir)
 
     state_file_resources = {
@@ -133,9 +123,7 @@ def test_cli_get_command_with_no_state_file(runner: CliRunner):
     Args:
         runner (CliRunner): typer CLI runner
     """
-    state_file_path = os.path.join(
-        ".matcha", "infrastructure", "resources", "matcha.state"
-    )
+    state_file_path = os.path.join(".matcha", "infrastructure", "matcha.state")
     os.remove(state_file_path)
 
     # Invoke get command

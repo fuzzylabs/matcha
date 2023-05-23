@@ -1,7 +1,10 @@
 name: Docs
 on:
-  release:
-    types: [published]
+  push:
+    paths:
+        - docs/**
+    branches:
+      - main
 
 permissions:
   contents: write

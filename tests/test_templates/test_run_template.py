@@ -124,7 +124,7 @@ def terraform_test_config(matcha_testing_directory: str) -> TerraformConfig:
         TerraformConfig: test terraform config
     """
     infrastructure_directory = os.path.join(
-        matcha_testing_directory, ".matcha", "infrastructure", "resources"
+        matcha_testing_directory, ".matcha", "infrastructure"
     )
     os.makedirs(infrastructure_directory, exist_ok=True)
 
@@ -134,7 +134,11 @@ def terraform_test_config(matcha_testing_directory: str) -> TerraformConfig:
     with open(matcha_state_file, "w") as fp:
         json.dump(dummy_data, fp)
 
-    return TerraformConfig(working_dir=infrastructure_directory)
+    return TerraformConfig(
+        working_dir=infrastructure_directory,
+        state_file=matcha_state_file,
+        var_file=os.path.join(infrastructure_directory, "terraform.tfvars.json"),
+    )
 
 
 @pytest.fixture
@@ -232,17 +236,14 @@ def test_initialize_terraform(capsys: SysCapture, template_runner: TemplateRunne
 
 
 def test_check_matcha_directory_exists(
-    capsys: SysCapture, template_runner: TemplateRunner, matcha_testing_directory: str
+    capsys: SysCapture, template_runner: TemplateRunner
 ):
     """Test if service exit as expected and print out the expected error message when required files does not exists.
 
     Args:
         capsys (SysCapture): fixture to capture stdout and stderr
         template_runner (TemplateRunner): a TemplateRunner object instance
-        matcha_testing_directory (str): the test directory
     """
-    os.chdir(matcha_testing_directory)
-
     template_runner.tfs.check_matcha_directory_exists = MagicMock(return_value=False)
     template_runner.tfs.check_matcha_directory_integrity = MagicMock(return_value=False)
 

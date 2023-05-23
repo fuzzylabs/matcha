@@ -22,7 +22,6 @@ from matcha_ml.cli.ui.resource_message_builders import (
 from matcha_ml.core import core
 from matcha_ml.errors import MatchaError, MatchaInputError
 from matcha_ml.services.analytics_service import AnalyticsEvent, track
-from matcha_ml.state import RemoteStateManager
 
 app = typer.Typer(no_args_is_help=True, pretty_exceptions_show_locals=False)
 analytics_app = typer.Typer(no_args_is_help=True, pretty_exceptions_show_locals=False)
@@ -81,15 +80,9 @@ def get(
         show_sensitive (Optional[bool]): show hidden sensitive resource values when True. Defaults to False.
 
     Raises:
-        Exit: Exit if matcha remote state has not been provisioned.
         Exit: Exit if matcha.state file does not exist.
         Exit: Exit if resource type or property does not exist in matcha.state.
     """
-    remote_state = RemoteStateManager()
-    if not remote_state.is_state_provisioned():
-        print_error("Error - matcha state has not been initialized, nothing to get.")
-        raise typer.Exit()
-
     try:
         resources = core.get(resource_name, property_name)
     except MatchaInputError as e:
@@ -108,19 +101,9 @@ def get(
 
 @app.command()
 @track(event_name=AnalyticsEvent.DESTROY)
-def destroy(
-    full: Optional[str] = typer.Argument(
-        default=None,
-        help="When the full command is specified, the resource group and all its provisioned resources will be destroyed together.",
-    ),
-) -> None:
-    """Destroy the provisioned cloud resources."""
-    remote_state_manager = RemoteStateManager()
-
+def destroy() -> None:
+    """Destroy the provisioned cloud resources. It will destroy the resource group even if resources are provisioned inside the group."""
     destroy_resources()
-
-    if full:
-        remote_state_manager.deprovision_state_storage()
 
 
 def version_callback(value: bool) -> None:

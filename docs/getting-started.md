@@ -205,16 +205,8 @@ This will result in a score, which represents how strongly we recommend movie ID
 
 # Destroying
 
-The final thing you'll want to do is decommission the infrastructure that Matcha has set up during this guide. Matcha includes a `destroy` command which will remove everything that has been provisioned, which avoids running up an Azure bill!
-
-To destroy the provisioned resources only, run:
+The final thing you'll want to do is decomission the infrastructure that Matcha has set up during this guide. Matcha includes a `destroy` command which will remove everything that has been provisioned, which avoids running up an Azure bill!
 
 ```bash
 matcha destroy
-```
-
-To destroy both the provisioned resources and remote state management, run:
-
-```bash
-matcha destroy full
 ```

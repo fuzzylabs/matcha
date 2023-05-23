@@ -26,7 +26,7 @@ def mock_state_file(matcha_testing_directory: str):
     """
     os.chdir(matcha_testing_directory)
 
-    matcha_infrastructure_dir = os.path.join(".matcha", "infrastructure", "resources")
+    matcha_infrastructure_dir = os.path.join(".matcha", "infrastructure")
     os.makedirs(matcha_infrastructure_dir)
 
     state_file_resources = {
@@ -113,7 +113,7 @@ def test_check_state_file_does_not_exist(matcha_state_service: MatchaStateServic
     Args:
         matcha_state_service (MatchaStateService): The matcha_state_service testing instance.
     """
-    matcha_infrastructure_dir = os.path.join(".matcha", "infrastructure", "resources")
+    matcha_infrastructure_dir = os.path.join(".matcha", "infrastructure")
     os.remove(os.path.join(matcha_infrastructure_dir, "matcha.state"))
     result = matcha_state_service.check_state_file_exists()
     assert result is False

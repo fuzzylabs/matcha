@@ -16,7 +16,7 @@ from matcha_ml.templates.build_templates.azure_template import (
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 TEMPLATE_DIR = os.path.join(
-    BASE_DIR, os.pardir, os.pardir, "src", "matcha_ml", "infrastructure", "resources"
+    BASE_DIR, os.pardir, os.pardir, "src", "matcha_ml", "infrastructure"
 )
 
 
@@ -83,9 +83,7 @@ def test_build_template(matcha_testing_directory, template_src_path):
     """
     config = TemplateVariables("uksouth", "matcha", "superninja")
 
-    destination_path = os.path.join(
-        matcha_testing_directory, "infrastructure", "resources"
-    )
+    destination_path = os.path.join(matcha_testing_directory, "infrastructure")
 
     build_template(config, template_src_path, destination_path)
 
@@ -109,9 +107,7 @@ def test_build_template_raises_permission_error(
     """
     config = TemplateVariables("uksouth", "matcha", "superninja")
 
-    destination_path = os.path.join(
-        matcha_testing_directory, "infrastructure", "resources"
-    )
+    destination_path = os.path.join(matcha_testing_directory, "infrastructure")
 
     # Alters the permissions on the testing directory to be read-only
     os.chmod(matcha_testing_directory, S_IREAD)

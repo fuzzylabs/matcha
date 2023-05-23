@@ -55,9 +55,7 @@ def mocked_azure_client() -> AzureClient:
         f"{INTERNAL_FUNCTION_STUB}.resource_group_state"
     ) as rg_state, patch(
         f"{INTERNAL_FUNCTION_STUB}._fetch_user_roles"
-    ) as roles, patch(
-        f"{INTERNAL_FUNCTION_STUB}.fetch_storage_access_key"
-    ) as key:
+    ) as roles:
         auth.return_value = True
         sub.return_value = "id"
         rg.return_value = None
@@ -66,7 +64,6 @@ def mocked_azure_client() -> AzureClient:
             f"/subscriptions/id/providers/Microsoft.Authorization/roleDefinitions/{ROLE_ID_MAPPING['Owner']}",
             f"/subscriptions/id/providers/Microsoft.Authorization/roleDefinitions/{ROLE_ID_MAPPING['Contributor']}",
         ]
-        key.return_value = "key"
 
         yield AzureClient()
 
