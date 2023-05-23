@@ -110,7 +110,7 @@ def get(
 @track(event_name=AnalyticsEvent.DESTROY)
 def destroy(
     full: Optional[str] = typer.Argument(
-        default=False,
+        default=None,
         help="When the full command is specified, the resource group and all its provisioned resources will be destroyed together.",
     ),
 ) -> None:
