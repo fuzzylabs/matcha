@@ -1,4 +1,4 @@
-"""Test suite to test the azure template."""
+"""Test suite for test state storage template."""
 import glob
 import json
 import os
@@ -8,7 +8,7 @@ from typing import Dict
 import pytest
 
 from matcha_ml.errors import MatchaPermissionError
-from matcha_ml.templates.build_templates.azure_template import (
+from matcha_ml.templates.build_templates.state_storage_template import (
     SUBMODULE_NAMES,
     TemplateVariables,
     build_template,
@@ -16,7 +16,13 @@ from matcha_ml.templates.build_templates.azure_template import (
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 TEMPLATE_DIR = os.path.join(
-    BASE_DIR, os.pardir, os.pardir, "src", "matcha_ml", "infrastructure", "resources"
+    BASE_DIR,
+    os.pardir,
+    os.pardir,
+    "src",
+    "matcha_ml",
+    "infrastructure",
+    "remote_state_storage",
 )
 
 
@@ -62,17 +68,6 @@ def assert_infrastructure(destination_path: str, expected_tf_vars: Dict[str, str
 
     assert tf_vars == expected_tf_vars
 
-    # Check that matcha state file exists and content is equal/correct
-    state_file_path = os.path.join(destination_path, "matcha.state")
-    assert os.path.exists(state_file_path)
-
-    with open(state_file_path) as f:
-        tf_vars = json.load(f)
-
-    _ = expected_tf_vars.pop("password", None)
-    expected_matcha_state_vars = {"cloud": expected_tf_vars}
-    assert tf_vars == expected_matcha_state_vars
-
 
 def test_build_template(matcha_testing_directory, template_src_path):
     """Test that the template is built and copied to correct locations.
@@ -81,19 +76,15 @@ def test_build_template(matcha_testing_directory, template_src_path):
         matcha_testing_directory (str): Temporary .matcha directory path
         template_src_path (str): Existing template directory path
     """
-    config = TemplateVariables("uksouth", "matcha", "superninja")
+    config = TemplateVariables("uksouth", "matcha")
 
     destination_path = os.path.join(
-        matcha_testing_directory, "infrastructure", "resources"
+        matcha_testing_directory, "infrastructure", "remote_state_storage"
     )
 
     build_template(config, template_src_path, destination_path)
 
-    expected_tf_vars = {
-        "location": "uksouth",
-        "prefix": "matcha",
-        "password": "superninja",
-    }
+    expected_tf_vars = {"location": "uksouth", "prefix": "matcha"}
 
     assert_infrastructure(destination_path, expected_tf_vars)
 
@@ -107,10 +98,10 @@ def test_build_template_raises_permission_error(
         matcha_testing_directory (str): Temporary .matcha directory path
         template_src_path (str): Existing template directory path
     """
-    config = TemplateVariables("uksouth", "matcha", "superninja")
+    config = TemplateVariables("uksouth", "matcha")
 
     destination_path = os.path.join(
-        matcha_testing_directory, "infrastructure", "resources"
+        matcha_testing_directory, "infrastructure", "remote_state_storage"
     )
 
     # Alters the permissions on the testing directory to be read-only
