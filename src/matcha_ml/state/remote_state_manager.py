@@ -246,4 +246,10 @@ class RemoteStateManager:
         Downloads the state before executing the code.
         Upload the state when context is finished.
         """
-        yield
+        matcha_resources_dir = os.path.join(
+            os.getcwd(), ".matcha", "infrastructure", "resources"
+        )
+        print(matcha_resources_dir)
+        self.download(matcha_resources_dir)
+        yield None
+        self.upload(matcha_resources_dir)

@@ -6,6 +6,7 @@ from matcha_ml.cli._validation import get_command_validation
 from matcha_ml.errors import MatchaError
 from matcha_ml.services.global_parameters_service import GlobalParameters
 from matcha_ml.state.matcha_state import MatchaStateService
+from matcha_ml.state.remote_state_manager import RemoteStateManager
 
 
 def get(
@@ -27,30 +28,35 @@ def get(
         MatchaError: Raised when the matcha.state file does not exist
         MatchaInputError: Raised when the resource or property name does not exist in the matcha.state file
     """
-    matcha_state_service = MatchaStateService()
+    remote_state_manager = RemoteStateManager()
 
-    if not matcha_state_service.state_file_exists:
-        raise MatchaError(
-            f"Error: matcha.state file does not exist at {os.path.join(os.getcwd(), '.matcha', 'infrastructure', 'resources')} . Please run 'matcha provision' before trying to get the resource."
+    with remote_state_manager.use_remote_state():
+        matcha_state_service = MatchaStateService()
+
+        if not matcha_state_service.state_file_exists:
+            raise MatchaError(
+                f"Error: matcha.state file does not exist at {os.path.join(os.getcwd(), '.matcha', 'infrastructure', 'resources')} . Please run 'matcha provision' before trying to get the resource."
+            )
+
+        if resource_name:
+            get_command_validation(
+                resource_name,
+                matcha_state_service.get_resource_names(),
+                "resource type",
+            )
+
+        if resource_name and property_name:
+            get_command_validation(
+                property_name,
+                matcha_state_service.get_property_names(resource_name),
+                "property",
+            )
+
+        result = matcha_state_service.fetch_resources_from_state_file(
+            resource_name, property_name
         )
 
-    if resource_name:
-        get_command_validation(
-            resource_name, matcha_state_service.get_resource_names(), "resource type"
-        )
-
-    if resource_name and property_name:
-        get_command_validation(
-            property_name,
-            matcha_state_service.get_property_names(resource_name),
-            "property",
-        )
-
-    result = matcha_state_service.fetch_resources_from_state_file(
-        resource_name, property_name
-    )
-
-    return result
+        return result
 
 
 def analytics_opt_out() -> None:
