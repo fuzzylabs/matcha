@@ -11,11 +11,7 @@ from matcha_ml.cli.ui.status_message_builders import (
     build_step_success_status,
 )
 from matcha_ml.state import RemoteStateManager
-from matcha_ml.templates.build_templates.azure_template import (
-    build_template,
-    build_template_configuration,
-    reuse_configuration,
-)
+from matcha_ml.templates.build_templates.azure_template import AzureTemplate
 from matcha_ml.templates.run_template import TemplateRunner
 
 # create a typer app to group all provision subcommands
@@ -79,10 +75,12 @@ def provision_resources(
     """
     remote_state_manager = RemoteStateManager()
 
+    # Check whether remote state storage has been provisioned
     if not remote_state_manager.is_state_provisioned():
         location, prefix, _ = fill_provision_variables(
             location=location, prefix=prefix, password="temp"
         )
+        # Provision a state storage if it's not provisioned
         remote_state_manager.provision_state_storage(location, prefix)
 
     # create a runner for provisioning resource with Terraform service.
@@ -96,15 +94,20 @@ def provision_resources(
         os.path.dirname(__file__), os.pardir, "infrastructure", "resources"
     )
 
-    if not reuse_configuration(destination):
+    # Create a azure template object
+    azure_template = AzureTemplate()
+
+    if not azure_template.reuse_configuration(destination):
         location, prefix, password = fill_provision_variables(
             location, prefix, password
         )
 
-        config = build_template_configuration(location, prefix, password)
-        build_template(config, template, destination, verbose)
+        config = azure_template.build_template_configuration(
+            location=location, prefix=prefix, password=password
+        )
+        azure_template.build_template(config, template, destination, verbose)
 
-    # initialises the infrastructure provisioning process.
+    # Initialises the infrastructure provisioning process.
     if template_runner.is_approved(verb="provision"):
         # provision resources by running the template
         template_runner.provision()

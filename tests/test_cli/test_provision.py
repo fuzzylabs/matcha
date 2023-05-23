@@ -295,10 +295,11 @@ def test_cli_provision_command_with_verbose_arg(
 
     for verbose_output in [
         "module configuration was copied",
-        "Configuration was copied",
+        "Configurations were copied",
         "Template variables were added",
         "Template configuration has finished!",
     ]:
+        print(result.stdout)
         assert verbose_output in result.stdout
 
 

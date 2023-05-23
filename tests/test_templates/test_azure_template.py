@@ -1,119 +1,58 @@
 """Test suite to test the azure template."""
-import glob
-import json
 import os
-from stat import S_IREAD
-from typing import Dict
+from unittest.mock import patch
 
 import pytest
 
-from matcha_ml.errors import MatchaPermissionError
-from matcha_ml.templates.build_templates.azure_template import (
-    SUBMODULE_NAMES,
-    TemplateVariables,
-    build_template,
-)
-
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-TEMPLATE_DIR = os.path.join(
-    BASE_DIR, os.pardir, os.pardir, "src", "matcha_ml", "infrastructure", "resources"
-)
+from matcha_ml.templates.build_templates.azure_template import AzureTemplate
 
 
 @pytest.fixture
-def template_src_path() -> str:
-    """Fixture for the test infrastructure template path.
+def azure_template() -> AzureTemplate:
+    """A base template object for testing.
 
     Returns:
-        str: template path
+        BaseTemplate: the base template.
     """
-    return TEMPLATE_DIR
+    return AzureTemplate()
 
 
-def assert_infrastructure(destination_path: str, expected_tf_vars: Dict[str, str]):
-    """Assert if the infrastructure configuration is valid.
-
-    Args:
-        destination_path (str): infrastructure config destination path
-        expected_tf_vars (Dict[str, str]): expected Terraform variables
-    """
-    # Test that destination path is a directory
-    assert os.path.exists(destination_path)
-
-    for module_file_name in glob.glob(os.path.join(TEMPLATE_DIR, "*.tf")):
-        module_file_path = os.path.join(destination_path, module_file_name)
-        assert os.path.exists(module_file_path)
-
-    for module_name in SUBMODULE_NAMES:
-        for module_file_name in glob.glob(
-            os.path.join(TEMPLATE_DIR, module_name, "*.tf")
-        ):
-            module_file_path = os.path.join(
-                destination_path, module_name, module_file_name
-            )
-            assert os.path.exists(module_file_path)
-
-    # Check that Terraform variables file exists and content is equal/correct
-    variables_file_path = os.path.join(destination_path, "terraform.tfvars.json")
-    assert os.path.exists(variables_file_path)
-
-    with open(variables_file_path) as f:
-        tf_vars = json.load(f)
-
-    assert tf_vars == expected_tf_vars
-
-    # Check that matcha state file exists and content is equal/correct
-    state_file_path = os.path.join(destination_path, "matcha.state")
-    assert os.path.exists(state_file_path)
-
-    with open(state_file_path) as f:
-        tf_vars = json.load(f)
-
-    _ = expected_tf_vars.pop("password", None)
-    assert tf_vars == expected_tf_vars
-
-
-def test_build_template(matcha_testing_directory, template_src_path):
-    """Test that the template is built and copied to correct locations.
-
-    Args:
-        matcha_testing_directory (str): Temporary .matcha directory path
-        template_src_path (str): Existing template directory path
-    """
-    config = TemplateVariables("uksouth", "matcha", "superninja")
-
-    destination_path = os.path.join(
-        matcha_testing_directory, "infrastructure", "resources"
-    )
-
-    build_template(config, template_src_path, destination_path)
-
-    expected_tf_vars = {
-        "location": "uksouth",
-        "prefix": "matcha",
-        "password": "superninja",
-    }
-
-    assert_infrastructure(destination_path, expected_tf_vars)
-
-
-def test_build_template_raises_permission_error(
-    matcha_testing_directory, template_src_path
+def test_reuse_configuration(
+    matcha_testing_directory: str, azure_template: AzureTemplate
 ):
-    """Test that the MatchaPermissionError is thrown where the user does not have permission to write to the target directory.
+    """Test the reuse_configuration function of AzureTemplate.
 
     Args:
-        matcha_testing_directory (str): Temporary .matcha directory path
-        template_src_path (str): Existing template directory path
+        matcha_testing_directory (str): The path to the testing directory.
+        azure_template (AzureTemplate): An instance of AzureTemplate.
     """
-    config = TemplateVariables("uksouth", "matcha", "superninja")
+    test_config_dir = os.path.join(matcha_testing_directory, "test_config")
+    assert not azure_template.reuse_configuration(test_config_dir)
 
-    destination_path = os.path.join(
-        matcha_testing_directory, "infrastructure", "resources"
+    os.makedirs(test_config_dir)
+
+    matcha_state_service_stub = (
+        "matcha_ml.templates.build_templates.azure_template.MatchaStateService"
     )
 
-    # Alters the permissions on the testing directory to be read-only
-    os.chmod(matcha_testing_directory, S_IREAD)
+    with patch(
+        "matcha_ml.templates.build_templates.azure_template.check_current_deployment_exists"
+    ) as mock_check_current_deployment_exists, patch(
+        "typer.confirm"
+    ) as mock_confirm, patch(
+        matcha_state_service_stub
+    ) as mock_matcha_state_service, patch(
+        f"{matcha_state_service_stub}.fetch_resources_from_state_file"
+    ) as mock_fetch_resources_from_state_file:
 
-    with pytest.raises(MatchaPermissionError):
-        build_template(config, template_src_path, destination_path)
+        mock_check_current_deployment_exists.return_value = True
+        mock_confirm.return_value = True
+        mock_matcha_state_service_instance = mock_matcha_state_service.return_value
+        mock_matcha_state_service_instance.return_value = None
+        mock_fetch_resources_from_state_file.return_value = None
+
+        assert not azure_template.reuse_configuration(test_config_dir)
+
+        mock_confirm.return_value = False
+
+        assert azure_template.reuse_configuration(test_config_dir)
