@@ -21,11 +21,20 @@ from matcha_ml.cli.ui.resource_message_builders import (
 )
 from matcha_ml.core import core
 from matcha_ml.errors import MatchaError, MatchaInputError
+from matcha_ml.services.analytics_service import AnalyticsEvent, track
+from matcha_ml.state import RemoteStateManager
 
 app = typer.Typer(no_args_is_help=True, pretty_exceptions_show_locals=False)
+analytics_app = typer.Typer(no_args_is_help=True, pretty_exceptions_show_locals=False)
+app.add_typer(
+    analytics_app,
+    name="analytics",
+    help="Enable or disable the collection of anonymous usage data (enabled by default).",
+)
 
 
 @app.command()
+@track(event_name=AnalyticsEvent.PROVISION)
 def provision(
     location: str = typer.Option(
         callback=region_typer_callback,
@@ -50,6 +59,7 @@ def provision(
 
 
 @app.command(help="Get information for the provisioned resources.")
+@track(event_name=AnalyticsEvent.GET)
 def get(
     resource_name: Optional[str] = typer.Argument(None),
     property_name: Optional[str] = typer.Argument(None),
@@ -71,9 +81,15 @@ def get(
         show_sensitive (Optional[bool]): show hidden sensitive resource values when True. Defaults to False.
 
     Raises:
+        Exit: Exit if matcha remote state has not been provisioned.
         Exit: Exit if matcha.state file does not exist.
         Exit: Exit if resource type or property does not exist in matcha.state.
     """
+    remote_state = RemoteStateManager()
+    if not remote_state.is_state_provisioned():
+        print_error("Error - matcha state has not been initialized, nothing to get.")
+        raise typer.Exit()
+
     try:
         resources = core.get(resource_name, property_name)
     except MatchaInputError as e:
@@ -91,9 +107,20 @@ def get(
 
 
 @app.command()
-def destroy() -> None:
-    """Destroy the provisioned cloud resources. It will destroy the resource group even if resources are provisioned inside the group."""
+@track(event_name=AnalyticsEvent.DESTROY)
+def destroy(
+    full: Optional[str] = typer.Argument(
+        default=None,
+        help="When the full command is specified, the resource group and all its provisioned resources will be destroyed together.",
+    ),
+) -> None:
+    """Destroy the provisioned cloud resources."""
+    remote_state_manager = RemoteStateManager()
+
     destroy_resources()
+
+    if full:
+        remote_state_manager.deprovision_state_storage()
 
 
 def version_callback(value: bool) -> None:
@@ -123,6 +150,24 @@ def cli(
     For more help on how to use matcha, head to https://fuzzylabs.github.io/matcha/
     """
     pass
+
+
+@analytics_app.command()
+def opt_out() -> None:
+    """Disable the collection of anonymous usage data."""
+    print(
+        "Data collection has been turned off and no data will be collected - you can turn this back on by running the command: 'matcha analytics opt-in'."
+    )
+    core.analytics_opt_out()
+
+
+@analytics_app.command()
+def opt_in() -> None:
+    """Enable the collection of anonymous usage data (enabled by default)."""
+    print(
+        "Thank you for enabling data collection, this helps us improve matcha and anonymously understand how people are using the tool."
+    )
+    core.analytics_opt_in()
 
 
 if __name__ == "__main__":

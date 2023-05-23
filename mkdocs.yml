@@ -12,7 +12,10 @@ nav:
     - Workflows: 'workflows.md'
     - Azure Permissions: 'azure-permissions.md'
     - Azure Costs: 'costings.md'
-  - Inside Matcha: 'inside-matcha.md'
+  - Inside Matcha:
+    - How does Matcha work: 'inside-matcha.md'
+    - Why we collect usage data: 'privacy.md'
+
 
 theme:
   name: material

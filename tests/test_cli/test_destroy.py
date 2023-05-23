@@ -2,7 +2,18 @@
 import os
 from unittest.mock import patch
 
+import pytest
+
 from matcha_ml.cli.cli import app
+
+
+@pytest.fixture(autouse=True)
+def mock_provisioned_remote_state():
+    """Mock remote state manager to have state provisioned."""
+    with patch("matcha_ml.cli.destroy.RemoteStateManager") as mock_state_manager_class:
+        mock_state_manager = mock_state_manager_class.return_value
+        mock_state_manager.is_state_provisioned.return_value = True
+        yield
 
 
 def test_cli_destroy_command_help(runner):
@@ -11,7 +22,7 @@ def test_cli_destroy_command_help(runner):
     Args:
         runner (CliRunner): typer CLI runner
     """
-    # Invoke provision command
+    # Invoke destroy command
     result = runner.invoke(app, ["destroy", "--help"])
 
     # Exit code 0 means there was no error
@@ -32,7 +43,7 @@ def test_cli_destroy_command_with_no_provisioned_resources(
     """
     os.chdir(matcha_testing_directory)
 
-    # Invoke provision command
+    # Invoke destroy command
     with patch(
         "matcha_ml.templates.build_templates.azure_template.check_current_deployment_exists"
     ) as check_deployment_exists:

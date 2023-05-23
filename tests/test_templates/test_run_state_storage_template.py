@@ -1,7 +1,5 @@
-"""Test for interacting with Terraform service."""
-import json
+"""Test for interacting with terraform service to run the state storage template."""
 import os
-from contextlib import nullcontext as does_not_raise
 from typing import Callable, Dict, Union
 from unittest import mock
 from unittest.mock import MagicMock
@@ -12,7 +10,7 @@ from _pytest.capture import SysCapture
 
 from matcha_ml.errors import MatchaTerraformError
 from matcha_ml.services.terraform_service import TerraformConfig
-from matcha_ml.templates.run_template import TemplateRunner
+from matcha_ml.templates.run_state_storage_template import TemplateRunner
 
 
 @pytest.fixture
@@ -25,19 +23,8 @@ def mock_output() -> Callable[[str, bool], Union[str, Dict[str, str]]]:
 
     def output() -> str:
         terraform_outputs = {
-            "cloud_azure_resource_group_name": {
-                "value": "random-resources",
-            },
-            "experiment_tracker_mlflow_tracking_url": {"value": "mlflow_test_url"},
-            "pipeline_zenml_connection_string": {
-                "value": "zenml_test_connection_string"
-            },
-            "pipeline_zenml_server_url": {"value": "zen_server_url"},
-            "pipeline_zenml_server_password": {"value": "zen_server_password"},
-            "orchestrator_aks_k8s_context": {"value": "k8s_test_context"},
-            "container_registry_azure_registry_url": {
-                "value": "azure_container_registry"
-            },
+            "remote_state_storage_account_name": {"value": "test_account_name"},
+            "remote_state_storage_container_name": {"value": "test_container_name"},
         }
         return terraform_outputs
 
@@ -45,74 +32,17 @@ def mock_output() -> Callable[[str, bool], Union[str, Dict[str, str]]]:
 
 
 @pytest.fixture
-def expected_outputs_show_sensitive() -> Dict[str, Dict[str, str]]:
-    """The expected output from terraform.
+def expected_bucket_config() -> dict:
+    """The expected output generated for the config file when a state bucket is provisioned.
 
     Returns:
-        dict: expected output
+        dict: the expected output
     """
     outputs = {
-        "cloud": {
-            "flavor": "azure",
-            "resource-group-name": "random-resources",
-            "location": "uksouth",
-            "prefix": "random",
-        },
-        "experiment-tracker": {
-            "flavor": "mlflow",
-            "tracking-url": "mlflow_test_url",
-        },
-        "pipeline": {
-            "flavor": "zenml",
-            "connection-string": "zenml_test_connection_string",
-            "server-password": "zen_server_password",
-            "server-url": "zen_server_url",
-        },
-        "orchestrator": {
-            "flavor": "aks",
-            "k8s-context": "k8s_test_context",
-        },
-        "container-registry": {
-            "flavor": "azure",
-            "registry-url": "azure_container_registry",
-        },
-        "id": {"matcha_uuid": "matcha_id_test_value"},
-        "prefix": "random",
-        "location": "uksouth",
-    }
-
-    return outputs
-
-
-@pytest.fixture
-def expected_outputs_hide_sensitive() -> dict:
-    """The expected output from terraform.
-
-    Returns:
-        dict: expected output
-    """
-    outputs = {
-        "experiment-tracker": {
-            "flavor": "mlflow",
-            "tracking-url": "mlflow_test_url",
-        },
-        "pipeline": {
-            "flavor": "zenml",
-            "connection-string": "********",
-            "server-password": "********",
-            "server-url": "zen_server_url",
-        },
-        "orchestrator": {
-            "flavor": "aks",
-            "k8s-context": "k8s_test_context",
-        },
-        "container-registry": {
-            "flavor": "azure",
-            "registry-url": "azure_container_registry",
-        },
-        "id": {"matcha_uuid": "matcha_id_test_value"},
-        "prefix": "random",
-        "location": "uksouth",
+        "remote_state_storage": {
+            "account_name": "test_account_name",
+            "container_name": "test_container_name",
+        }
     }
     return outputs
 
@@ -128,15 +58,9 @@ def terraform_test_config(matcha_testing_directory: str) -> TerraformConfig:
         TerraformConfig: test terraform config
     """
     infrastructure_directory = os.path.join(
-        matcha_testing_directory, ".matcha", "infrastructure", "resources"
+        matcha_testing_directory, ".matcha", "infrastructure", "remote_state_storage"
     )
     os.makedirs(infrastructure_directory, exist_ok=True)
-
-    # Create a dummy matcha state file
-    matcha_state_file = os.path.join(infrastructure_directory, "matcha.state")
-    dummy_data = {"cloud": {"prefix": "random", "location": "uksouth"}}
-    with open(matcha_state_file, "w") as fp:
-        json.dump(dummy_data, fp)
 
     return TerraformConfig(working_dir=infrastructure_directory)
 
@@ -161,7 +85,7 @@ def test_check_terraform_installation(
         template_runner (TemplateRunner): a TemplateRunner object instance
     """
     with mock.patch(
-        "matcha_ml.templates.run_template.TemplateRunner.tfs.check_installation"
+        "matcha_ml.templates.run_state_storage_template.TemplateRunner.tfs.check_installation"
     ) as mock_check_installation:
         mock_check_installation.return_value = False
         expected = "Terraform is not installed"
@@ -181,7 +105,7 @@ def test_validate_terraform_config(capsys: SysCapture, template_runner: Template
         template_runner (TemplateRunner): a TemplateRunner object instance
     """
     with mock.patch(
-        "matcha_ml.templates.run_template.TemplateRunner.tfs.validate_config"
+        "matcha_ml.templates.run_state_storage_template.TemplateRunner.tfs.validate_config"
     ) as mock_validate_config:
         mock_validate_config.return_value = False
         expected = "The file terraform.tfvars.json was not found"
@@ -193,20 +117,6 @@ def test_validate_terraform_config(capsys: SysCapture, template_runner: Template
         assert expected in captured.err
 
 
-def test_is_approved(template_runner: TemplateRunner):
-    """Test if is_approved behaves as expected based on user's input.
-
-    Args:
-        template_runner (TemplateRunner): a TemplateRunner object instance
-    """
-    with mock.patch("typer.confirm") as mock_confirm:
-        mock_confirm.return_value = True
-        assert template_runner.is_approved("provision")
-
-        mock_confirm.return_value = False
-        assert not template_runner.is_approved("provision")
-
-
 def test_initialize_terraform(capsys: SysCapture, template_runner: TemplateRunner):
     """Test if service behaves as expected when initializing Terraform.
 
@@ -214,25 +124,13 @@ def test_initialize_terraform(capsys: SysCapture, template_runner: TemplateRunne
         capsys (SysCapture): fixture to capture stdout and stderr
         template_runner (TemplateRunner): a TemplateRunner object instance
     """
-    template_runner.tf_state_dir = MagicMock()
+    expected = "Remote state management initialized!"
 
-    with mock.patch.object(template_runner.tf_state_dir, "exists", return_value=True):
-        expected = "has already been initialized"
+    template_runner.tfs.init = MagicMock(return_value=(0, "", ""))
+    template_runner._initialize_terraform()
+    captured = capsys.readouterr()
 
-        template_runner._initialize_terraform()
-
-        captured = capsys.readouterr()
-
-        assert expected in captured.out
-
-    with mock.patch.object(template_runner.tf_state_dir, "exists", return_value=False):
-        template_runner.tfs.init = MagicMock(return_value=(0, "", ""))
-        expected = " initialized!"
-        template_runner._initialize_terraform()
-
-        captured = capsys.readouterr()
-
-        assert expected in captured.out
+    assert expected in captured.out
 
 
 def test_check_matcha_directory_exists(
@@ -292,58 +190,6 @@ def test_apply_terraform(capsys: SysCapture, template_runner: TemplateRunner):
         )
 
 
-def test_write_outputs_state(
-    template_runner: TemplateRunner,
-    terraform_test_config: TerraformConfig,
-    mock_output: Callable[[str, bool], Union[str, Dict[str, str]]],
-    expected_outputs_show_sensitive: dict,
-):
-    """Test service writes the state file correctly.
-
-    Args:
-        template_runner (TemplateRunner): a TemplateRunner object instance
-        terraform_test_config (TerraformConfig): test terraform service config
-        mock_output (Callable[[str, bool], Union[str, Dict[str, str]]]): the mock output
-        expected_outputs_show_sensitive (dict): expected output from terraform
-    """
-    template_runner.state_file = terraform_test_config.state_file
-    template_runner.tfs.terraform_client.output = MagicMock(wraps=mock_output)
-
-    with does_not_raise():
-        with mock.patch("uuid.uuid4") as uuid4:
-            uuid4.return_value = "matcha_id_test_value"
-            template_runner._write_outputs_state()
-        with open(terraform_test_config.state_file) as f:
-            assert json.load(f) == expected_outputs_show_sensitive
-
-
-def test_show_terraform_outputs(
-    template_runner: TemplateRunner,
-    terraform_test_config: TerraformConfig,
-    capsys: SysCapture,
-    mock_output: Callable[[str, bool], Union[str, Dict[str, str]]],
-    expected_outputs_hide_sensitive: dict,
-):
-    """Test service shows the correct terraform output.
-
-    Args:
-        template_runner (TemplateRunner): a TemplateRunner object instance
-        terraform_test_config (TerraformConfig): test terraform service config
-        capsys (SysCapture): fixture to capture stdout and stderr
-        mock_output (Callable[[str, bool], Union[str, Dict[str, str]]]): the mock output
-        expected_outputs_hide_sensitive (dict): expected output from terraform
-    """
-    template_runner.state_file = terraform_test_config.state_file
-    template_runner.tfs.terraform_client.output = MagicMock(wraps=mock_output)
-
-    with does_not_raise():
-        template_runner._show_terraform_outputs()
-        captured = capsys.readouterr()
-
-        for output in expected_outputs_hide_sensitive:
-            assert output in captured.out
-
-
 def test_destroy_terraform(capsys: SysCapture, template_runner: TemplateRunner):
     """Test if terraform exception is captured when performing deprovision.
 
@@ -353,7 +199,7 @@ def test_destroy_terraform(capsys: SysCapture, template_runner: TemplateRunner):
     """
     template_runner.tfs.destroy = MagicMock(return_value=(0, "", ""))
 
-    expected = "Destroying your resources"
+    expected = "Destroying remote state management"
 
     template_runner._destroy_terraform()
 
@@ -383,7 +229,7 @@ def test_provision(template_runner: TemplateRunner):
     template_runner._validate_terraform_config = MagicMock()
     template_runner._initialize_terraform = MagicMock()
     template_runner._apply_terraform = MagicMock()
-    template_runner._show_terraform_outputs = MagicMock()
+    template_runner._get_terraform_output = MagicMock()
 
     with mock.patch("typer.confirm") as mock_confirm:
         mock_confirm.return_value = False
@@ -395,6 +241,7 @@ def test_provision(template_runner: TemplateRunner):
         template_runner.provision()
         template_runner._initialize_terraform.assert_called()
         template_runner._apply_terraform.assert_called()
+        template_runner._get_terraform_output.assert_called()
 
 
 def test_deprovision(template_runner: TemplateRunner):

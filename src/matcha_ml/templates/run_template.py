@@ -1,6 +1,7 @@
 """Run terraform templates to provision and deprovision resources."""
 import json
 import os
+import uuid
 from collections import defaultdict
 from typing import Dict, Tuple
 
@@ -23,7 +24,7 @@ from matcha_ml.cli.ui.status_message_builders import (
     build_substep_success_status,
 )
 from matcha_ml.errors import MatchaInputError, MatchaTerraformError
-from matcha_ml.services.terraform_service import TerraformService
+from matcha_ml.services.terraform_service import TerraformConfig, TerraformService
 
 SPINNER = "dots"
 
@@ -40,7 +41,8 @@ RESOURCE_NAMES = [
 class TemplateRunner:
     """A Runner class provides methods that interface with the Terraform service to facilitate the provisioning and deprovisioning of resources."""
 
-    tfs: TerraformService = TerraformService()
+    terraform_config = TerraformConfig()
+    tfs: TerraformService = TerraformService(terraform_config)
     tf_state_dir = tfs.get_tf_state_dir()
     state_file = tfs.config.state_file
 
@@ -193,6 +195,9 @@ class TemplateRunner:
             state_outputs[resource_type].setdefault("flavor", flavor)
             state_outputs[resource_type][resource_name] = properties["value"]
 
+        # Create a unique matcha state identifier
+        state_outputs["id"] = {"matcha_uuid": str(uuid.uuid4())}
+
         self._update_state_file(state_outputs)
 
     def _update_state_file(self, state_outputs: Dict[str, Dict[str, str]]) -> None:
@@ -246,7 +251,6 @@ class TemplateRunner:
         summary_message = build_resource_confirmation(
             header=f"The following resources will be {verb}ed",
             resources=[
-                ("Resource group", "A resource group"),
                 ("Azure Kubernetes Service (AKS)", "A kubernetes cluster"),
                 (
                     "Two Storage Containers",
