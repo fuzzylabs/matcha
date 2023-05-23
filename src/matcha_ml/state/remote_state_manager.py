@@ -175,6 +175,7 @@ class RemoteStateManager:
         self._write_matcha_config(account_name, container_name, resource_group_name)
 
         print_status(build_step_success_status("Provisioning is complete!"))
+        print()
 
     def deprovision_state_storage(self) -> None:
         """Destroy the state bucket provisioned."""

@@ -109,12 +109,12 @@ def get(
 @app.command()
 @track(event_name=AnalyticsEvent.DESTROY)
 def destroy(
-    full: Optional[str] = typer.Argument(None),
+    full: Optional[str] = typer.Argument(
+        default=False,
+        help="When the full command is specified, the resource group and all its provisioned resources will be destroyed together.",
+    ),
 ) -> None:
-    """Destroy the provisioned cloud resources.
-
-    When `full` is passed to the command, it will destroy the resource group even if resources are provisioned inside the group.
-    """
+    """Destroy the provisioned cloud resources."""
     remote_state_manager = RemoteStateManager()
 
     destroy_resources()

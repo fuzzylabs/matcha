@@ -23,7 +23,7 @@ class TemplateRunner:
 
     terraform_config = TerraformConfig(
         working_dir=os.path.join(
-            os.getcwd(), ".matcha", "infrastructure/remote_state_storage"
+            os.getcwd(), ".matcha", "infrastructure", "remote_state_storage"
         )
     )
     tfs: TerraformService = TerraformService(terraform_config)
@@ -122,14 +122,10 @@ class TemplateRunner:
         container_name = ""
         resource_group_name = ""
 
-        for output_name, properties in tf_outputs.items():
-            property_name = output_name.replace("remote_state_storage_", "")
-            if property_name == "account_name":
-                account_name = properties["value"]
-            elif property_name == "container_name":
-                container_name = properties["value"]
-            elif property_name == "resource_group_name":
-                resource_group_name = properties["value"]
+        prefix = "remote_state_storage"
+        account_name = tf_outputs[f"{prefix}_account_name"]["value"]
+        resource_group_name = tf_outputs[f"{prefix}_resource_group_name"]["value"]
+        container_name = tf_outputs[f"{prefix}_container_name"]["value"]
 
         return account_name, container_name, resource_group_name
 
