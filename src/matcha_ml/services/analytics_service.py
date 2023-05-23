@@ -71,6 +71,8 @@ def track(event_name: AnalyticsEvent) -> Callable[..., Any]:
                         "matcha_state_uuid": matcha_state_uuid,
                     },
                 )
+                if error_code is not None:
+                    raise error_code
             else:
                 result = func(*args, **kwargs)
 
