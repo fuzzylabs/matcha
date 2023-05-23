@@ -75,7 +75,7 @@ def assert_infrastructure(
 
         _ = expected_tf_vars.pop("password", None)
         expected_matcha_state_vars = {"cloud": expected_tf_vars}
-    assert tf_vars == expected_matcha_state_vars
+        assert tf_vars == expected_matcha_state_vars
 
 
 def test_cli_provision_command_help(runner: CliRunner):
