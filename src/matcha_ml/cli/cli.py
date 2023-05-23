@@ -122,6 +122,11 @@ def destroy(
     if full:
         remote_state_manager.deprovision_state_storage()
 
+@app.command()
+def force_unlock() -> None:
+    """Force unlock lock on remote matcha state on azure."""
+    core.unlock_state_lock()
+
 
 def version_callback(value: bool) -> None:
     """Print version for matcha cli.

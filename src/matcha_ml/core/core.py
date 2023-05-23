@@ -61,3 +61,7 @@ def analytics_opt_out() -> None:
 def analytics_opt_in() -> None:
     """Enable the collection of anonymous usage data (enabled by default)."""
     GlobalParameters().analytics_opt_out = False
+
+
+def unlock_state_lock() -> None:
+    ...
