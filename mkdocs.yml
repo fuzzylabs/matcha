@@ -22,7 +22,7 @@ theme:
   features:
     - content.code.copy
     - navigation.top
-  logo: img/logo.png
+  logo: img/logo-white.png
   favicon: img/favicon.png
 
 
