@@ -13,8 +13,7 @@ from matcha_ml.cli.ui.status_message_builders import (
 from matcha_ml.errors import MatchaError
 from matcha_ml.storage import AzureStorage
 from matcha_ml.templates.build_templates.state_storage_template import (
-    build_template,
-    build_template_configuration,
+    StateStorageTemplate,
 )
 from matcha_ml.templates.run_state_storage_template import TemplateRunner
 
@@ -156,6 +155,7 @@ class RemoteStateManager:
             verbose (Optional[bool], optional): additional output is show when True. Defaults to False.
         """
         template_runner = TemplateRunner()
+        state_storage_template = StateStorageTemplate()
 
         project_directory = os.getcwd()
         destination = os.path.join(
@@ -168,8 +168,10 @@ class RemoteStateManager:
             "remote_state_storage",
         )
 
-        config = build_template_configuration(location, prefix)
-        build_template(config, template, destination, verbose)
+        config = state_storage_template.build_template_configuration(
+            location=location, prefix=prefix
+        )
+        state_storage_template.build_template(config, template, destination, verbose)
 
         account_name, container_name, resource_group_name = template_runner.provision()
         self._write_matcha_config(account_name, container_name, resource_group_name)

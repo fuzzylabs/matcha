@@ -4,7 +4,7 @@ import glob
 import json
 import os
 from shutil import copy, rmtree
-from typing import Dict, List, Optional
+from typing import List, Optional
 
 from matcha_ml.cli.ui.print_messages import print_status
 from matcha_ml.cli.ui.status_message_builders import (
@@ -19,7 +19,7 @@ from matcha_ml.errors import MatchaPermissionError
 class TemplateVariables:
     """Terraform template variables."""
 
-    def __init__(self, **kwargs: Dict[str, str]):
+    def __init__(self, **kwargs: str):
         """A constructor that accepts an arbitrary number of named arguments and sets them as class variables."""
         vars(self).update(kwargs)
 
@@ -44,16 +44,14 @@ class BaseTemplate:
         """
         self.submodule_names = submodule_names
 
-    def build_template_configuration(
-        self, **kwargs: Dict[str, str]
-    ) -> TemplateVariables:
+    def build_template_configuration(self, **kwargs: str) -> TemplateVariables:
         """Ask for variables and build the configuration.
 
         Args:
             **kwargs: Named arguments representing the variables.
 
         Returns:
-            TemplateVariables: Terraform variables required by a template
+            TemplateVariables: Terraform variables required by a template.
         """
         return TemplateVariables(**kwargs)
 
