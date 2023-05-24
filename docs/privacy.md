@@ -15,6 +15,7 @@ All data collected is fully anonymised.
 Within the tool we currently collect:
 
 For each command that is run (e.g. `matcha provision`)
+
 1. The command that was run
 2. The timestamp of when the command was run
 3. An anonymous random user ID, this is used to correctly identify the current number of users of our tool
