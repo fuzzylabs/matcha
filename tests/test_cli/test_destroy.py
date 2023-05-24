@@ -68,6 +68,8 @@ def test_cli_destroy_command_updates_matcha_state(runner, matcha_testing_directo
     os.chdir(matcha_testing_directory)
 
     matcha_infrastructure_dir = os.path.join(".matcha", "infrastructure", "resources")
+    matcha_state_file_path = os.path.join(".matcha", "infrastructure", "matcha.state")
+
     os.makedirs(matcha_infrastructure_dir)
 
     state_file_resources = {
@@ -85,9 +87,8 @@ def test_cli_destroy_command_updates_matcha_state(runner, matcha_testing_directo
         },
         "experiment-tracker": {"flavor": "mlflow", "tracking-url": "mlflow_test_url"},
     }
-    state_file_path = os.path.join(matcha_infrastructure_dir, "matcha.state")
 
-    with open(state_file_path, "w") as f:
+    with open(matcha_state_file_path, "w") as f:
         json.dump(state_file_resources, f)
 
     expected_matcha_state_contents = {
@@ -104,7 +105,7 @@ def test_cli_destroy_command_updates_matcha_state(runner, matcha_testing_directo
     with patch(
         "matcha_ml.cli.destroy.check_current_deployment_exists"
     ) as check_deployment_exists, patch.object(
-        TemplateRunner, "state_file", state_file_path
+        TemplateRunner, "state_file", matcha_state_file_path
     ):
         check_deployment_exists.return_value = True
         runner.invoke(
@@ -113,7 +114,7 @@ def test_cli_destroy_command_updates_matcha_state(runner, matcha_testing_directo
             input="Y\n",
         )
 
-    with open(os.path.join(matcha_infrastructure_dir, "matcha.state")) as f:
+    with open(matcha_state_file_path) as f:
         matcha_state_data = json.load(f)
 
     assert matcha_state_data == expected_matcha_state_contents

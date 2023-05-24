@@ -16,12 +16,15 @@ class TerraformConfig:
     working_dir: str = os.path.join(
         os.getcwd(), ".matcha", "infrastructure", "resources"
     )
+    matcha_state_path: str = os.path.join(
+        os.getcwd(), ".matcha", "infrastructure", "matcha.state"
+    )
 
     # state file to store output after terraform apply
     @property
     def state_file(self) -> str:
         """The path to the state file."""
-        return os.path.join(self.working_dir, "matcha.state")
+        return self.matcha_state_path
 
     # variables file
     @property

@@ -63,7 +63,7 @@ def assert_infrastructure(destination_path: str, expected_tf_vars: Dict[str, str
     assert tf_vars == expected_tf_vars
 
     # Check that matcha state file exists and content is equal/correct
-    state_file_path = os.path.join(destination_path, "matcha.state")
+    state_file_path = os.path.join(destination_path, "..", "matcha.state")
     assert os.path.exists(state_file_path)
 
     with open(state_file_path) as f:

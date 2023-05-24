@@ -175,7 +175,7 @@ def build_template(
             print_status(build_substep_success_status("Configuration was copied"))
 
         configuration_destination = os.path.join(destination, "terraform.tfvars.json")
-        state_file_destination = os.path.join(destination, "matcha.state")
+        state_file_destination = os.path.join(destination, "..", "matcha.state")
 
         config_dict = dataclasses.asdict(config)
         with open(configuration_destination, "w") as f:
