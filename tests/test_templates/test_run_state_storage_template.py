@@ -10,7 +10,9 @@ from _pytest.capture import SysCapture
 
 from matcha_ml.errors import MatchaTerraformError
 from matcha_ml.services.terraform_service import TerraformConfig
-from matcha_ml.templates.run_state_storage_template import TemplateRunner
+from matcha_ml.templates.state_storage_template.run_state_storage_template import (
+    TemplateRunner,
+)
 
 
 @pytest.fixture
@@ -85,7 +87,7 @@ def test_check_terraform_installation(
         template_runner (TemplateRunner): a TemplateRunner object instance
     """
     with mock.patch(
-        "matcha_ml.templates.run_state_storage_template.TemplateRunner.tfs.check_installation"
+        "matcha_ml.templates.state_storage_template.run_state_storage_template.TemplateRunner.tfs.check_installation"
     ) as mock_check_installation:
         mock_check_installation.return_value = False
         expected = "Terraform is not installed"
@@ -105,7 +107,7 @@ def test_validate_terraform_config(capsys: SysCapture, template_runner: Template
         template_runner (TemplateRunner): a TemplateRunner object instance
     """
     with mock.patch(
-        "matcha_ml.templates.run_state_storage_template.TemplateRunner.tfs.validate_config"
+        "matcha_ml.templates.state_storage_template.run_state_storage_template.TemplateRunner.tfs.validate_config"
     ) as mock_validate_config:
         mock_validate_config.return_value = False
         expected = "The file terraform.tfvars.json was not found"

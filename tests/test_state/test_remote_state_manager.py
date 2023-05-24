@@ -15,8 +15,12 @@ from matcha_ml.state.remote_state_manager import (
     RemoteStateConfig,
     RemoteStateManager,
 )
-from matcha_ml.templates.build_templates.state_storage_template import SUBMODULE_NAMES
-from matcha_ml.templates.run_state_storage_template import TemplateRunner
+from matcha_ml.templates.state_storage_template.run_state_storage_template import (
+    TemplateRunner,
+)
+from matcha_ml.templates.state_storage_template.state_storage_template import (
+    SUBMODULE_NAMES,
+)
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 TEMPLATE_DIR = os.path.join(
@@ -208,7 +212,7 @@ def test_deprovision_state_storage(capsys: SysCapture) -> None:
         capsys (SysCapture): fixture to capture stdout and stderr
     """
     with patch(
-        "matcha_ml.templates.run_state_storage_template.TemplateRunner.deprovision"
+        "matcha_ml.templates.state_storage_template.run_state_storage_template.TemplateRunner.deprovision"
     ) as destroy:
         destroy.return_value = None
         remote_state_manager = RemoteStateManager()

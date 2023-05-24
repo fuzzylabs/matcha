@@ -3,7 +3,7 @@ from unittest.mock import patch
 
 import pytest
 
-from matcha_ml.templates.run_state_storage_template import (
+from matcha_ml.templates.state_storage_template.run_state_storage_template import (
     TemplateRunner as StateStorageTemplateRunner,
 )
 

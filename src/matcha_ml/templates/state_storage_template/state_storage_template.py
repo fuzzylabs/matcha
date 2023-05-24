@@ -1,5 +1,5 @@
 """Build a template for provisioning remote state storage on Azure using terraform files."""
-from matcha_ml.templates.build_templates.base_template import (
+from matcha_ml.templates.base_template import (
     BaseTemplate,
 )
 

@@ -12,10 +12,12 @@ from matcha_ml.cli.ui.status_message_builders import (
 )
 from matcha_ml.errors import MatchaError
 from matcha_ml.storage import AzureStorage
-from matcha_ml.templates.build_templates.state_storage_template import (
+from matcha_ml.templates.state_storage_template.run_state_storage_template import (
+    TemplateRunner,
+)
+from matcha_ml.templates.state_storage_template.state_storage_template import (
     StateStorageTemplate,
 )
-from matcha_ml.templates.run_state_storage_template import TemplateRunner
 
 DEFAULT_CONFIG_NAME = "matcha.config.json"
 

@@ -11,8 +11,8 @@ from matcha_ml.cli.ui.status_message_builders import (
     build_step_success_status,
 )
 from matcha_ml.state import RemoteStateManager
-from matcha_ml.templates.build_templates.azure_template import AzureTemplate
-from matcha_ml.templates.run_azure_template import TemplateRunner
+from matcha_ml.templates.azure_template.azure_template import AzureTemplate
+from matcha_ml.templates.azure_template.run_azure_template import TemplateRunner
 
 # create a typer app to group all provision subcommands
 app = typer.Typer()

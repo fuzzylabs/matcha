@@ -6,7 +6,7 @@ from typing import Dict, Tuple
 
 import pytest
 
-from matcha_ml.templates.build_templates.base_template import (
+from matcha_ml.templates.base_template import (
     BaseTemplate,
     TemplateVariables,
 )

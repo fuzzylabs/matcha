@@ -5,8 +5,10 @@ from unittest.mock import PropertyMock, patch
 import pytest
 
 from matcha_ml.services.global_parameters_service import GlobalParameters
-from matcha_ml.templates.run_azure_template import TemplateRunner as AzureTemplateRunner
-from matcha_ml.templates.run_state_storage_template import (
+from matcha_ml.templates.azure_template.run_azure_template import (
+    TemplateRunner as AzureTemplateRunner,
+)
+from matcha_ml.templates.state_storage_template.run_state_storage_template import (
     TemplateRunner as StateStorageTemplateRunner,
 )
 
