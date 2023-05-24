@@ -2,6 +2,7 @@
 import glob
 import json
 import os
+import shutil
 from typing import Dict, Iterator
 from unittest.mock import MagicMock, patch
 
@@ -297,3 +298,73 @@ def test_is_state_provisioned_broken_no_bucket(
     mock_azure_storage_instance.container_exists.return_value = False
     remote_state = RemoteStateManager()
     assert not remote_state.is_state_provisioned()
+
+
+def test_use_remote_state(matcha_testing_directory: str):
+    """Test use_remote_state context manager executes functionality between downlaod and upload.
+
+    Args:
+        matcha_testing_directory (str): temporary working directory path
+    """
+    mocked_azure_blob_path = os.path.join(matcha_testing_directory, "blob")
+    mocked_local_storage_path = os.path.join(matcha_testing_directory, "local")
+    mocked_azure_blob_file = os.path.join(mocked_azure_blob_path, "test", "test.txt")
+    mocked_local_storage_file = os.path.join(
+        mocked_local_storage_path, "test", "test.txt"
+    )
+    os.mkdir(mocked_azure_blob_path)
+    os.mkdir(mocked_local_storage_path)
+
+    def mocked_upload(*args) -> None:
+        """Mocked upload function for the use_remote_state context manager.
+
+        Args:
+            *args (str): placeholder for the upload function positional arguments
+        """
+        shutil.copytree(
+            mocked_local_storage_path, mocked_azure_blob_path, dirs_exist_ok=True
+        )
+
+    def mocked_download(*args) -> None:
+        """Mocked download function for the use_remote_state context manager.
+
+        Args:
+            *args (str): placeholder for the download function positional arguments
+        """
+        shutil.copytree(
+            mocked_azure_blob_path, mocked_local_storage_path, dirs_exist_ok=True
+        )
+
+    with patch.object(
+        RemoteStateManager, "download", new=mocked_download
+    ), patch.object(RemoteStateManager, "upload", new=mocked_upload):
+        remote_state_manager = RemoteStateManager()
+        # test create locally and upload
+        assert not os.path.isfile(mocked_azure_blob_file)
+        with remote_state_manager.use_remote_state():
+            os.mkdir(os.path.join(mocked_local_storage_path, "test"))
+            with open(os.path.join(mocked_local_storage_file), "w") as file:
+                file.write("Hello, world!")
+        assert os.path.isfile(os.path.join(mocked_local_storage_file))
+        assert os.path.isfile(mocked_azure_blob_file)
+        # test download from blob
+        shutil.rmtree(mocked_local_storage_path)
+        assert not os.path.isfile(os.path.join(mocked_local_storage_file))
+        with remote_state_manager.use_remote_state():
+            pass
+        assert os.path.isfile(os.path.join(mocked_local_storage_file))
+        # test overwrite blob
+        with open(mocked_azure_blob_file) as file:
+            assert file.read() == "Hello, world!"
+        with remote_state_manager.use_remote_state(), open(
+            os.path.join(mocked_local_storage_file), "w"
+        ) as file:
+            file.write("Hello, Matcha!")
+        with open(mocked_azure_blob_file) as file:
+            assert file.read() == "Hello, Matcha!"
+        # test delete from blob
+        # assert os.path.isfile(mocked_azure_blob_file)
+        # with remote_state_manager.use_remote_state():
+        #     shutil.rmtree(os.path.join(mocked_local_storage_path, "test"))
+        # assert not os.path.isfile(mocked_azure_blob_file)
+        # assert False
