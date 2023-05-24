@@ -17,7 +17,7 @@ Fundamentally, `provision` stands up the default infrastructure that we've speci
 
 From a user's perspective, they're interacting with Matcha via the [typer](https://typer.tiangolo.com/) library - a great tool for designing CLI's.
 
-When `provision` is run by the user, we take their input (the `region` and `prefix`) and populate a set of Terraform files - our hand crafted sensible defaults definedas infrastructure-as-code. Once we have the populated Terraform files, Matcha calls `init` (via the [python-terraform](https://github.com/beelit94/python-terraform) library) to download the information we need from Azure which is used for deploying infrastructure. Immediately after, `apply` is run which deploys the infrastructure defined in the Terraform files to Azure.
+When `provision` is run by the user, we take their input (the `region` and `prefix`) and populate a set of Terraform files - our hand crafted sensible defaults defined infrastructure-as-code. Once we have the populated Terraform files, Matcha calls `init` (via the [python-terraform](https://github.com/beelit94/python-terraform) library) to download the information we need from Azure which is used for deploying infrastructure. Immediately after, `apply` is run which deploys the infrastructure defined in the Terraform files to Azure.
 
 Once the provisioning on Azure has completed, information about the resources are stored in a `matcha.state` file which, along with the populated Terraform files, are stored in a `.matcha/` directory.
 
