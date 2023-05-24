@@ -12,7 +12,7 @@ from matcha_ml.cli.ui.status_message_builders import (
 )
 from matcha_ml.state import RemoteStateManager
 from matcha_ml.templates.build_templates.azure_template import AzureTemplate
-from matcha_ml.templates.run_template import TemplateRunner
+from matcha_ml.templates.run_azure_template import TemplateRunner
 
 # create a typer app to group all provision subcommands
 app = typer.Typer()

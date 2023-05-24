@@ -8,7 +8,7 @@ from matcha_ml.cli.ui.status_message_builders import (
     build_step_success_status,
 )
 from matcha_ml.state import RemoteStateManager
-from matcha_ml.templates.run_template import TemplateRunner
+from matcha_ml.templates.run_azure_template import TemplateRunner
 
 
 def destroy_resources() -> None:
