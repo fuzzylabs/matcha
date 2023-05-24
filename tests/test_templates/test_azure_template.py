@@ -9,10 +9,10 @@ from matcha_ml.templates.azure_template.azure_template import AzureTemplate
 
 @pytest.fixture
 def azure_template() -> AzureTemplate:
-    """A base template object for testing.
+    """Azure template object for testing.
 
     Returns:
-        BaseTemplate: the base template.
+        AzureTemplate: the Azure template.
     """
     return AzureTemplate()
 
