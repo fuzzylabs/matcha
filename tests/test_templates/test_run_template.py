@@ -28,6 +28,12 @@ def mock_output() -> Callable[[str, bool], Union[str, Dict[str, str]]]:
             "cloud_azure_resource_group_name": {
                 "value": "random-resources",
             },
+            "cloud_azure_prefix": {
+                "value": "random",
+            },
+            "cloud_azure_location": {
+                "value": "uksouth",
+            },
             "experiment_tracker_mlflow_tracking_url": {"value": "mlflow_test_url"},
             "pipeline_zenml_connection_string": {
                 "value": "zenml_test_connection_string"
@@ -404,6 +410,7 @@ def test_deprovision(template_runner: TemplateRunner):
     template_runner._check_terraform_installation = MagicMock()
     template_runner._check_matcha_directory_exists = MagicMock()
     template_runner._destroy_terraform = MagicMock()
+    template_runner._write_outputs_state_cloud_only = MagicMock()
 
     with mock.patch("typer.confirm") as mock_confirm:
         mock_confirm.return_value = False

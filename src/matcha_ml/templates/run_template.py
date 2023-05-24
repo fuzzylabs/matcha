@@ -206,9 +206,6 @@ class TemplateRunner:
         Args:
             state_outputs (Dict[str, Dict[str, str]]): Dictionary containing outputs to be written to state file.
         """
-        with open(self.state_file) as f:
-            current_data = json.load(f)
-        state_outputs["cloud"].update(current_data["cloud"])
         with open(self.state_file, "w") as f:
             json.dump(state_outputs, f, indent=4)
 
@@ -281,8 +278,21 @@ class TemplateRunner:
         self._apply_terraform()
         self._show_terraform_outputs()
 
+    def _write_outputs_state_cloud_only(self) -> None:
+        """Write the outputs of the Terraform deployment to the state JSON file."""
+        with open(self.state_file) as f:
+            state_file_data = json.load(f)
+
+        updated_state_file_data = {}
+        for key, value in state_file_data.items():
+            if key in ["cloud", "id"]:
+                updated_state_file_data[key] = value
+
+        self._update_state_file(updated_state_file_data)
+
     def deprovision(self) -> None:
         """Destroy the provisioned resources."""
         self._check_matcha_directory_exists()
         self._check_terraform_installation()
         self._destroy_terraform()
+        self._write_outputs_state_cloud_only()

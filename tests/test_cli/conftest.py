@@ -37,12 +37,18 @@ def mocked_resource_template_runner() -> AzureTemplateRunner:
         f"{INTERNAL_FUNCTION_STUBS[0]}._check_terraform_installation"
     ) as check_tf_install, patch(
         f"{INTERNAL_FUNCTION_STUBS[0]}._validate_terraform_config"
-    ) as validate_tf_config:
+    ) as validate_tf_config, patch(
+        f"{INTERNAL_FUNCTION_STUBS[0]}._check_matcha_directory_exists"
+    ) as check_matcha_dir, patch(
+        f"{INTERNAL_FUNCTION_STUBS[0]}._destroy_terraform"
+    ) as destroy_terraform:
         initialize.return_value = None
         apply.return_value = None
         show.return_value = None
         check_tf_install.return_value = None
         validate_tf_config.return_value = None
+        check_matcha_dir.return_value = None
+        destroy_terraform.return_value = None
 
         yield AzureTemplateRunner()
 
