@@ -19,7 +19,7 @@ From a user's perspective, they're interacting with Matcha via the [typer](https
 
 When `provision` is run by the user, we take their input (the `region` and `prefix`) and populate a set of Terraform files - our hand crafted sensible defaults defined as infrastructure-as-code. Once we have the populated Terraform files, Matcha calls `init` (via the [python-terraform](https://github.com/beelit94/python-terraform) library) to download the information we need from Azure which is used for deploying infrastructure. Immediately after, `apply` is run which deploys the infrastructure defined in the Terraform files to Azure.
 
-After completing the provisioning process on Azure, the output information of the remote state manager is stored in a `matcha.config.json` file in the project root directory. Additionally, information about the provisioned resources, along with the populated Terraform files, is stored in a `.matcha/resources` directory in a `matcha.state` file.
+After completing the provisioning process on Azure, the output information of the remote state manager is stored in a `matcha.config.json` file in the project root directory. Additionally, information about the provisioned resources, along with the populated Terraform files, is stored in a `.matcha/infrastructure` directory in a `matcha.state` file.
 
 At this point, users have access to the provisioned resources and can utilize them as needed.
 
