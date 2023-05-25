@@ -144,8 +144,6 @@ def terraform_test_config(matcha_testing_directory: str) -> TerraformConfig:
     with open(matcha_state_file, "w") as fp:
         json.dump(dummy_data, fp)
 
-    # TODO UPDATE STATE FILE LOCATION, CURRENTLY LOOKING AT LOCAL FILES INSTEAD OF TESTING DIR
-
     return TerraformConfig(working_dir=infrastructure_directory)
 
 
@@ -327,8 +325,6 @@ def test_write_outputs_state(
             TemplateRunner, "state_file", terraform_test_config.state_file
         ):
             assert json.load(f) == expected_outputs_show_sensitive
-
-    assert False
 
 
 def test_show_terraform_outputs(
