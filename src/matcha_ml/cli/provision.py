@@ -107,7 +107,7 @@ def provision_resources(
         )
         azure_template.build_template(config, template, destination, verbose)
 
-    # Initialises the infrastructure provisioning process.
+    # Initializes the infrastructure provisioning process.
     if template_runner.is_approved(verb="provision"):
         # provision resources by running the template
         template_runner.provision()
