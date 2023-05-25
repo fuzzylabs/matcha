@@ -1,4 +1,5 @@
 """Class to interact with Azure Storage."""
+import glob
 import os
 
 from azure.storage.blob import BlobClient, BlobServiceClient, ContainerClient
@@ -104,6 +105,10 @@ class AzureStorage:
             container_name (str): Azure storage container name
             dest_folder_path (str): Path to folder to download all the files
         """
+        # Clears the local directory by removing all files, ensuring that it exclusively contains the files retrieved from Azure remote storage
+        for file in glob.glob(os.path.join(dest_folder_path, "*")):
+            os.remove(file)
+
         container_client = self._get_container_client(container_name)
 
         for blob in container_client.list_blobs():
@@ -111,4 +116,5 @@ class AzureStorage:
             file_path = os.path.join(dest_folder_path, str(blob.name))
             if not os.path.exists(os.path.dirname(file_path)):
                 os.makedirs(os.path.dirname(file_path), exist_ok=True)
+            print(file_path)
             self.download_file(blob_client, file_path)

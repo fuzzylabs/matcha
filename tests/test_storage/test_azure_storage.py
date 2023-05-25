@@ -197,6 +197,9 @@ def test_download_folder(
         matcha_testing_directory (str): Temporary directory
         mocked_azure_client (AzureClient): mocked azure client
     """
+    # Create a test set of azure files for mocking the return value of list_blobs method
+    files_on_azure = {"file_only_exist_azure"}
+
     # Create temp files inside temp directory
     for i in range(1, 3):
         tmp_file = os.path.join(matcha_testing_directory, f"temp{i}.txt")
@@ -211,7 +214,7 @@ def test_download_folder(
 
     # Mock list blobs function for container client
     mock_container_client.list_blobs.return_value = [
-        BlobProperties(name=n) for n in os.listdir(matcha_testing_directory)
+        BlobProperties(name=n) for n in files_on_azure
     ]
 
     mock_az_storage = AzureStorage("testaccount", "test-rg")
@@ -228,3 +231,6 @@ def test_download_folder(
         assert mock_blob_client.download_blob.call_count == len(
             os.listdir(matcha_testing_directory)
         )
+
+        # Check that there are only 1 files in local
+        assert len(os.listdir(matcha_testing_directory)) == 1
