@@ -38,7 +38,7 @@ RESOURCE_NAMES = [
 ]
 
 
-class TemplateRunner:
+class AzureTemplateRunner:
     """A Runner class provides methods that interface with the Terraform service to facilitate the provisioning and deprovisioning of resources."""
 
     terraform_config = TerraformConfig()

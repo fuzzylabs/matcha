@@ -10,7 +10,9 @@ from _pytest.capture import SysCapture
 
 from matcha_ml.errors import MatchaTerraformError
 from matcha_ml.services.terraform_service import TerraformConfig
-from matcha_ml.templates.run_state_storage_template import TemplateRunner
+from matcha_ml.templates.state_storage_template.run_state_storage_template import (
+    StateStorageTemplateRunner,
+)
 
 
 @pytest.fixture
@@ -66,26 +68,26 @@ def terraform_test_config(matcha_testing_directory: str) -> TerraformConfig:
 
 
 @pytest.fixture
-def template_runner() -> TemplateRunner:
+def template_runner() -> StateStorageTemplateRunner:
     """Return a template runner object instance for test.
 
     Returns:
-        TemplateRunner: a TemplateRunner object instance.
+        StateStorageTemplateRunner: a StateStorageTemplateRunner object instance.
     """
-    return TemplateRunner()
+    return StateStorageTemplateRunner()
 
 
 def test_check_terraform_installation(
-    capsys: SysCapture, template_runner: TemplateRunner
+    capsys: SysCapture, template_runner: StateStorageTemplateRunner
 ):
     """Test app exits when terraform is not installed.
 
     Args:
         capsys (SysCapture): fixture to capture stdout and stderr
-        template_runner (TemplateRunner): a TemplateRunner object instance
+        template_runner (StateStorageTemplateRunner): a StateStorageTemplateRunner object instance
     """
     with mock.patch(
-        "matcha_ml.templates.run_state_storage_template.TemplateRunner.tfs.check_installation"
+        "matcha_ml.templates.state_storage_template.run_state_storage_template.StateStorageTemplateRunner.tfs.check_installation"
     ) as mock_check_installation:
         mock_check_installation.return_value = False
         expected = "Terraform is not installed"
@@ -97,15 +99,17 @@ def test_check_terraform_installation(
         assert expected in captured.err
 
 
-def test_validate_terraform_config(capsys: SysCapture, template_runner: TemplateRunner):
+def test_validate_terraform_config(
+    capsys: SysCapture, template_runner: StateStorageTemplateRunner
+):
     """Test application exits if there is no config.
 
     Args:
         capsys (SysCapture): fixture to capture stdout and stderr
-        template_runner (TemplateRunner): a TemplateRunner object instance
+        template_runner (StateStorageTemplateRunner): a StateStorageTemplateRunner object instance
     """
     with mock.patch(
-        "matcha_ml.templates.run_state_storage_template.TemplateRunner.tfs.validate_config"
+        "matcha_ml.templates.state_storage_template.run_state_storage_template.StateStorageTemplateRunner.tfs.validate_config"
     ) as mock_validate_config:
         mock_validate_config.return_value = False
         expected = "The file terraform.tfvars.json was not found"
@@ -117,12 +121,14 @@ def test_validate_terraform_config(capsys: SysCapture, template_runner: Template
         assert expected in captured.err
 
 
-def test_initialize_terraform(capsys: SysCapture, template_runner: TemplateRunner):
+def test_initialize_terraform(
+    capsys: SysCapture, template_runner: StateStorageTemplateRunner
+):
     """Test if service behaves as expected when initializing Terraform.
 
     Args:
         capsys (SysCapture): fixture to capture stdout and stderr
-        template_runner (TemplateRunner): a TemplateRunner object instance
+        template_runner (StateStorageTemplateRunner): a StateStorageTemplateRunner object instance
     """
     expected = "Remote state management initialized!"
 
@@ -134,13 +140,15 @@ def test_initialize_terraform(capsys: SysCapture, template_runner: TemplateRunne
 
 
 def test_check_matcha_directory_exists(
-    capsys: SysCapture, template_runner: TemplateRunner, matcha_testing_directory: str
+    capsys: SysCapture,
+    template_runner: StateStorageTemplateRunner,
+    matcha_testing_directory: str,
 ):
     """Test if service exit as expected and print out the expected error message when required files does not exists.
 
     Args:
         capsys (SysCapture): fixture to capture stdout and stderr
-        template_runner (TemplateRunner): a TemplateRunner object instance
+        template_runner (StateStorageTemplateRunner): a StateStorageTemplateRunner object instance
         matcha_testing_directory (str): the test directory
     """
     os.chdir(matcha_testing_directory)
@@ -165,12 +173,14 @@ def test_check_matcha_directory_exists(
         assert expected in captured.err
 
 
-def test_apply_terraform(capsys: SysCapture, template_runner: TemplateRunner):
+def test_apply_terraform(
+    capsys: SysCapture, template_runner: StateStorageTemplateRunner
+):
     """Test if terraform applied is handled correctly during apply when provisioning resources.
 
     Args:
         capsys (SysCapture): fixture to capture stdout and stderr
-        template_runner (TemplateRunner): a TemplateRunner object instance
+        template_runner (StateStorageTemplateRunner): a StateStorageTemplateRunner object instance
     """
     template_runner.tfs.apply = MagicMock(return_value=(0, "", ""))
     expected = "Your environment has been provisioned!"
@@ -190,12 +200,14 @@ def test_apply_terraform(capsys: SysCapture, template_runner: TemplateRunner):
         )
 
 
-def test_destroy_terraform(capsys: SysCapture, template_runner: TemplateRunner):
+def test_destroy_terraform(
+    capsys: SysCapture, template_runner: StateStorageTemplateRunner
+):
     """Test if terraform exception is captured when performing deprovision.
 
     Args:
         capsys (SysCapture): fixture to capture stdout and stderr
-        template_runner (TemplateRunner): a TemplateRunner object instance
+        template_runner (StateStorageTemplateRunner): a StateStorageTemplateRunner object instance
     """
     template_runner.tfs.destroy = MagicMock(return_value=(0, "", ""))
 
@@ -219,11 +231,11 @@ def test_destroy_terraform(capsys: SysCapture, template_runner: TemplateRunner):
         )
 
 
-def test_provision(template_runner: TemplateRunner):
+def test_provision(template_runner: StateStorageTemplateRunner):
     """Test service can provision resources using terraform.
 
     Args:
-        template_runner (TemplateRunner): a TemplateRunner object instance
+        template_runner (StateStorageTemplateRunner): a StateStorageTemplateRunner object instance
     """
     template_runner._check_terraform_installation = MagicMock()
     template_runner._validate_terraform_config = MagicMock()
@@ -244,11 +256,11 @@ def test_provision(template_runner: TemplateRunner):
         template_runner._get_terraform_output.assert_called()
 
 
-def test_deprovision(template_runner: TemplateRunner):
+def test_deprovision(template_runner: StateStorageTemplateRunner):
     """Test service can deprovision resources using terraform.
 
     Args:
-        template_runner (TemplateRunner): a TemplateRunner object instance
+        template_runner (StateStorageTemplateRunner): a StateStorageTemplateRunner object instance
     """
     template_runner._check_terraform_installation = MagicMock()
     template_runner._check_matcha_directory_exists = MagicMock()

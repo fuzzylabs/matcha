@@ -12,11 +12,12 @@ from matcha_ml.cli.ui.status_message_builders import (
 )
 from matcha_ml.errors import MatchaError
 from matcha_ml.storage import AzureStorage
-from matcha_ml.templates.build_templates.state_storage_template import (
-    build_template,
-    build_template_configuration,
+from matcha_ml.templates.state_storage_template.run_state_storage_template import (
+    StateStorageTemplateRunner,
 )
-from matcha_ml.templates.run_state_storage_template import TemplateRunner
+from matcha_ml.templates.state_storage_template.state_storage_template import (
+    StateStorageTemplate,
+)
 
 DEFAULT_CONFIG_NAME = "matcha.config.json"
 
@@ -155,7 +156,8 @@ class RemoteStateManager:
             prefix (str): Prefix used for all resources, or empty string to fill in.
             verbose (Optional[bool], optional): additional output is show when True. Defaults to False.
         """
-        template_runner = TemplateRunner()
+        template_runner = StateStorageTemplateRunner()
+        state_storage_template = StateStorageTemplate()
 
         project_directory = os.getcwd()
         destination = os.path.join(
@@ -168,8 +170,10 @@ class RemoteStateManager:
             "remote_state_storage",
         )
 
-        config = build_template_configuration(location, prefix)
-        build_template(config, template, destination, verbose)
+        config = state_storage_template.build_template_configuration(
+            location=location, prefix=prefix
+        )
+        state_storage_template.build_template(config, template, destination, verbose)
 
         account_name, container_name, resource_group_name = template_runner.provision()
         self._write_matcha_config(account_name, container_name, resource_group_name)
@@ -180,7 +184,7 @@ class RemoteStateManager:
     def deprovision_state_storage(self) -> None:
         """Destroy the state bucket provisioned."""
         # create a runner for deprovisioning resource with Terraform service.
-        template_runner = TemplateRunner()
+        template_runner = StateStorageTemplateRunner()
 
         template_runner.deprovision()
         print_status(

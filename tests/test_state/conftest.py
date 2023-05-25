@@ -3,11 +3,13 @@ from unittest.mock import patch
 
 import pytest
 
-from matcha_ml.templates.run_state_storage_template import (
-    TemplateRunner as StateStorageTemplateRunner,
+from matcha_ml.templates.state_storage_template.run_state_storage_template import (
+    StateStorageTemplateRunner,
 )
 
-INTERNAL_FUNCTION_STUB = "matcha_ml.state.remote_state_manager.TemplateRunner"
+INTERNAL_FUNCTION_STUB = (
+    "matcha_ml.state.remote_state_manager.StateStorageTemplateRunner"
+)
 
 
 @pytest.fixture(scope="class", autouse=True)

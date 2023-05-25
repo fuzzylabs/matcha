@@ -10,7 +10,7 @@ from typer.testing import CliRunner
 
 from matcha_ml.cli._validation import LONGEST_RESOURCE_NAME, MAXIMUM_RESOURCE_NAME_LEN
 from matcha_ml.cli.cli import app
-from matcha_ml.templates.build_templates.azure_template import SUBMODULE_NAMES
+from matcha_ml.templates.azure_template.azure_template import SUBMODULE_NAMES
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 TEMPLATE_DIR = os.path.join(
@@ -296,10 +296,11 @@ def test_cli_provision_command_with_verbose_arg(
 
     for verbose_output in [
         "module configuration was copied",
-        "Configuration was copied",
+        "Configurations were copied",
         "Template variables were added",
         "Template configuration has finished!",
     ]:
+        print(result.stdout)
         assert verbose_output in result.stdout
 
 
@@ -528,9 +529,9 @@ def test_cli_provision_command_with_provisioned_resources(
 
     # Mock functions such that a deployment on Azure exists
     with patch(
-        "matcha_ml.templates.build_templates.azure_template.check_current_deployment_exists"
+        "matcha_ml.templates.azure_template.azure_template.check_current_deployment_exists"
     ) as check_deployment_exists, patch(
-        "matcha_ml.templates.build_templates.azure_template.MatchaStateService.fetch_resources_from_state_file"
+        "matcha_ml.templates.azure_template.azure_template.MatchaStateService.fetch_resources_from_state_file"
     ) as fetch_resources_from_state_file:
         check_deployment_exists.return_value = True
         fetch_resources_from_state_file.return_value = {
