@@ -22,7 +22,10 @@ from matcha_ml.templates.run_state_storage_template import TemplateRunner
 
 DEFAULT_CONFIG_NAME = "matcha.config.json"
 LOCK_FILE_NAME = "matcha.lock"
-ALREADY_LOCKED_MESSAGE = "Remote state is already locked."
+ALREADY_LOCKED_MESSAGE = (
+    "Remote state is already locked, maybe someone else is using matcha?"
+    "If you think this is a mistake, you can unlock the state by running `matcha force-unlock`."
+)
 
 
 @dataclasses.dataclass
@@ -253,7 +256,11 @@ class RemoteStateManager:
         yield
 
     def lock(self) -> None:
-        """Lock remote state."""
+        """Lock remote state.
+
+        Raises:
+            MatchaError: if the state is already locked
+        """
         try:
             self.azure_storage.create_empty(
                 container_name=self.configuration.remote_state_bucket.container_name,
