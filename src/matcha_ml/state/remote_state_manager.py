@@ -19,6 +19,7 @@ from matcha_ml.templates.build_templates.state_storage_template import (
 from matcha_ml.templates.run_state_storage_template import TemplateRunner
 
 DEFAULT_CONFIG_NAME = "matcha.config.json"
+MATCHA_STATE_DIR = os.path.join(".matcha", "infrastructure", "matcha.state")
 
 
 @dataclasses.dataclass
@@ -186,6 +187,7 @@ class RemoteStateManager:
         print_status(
             build_step_success_status("Destroying remote state management is complete!")
         )
+        os.remove(MATCHA_STATE_DIR)
 
     def _write_matcha_config(
         self, account_name: str, container_name: str, resource_group_name: str

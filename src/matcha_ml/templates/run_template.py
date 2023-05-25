@@ -206,9 +206,6 @@ class TemplateRunner:
         Args:
             state_outputs (Dict[str, Dict[str, str]]): Dictionary containing outputs to be written to state file.
         """
-        print("AAAA")
-        print(self.state_file)
-        print("BBBB")
         with open(self.state_file, "w") as f:
             json.dump(state_outputs, f, indent=4)
 
