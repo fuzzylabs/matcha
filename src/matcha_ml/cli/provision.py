@@ -85,35 +85,36 @@ def provision_resources(
         )
         remote_state_manager.provision_state_storage(location, prefix)
 
-    # create a runner for provisioning resource with Terraform service.
-    template_runner = TemplateRunner()
+    with remote_state_manager.use_lock():
+        # create a runner for provisioning resource with Terraform service.
+        template_runner = TemplateRunner()
 
-    project_directory = os.getcwd()
-    destination = os.path.join(
-        project_directory, ".matcha", "infrastructure", "resources"
-    )
-    template = os.path.join(
-        os.path.dirname(__file__), os.pardir, "infrastructure", "resources"
-    )
-
-    if not reuse_configuration(destination):
-        location, prefix, password = fill_provision_variables(
-            location, prefix, password
+        project_directory = os.getcwd()
+        destination = os.path.join(
+            project_directory, ".matcha", "infrastructure", "resources"
+        )
+        template = os.path.join(
+            os.path.dirname(__file__), os.pardir, "infrastructure", "resources"
         )
 
-        config = build_template_configuration(location, prefix, password)
-        build_template(config, template, destination, verbose)
-
-    # initialises the infrastructure provisioning process.
-    if template_runner.is_approved(verb="provision"):
-        # provision resources by running the template
-        template_runner.provision()
-        print_status(build_step_success_status("Provisioning is complete!"))
-
-    else:
-        print_status(
-            build_status(
-                "You decided to cancel - if you change your mind, then run 'matcha provision' again."
+        if not reuse_configuration(destination):
+            location, prefix, password = fill_provision_variables(
+                location, prefix, password
             )
-        )
-        raise typer.Exit()
+
+            config = build_template_configuration(location, prefix, password)
+            build_template(config, template, destination, verbose)
+
+        # initialises the infrastructure provisioning process.
+        if template_runner.is_approved(verb="provision"):
+            # provision resources by running the template
+            template_runner.provision()
+            print_status(build_step_success_status("Provisioning is complete!"))
+
+        else:
+            print_status(
+                build_status(
+                    "You decided to cancel - if you change your mind, then run 'matcha provision' again."
+                )
+            )
+            raise typer.Exit()
