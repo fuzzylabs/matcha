@@ -17,9 +17,7 @@ from matcha_ml.services import AzureClient
 LONGEST_RESOURCE_NAME = "artifactstore"
 MAXIMUM_RESOURCE_NAME_LEN = 24
 
-MATCHA_STATE_DIR = os.path.join(
-    ".matcha", "infrastructure", "resources", "matcha.state"
-)
+MATCHA_STATE_DIR = os.path.join(".matcha", "infrastructure", "matcha.state")
 
 
 def _is_alphanumeric(prefix: str) -> bool:

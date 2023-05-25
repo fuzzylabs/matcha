@@ -26,6 +26,7 @@ def mock_state_file(matcha_testing_directory: str):
 
     matcha_infrastructure_dir = os.path.join(".matcha", "infrastructure", "resources")
     os.makedirs(matcha_infrastructure_dir)
+    matcha_state_path = os.path.join(".matcha", "infrastructure", "matcha.state")
 
     state_file_resources = {
         "cloud": {"flavor": "azure", "resource-group-name": "test_resources"},
@@ -37,7 +38,7 @@ def mock_state_file(matcha_testing_directory: str):
         "experiment-tracker": {"flavor": "mlflow", "tracking-url": "mlflow_test_url"},
     }
 
-    with open(os.path.join(matcha_infrastructure_dir, "matcha.state"), "w") as f:
+    with open(matcha_state_path, "w") as f:
         json.dump(state_file_resources, f)
 
 
@@ -88,9 +89,7 @@ def test_get_resources(expected_outputs: dict):
 
 def test_get_resources_without_state_file():
     """Test get resources function when a state file does not exist."""
-    state_file_path = os.path.join(
-        ".matcha", "infrastructure", "resources", "matcha.state"
-    )
+    state_file_path = os.path.join(".matcha", "infrastructure", "matcha.state")
     os.remove(state_file_path)
 
     with pytest.raises(MatchaError):

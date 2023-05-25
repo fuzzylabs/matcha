@@ -131,9 +131,12 @@ def terraform_test_config(matcha_testing_directory: str) -> TerraformConfig:
     os.makedirs(infrastructure_directory, exist_ok=True)
 
     # Create a dummy matcha state file
-    matcha_state_file = os.path.join(infrastructure_directory, "matcha.state")
+    matcha_state_path = os.path.join(
+        matcha_testing_directory, ".matcha", "infrastructure", "matcha.state"
+    )
+
     dummy_data = {"cloud": {"prefix": "random", "location": "uksouth"}}
-    with open(matcha_state_file, "w") as fp:
+    with open(matcha_state_path, "w") as fp:
         json.dump(dummy_data, fp)
 
     return TerraformConfig(working_dir=infrastructure_directory)
