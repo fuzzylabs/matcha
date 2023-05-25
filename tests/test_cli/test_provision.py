@@ -78,7 +78,7 @@ def assert_infrastructure(
 
     if check_matcha_state_file:
         # Check that matcha state file exists and content is equal/correct
-        state_file_path = os.path.join(destination_path, "matcha.state")
+        state_file_path = os.path.join(destination_path, "..", "matcha.state")
         assert os.path.exists(state_file_path)
 
         with open(state_file_path) as f:
