@@ -313,8 +313,6 @@ def test_write_outputs_state(
         expected_outputs_show_sensitive (dict): expected output from terraform
     """
     template_runner.state_file = terraform_test_config.state_file
-    print(terraform_test_config.state_file)
-    print(template_runner.state_file)
     template_runner.tfs.terraform_client.output = MagicMock(wraps=mock_output)
 
     with does_not_raise():
