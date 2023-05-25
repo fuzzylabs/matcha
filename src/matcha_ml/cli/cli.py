@@ -23,6 +23,7 @@ from matcha_ml.core import core
 from matcha_ml.errors import MatchaError, MatchaInputError
 from matcha_ml.services.analytics_service import AnalyticsEvent, track
 from matcha_ml.state import RemoteStateManager
+from matcha_ml.state.matcha_state import MatchaStateService
 
 app = typer.Typer(no_args_is_help=True, pretty_exceptions_show_locals=False)
 analytics_app = typer.Typer(no_args_is_help=True, pretty_exceptions_show_locals=False)
@@ -121,6 +122,8 @@ def destroy(
 
     if full:
         remote_state_manager.deprovision_state_storage()
+        matcha_state_service = MatchaStateService()
+        matcha_state_service.remove_matcha_state_file()
 
 
 def version_callback(value: bool) -> None:
