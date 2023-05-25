@@ -5,7 +5,7 @@ from typing import Dict, Optional
 from matcha_ml.cli._validation import get_command_validation
 from matcha_ml.errors import MatchaError
 from matcha_ml.services.global_parameters_service import GlobalParameters
-from matcha_ml.state.matcha_state import MatchaStateService
+from matcha_ml.state import MatchaStateService, RemoteStateManager
 
 
 def get(
@@ -64,4 +64,6 @@ def analytics_opt_in() -> None:
 
 
 def unlock_state_lock() -> None:
-    ...
+    """Unlock remote state."""
+    remote_state = RemoteStateManager()
+    remote_state.unlock()

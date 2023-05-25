@@ -122,12 +122,12 @@ def destroy(
     if full:
         remote_state_manager.deprovision_state_storage()
 
+
 @app.command()
 def force_unlock() -> None:
     """Force unlock lock on remote matcha state on azure."""
     delete = typer.confirm("Are you sure you want to remove the lock forcefully?")
     if not delete:
-        print("Not deleting")
         raise typer.Exit()
     core.unlock_state_lock()
 

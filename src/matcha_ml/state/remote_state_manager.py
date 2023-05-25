@@ -9,6 +9,7 @@ from dataclasses_json import DataClassJsonMixin
 from matcha_ml.cli.ui.print_messages import print_status
 from matcha_ml.cli.ui.status_message_builders import (
     build_step_success_status,
+    build_warning_status,
 )
 from matcha_ml.errors import MatchaError
 from matcha_ml.storage import AzureStorage
@@ -19,6 +20,8 @@ from matcha_ml.templates.build_templates.state_storage_template import (
 from matcha_ml.templates.run_state_storage_template import TemplateRunner
 
 DEFAULT_CONFIG_NAME = "matcha.config.json"
+LOCK_FILE_NAME = "matcha.lock"
+ALREADY_LOCKED_MESSAGE = "Remote state is already locked."
 
 
 @dataclasses.dataclass
@@ -247,3 +250,19 @@ class RemoteStateManager:
         Upload the state when context is finished.
         """
         yield
+
+    def unlock(self) -> None:
+        """Unlock remote state."""
+        if not self.azure_storage.blob_exists(
+            container_name=self.configuration.remote_state_bucket.container_name,
+            blob_name=LOCK_FILE_NAME,
+        ):
+            print_status(
+                build_warning_status("Tried unlocking state, but it was not locked")
+            )
+            return
+        else:
+            self.azure_storage.delete_blob(
+                container_name=self.configuration.remote_state_bucket.container_name,
+                blob_name=LOCK_FILE_NAME,
+            )

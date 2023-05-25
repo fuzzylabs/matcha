@@ -77,6 +77,13 @@ def expected_configuration() -> Dict[str, Union[str, bool]]:
     return {"analytics_opt_out": False, "user_id": "dummy_user_id"}
 
 
+@pytest.fixture
+def mock_unlock():
+    """Mock unlock function in RemoteStateManger class"""
+    with mock.patch("matcha_ml.cli.provision.RemoteStateManager.unlock") as mock_unlock:
+        yield mock_unlock
+
+
 def test_get_resources(expected_outputs: dict):
     """Test get resources function with no resource specified.
 
@@ -201,3 +208,39 @@ def test_opt_in_subcommand(
     # Check the contents of the config file match
     with open(config_file_path) as f:
         assert dict(yaml.safe_load(f)) == expected_configuration
+
+
+def test_unlock_state_lock_called(runner, mock_unlock):
+    """Test if unlock function in RemoteStateManager is called.
+
+    Args:
+        runner: Mock runner
+        mock_unlock: pytest fixture to force unlock state file
+    """
+
+    # Invoke force-unlock command with yes confirmation
+    result = runner.invoke(app, ["force-unlock"], input="Y\n")
+
+    # Exit code 0 means there was no error
+    assert result.exit_code == 0
+
+    # Check if unlock function from RemoteStateManager class is called
+    mock_unlock.assert_called_once()
+
+
+def test_unlock_state_lock_not_called(runner, mock_unlock):
+    """Test if unlock function in RemoteStateManager is not called.
+
+    Args:
+        runner: Mock runner
+        mock_unlock: pytest fixture to force unlock state file
+    """
+
+    # Invoke force-unlock command with no confirmation
+    result = runner.invoke(app, ["force-unlock"], input="n\n")
+
+    # Exit code 0 means there was no error
+    assert result.exit_code == 0
+
+    # Check if unlock function from RemoteStateManager class is not called
+    mock_unlock.assert_not_called()
