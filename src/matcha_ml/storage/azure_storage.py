@@ -62,19 +62,29 @@ class AzureStorage:
             blob_client.upload_blob(data=blob_data)
 
     def upload_folder(self, container_name: str, src_folder_path: str) -> None:
-        """Upload a folder to Azure Storage Container.
+        """Upload a folder to an Azure Storage Container and delete any files that are not present `src_folder_path`.
 
         Args:
             container_name (str): Azure storage container name
             src_folder_path (str): Path to folder to upload all files from
         """
         container_client = self._get_container_client(container_name)
+        # Get all existing blobs
+        blob_list = set(container_client.list_blob_names())
 
         for root, _, filenames in os.walk(src_folder_path):
             for filename in filenames:
                 file_path = os.path.join(root, filename)
+
+                if file_path in blob_list:
+                    blob_list.remove(file_path)
+
                 blob_client = container_client.get_blob_client(blob=file_path)
                 self.upload_file(blob_client, file_path)
+
+        # Remove blobs that are not present in the local `src_folder_path``
+        for blob in blob_list:
+            container_client.delete_blob(blob)
 
     def download_file(self, blob_client: BlobClient, dest_file: str) -> None:
         """Download a file from Azure Storage Container.

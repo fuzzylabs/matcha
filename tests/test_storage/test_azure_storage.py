@@ -113,9 +113,13 @@ def test_upload_folder(
         matcha_testing_directory (str): Temporary directory
         mocked_azure_client (AzureClient): mocked azure client
     """
+    # Create a test set of azure files for mocking the return value of list_blob_names method
+    test_azure_files = {"file_not_exist"}
+
     # Create temp files inside temp directory
     for i in range(1, 3):
         tmp_file = os.path.join(matcha_testing_directory, f"temp{i}.txt")
+        test_azure_files.add(tmp_file)
         with open(tmp_file, "w"):
             pass
 
@@ -124,6 +128,9 @@ def test_upload_folder(
 
     # Mock blob client
     mock_blob_client = mock_container_client.get_blob_client.return_value
+
+    # Mock container client list_blob_names() method, only 1 file to delete
+    mock_container_client.list_blob_names.return_value = test_azure_files
 
     mock_az_storage = AzureStorage("testaccount", "test-rg")
     mock_az_storage.az_client = mocked_azure_client
@@ -135,10 +142,19 @@ def test_upload_folder(
         # Check if upload_blob function is called
         mock_blob_client.upload_blob.assert_called()
 
+        # Check if list_blob_names function is called
+        mock_container_client.list_blob_names.assert_called()
+
+        # Check if delete_blob function is called
+        mock_container_client.delete_blob.assert_called()
+
         # Check if upload_blob function is called exactly twice
         assert mock_blob_client.upload_blob.call_count == len(
             os.listdir(matcha_testing_directory)
         )
+
+        # Check if the delete_blob function is called exactly once as only file does not exist
+        assert mock_container_client.delete_blob.call_count == 1
 
 
 def test_download_file(
