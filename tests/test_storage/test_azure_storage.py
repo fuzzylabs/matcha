@@ -212,3 +212,106 @@ def test_download_folder(
         assert mock_blob_client.download_blob.call_count == len(
             os.listdir(matcha_testing_directory)
         )
+
+
+def test_create_empty(mock_blob_service: BlobServiceClient) -> None:
+    """Test AzureStorage create_empty function.
+
+    Args:
+        mock_blob_service (BlobServiceClient): Mocked blob service client
+    """
+    # Mock container client
+    mock_container_client = (
+        mock_blob_service.return_value.get_container_client.return_value
+    )
+
+    # Mock blob client
+    mock_blob_client = mock_container_client.get_blob_client.return_value
+
+    az_storage = AzureStorage("testaccount", "test-rg")
+    az_storage.create_empty("testcontainer", "testblob")
+
+    mock_blob_service.return_value.get_container_client.assert_called_once_with(
+        "testcontainer"
+    )
+    mock_container_client.get_blob_client.assert_called_once_with("testblob")
+    mock_blob_client.upload_blob.assert_called_once_with(
+        data=""
+    )  # Check that blob is uploaded and empty
+
+
+def test_blob_exists(mock_blob_service: BlobServiceClient) -> None:
+    """Test AzureStorage blob_exists function.
+
+    Args:
+        mock_blob_service (BlobServiceClient): Mocked blob service client
+    """
+    # Mock container client
+    mock_container_client = (
+        mock_blob_service.return_value.get_container_client.return_value
+    )
+
+    # Mock blob client
+    mock_blob_client = mock_container_client.get_blob_client.return_value
+
+    az_storage = AzureStorage("testaccount", "test-rg")
+
+    mock_blob_client.exists.return_value = True
+    assert az_storage.blob_exists("testcontainer", "testblob")
+
+    mock_blob_service.return_value.get_container_client.assert_called_with(
+        "testcontainer"
+    )
+    mock_container_client.get_blob_client.assert_called_with("testblob")
+    mock_blob_client.exists.assert_called_once()
+
+
+def test_blob_does_not_exist(mock_blob_service: BlobServiceClient) -> None:
+    """Test AzureStorage blob_exists function, when blob does not exist.
+
+    Args:
+        mock_blob_service (BlobServiceClient): Mocked blob service client
+    """
+    # Mock container client
+    mock_container_client = (
+        mock_blob_service.return_value.get_container_client.return_value
+    )
+
+    # Mock blob client
+    mock_blob_client = mock_container_client.get_blob_client.return_value
+
+    az_storage = AzureStorage("testaccount", "test-rg")
+
+    mock_blob_client.exists.return_value = False
+    assert not az_storage.blob_exists("testcontainer", "testblob")
+
+    mock_blob_service.return_value.get_container_client.assert_called_with(
+        "testcontainer"
+    )
+    mock_container_client.get_blob_client.assert_called_with("testblob")
+    mock_blob_client.exists.assert_called_once()
+
+
+def test_delete_blob(mock_blob_service: BlobServiceClient) -> None:
+    """Test AzureStorage delete_blob function.
+
+    Args:
+        mock_blob_service (BlobServiceClient): Mocked blob service client
+    """
+    # Mock container client
+    mock_container_client = (
+        mock_blob_service.return_value.get_container_client.return_value
+    )
+
+    # Mock blob client
+    mock_blob_client = mock_container_client.get_blob_client.return_value
+
+    az_storage = AzureStorage("testaccount", "test-rg")
+
+    az_storage.delete_blob("testcontainer", "testblob")
+
+    mock_blob_service.return_value.get_container_client.assert_called_with(
+        "testcontainer"
+    )
+    mock_container_client.get_blob_client.assert_called_with("testblob")
+    mock_blob_client.delete_blob.assert_called_once_with()  # Check that blob is uploaded and empty
