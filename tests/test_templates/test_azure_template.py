@@ -4,7 +4,7 @@ from unittest.mock import patch
 
 import pytest
 
-from matcha_ml.templates.azure_template.azure_template import AzureTemplate
+from matcha_ml.templates import AzureTemplate
 
 
 @pytest.fixture
@@ -31,12 +31,10 @@ def test_reuse_configuration(
 
     os.makedirs(test_config_dir)
 
-    matcha_state_service_stub = (
-        "matcha_ml.templates.azure_template.azure_template.MatchaStateService"
-    )
+    matcha_state_service_stub = "matcha_ml.templates.azure_template.MatchaStateService"
 
     with patch(
-        "matcha_ml.templates.azure_template.azure_template.check_current_deployment_exists"
+        "matcha_ml.templates.azure_template.check_current_deployment_exists"
     ) as mock_check_current_deployment_exists, patch(
         "typer.confirm"
     ) as mock_confirm, patch(
@@ -44,7 +42,6 @@ def test_reuse_configuration(
     ) as mock_matcha_state_service, patch(
         f"{matcha_state_service_stub}.fetch_resources_from_state_file"
     ) as mock_fetch_resources_from_state_file:
-
         mock_check_current_deployment_exists.return_value = True
         mock_confirm.return_value = True
         mock_matcha_state_service_instance = mock_matcha_state_service.return_value

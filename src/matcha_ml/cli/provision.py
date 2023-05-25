@@ -11,8 +11,8 @@ from matcha_ml.cli.ui.status_message_builders import (
     build_step_success_status,
 )
 from matcha_ml.state import RemoteStateManager
-from matcha_ml.templates.azure_template.azure_template import AzureTemplate
-from matcha_ml.templates.azure_template.run_azure_template import AzureTemplateRunner
+from matcha_ml.templates import AzureTemplate
+from matcha_ml.runners import AzureRunner
 
 # create a typer app to group all provision subcommands
 app = typer.Typer()
@@ -85,7 +85,7 @@ def provision_resources(
 
     with remote_state_manager.use_lock():
         # create a runner for provisioning resource with Terraform service.
-        template_runner = AzureTemplateRunner()
+        template_runner = AzureRunner()
 
         project_directory = os.getcwd()
         destination = os.path.join(
