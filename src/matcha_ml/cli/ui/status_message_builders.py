@@ -69,3 +69,17 @@ def build_substep_success_status(status: str) -> str:
         str: formatted message
     """
     return f"[green]{status}[/green]"
+
+
+def build_warning_status(status: str) -> str:
+    """Build warning status message.
+
+    Use yellow colour for formatting
+
+    Args:
+        status: status message
+
+    Returns:
+        str: formatted message
+    """
+    return f"[yellow]{status}[/yellow]"
