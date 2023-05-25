@@ -187,7 +187,6 @@ class RemoteStateManager:
         print_status(
             build_step_success_status("Destroying remote state management is complete!")
         )
-        os.remove(MATCHA_STATE_DIR)
 
     def _write_matcha_config(
         self, account_name: str, container_name: str, resource_group_name: str
