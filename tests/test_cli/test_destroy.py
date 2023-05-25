@@ -1,7 +1,8 @@
 """Test suite to test the destroy command and all its subcommands."""
 import json
 import os
-from unittest.mock import patch
+from typing import Iterable
+from unittest.mock import MagicMock, patch
 
 import pytest
 
@@ -10,12 +11,16 @@ from matcha_ml.templates.azure_template.run_azure_template import AzureTemplateR
 
 
 @pytest.fixture(autouse=True)
-def mock_provisioned_remote_state():
-    """Mock remote state manager to have state provisioned."""
+def mock_provisioned_remote_state() -> Iterable[MagicMock]:
+    """Mock remote state manager to have state provisioned.
+
+    Returns:
+        MagicMock: mock of an RemoteStateManager instance
+    """
     with patch("matcha_ml.cli.destroy.RemoteStateManager") as mock_state_manager_class:
         mock_state_manager = mock_state_manager_class.return_value
         mock_state_manager.is_state_provisioned.return_value = True
-        yield
+        yield mock_state_manager
 
 
 def test_cli_destroy_command_help(runner):
@@ -35,13 +40,14 @@ def test_cli_destroy_command_help(runner):
 
 
 def test_cli_destroy_command_with_no_provisioned_resources(
-    runner, matcha_testing_directory
+    runner, matcha_testing_directory, mock_provisioned_remote_state: MagicMock
 ):
     """Test provision command when there no existing resources deployed.
 
     Args:
         runner (CliRunner): typer CLI runner
         matcha_testing_directory (str): temporary working directory.
+        mock_provisioned_remote_state (MagicMock): mock of an RemoteStateManager instance
     """
     os.chdir(matcha_testing_directory)
 
@@ -56,6 +62,8 @@ def test_cli_destroy_command_with_no_provisioned_resources(
         "Error - you cannot destroy resources that have not been provisioned yet."
         in result.stdout
     )
+    
+    mock_provisioned_remote_state.use_lock.assert_called_once()
 
 
 def test_cli_destroy_command_updates_matcha_state(runner, matcha_testing_directory):
