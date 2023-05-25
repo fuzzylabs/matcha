@@ -39,6 +39,15 @@ def mock_use_lock():
         yield mocked_use_lock
 
 
+@pytest.fixture(autouse=True)
+def mock_use_remote_state():
+    """Mock use_lock state context manager."""
+    with patch(
+        "matcha_ml.cli.provision.RemoteStateManager.use_remote_state"
+    ) as mocked_use_remote_state:
+        yield mocked_use_remote_state
+
+
 def assert_infrastructure(
     destination_path: str,
     expected_tf_vars: Dict[str, str],
@@ -117,11 +126,13 @@ def test_cli_provision_command(
     """
     os.chdir(matcha_testing_directory)
 
+    print("A")
     # Invoke provision command
     result = runner.invoke(
         app, ["provision"], input="uksouth\nmatcha\ndefault\ndefault\nY\n"
     )
 
+    print("HERE")
     # Exit code 0 means there was no error
     assert result.exit_code == 0
 
