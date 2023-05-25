@@ -6,15 +6,15 @@ import pytest
 
 from matcha_ml.services.global_parameters_service import GlobalParameters
 from matcha_ml.templates.azure_template.run_azure_template import (
-    TemplateRunner as AzureTemplateRunner,
+    AzureTemplateRunner,
 )
 from matcha_ml.templates.state_storage_template.run_state_storage_template import (
-    TemplateRunner as StateStorageTemplateRunner,
+    StateStorageTemplateRunner,
 )
 
 INTERNAL_FUNCTION_STUBS = [
-    "matcha_ml.cli.provision.TemplateRunner",
-    "matcha_ml.state.remote_state_manager.TemplateRunner",
+    "matcha_ml.cli.provision.AzureTemplateRunner",
+    "matcha_ml.state.remote_state_manager.StateStorageTemplateRunner",
 ]
 
 GLOBAL_PARAMETER_SERVICE_FUNCTION_STUB = (

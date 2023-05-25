@@ -16,7 +16,7 @@ from matcha_ml.state.remote_state_manager import (
     RemoteStateManager,
 )
 from matcha_ml.templates.state_storage_template.run_state_storage_template import (
-    TemplateRunner,
+    StateStorageTemplateRunner,
 )
 from matcha_ml.templates.state_storage_template.state_storage_template import (
     SUBMODULE_NAMES,
@@ -212,7 +212,7 @@ def test_deprovision_state_storage(capsys: SysCapture) -> None:
         capsys (SysCapture): fixture to capture stdout and stderr
     """
     with patch(
-        "matcha_ml.templates.state_storage_template.run_state_storage_template.TemplateRunner.deprovision"
+        "matcha_ml.templates.state_storage_template.run_state_storage_template.StateStorageTemplateRunner.deprovision"
     ) as destroy:
         destroy.return_value = None
         remote_state_manager = RemoteStateManager()
@@ -223,7 +223,7 @@ def test_deprovision_state_storage(capsys: SysCapture) -> None:
 
         expected_output = "Destroying remote state management is complete!"
 
-        template_runner = TemplateRunner()
+        template_runner = StateStorageTemplateRunner()
         template_runner.deprovision.assert_called()
 
         assert expected_output in captured.out
