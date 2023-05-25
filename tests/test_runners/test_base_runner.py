@@ -50,18 +50,48 @@ def test_validate_terraform_config(capsys: SysCapture):
     assert expected in captured.err
 
 
-# def test_is_approved(template_runner: BaseRunner):
-#     """Test if is_approved behaves as expected based on user's input.
+def test_check_matcha_directory_exists(
+    capsys: SysCapture,
+    matcha_testing_directory: str,
+):
+    """Test if service exit as expected and print out the expected error message when required files does not exists.
 
-#     Args:
-#         template_runner (BaseRunner): a BaseRunner object instance
-#     """
-#     with mock.patch("typer.confirm") as mock_confirm:
-#         mock_confirm.return_value = True
-#         assert template_runner.is_approved("provision")
+    Args:
+        capsys (SysCapture): fixture to capture stdout and stderr
+        matcha_testing_directory (str): the test directory
+    """
+    os.chdir(matcha_testing_directory)
 
-#         mock_confirm.return_value = False
-#         assert not template_runner.is_approved("provision")
+    template_runner = BaseRunner()
+    template_runner.tfs.check_matcha_directory_exists = MagicMock(return_value=False)
+    template_runner.tfs.check_matcha_directory_integrity = MagicMock(return_value=False)
+
+    with pytest.raises(typer.Exit):
+        expected = "Error, the .matcha directory does not exist"
+        template_runner._check_matcha_directory_exists()
+
+        captured = capsys.readouterr()
+
+        assert expected in captured.err
+
+    with pytest.raises(typer.Exit):
+        expected = "Error, the .matcha directory does not contain files relating to deployed resources. Please ensure you are trying to destroy resources that you have provisioned in the current working directory."
+        template_runner._check_matcha_directory_exists()
+
+        captured = capsys.readouterr()
+
+        assert expected in captured.err
+
+
+def test_is_approved():
+    """Test if is_approved behaves as expected based on user's input."""
+    template_runner = BaseRunner()
+    with mock.patch("typer.confirm") as mock_confirm:
+        mock_confirm.return_value = True
+        assert template_runner.is_approved("provision")
+
+        mock_confirm.return_value = False
+        assert not template_runner.is_approved("provision")
 
 
 # def test_initialize_terraform(capsys: SysCapture, template_runner: BaseRunner):
@@ -90,40 +120,6 @@ def test_validate_terraform_config(capsys: SysCapture):
 #         captured = capsys.readouterr()
 
 #         assert expected in captured.out
-
-
-# def test_check_matcha_directory_exists(
-#     capsys: SysCapture,
-#     template_runner: BaseRunner,
-#     matcha_testing_directory: str,
-# ):
-#     """Test if service exit as expected and print out the expected error message when required files does not exists.
-
-#     Args:
-#         capsys (SysCapture): fixture to capture stdout and stderr
-#         template_runner (BaseRunner): a BaseRunner object instance
-#         matcha_testing_directory (str): the test directory
-#     """
-#     os.chdir(matcha_testing_directory)
-
-#     template_runner.tfs.check_matcha_directory_exists = MagicMock(return_value=False)
-#     template_runner.tfs.check_matcha_directory_integrity = MagicMock(return_value=False)
-
-#     with pytest.raises(typer.Exit):
-#         expected = "Error, the .matcha directory does not exist"
-#         template_runner._check_matcha_directory_exists()
-
-#         captured = capsys.readouterr()
-
-#         assert expected in captured.err
-
-#     with pytest.raises(typer.Exit):
-#         expected = "Error, the .matcha directory does not contain files relating to deployed resources. Please ensure you are trying to destroy resources that you have provisioned in the current working directory."
-#         template_runner._check_matcha_directory_exists()
-
-#         captured = capsys.readouterr()
-
-#         assert expected in captured.err
 
 
 # def test_apply_terraform(capsys: SysCapture, template_runner: BaseRunner):
