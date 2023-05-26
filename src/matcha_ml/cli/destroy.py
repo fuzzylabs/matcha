@@ -27,7 +27,8 @@ def destroy_resources() -> None:
         raise typer.Exit()
 
     with remote_state.use_lock():
-        with RemoteStateManager.use_remote_state():
+
+        with remote_state.use_remote_state():
             # create a runner for deprovisioning resource with Terraform service.
             template_runner = AzureTemplateRunner()
 
