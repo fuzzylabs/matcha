@@ -253,7 +253,11 @@ class RemoteStateManager:
         Downloads the state before executing the code.
         Upload the state when context is finished.
         """
-        yield
+        self.download(os.getcwd())
+
+        yield None
+
+        self.upload(os.path.join(".matcha", "infrastructure"))
 
     def lock(self) -> None:
         """Lock remote state.

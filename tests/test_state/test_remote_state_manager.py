@@ -2,6 +2,7 @@
 import glob
 import json
 import os
+import shutil
 from typing import Dict, Iterator
 from unittest.mock import MagicMock, patch
 
@@ -415,3 +416,13 @@ def test_use_lock(
     assert mock_azure_storage_instance.create_empty.call_count == 1
     assert mock_azure_storage_instance.blob_exists.call_count == 1
     assert mock_azure_storage_instance.delete_blob.call_count == 1
+
+
+def test_use_remote_state():
+    """Test use_remote_state context manager.
+    """
+    remote_state_manager = RemoteStateManager()
+    with patch.object(remote_state_manager,"upload") as mocked_upload, patch.object(remote_state_manager,"download") as mocked_downlaod:
+        with remote_state_manager.use_remote_state():
+            mocked_downlaod.assert_called_once_with(os.getcwd())
+        mocked_upload.assert_called_once_with(os.path.join(".matcha", "infrastructure"))

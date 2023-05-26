@@ -84,40 +84,42 @@ def provision_resources(
         remote_state_manager.provision_state_storage(location, prefix)
 
     with remote_state_manager.use_lock():
-        # create a runner for provisioning resource with Terraform service.
-        template_runner = AzureRunner()
 
-        project_directory = os.getcwd()
-        destination = os.path.join(
-            project_directory, ".matcha", "infrastructure", "resources"
-        )
-        template = os.path.join(
-            os.path.dirname(__file__), os.pardir, "infrastructure", "resources"
-        )
+        with remote_state_manager.use_remote_state():
+            # create a runner for provisioning resource with Terraform service.
+            template_runner = AzureRunner()
 
-        # Create a azure template object
-        azure_template = AzureTemplate()
-
-        if not azure_template.reuse_configuration(destination):
-            location, prefix, password = fill_provision_variables(
-                location, prefix, password
+            project_directory = os.getcwd()
+            destination = os.path.join(
+                project_directory, ".matcha", "infrastructure", "resources"
+            )
+            template = os.path.join(
+                os.path.dirname(__file__), os.pardir, "infrastructure", "resources"
             )
 
-            config = azure_template.build_template_configuration(
-                location=location, prefix=prefix, password=password
-            )
-            azure_template.build_template(config, template, destination, verbose)
+            # Create a azure template object
+            azure_template = AzureTemplate()
 
-        # Initializes the infrastructure provisioning process.
-        if template_runner.is_approved(verb="provision"):
-            # provision resources by running the template
-            template_runner.provision()
-            print_status(build_step_success_status("Provisioning is complete!"))
-
-        else:
-            print_status(
-                build_status(
-                    "You decided to cancel - if you change your mind, then run 'matcha provision' again."
+            if not azure_template.reuse_configuration(destination):
+                location, prefix, password = fill_provision_variables(
+                    location, prefix, password
                 )
-            )
-            raise typer.Exit()
+
+                config = azure_template.build_template_configuration(
+                    location=location, prefix=prefix, password=password
+                )
+                azure_template.build_template(config, template, destination, verbose)
+
+            # Initializes the infrastructure provisioning process.
+            if template_runner.is_approved(verb="provision"):
+                # provision resources by running the template
+                template_runner.provision()
+                print_status(build_step_success_status("Provisioning is complete!"))
+
+            else:
+                print_status(
+                    build_status(
+                        "You decided to cancel - if you change your mind, then run 'matcha provision' again."
+                    )
+                )
+                raise typer.Exit()
