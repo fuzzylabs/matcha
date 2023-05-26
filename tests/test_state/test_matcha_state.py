@@ -28,6 +28,7 @@ def mock_state_file(matcha_testing_directory: str):
 
     matcha_infrastructure_dir = os.path.join(".matcha", "infrastructure", "resources")
     os.makedirs(matcha_infrastructure_dir)
+    matcha_state_path = os.path.join(".matcha", "infrastructure", "matcha.state")
 
     state_file_resources = {
         "cloud": {"flavor": "azure", "resource-group-name": "test_resources"},
@@ -39,7 +40,7 @@ def mock_state_file(matcha_testing_directory: str):
         "experiment-tracker": {"flavor": "mlflow", "tracking-url": "mlflow_test_url"},
     }
 
-    with open(os.path.join(matcha_infrastructure_dir, "matcha.state"), "w") as f:
+    with open(matcha_state_path, "w") as f:
         json.dump(state_file_resources, f)
 
 
@@ -113,7 +114,9 @@ def test_check_state_file_does_not_exist(matcha_state_service: MatchaStateServic
     Args:
         matcha_state_service (MatchaStateService): The matcha_state_service testing instance.
     """
-    matcha_infrastructure_dir = os.path.join(".matcha", "infrastructure", "resources")
-    os.remove(os.path.join(matcha_infrastructure_dir, "matcha.state"))
+    matcha_state_path = os.path.join(".matcha", "infrastructure", "matcha.state")
+
+    os.remove(matcha_state_path)
+
     result = matcha_state_service.check_state_file_exists()
     assert result is False

@@ -26,6 +26,12 @@ def mock_output() -> Callable[[str, bool], Union[str, Dict[str, str]]]:
             "cloud_azure_resource_group_name": {
                 "value": "random-resources",
             },
+            "cloud_azure_prefix": {
+                "value": "random",
+            },
+            "cloud_azure_location": {
+                "value": "uksouth",
+            },
             "experiment_tracker_mlflow_tracking_url": {"value": "mlflow_test_url"},
             "pipeline_zenml_connection_string": {
                 "value": "zenml_test_connection_string"
@@ -88,6 +94,12 @@ def expected_outputs_hide_sensitive() -> dict:
         dict: expected output
     """
     outputs = {
+        "cloud": {
+            "flavor": "azure",
+            "resource-group-name": "random-resources",
+            "location": "uksouth",
+            "prefix": "random",
+        },
         "experiment-tracker": {
             "flavor": "mlflow",
             "tracking-url": "mlflow_test_url",
@@ -129,9 +141,12 @@ def terraform_test_config(matcha_testing_directory: str) -> TerraformConfig:
     os.makedirs(infrastructure_directory, exist_ok=True)
 
     # Create a dummy matcha state file
-    matcha_state_file = os.path.join(infrastructure_directory, "matcha.state")
+    matcha_state_path = os.path.join(
+        matcha_testing_directory, ".matcha", "infrastructure", "matcha.state"
+    )
+
     dummy_data = {"cloud": {"prefix": "random", "location": "uksouth"}}
-    with open(matcha_state_file, "w") as fp:
+    with open(matcha_state_path, "w") as fp:
         json.dump(dummy_data, fp)
 
     return TerraformConfig(working_dir=infrastructure_directory)
@@ -237,21 +252,51 @@ def test_provision(template_runner: AzureRunner):
         template_runner._apply_terraform.assert_called()
 
 
-def test_deprovision(template_runner: AzureRunner):
-    """Test service can deprovision resources using terraform.
+def test_deprovision(
+    template_runner: AzureRunner,
+    matcha_testing_directory: str,
+    expected_outputs_show_sensitive: dict,
+):
+    """Test service can deprovision resources using terraform and that the matcha.state file contains the expected output.
 
     Args:
-        template_runner (AzureRunner): a AzureRunner object instance
+        template_runner (AzureRunner): a AzureTemplateRunner object instance
+        matcha_testing_directory (str): Testing directory
+        expected_outputs_show_sensitive (dict): matcha.state contents before destroy is run
     """
     template_runner._check_terraform_installation = MagicMock()
     template_runner._check_matcha_directory_exists = MagicMock()
     template_runner._destroy_terraform = MagicMock()
+    matcha_state_file_dir = os.path.join(
+        matcha_testing_directory, ".matcha", "infrastructure", "matcha.state"
+    )
+    expected_state_file_contents = {
+        "cloud": {
+            "flavor": "azure",
+            "resource-group-name": "random-resources",
+            "location": "uksouth",
+            "prefix": "random",
+        },
+        "id": {"matcha_uuid": "matcha_id_test_value"},
+    }
 
-    with mock.patch("typer.confirm") as mock_confirm:
+    # Create mock matcha.state file with the required contents
+    os.makedirs(os.path.join(matcha_testing_directory, ".matcha", "infrastructure"))
+    with open(matcha_state_file_dir, "w") as f:
+        json.dump(expected_outputs_show_sensitive, f, indent=4)
+
+    with mock.patch("typer.confirm") as mock_confirm, mock.patch.object(
+        AzureRunner, "state_file", matcha_state_file_dir
+    ):
         mock_confirm.return_value = False
         template_runner._destroy_terraform.assert_not_called()
 
-    with mock.patch("typer.confirm") as mock_confirm:
+    with mock.patch("typer.confirm") as mock_confirm, mock.patch.object(
+        AzureRunner, "state_file", matcha_state_file_dir
+    ):
         mock_confirm.return_value = True
         template_runner.deprovision()
         template_runner._destroy_terraform.assert_called()
+
+    with open(matcha_state_file_dir) as f:
+        assert json.load(f) == expected_state_file_contents

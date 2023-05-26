@@ -21,7 +21,7 @@ class TerraformConfig:
     @property
     def state_file(self) -> str:
         """The path to the state file."""
-        return os.path.join(self.working_dir, "matcha.state")
+        return os.path.join(self.working_dir, os.pardir, "matcha.state")
 
     # variables file
     @property
