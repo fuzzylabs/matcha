@@ -59,3 +59,4 @@ class RemoteStateRunner(BaseRunner):
         self._check_matcha_directory_exists()
         self._check_terraform_installation()
         self._destroy_terraform(msg="Remote State")
+        self._clean_up()
