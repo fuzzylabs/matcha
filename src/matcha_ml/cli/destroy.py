@@ -40,7 +40,9 @@ def destroy_resources() -> None:
             if template_runner.is_approved(verb="destroy"):
                 # deprovision the resources
                 template_runner.deprovision()
-                print_status(build_step_success_status("Destroying resources is complete!"))
+                print_status(
+                    build_step_success_status("Destroying resources is complete!")
+                )
             else:
                 print_status(
                     build_status(
