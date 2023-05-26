@@ -343,7 +343,7 @@ def test_get_blobs(mock_blob_service: BlobServiceClient) -> None:
     """Test that the get_blobs function return the expected result.
 
     Args:
-        mock_blob_service (BlobServiceClient): Mocked blob service client
+        mock_blob_service (BlobServiceClient): Mocked blob service client.
     """
     # Mock container client
     mock_container_client = (
@@ -365,3 +365,25 @@ def test_get_blobs(mock_blob_service: BlobServiceClient) -> None:
 
     # Test the result has expected value
     assert result == {"test_blob_name_1", "test_blob_name_2"}
+
+
+def test_sync_remote(mock_blob_service: BlobServiceClient):
+    """Test that sync remote removes the expected the blob.
+
+    Args:
+        mock_blob_service (BlobServiceClient): Mocked blob service client.
+    """
+    # Mock container client
+    mock_container_client = (
+        mock_blob_service.return_value.get_container_client.return_value
+    )
+
+    mock_blob_set = {"blob_1"}
+
+    _ = mock_container_client.delete_blob.return_value
+
+    az_storage = AzureStorage("testaccount", "test-rg")
+
+    az_storage._sync_remote("testcontainer", mock_blob_set)
+
+    mock_container_client.delete_blob.assert_called_once_with("blob_1")

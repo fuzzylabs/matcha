@@ -72,21 +72,20 @@ class AzureStorage:
         """
         container_client = self._get_container_client(container_name)
         # Get all existing blobs
-        blob_list = self._get_blobs(container_name=container_name)
+        blob_set = self._get_blobs(container_name=container_name)
 
         for root, _, filenames in os.walk(src_folder_path):
             for filename in filenames:
                 file_path = os.path.join(root, filename)
 
-                if file_path in blob_list:
-                    blob_list.remove(file_path)
+                if file_path in blob_set:
+                    blob_set.remove(file_path)
 
                 blob_client = container_client.get_blob_client(blob=file_path)
                 self.upload_file(blob_client, file_path)
 
         # Remove blobs that are not present in the local `src_folder_path``
-        for blob in blob_list:
-            container_client.delete_blob(blob)
+        self._sync_remote(container_name=container_name, blob_set=blob_set)
 
     def download_file(self, blob_client: BlobClient, dest_file: str) -> None:
         """Download a file from Azure Storage Container.
@@ -178,3 +177,16 @@ class AzureStorage:
             Set[str]: a set of blob names in the container.
         """
         return set(self._get_container_client(container_name).list_blob_names())
+
+    def _sync_remote(self, container_name: str, blob_set: Set[str]) -> None:
+        """Synchronizes the remote storage with the local files.
+
+        Args:
+            container_name (str): The name of the blob container to look for blobs.
+            blob_set (Set[str]): Set of blob names to be removed on the remote storage.
+        """
+        container_client = self._get_container_client(container_name=container_name)
+
+        # Remove blobs that are not present in the local `src_folder_path``
+        for blob in blob_set:
+            container_client.delete_blob(blob)
