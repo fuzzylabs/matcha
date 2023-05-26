@@ -116,7 +116,8 @@ class AzureStorage:
         for blob in container_client.list_blobs():
             blob_client = container_client.get_blob_client(blob=str(blob.name))
             file_path = os.path.join(dest_folder_path, str(blob.name))
+
             if not os.path.exists(os.path.dirname(file_path)):
                 os.makedirs(os.path.dirname(file_path), exist_ok=True)
-            print(file_path)
+
             self.download_file(blob_client, file_path)
