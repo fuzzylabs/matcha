@@ -7,7 +7,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from matcha_ml.cli.cli import app
-from matcha_ml.runners import AzureRunner
+from matcha_ml.services.terraform_service import TerraformConfig
 
 
 @pytest.fixture(autouse=True)
@@ -113,7 +113,7 @@ def test_cli_destroy_command_updates_matcha_state(runner, matcha_testing_directo
     with patch(
         "matcha_ml.cli.destroy.check_current_deployment_exists"
     ) as check_deployment_exists, patch.object(
-        AzureRunner, "state_file", matcha_state_file_path
+        TerraformConfig, "state_file", matcha_state_file_path
     ):
         # mock_az_runner.return_value.state_file = matcha_state_file_path
         check_deployment_exists.return_value = True
