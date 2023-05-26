@@ -337,3 +337,31 @@ def test_delete_blob(mock_blob_service: BlobServiceClient) -> None:
     )
     mock_container_client.get_blob_client.assert_called_with("testblob")
     mock_blob_client.delete_blob.assert_called_once_with()  # Check that blob is uploaded and empty
+
+
+def test_get_blobs(mock_blob_service: BlobServiceClient) -> None:
+    """Test that the get_blobs function return the expected result.
+
+    Args:
+        mock_blob_service (BlobServiceClient): Mocked blob service client
+    """
+    # Mock container client
+    mock_container_client = (
+        mock_blob_service.return_value.get_container_client.return_value
+    )
+
+    mock_list_blob_names = mock_container_client.list_blob_names
+
+    mock_list_blob_names.return_value = ["test_blob_name_1", "test_blob_name_2"]
+
+    az_storage = AzureStorage("testaccount", "test-rg")
+
+    result = az_storage._get_blobs("testcontainer")
+
+    mock_container_client.list_blob_names.assert_called_once()
+
+    # Test that result returned is a set
+    assert isinstance(result, set)
+
+    # Test the result has expected value
+    assert result == {"test_blob_name_1", "test_blob_name_2"}
