@@ -24,7 +24,7 @@ def test_cli_force_unlock_command_help_option(runner: CliRunner) -> None:
 
 
 def test_cli_force_unlock_command_called(runner: CliRunner) -> None:
-    """Tests the cli force-unlock command is called when running the user provides confirmation.
+    """Tests the cli force-unlock command is called when a user runs matcha force-unlock and does confirm.
 
     Args:
         runner (CliRunner): typer CLI runner
@@ -41,7 +41,7 @@ def test_cli_force_unlock_command_called(runner: CliRunner) -> None:
 
 
 def test_cli_force_unlock_command_not_called(runner: CliRunner) -> None:
-    """Tests the cli force-unlock command is not called when running the user does not confirm.
+    """Tests the cli force-unlock command is not called when a user runs matcha force-unlock and does not confirm.
 
     Args:
         runner (CliRunner): typer CLI runner

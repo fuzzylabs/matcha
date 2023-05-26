@@ -211,7 +211,7 @@ def test_opt_in_subcommand(
 
 
 def test_unlock_state_lock_called(runner, mock_unlock):
-    """Test if unlock function in RemoteStateManager is called when running the user provides confirmation.
+    """Test that the unlock function is not called when a user runs matcha force-unlock and does confirm.
 
     Args:
         runner: Mock runner
@@ -229,7 +229,7 @@ def test_unlock_state_lock_called(runner, mock_unlock):
 
 
 def test_remove_state_lock_not_called(runner, mock_unlock):
-    """Test if unlock function in RemoteStateManager is not called when running the user does not confirm.
+    """Test that the unlock function is not called when a user runs matcha force-unlock and does not confirm.
 
     Args:
         runner: Mock runner
