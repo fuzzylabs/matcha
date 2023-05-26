@@ -7,9 +7,7 @@ from typing import Dict, List, Optional
 class MatchaStateService:
     """A matcha state service for handling to matcha.state file."""
 
-    matcha_state_path = os.path.join(
-        ".matcha", "infrastructure", "resources", "matcha.state"
-    )
+    matcha_state_path = os.path.join(".matcha", "infrastructure", "matcha.state")
 
     def __init__(self) -> None:
         """MatchaStateService constructor."""
