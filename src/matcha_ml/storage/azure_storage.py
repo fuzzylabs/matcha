@@ -135,7 +135,7 @@ class AzureStorage:
             blob_name (str): blob name
 
         Returns:
-             bool: True, if blob exists
+            bool: True, if blob exists
         """
         return self._get_blob_client(container_name, blob_name).exists()
 

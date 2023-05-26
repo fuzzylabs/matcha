@@ -25,7 +25,7 @@ DEFAULT_CONFIG_NAME = "matcha.config.json"
 LOCK_FILE_NAME = "matcha.lock"
 ALREADY_LOCKED_MESSAGE = (
     "Remote state is already locked, maybe someone else is using matcha?"
-    "If you think this is a mistake, you can unlock the state by running `matcha force-unlock`."
+    "If you think this is a mistake, you can unlock the state by running 'matcha force-unlock'."
 )
 
 
