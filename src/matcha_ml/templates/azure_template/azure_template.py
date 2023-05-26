@@ -89,7 +89,7 @@ class AzureTemplate(BaseTemplate):
         super().build_template(config, template_src, destination, verbose)
 
         # Add matcha.state file one directory above the template
-        state_file_destination = os.path.join(destination, "..", "matcha.state")
+        state_file_destination = os.path.join(destination, os.pardir, "matcha.state")
 
         config_dict = vars(config)
         _ = config_dict.pop("password", None)
