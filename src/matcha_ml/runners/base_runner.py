@@ -1,14 +1,11 @@
-"""Run terraform templates to provision and deprovision state bucket resource."""
+"""Run terraform templates to provision and deprovision resources."""
 import os
-from typing import Tuple
+from typing import Optional, Tuple
 
 import typer
 
 from matcha_ml.cli.ui.emojis import Emojis
-from matcha_ml.cli.ui.print_messages import (
-    print_error,
-    print_status,
-)
+from matcha_ml.cli.ui.print_messages import print_error, print_status
 from matcha_ml.cli.ui.spinner import Spinner
 from matcha_ml.cli.ui.status_message_builders import (
     build_status,
@@ -17,16 +14,26 @@ from matcha_ml.cli.ui.status_message_builders import (
 from matcha_ml.errors import MatchaTerraformError
 from matcha_ml.services.terraform_service import TerraformConfig, TerraformService
 
+SPINNER = "dots"
 
-class StateStorageTemplateRunner:
-    """A Runner class provides methods that interface with the Terraform service to facilitate the provisioning and deprovisioning of the state bucket."""
 
-    terraform_config = TerraformConfig(
-        working_dir=os.path.join(
-            os.getcwd(), ".matcha", "infrastructure", "remote_state_storage"
-        )
-    )
-    tfs: TerraformService = TerraformService(terraform_config)
+class BaseRunner:
+    """A BaseRunner class provides methods that interface with the Terraform service to facilitate the provisioning and deprovisioning of resources."""
+
+    def __init__(self, working_dir: Optional[str] = None) -> None:
+        """Initialize BaseRunner class.
+
+        Args:
+            working_dir (Optional[str]): Working directory for terraform. Defaults to None.
+        """
+        if working_dir is not None:
+            working_dir = working_dir
+        else:
+            working_dir = TerraformConfig().working_dir
+        self.terraform_config = TerraformConfig(working_dir=working_dir)
+        self.tfs = TerraformService(self.terraform_config)
+        self.tf_state_dir = self.tfs.get_tf_state_dir()
+        self.state_file = self.tfs.config.state_file
 
     def _check_terraform_installation(self) -> None:
         """Checks if terraform is installed on the host system.
@@ -56,6 +63,49 @@ class StateStorageTemplateRunner:
             )
             raise typer.Exit()
 
+    def _validate_kubeconfig(self, base_path: str = ".kube/config") -> None:
+        """Check if kubeconfig file exists at location '~/.kube/config', if not create empty config file.
+
+        Args:
+            base_path (str): Relative path to location of kubeconfig
+        """
+        self.tfs.verify_kubectl_config_file(base_path)
+
+    def _initialize_terraform(self, msg: str = "") -> None:
+        """Run terraform init to initialize Terraform .
+
+        Raises:
+            MatchaTerraformError: if 'terraform init' failed.
+            msg (str) : Message to display. Default is empty string.
+        """
+        if self.tf_state_dir.exists():
+            # this directory gets created after a successful init command
+            print_status(
+                build_status(
+                    f"matcha {Emojis.MATCHA.value} has already been initialized. Skipping this step..."
+                )
+            )
+
+        else:
+            print_status(
+                build_status(
+                    f"\n{Emojis.WAITING.value} Brewing matcha {Emojis.MATCHA.value}...\n"
+                )
+            )
+
+            with Spinner("Initializing"):
+                ret_code, _, err = self.tfs.init()
+
+                if ret_code != 0:
+                    print_error("The command 'terraform init' failed.")
+                    raise MatchaTerraformError(tf_error=err)
+
+            print_status(
+                build_substep_success_status(
+                    f"{Emojis.CHECKMARK.value} {msg} {Emojis.MATCHA.value} initialized!\n"
+                )
+            )
+
     def _check_matcha_directory_exists(self) -> None:
         """Checks if .matcha directory exists within the current working directory.
 
@@ -75,23 +125,6 @@ class StateStorageTemplateRunner:
             )
             raise typer.Exit()
 
-    def _initialize_terraform(self) -> None:
-        """Run terraform init to initialize Terraform .
-
-        Raises:
-            MatchaTerraformError: if 'terraform init' failed.
-        """
-        with Spinner("Initializing"):
-            ret_code, _, err = self.tfs.init()
-
-            if ret_code != 0:
-                print_error("The command 'terraform init' failed.")
-                raise MatchaTerraformError(tf_error=err)
-
-        print_status(
-            build_substep_success_status("Remote state management initialized!\n")
-        )
-
     def _apply_terraform(self) -> None:
         """Run terraform apply to create resources on cloud.
 
@@ -110,34 +143,16 @@ class StateStorageTemplateRunner:
             )
         )
 
-    def _get_terraform_output(self) -> Tuple[str, str, str]:
-        """Return the account name and the container name from terraform output.
-
-        Returns:
-            Tuple[str, str]: account name, the container name and azure resource_group_name.
-        """
-        tf_outputs = self.tfs.terraform_client.output()
-
-        account_name = ""
-        container_name = ""
-        resource_group_name = ""
-
-        prefix = "remote_state_storage"
-        account_name = tf_outputs[f"{prefix}_account_name"]["value"]
-        resource_group_name = tf_outputs[f"{prefix}_resource_group_name"]["value"]
-        container_name = tf_outputs[f"{prefix}_container_name"]["value"]
-
-        return account_name, container_name, resource_group_name
-
-    def _destroy_terraform(self) -> None:
+    def _destroy_terraform(self, msg: str = "") -> None:
         """Destroy the provisioned resources.
 
         Raises:
             MatchaTerraformError: if 'terraform destroy' failed.
+            msg (str) : Message to display. Default is empty string.
         """
         print()
         print_status(
-            build_status(f"{Emojis.WAITING.value} Destroying remote state management")
+            build_status(f"{Emojis.WAITING.value} Destroying {msg} resources...")
         )
         print()
         with Spinner("Destroying"):
@@ -146,17 +161,10 @@ class StateStorageTemplateRunner:
             if ret_code != 0:
                 raise MatchaTerraformError(tf_error=err)
 
-    def provision(self) -> Tuple[str, str, str]:
-        """Provision the azure storage bucket for remote state management."""
-        self._check_terraform_installation()
-        self._validate_terraform_config()
-        self._initialize_terraform()
-        self._apply_terraform()
-
-        return self._get_terraform_output()
+    def provision(self) -> Optional[Tuple[str, str, str]]:
+        """Provision resources required for the deployment."""
+        raise NotImplementedError
 
     def deprovision(self) -> None:
         """Destroy the provisioned resources."""
-        self._check_matcha_directory_exists()
-        self._check_terraform_installation()
-        self._destroy_terraform()
+        raise NotImplementedError

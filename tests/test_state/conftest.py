@@ -3,21 +3,17 @@ from unittest.mock import patch
 
 import pytest
 
-from matcha_ml.templates.state_storage_template.run_state_storage_template import (
-    StateStorageTemplateRunner,
-)
+from matcha_ml.runners import RemoteStateRunner
 
-INTERNAL_FUNCTION_STUB = (
-    "matcha_ml.state.remote_state_manager.StateStorageTemplateRunner"
-)
+INTERNAL_FUNCTION_STUB = "matcha_ml.state.remote_state_manager.RemoteStateRunner"
 
 
 @pytest.fixture(scope="class", autouse=True)
-def mocked_state_storage_template_runner() -> StateStorageTemplateRunner:
+def mocked_state_storage_template_runner() -> RemoteStateRunner:
     """The Template Runner with mocked variables.
 
     Returns:
-        TemplateRunner: the mocked TemplateRunner.
+        RemoteStateRunner: the mocked TemplateRunner.
     """
     with patch(f"{INTERNAL_FUNCTION_STUB}._initialize_terraform") as initialize, patch(
         f"{INTERNAL_FUNCTION_STUB}._apply_terraform"
@@ -38,4 +34,4 @@ def mocked_state_storage_template_runner() -> StateStorageTemplateRunner:
             "test-rg",
         )
 
-        yield StateStorageTemplateRunner()
+        yield RemoteStateRunner()

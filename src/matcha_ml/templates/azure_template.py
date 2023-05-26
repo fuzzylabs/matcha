@@ -8,10 +8,7 @@ import typer
 from matcha_ml.cli._validation import check_current_deployment_exists
 from matcha_ml.cli.ui.print_messages import print_status
 from matcha_ml.state import MatchaStateService
-from matcha_ml.templates.base_template import (
-    BaseTemplate,
-    TemplateVariables,
-)
+from matcha_ml.templates.base_template import BaseTemplate, TemplateVariables
 
 SUBMODULE_NAMES = [
     "aks",
