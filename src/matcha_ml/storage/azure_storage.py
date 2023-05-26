@@ -141,6 +141,7 @@ class AzureStorage:
 
     def delete_blob(self, container_name: str, blob_name: str) -> None:
         """Delete blob by name.
+
         Args:
             container_name (str): Azure storage container name
             blob_name (str): blob name

@@ -1,1 +1,1 @@
-"""init for the run_template package."""
+"""Init for the templates package."""

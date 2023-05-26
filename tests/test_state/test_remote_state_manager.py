@@ -10,13 +10,19 @@ from _pytest.capture import SysCapture
 
 from matcha_ml.errors import MatchaError
 from matcha_ml.state.remote_state_manager import (
+    ALREADY_LOCKED_MESSAGE,
     DEFAULT_CONFIG_NAME,
+    LOCK_FILE_NAME,
     RemoteStateBucketConfig,
     RemoteStateConfig,
     RemoteStateManager,
 )
-from matcha_ml.templates.build_templates.state_storage_template import SUBMODULE_NAMES
-from matcha_ml.templates.run_state_storage_template import TemplateRunner
+from matcha_ml.templates.state_storage_template.run_state_storage_template import (
+    StateStorageTemplateRunner,
+)
+from matcha_ml.templates.state_storage_template.state_storage_template import (
+    SUBMODULE_NAMES,
+)
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 TEMPLATE_DIR = os.path.join(
@@ -208,7 +214,7 @@ def test_deprovision_state_storage(capsys: SysCapture) -> None:
         capsys (SysCapture): fixture to capture stdout and stderr
     """
     with patch(
-        "matcha_ml.templates.run_state_storage_template.TemplateRunner.deprovision"
+        "matcha_ml.templates.state_storage_template.run_state_storage_template.StateStorageTemplateRunner.deprovision"
     ) as destroy:
         destroy.return_value = None
         remote_state_manager = RemoteStateManager()
@@ -219,7 +225,7 @@ def test_deprovision_state_storage(capsys: SysCapture) -> None:
 
         expected_output = "Destroying remote state management is complete!"
 
-        template_runner = TemplateRunner()
+        template_runner = StateStorageTemplateRunner()
         template_runner.deprovision.assert_called()
 
         assert expected_output in captured.out
@@ -297,3 +303,119 @@ def test_is_state_provisioned_broken_no_bucket(
     mock_azure_storage_instance.container_exists.return_value = False
     remote_state = RemoteStateManager()
     assert not remote_state.is_state_provisioned()
+
+
+def test_lock_state(
+    valid_config_testing_directory: str, mock_azure_storage_instance: MagicMock
+):
+    """Test remote state locking.
+
+    Args:
+        valid_config_testing_directory (str): temporary working directory path, with valid config file
+        mock_azure_storage_instance (MagicMock): mock of AzureStorage instance
+    """
+    os.chdir(valid_config_testing_directory)
+    remote_state = RemoteStateManager()
+    remote_state.lock()
+    mock_azure_storage_instance.create_empty.assert_called_with(
+        container_name="test-container", blob_name=LOCK_FILE_NAME
+    )
+
+
+def test_state_already_locked(
+    valid_config_testing_directory: str, mock_azure_storage_instance: MagicMock
+):
+    """Test remote state is already locked, hence failed to lock.
+
+    Args:
+        valid_config_testing_directory (str): temporary working directory path, with valid config file
+        mock_azure_storage_instance (MagicMock): mock of AzureStorage instance
+    """
+    os.chdir(valid_config_testing_directory)
+    mock_azure_storage_instance.create_empty.side_effect = MatchaError(
+        ALREADY_LOCKED_MESSAGE
+    )
+    remote_state = RemoteStateManager()
+    with pytest.raises(MatchaError):
+        remote_state.lock()
+
+
+def test_unlock_state(
+    valid_config_testing_directory: str, mock_azure_storage_instance: MagicMock
+):
+    """Test remote state is unlocking.
+
+    Args:
+        valid_config_testing_directory (str): temporary working directory path, with valid config file
+        mock_azure_storage_instance (MagicMock): mock of AzureStorage instance
+    """
+    os.chdir(valid_config_testing_directory)
+    mock_azure_storage_instance.blob_exists.return_value = True
+
+    remote_state = RemoteStateManager()
+    remote_state.unlock()
+    mock_azure_storage_instance.blob_exists.assert_called_with(
+        container_name="test-container", blob_name=LOCK_FILE_NAME
+    )
+    mock_azure_storage_instance.delete_blob.assert_called_with(
+        container_name="test-container", blob_name=LOCK_FILE_NAME
+    )
+
+
+def test_unlock_state_not_locked(
+    valid_config_testing_directory: str, mock_azure_storage_instance: MagicMock
+):
+    """Test remote state is unlocking, which was not locked.
+
+    Args:
+        valid_config_testing_directory (str): temporary working directory path, with valid config file
+        mock_azure_storage_instance (MagicMock): mock of AzureStorage instance
+    """
+    os.chdir(valid_config_testing_directory)
+    mock_azure_storage_instance.blob_exists.return_value = False
+    mock_azure_storage_instance.delete_blob.side_effect = Exception("Does not exist")
+
+    remote_state = RemoteStateManager()
+    remote_state.unlock()
+    mock_azure_storage_instance.blob_exists.assert_called_with(
+        container_name="test-container", blob_name=LOCK_FILE_NAME
+    )
+    mock_azure_storage_instance.delete_blob.assert_not_called()
+
+
+def test_use_lock(
+    valid_config_testing_directory: str, mock_azure_storage_instance: MagicMock
+):
+    """Test use_lock context manager.
+
+    Args:
+        valid_config_testing_directory (str): temporary working directory path, with valid config file
+        mock_azure_storage_instance (MagicMock): mock of AzureStorage instance
+    """
+    os.chdir(valid_config_testing_directory)
+
+    mock_azure_storage_instance.blob_exists.return_value = False
+
+    remote_state = RemoteStateManager()
+    with remote_state.use_lock():
+        # Test that the state was locked
+        mock_azure_storage_instance.create_empty.assert_called_with(
+            container_name="test-container", blob_name=LOCK_FILE_NAME
+        )
+        assert mock_azure_storage_instance.create_empty.call_count == 1
+        mock_azure_storage_instance.blob_exists.assert_not_called()
+        mock_azure_storage_instance.delete_blob.assert_not_called()
+
+        # Set azure storage mock into a locked state
+        mock_azure_storage_instance.blob_exists.return_value = True
+
+    # Test that the state was unlocked
+    mock_azure_storage_instance.blob_exists.assert_called_with(
+        container_name="test-container", blob_name=LOCK_FILE_NAME
+    )
+    mock_azure_storage_instance.delete_blob.assert_called_with(
+        container_name="test-container", blob_name=LOCK_FILE_NAME
+    )
+    assert mock_azure_storage_instance.create_empty.call_count == 1
+    assert mock_azure_storage_instance.blob_exists.call_count == 1
+    assert mock_azure_storage_instance.delete_blob.call_count == 1

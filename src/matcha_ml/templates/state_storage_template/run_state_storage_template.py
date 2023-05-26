@@ -18,7 +18,7 @@ from matcha_ml.errors import MatchaTerraformError
 from matcha_ml.services.terraform_service import TerraformConfig, TerraformService
 
 
-class TemplateRunner:
+class StateStorageTemplateRunner:
     """A Runner class provides methods that interface with the Terraform service to facilitate the provisioning and deprovisioning of the state bucket."""
 
     terraform_config = TerraformConfig(

@@ -3,19 +3,21 @@ import glob
 import json
 import os
 from typing import Dict
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 import pytest
 from typer.testing import CliRunner
 
 from matcha_ml.cli._validation import LONGEST_RESOURCE_NAME, MAXIMUM_RESOURCE_NAME_LEN
 from matcha_ml.cli.cli import app
-from matcha_ml.templates.build_templates.azure_template import SUBMODULE_NAMES
+from matcha_ml.templates.azure_template.azure_template import SUBMODULE_NAMES
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 TEMPLATE_DIR = os.path.join(
     BASE_DIR, os.pardir, os.pardir, "src", "matcha_ml", "infrastructure"
 )
+
+RUN_TWICE = 2
 
 
 @pytest.fixture(autouse=True)
@@ -26,6 +28,15 @@ def mock_provisioned_remote_state():
     ) as mock_is_state_provisioned:
         mock_is_state_provisioned.return_value = False
         yield
+
+
+@pytest.fixture(autouse=True)
+def mock_use_lock():
+    """Mock use_lock state context manager."""
+    with patch(
+        "matcha_ml.cli.provision.RemoteStateManager.use_lock"
+    ) as mocked_use_lock:
+        yield mocked_use_lock
 
 
 def assert_infrastructure(
@@ -74,7 +85,8 @@ def assert_infrastructure(
             tf_vars = json.load(f)
 
         _ = expected_tf_vars.pop("password", None)
-        assert tf_vars == expected_tf_vars
+        expected_matcha_state_vars = {"cloud": expected_tf_vars}
+        assert tf_vars == expected_matcha_state_vars
 
 
 def test_cli_provision_command_help(runner: CliRunner):
@@ -94,14 +106,14 @@ def test_cli_provision_command_help(runner: CliRunner):
 
 
 def test_cli_provision_command(
-    runner,
-    matcha_testing_directory,
+    runner: CliRunner, matcha_testing_directory: str, mock_use_lock: MagicMock
 ):
     """Test provision command to copy the infrastructure template.
 
     Args:
         runner (CliRunner): typer CLI runner
         matcha_testing_directory (str): temporary working directory
+        mock_use_lock (MagicMock): mock use_lock context manager
     """
     os.chdir(matcha_testing_directory)
 
@@ -136,17 +148,18 @@ def test_cli_provision_command(
         state_storage_destination_path, state_storage_expected_tf_vars, False
     )
     assert_infrastructure(resources_destination_path, resources_expected_tf_vars)
+    mock_use_lock.assert_called_once()
 
 
 def test_cli_provision_command_with_args(
-    runner,
-    matcha_testing_directory,
+    runner: CliRunner, matcha_testing_directory: str, mock_use_lock: MagicMock
 ):
     """Test provision command to copy the infrastructure template with command-line arguments.
 
     Args:
         runner (CliRunner): typer CLI runner
         matcha_testing_directory (str): temporary working directory
+        mock_use_lock (MagicMock): mock use_lock context manager
     """
     os.chdir(matcha_testing_directory)
 
@@ -191,14 +204,18 @@ def test_cli_provision_command_with_args(
         state_storage_destination_path, state_storage_expected_tf_vars, False
     )
     assert_infrastructure(resources_destination_path, resources_expected_tf_vars)
+    mock_use_lock.assert_called_once()
 
 
-def test_cli_provision_command_with_prefix(runner, matcha_testing_directory):
+def test_cli_provision_command_with_prefix(
+    runner: CliRunner, matcha_testing_directory: str, mock_use_lock: MagicMock
+):
     """Test provision command to copy the infrastructure template with different prefix.
 
     Args:
         runner (CliRunner): typer CLI runner
         matcha_testing_directory (str): temporary working directory
+        mock_use_lock (MagicMock): mock use_lock context manager
     """
     os.chdir(matcha_testing_directory)
 
@@ -233,14 +250,18 @@ def test_cli_provision_command_with_prefix(runner, matcha_testing_directory):
         state_storage_destination_path, state_storage_expected_tf_vars, False
     )
     assert_infrastructure(resources_destination_path, resources_expected_tf_vars)
+    mock_use_lock.assert_called_once()
 
 
-def test_cli_provision_command_with_default_prefix(runner, matcha_testing_directory):
+def test_cli_provision_command_with_default_prefix(
+    runner: CliRunner, matcha_testing_directory: str, mock_use_lock: MagicMock
+):
     """Test provision command to copy the infrastructure template with no prefix.
 
     Args:
         runner (CliRunner): typer CLI runner
         matcha_testing_directory (str): temporary working directory
+        mock_use_lock (MagicMock): mock use_lock context manager
     """
     os.chdir(matcha_testing_directory)
 
@@ -273,17 +294,18 @@ def test_cli_provision_command_with_default_prefix(runner, matcha_testing_direct
         state_storage_destination_path, state_storage_expected_tf_vars, False
     )
     assert_infrastructure(resources_destination_path, resources_expected_tf_vars)
+    mock_use_lock.assert_called_once()
 
 
 def test_cli_provision_command_with_verbose_arg(
-    runner,
-    matcha_testing_directory,
+    runner: CliRunner, matcha_testing_directory: str, mock_use_lock: MagicMock
 ):
     """Test that the verbose argument works and provision shows more output.
 
     Args:
         runner (CliRunner): typer CLI runner
         matcha_testing_directory (str): temporary working directory
+        mock_use_lock (MagicMock): mock use_lock context manager
     """
     os.chdir(matcha_testing_directory)
 
@@ -295,11 +317,14 @@ def test_cli_provision_command_with_verbose_arg(
 
     for verbose_output in [
         "module configuration was copied",
-        "Configuration was copied",
+        "Configurations were copied",
         "Template variables were added",
         "Template configuration has finished!",
     ]:
+        print(result.stdout)
         assert verbose_output in result.stdout
+
+    mock_use_lock.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -326,6 +351,7 @@ def test_cli_provision_command_with_verbose_arg(
 def test_cli_provision_command_prefix_rule(
     runner: CliRunner,
     matcha_testing_directory: str,
+    mock_use_lock: MagicMock,
     user_input: str,
     expected_output: str,
 ):
@@ -334,6 +360,7 @@ def test_cli_provision_command_prefix_rule(
     Args:
         runner (CliRunner): typer CLI runner
         matcha_testing_directory (str): temporary working directory
+        mock_use_lock (MagicMock): mock use_lock context manager
         user_input (str): prefix entered by user
         expected_output (str): the expected error message
     """
@@ -343,16 +370,20 @@ def test_cli_provision_command_prefix_rule(
 
     assert expected_output in result.stdout
 
+    mock_use_lock.assert_called_once()
+
 
 def test_cli_provision_command_with_existing_prefix_name(
     runner: CliRunner,
     matcha_testing_directory: str,
+    mock_use_lock: MagicMock,
 ):
     """Test whether the expected error message is prompt when user entered an existing prefix.
 
     Args:
         runner (CliRunner): typer CLI runner
         matcha_testing_directory (str): temporary working directory
+        mock_use_lock (MagicMock): mock use_lock context manager
     """
     expected_error_message = "Error: You entered a resource group name prefix that have been used before, prefix must be unique."
     os.chdir(matcha_testing_directory)
@@ -364,9 +395,14 @@ def test_cli_provision_command_with_existing_prefix_name(
     )
     assert expected_error_message in result.stdout
 
+    mock_use_lock.assert_called_once()
+
 
 def test_cli_provision_command_override(
-    runner, matcha_testing_directory, mocked_azure_client
+    runner: CliRunner,
+    matcha_testing_directory: str,
+    mocked_azure_client: MagicMock,
+    mock_use_lock: MagicMock,
 ):
     """Test provision command to override the configuration file within the .matcha directory.
 
@@ -374,6 +410,7 @@ def test_cli_provision_command_override(
         runner (CliRunner): typer CLI runner
         matcha_testing_directory (str): temporary working directory.
         mocked_azure_client (AzureClient) : Mocked Azure client
+        mock_use_lock (MagicMock): mock use_lock context manager
     """
     os.chdir(matcha_testing_directory)
 
@@ -427,13 +464,18 @@ def test_cli_provision_command_override(
 
     assert_infrastructure(resources_destination_path, resources_expected_tf_vars)
 
+    assert mock_use_lock.call_count == RUN_TWICE
 
-def test_cli_provision_command_with_password_mismatch(runner, matcha_testing_directory):
+
+def test_cli_provision_command_with_password_mismatch(
+    runner: CliRunner, matcha_testing_directory: str, mock_use_lock: MagicMock
+):
     """Test provision command to copy the infrastructure template with different prefix.
 
     Args:
         runner (CliRunner): typer CLI runner
         matcha_testing_directory (str): temporary working directory
+        mock_use_lock (MagicMock): mock use_lock context manager
     """
     os.chdir(matcha_testing_directory)
 
@@ -447,13 +489,18 @@ def test_cli_provision_command_with_password_mismatch(runner, matcha_testing_dir
 
     assert "Error: The two entered values do not match." in result.stdout
 
+    mock_use_lock.assert_called_once()
 
-def test_cli_provision_command_reuse(runner, matcha_testing_directory):
+
+def test_cli_provision_command_reuse(
+    runner: CliRunner, matcha_testing_directory: str, mock_use_lock: MagicMock
+):
     """Test provision command to reuse the configuration file within the .matcha directory.
 
     Args:
         runner (CliRunner): typer CLI runner
         matcha_testing_directory (str): temporary working directory.
+        mock_use_lock (MagicMock): mock use_lock context manager
     """
     os.chdir(matcha_testing_directory)
 
@@ -490,15 +537,18 @@ def test_cli_provision_command_reuse(runner, matcha_testing_directory):
 
     assert_infrastructure(resources_destination_path, resources_expected_tf_vars)
 
+    assert mock_use_lock.call_count == RUN_TWICE
+
 
 def test_cli_provision_command_with_provisioned_resources(
-    runner, matcha_testing_directory
+    runner: CliRunner, matcha_testing_directory: str, mock_use_lock: MagicMock
 ):
     """Test provision command when there are already existing resources deployed.
 
     Args:
         runner (CliRunner): typer CLI runner
         matcha_testing_directory (str): temporary working directory.
+        mock_use_lock (MagicMock): mock use_lock context manager
     """
     os.chdir(matcha_testing_directory)
 
@@ -527,13 +577,13 @@ def test_cli_provision_command_with_provisioned_resources(
 
     # Mock functions such that a deployment on Azure exists
     with patch(
-        "matcha_ml.templates.build_templates.azure_template.check_current_deployment_exists"
+        "matcha_ml.templates.azure_template.azure_template.check_current_deployment_exists"
     ) as check_deployment_exists, patch(
-        "matcha_ml.templates.build_templates.azure_template.MatchaStateService.fetch_resources_from_state_file"
+        "matcha_ml.templates.azure_template.azure_template.MatchaStateService.fetch_resources_from_state_file"
     ) as fetch_resources_from_state_file:
         check_deployment_exists.return_value = True
         fetch_resources_from_state_file.return_value = {
-            "cloud": {"resource-group-name": "matcha-resources"}
+            "cloud": {"resource-group-name": "matcha-resources", "prefix": "matcha"}
         }
         # Invoke provision command for a second time, which overwrites the existing .matcha directory and removes the 'dummy.tf' file
         result = runner.invoke(
@@ -565,3 +615,5 @@ def test_cli_provision_command_with_provisioned_resources(
         "WARNING: Matcha has detected that a deployment already exists in Azure"
         in result.stdout
     )
+
+    assert mock_use_lock.call_count == RUN_TWICE

@@ -38,7 +38,7 @@ RESOURCE_NAMES = [
 ]
 
 
-class TemplateRunner:
+class AzureTemplateRunner:
     """A Runner class provides methods that interface with the Terraform service to facilitate the provisioning and deprovisioning of resources."""
 
     terraform_config = TerraformConfig()
@@ -206,11 +206,11 @@ class TemplateRunner:
         Args:
             state_outputs (Dict[str, Dict[str, str]]): Dictionary containing outputs to be written to state file.
         """
-        with open(self.state_file) as fp:
-            out_data = json.load(fp)
-        out_data.update(state_outputs)
-        with open(self.state_file, "w") as fp:
-            json.dump(out_data, fp, indent=4)
+        with open(self.state_file) as f:
+            current_data = json.load(f)
+        state_outputs["cloud"].update(current_data["cloud"])
+        with open(self.state_file, "w") as f:
+            json.dump(state_outputs, f, indent=4)
 
     def _show_terraform_outputs(self) -> None:
         """Print the terraform outputs from state file."""
