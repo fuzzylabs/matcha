@@ -190,6 +190,7 @@ class RemoteStateManager:
         template_runner = RemoteStateRunner()
 
         template_runner.deprovision()
+        self._remove_matcha_config()
         print_status(
             build_step_success_status("Destroying remote state management is complete!")
         )
@@ -223,6 +224,10 @@ class RemoteStateManager:
                 f"The matcha configuration is written to {self.config_path}"
             )
         )
+
+    def _remove_matcha_config(self) -> None:
+        """Remove the matcha.config.json file after destroy full is run."""
+        os.remove(self.config_path)
 
     def download(self, dest_folder_path: str) -> None:
         """Download the remote state into the local matcha state directory.

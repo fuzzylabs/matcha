@@ -10,6 +10,7 @@ from _pytest.capture import SysCapture
 
 from matcha_ml.errors import MatchaError
 from matcha_ml.runners import RemoteStateRunner
+from matcha_ml.state import RemoteStateManager
 from matcha_ml.state.remote_state_manager import (
     ALREADY_LOCKED_MESSAGE,
     DEFAULT_CONFIG_NAME,
@@ -17,7 +18,6 @@ from matcha_ml.state.remote_state_manager import (
     RemoteStateBucketConfig,
     RemoteStateConfig,
 )
-from matcha_ml.state import RemoteStateManager
 from matcha_ml.templates.remote_state_template import SUBMODULE_NAMES
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -203,19 +203,29 @@ def test_provision_state_storage(
     assert_matcha_config(matcha_testing_directory, expected_matcha_config)
 
 
-def test_deprovision_state_storage(capsys: SysCapture) -> None:
+def test_deprovision_state_storage(
+    capsys: SysCapture, matcha_testing_directory: str
+) -> None:
     """Test whether deprovision state storage behaves as expected.
 
     Args:
         capsys (SysCapture): fixture to capture stdout and stderr
+        matcha_testing_directory (str): temporary working directory for tests.
     """
     with patch(
         "matcha_ml.runners.remote_state_runner.RemoteStateRunner.deprovision"
     ) as destroy:
         destroy.return_value = None
-        remote_state_manager = RemoteStateManager()
+        mock_config_path = os.path.join(matcha_testing_directory, DEFAULT_CONFIG_NAME)
+
+        with open(mock_config_path, "a"):
+            ...
+
+        remote_state_manager = RemoteStateManager(config_path=mock_config_path)
 
         remote_state_manager.deprovision_state_storage()
+
+        assert not os.path.exists(mock_config_path)
 
         captured = capsys.readouterr()
 
