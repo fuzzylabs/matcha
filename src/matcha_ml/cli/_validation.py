@@ -17,7 +17,7 @@ from matcha_ml.services import AzureClient
 LONGEST_RESOURCE_NAME = "artifactstore"
 MAXIMUM_RESOURCE_NAME_LEN = 24
 
-MATCHA_STATE_DIR = os.path.join(
+MATCHA_STATE_PATH = os.path.join(
     ".matcha", "infrastructure", "resources", "matcha.state"
 )
 
@@ -223,10 +223,10 @@ def check_current_deployment_exists() -> bool:
     Returns:
         bool: True if a deployment currently exists, else False.
     """
-    if not os.path.isfile(MATCHA_STATE_DIR):
+    if not os.path.isfile(MATCHA_STATE_PATH):
         return False
 
-    with open(MATCHA_STATE_DIR) as f:
+    with open(MATCHA_STATE_PATH) as f:
         data = json.load(f)
 
     # Check if a resource group name prefix is present in matcha.state file
