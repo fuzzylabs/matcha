@@ -20,7 +20,7 @@ def test_cli_force_unlock_command_help_option(runner: CliRunner) -> None:
     assert result.exit_code == 0
 
     # Assert string is present in cli output
-    assert "Force unlock lock on remote matcha state on azure." in result.stdout
+    assert "Force unlock remote matcha state on Azure." in result.stdout
 
 
 def test_cli_force_unlock_command_called(runner: CliRunner) -> None:
