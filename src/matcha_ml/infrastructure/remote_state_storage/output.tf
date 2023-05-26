@@ -9,6 +9,16 @@ output "remote_state_storage_container_name" {
 }
 
 output "remote_state_storage_resource_group_name" {
-  description = "Name of the resource group"
+  description = "Name of the Azure resource group"
   value = module.resource_group.name
+}
+
+output "cloud_azure_prefix"{
+  description = "The Azure resource group name prefix"
+  value = var.prefix
+}
+
+output "cloud_azure_location"{
+  description = "The Azure location in which the resources are provisioned" 
+  value = var.location
 }

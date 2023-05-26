@@ -66,7 +66,11 @@ def mocked_state_storage_template_runner() -> StateStorageTemplateRunner:
         f"{INTERNAL_FUNCTION_STUBS[1]}._validate_terraform_config"
     ) as validate_tf_config, patch(
         f"{INTERNAL_FUNCTION_STUBS[1]}._get_terraform_output"
-    ) as get:
+    ) as get, patch(
+        f"{INTERNAL_FUNCTION_STUBS[0]}._check_matcha_directory_exists"
+    ) as check_matcha_dir, patch(
+        f"{INTERNAL_FUNCTION_STUBS[0]}._destroy_terraform"
+    ) as destroy_terraform:
         initialize.return_value = None
         apply.return_value = None
         check_tf_install.return_value = None
@@ -76,6 +80,8 @@ def mocked_state_storage_template_runner() -> StateStorageTemplateRunner:
             "test-container",
             "test-rg",
         )
+        check_matcha_dir.return_value = None
+        destroy_terraform.return_value = None
 
         yield StateStorageTemplateRunner()
 

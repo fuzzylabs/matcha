@@ -25,7 +25,7 @@ DEFAULT_CONFIG_NAME = "matcha.config.json"
 LOCK_FILE_NAME = "matcha.lock"
 ALREADY_LOCKED_MESSAGE = (
     "Remote state is already locked, maybe someone else is using matcha?"
-    "If you think this is a mistake, you can unlock the state by running `matcha force-unlock`."
+    "If you think this is a mistake, you can unlock the state by running 'matcha force-unlock'."
 )
 
 
@@ -257,7 +257,11 @@ class RemoteStateManager:
         Downloads the state before executing the code.
         Upload the state when context is finished.
         """
-        yield
+        self.download(os.getcwd())
+
+        yield None
+
+        self.upload(os.path.join(".matcha", "infrastructure"))
 
     def lock(self) -> None:
         """Lock remote state.

@@ -59,7 +59,7 @@ class AzureStorage:
             src_file (str): Path to upload the file from
         """
         with open(src_file, "rb") as blob_data:
-            blob_client.upload_blob(data=blob_data)
+            blob_client.upload_blob(data=blob_data, overwrite=True)
 
     def upload_folder(self, container_name: str, src_folder_path: str) -> None:
         """Upload a folder to Azure Storage Container.
@@ -135,7 +135,7 @@ class AzureStorage:
             blob_name (str): blob name
 
         Returns:
-             bool: True, if blob exists
+            bool: True, if blob exists
         """
         return self._get_blob_client(container_name, blob_name).exists()
 

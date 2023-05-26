@@ -220,11 +220,11 @@ def check_current_deployment_exists() -> bool:
     Returns:
         bool: True if a deployment currently exists, else False.
     """
-    matcha_state_dir = MatchaStateService.matcha_state_dir
-    if not os.path.isfile(matcha_state_dir):
+    matcha_state_path = MatchaStateService.matcha_state_path
+    if not os.path.isfile(matcha_state_path):
         return False
 
-    with open(matcha_state_dir) as f:
+    with open(matcha_state_path) as f:
         data = json.load(f)
 
     # Check if a resource group name prefix is present in matcha.state file

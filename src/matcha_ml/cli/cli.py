@@ -23,6 +23,7 @@ from matcha_ml.core import core
 from matcha_ml.errors import MatchaError, MatchaInputError
 from matcha_ml.services.analytics_service import AnalyticsEvent, track
 from matcha_ml.state import RemoteStateManager
+from matcha_ml.state.matcha_state import MatchaStateService
 
 app = typer.Typer(no_args_is_help=True, pretty_exceptions_show_locals=False)
 analytics_app = typer.Typer(no_args_is_help=True, pretty_exceptions_show_locals=False)
@@ -124,6 +125,17 @@ def destroy(
 
     if full:
         remote_state_manager.deprovision_state_storage()
+        matcha_state_service = MatchaStateService()
+        matcha_state_service.remove_matcha_state_file()
+
+
+@app.command()
+def force_unlock() -> None:
+    """Force unlock remote matcha state on Azure."""
+    delete = typer.confirm("Are you sure you want to remove the lock forcefully?")
+    if not delete:
+        raise typer.Exit()
+    core.remove_state_lock()
 
 
 def version_callback(value: bool) -> None:
