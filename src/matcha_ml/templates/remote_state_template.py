@@ -1,12 +1,10 @@
 """Build a template for provisioning remote state storage on Azure using terraform files."""
-from matcha_ml.templates.base_template import (
-    BaseTemplate,
-)
+from matcha_ml.templates.base_template import BaseTemplate
 
 SUBMODULE_NAMES = ["resource_group", "state_storage"]
 
 
-class StateStorageTemplate(BaseTemplate):
+class RemoteStateTemplate(BaseTemplate):
     """A template tailored for provisioning the state storage on azure.
 
     Inherits:

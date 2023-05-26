@@ -6,10 +6,7 @@ from typing import Dict, Tuple
 
 import pytest
 
-from matcha_ml.templates.base_template import (
-    BaseTemplate,
-    TemplateVariables,
-)
+from matcha_ml.templates.base_template import BaseTemplate, TemplateVariables
 
 SUBMODULE_NAMES = ["test_submodule_1", "test_submodule_2"]
 

@@ -7,8 +7,8 @@ from matcha_ml.cli.ui.status_message_builders import (
     build_status,
     build_step_success_status,
 )
+from matcha_ml.runners import AzureRunner
 from matcha_ml.state import RemoteStateManager
-from matcha_ml.templates.azure_template.run_azure_template import AzureTemplateRunner
 
 
 def destroy_resources() -> None:
@@ -27,10 +27,9 @@ def destroy_resources() -> None:
         raise typer.Exit()
 
     with remote_state.use_lock():
-
         with remote_state.use_remote_state():
             # create a runner for deprovisioning resource with Terraform service.
-            template_runner = AzureTemplateRunner()
+            template_runner = AzureRunner()
 
             if not check_current_deployment_exists():
                 print_error(

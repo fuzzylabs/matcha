@@ -1,4 +1,4 @@
-"""Test for interacting with Terraform service."""
+"""Test for testing AzureRunner class."""
 import json
 import os
 from contextlib import nullcontext as does_not_raise
@@ -7,12 +7,10 @@ from unittest import mock
 from unittest.mock import MagicMock
 
 import pytest
-import typer
 from _pytest.capture import SysCapture
 
-from matcha_ml.errors import MatchaTerraformError
+from matcha_ml.runners import AzureRunner
 from matcha_ml.services.terraform_service import TerraformConfig
-from matcha_ml.templates.azure_template.run_azure_template import AzureTemplateRunner
 
 
 @pytest.fixture
@@ -155,64 +153,20 @@ def terraform_test_config(matcha_testing_directory: str) -> TerraformConfig:
 
 
 @pytest.fixture
-def template_runner() -> AzureTemplateRunner:
+def template_runner() -> AzureRunner:
     """Return a template runner object instance for test.
 
     Returns:
-        AzureTemplateRunner: a AzureTemplateRunner object instance.
+        AzureRunner: a AzureRunner object instance.
     """
-    return AzureTemplateRunner()
+    return AzureRunner()
 
 
-def test_check_terraform_installation(
-    capsys: SysCapture, template_runner: AzureTemplateRunner
-):
-    """Test app exits when terraform is not installed.
-
-    Args:
-        capsys (SysCapture): fixture to capture stdout and stderr
-        template_runner (AzureTemplateRunner): a AzureTemplateRunner object instance
-    """
-    with mock.patch(
-        "matcha_ml.templates.azure_template.run_azure_template.AzureTemplateRunner.tfs.check_installation"
-    ) as mock_check_installation:
-        mock_check_installation.return_value = False
-        expected = "Terraform is not installed"
-
-        with pytest.raises(typer.Exit):
-            template_runner._check_terraform_installation()
-        captured = capsys.readouterr()
-
-        assert expected in captured.err
-
-
-def test_validate_terraform_config(
-    capsys: SysCapture, template_runner: AzureTemplateRunner
-):
-    """Test application exits if there is no config.
-
-    Args:
-        capsys (SysCapture): fixture to capture stdout and stderr
-        template_runner (AzureTemplateRunner): a AzureTemplateRunner object instance
-    """
-    with mock.patch(
-        "matcha_ml.templates.azure_template.run_azure_template.AzureTemplateRunner.tfs.validate_config"
-    ) as mock_validate_config:
-        mock_validate_config.return_value = False
-        expected = "The file terraform.tfvars.json was not found"
-
-        with pytest.raises(typer.Exit):
-            template_runner._validate_terraform_config()
-        captured = capsys.readouterr()
-
-        assert expected in captured.err
-
-
-def test_is_approved(template_runner: AzureTemplateRunner):
+def test_is_approved(template_runner: AzureRunner):
     """Test if is_approved behaves as expected based on user's input.
 
     Args:
-        template_runner (AzureTemplateRunner): a AzureTemplateRunner object instance
+        template_runner (AzureRunner): a AzureRunner object instance
     """
     with mock.patch("typer.confirm") as mock_confirm:
         mock_confirm.return_value = True
@@ -222,95 +176,8 @@ def test_is_approved(template_runner: AzureTemplateRunner):
         assert not template_runner.is_approved("provision")
 
 
-def test_initialize_terraform(capsys: SysCapture, template_runner: AzureTemplateRunner):
-    """Test if service behaves as expected when initializing Terraform.
-
-    Args:
-        capsys (SysCapture): fixture to capture stdout and stderr
-        template_runner (AzureTemplateRunner): a AzureTemplateRunner object instance
-    """
-    template_runner.tf_state_dir = MagicMock()
-
-    with mock.patch.object(template_runner.tf_state_dir, "exists", return_value=True):
-        expected = "has already been initialized"
-
-        template_runner._initialize_terraform()
-
-        captured = capsys.readouterr()
-
-        assert expected in captured.out
-
-    with mock.patch.object(template_runner.tf_state_dir, "exists", return_value=False):
-        template_runner.tfs.init = MagicMock(return_value=(0, "", ""))
-        expected = " initialized!"
-        template_runner._initialize_terraform()
-
-        captured = capsys.readouterr()
-
-        assert expected in captured.out
-
-
-def test_check_matcha_directory_exists(
-    capsys: SysCapture,
-    template_runner: AzureTemplateRunner,
-    matcha_testing_directory: str,
-):
-    """Test if service exit as expected and print out the expected error message when required files does not exists.
-
-    Args:
-        capsys (SysCapture): fixture to capture stdout and stderr
-        template_runner (AzureTemplateRunner): a AzureTemplateRunner object instance
-        matcha_testing_directory (str): the test directory
-    """
-    os.chdir(matcha_testing_directory)
-
-    template_runner.tfs.check_matcha_directory_exists = MagicMock(return_value=False)
-    template_runner.tfs.check_matcha_directory_integrity = MagicMock(return_value=False)
-
-    with pytest.raises(typer.Exit):
-        expected = "Error, the .matcha directory does not exist"
-        template_runner._check_matcha_directory_exists()
-
-        captured = capsys.readouterr()
-
-        assert expected in captured.err
-
-    with pytest.raises(typer.Exit):
-        expected = "Error, the .matcha directory does not contain files relating to deployed resources. Please ensure you are trying to destroy resources that you have provisioned in the current working directory."
-        template_runner._check_matcha_directory_exists()
-
-        captured = capsys.readouterr()
-
-        assert expected in captured.err
-
-
-def test_apply_terraform(capsys: SysCapture, template_runner: AzureTemplateRunner):
-    """Test if terraform applied is handled correctly during apply when provisioning resources.
-
-    Args:
-        capsys (SysCapture): fixture to capture stdout and stderr
-        template_runner (AzureTemplateRunner): a AzureTemplateRunner object instance
-    """
-    template_runner.tfs.apply = MagicMock(return_value=(0, "", ""))
-    expected = "Your environment has been provisioned!"
-
-    template_runner._apply_terraform()
-    captured = capsys.readouterr()
-
-    assert expected in captured.out
-
-    template_runner.tfs.apply = MagicMock(return_value=(1, "", "Apply failed"))
-
-    with pytest.raises(MatchaTerraformError) as exc_info:
-        template_runner._apply_terraform()
-        assert (
-            str(exc_info.value)
-            == "Terraform failed because of the following error: 'Apply failed'."
-        )
-
-
 def test_write_outputs_state(
-    template_runner: AzureTemplateRunner,
+    template_runner: AzureRunner,
     terraform_test_config: TerraformConfig,
     mock_output: Callable[[str, bool], Union[str, Dict[str, str]]],
     expected_outputs_show_sensitive: dict,
@@ -318,7 +185,7 @@ def test_write_outputs_state(
     """Test service writes the state file correctly.
 
     Args:
-        template_runner (AzureTemplateRunner): a AzureTemplateRunner object instance
+        template_runner (AzureRunner): a AzureRunner object instance
         terraform_test_config (TerraformConfig): test terraform service config
         mock_output (Callable[[str, bool], Union[str, Dict[str, str]]]): the mock output
         expected_outputs_show_sensitive (dict): expected output from terraform
@@ -335,7 +202,7 @@ def test_write_outputs_state(
 
 
 def test_show_terraform_outputs(
-    template_runner: AzureTemplateRunner,
+    template_runner: AzureRunner,
     terraform_test_config: TerraformConfig,
     capsys: SysCapture,
     mock_output: Callable[[str, bool], Union[str, Dict[str, str]]],
@@ -344,7 +211,7 @@ def test_show_terraform_outputs(
     """Test service shows the correct terraform output.
 
     Args:
-        template_runner (AzureTemplateRunner): a AzureTemplateRunner object instance
+        template_runner (AzureRunner): a AzureRunner object instance
         terraform_test_config (TerraformConfig): test terraform service config
         capsys (SysCapture): fixture to capture stdout and stderr
         mock_output (Callable[[str, bool], Union[str, Dict[str, str]]]): the mock output
@@ -361,40 +228,11 @@ def test_show_terraform_outputs(
             assert output in captured.out
 
 
-def test_destroy_terraform(capsys: SysCapture, template_runner: AzureTemplateRunner):
-    """Test if terraform exception is captured when performing deprovision.
-
-    Args:
-        capsys (SysCapture): fixture to capture stdout and stderr
-        template_runner (AzureTemplateRunner): a AzureTemplateRunner object instance
-    """
-    template_runner.tfs.destroy = MagicMock(return_value=(0, "", ""))
-
-    expected = "Destroying your resources"
-
-    template_runner._destroy_terraform()
-
-    captured = capsys.readouterr()
-
-    template_runner.tfs.destroy.assert_called()
-
-    assert expected in captured.out
-
-    template_runner.tfs.destroy = MagicMock(return_value=(1, "", "Init failed"))
-
-    with pytest.raises(MatchaTerraformError) as exc_info:
-        template_runner._destroy_terraform()
-        assert (
-            str(exc_info.value)
-            == "Terraform failed because of the following error: 'Destroy failed'."
-        )
-
-
-def test_provision(template_runner: AzureTemplateRunner):
+def test_provision(template_runner: AzureRunner):
     """Test service can provision resources using terraform.
 
     Args:
-        template_runner (AzureTemplateRunner): a AzureTemplateRunner object instance
+        template_runner (AzureRunner): a AzureRunner object instance
     """
     template_runner._check_terraform_installation = MagicMock()
     template_runner._validate_terraform_config = MagicMock()
@@ -415,14 +253,14 @@ def test_provision(template_runner: AzureTemplateRunner):
 
 
 def test_deprovision(
-    template_runner: AzureTemplateRunner,
+    template_runner: AzureRunner,
     matcha_testing_directory: str,
     expected_outputs_show_sensitive: dict,
 ):
     """Test service can deprovision resources using terraform and that the matcha.state file contains the expected output.
 
     Args:
-        template_runner (AzureTemplateRunner): a AzureTemplateRunner object instance
+        template_runner (AzureRunner): a AzureTemplateRunner object instance
         matcha_testing_directory (str): Testing directory
         expected_outputs_show_sensitive (dict): matcha.state contents before destroy is run
     """
@@ -447,15 +285,13 @@ def test_deprovision(
     with open(matcha_state_file_dir, "w") as f:
         json.dump(expected_outputs_show_sensitive, f, indent=4)
 
-    with mock.patch("typer.confirm") as mock_confirm, mock.patch.object(
-        AzureTemplateRunner, "state_file", matcha_state_file_dir
-    ):
+    with mock.patch("typer.confirm") as mock_confirm:
+        template_runner.state_file = matcha_state_file_dir
         mock_confirm.return_value = False
         template_runner._destroy_terraform.assert_not_called()
 
-    with mock.patch("typer.confirm") as mock_confirm, mock.patch.object(
-        AzureTemplateRunner, "state_file", matcha_state_file_dir
-    ):
+    with mock.patch("typer.confirm") as mock_confirm:
+        template_runner.state_file = matcha_state_file_dir
         mock_confirm.return_value = True
         template_runner.deprovision()
         template_runner._destroy_terraform.assert_called()

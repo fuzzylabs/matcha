@@ -7,7 +7,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from matcha_ml.cli.cli import app
-from matcha_ml.templates.azure_template.run_azure_template import AzureTemplateRunner
+from matcha_ml.services.terraform_service import TerraformConfig
 
 
 @pytest.fixture(autouse=True)
@@ -53,7 +53,7 @@ def test_cli_destroy_command_with_no_provisioned_resources(
 
     # Invoke destroy command
     with patch(
-        "matcha_ml.templates.azure_template.azure_template.check_current_deployment_exists"
+        "matcha_ml.templates.azure_template.check_current_deployment_exists"
     ) as check_deployment_exists:
         check_deployment_exists.return_value = False
         result = runner.invoke(app, ["destroy"])
@@ -62,7 +62,7 @@ def test_cli_destroy_command_with_no_provisioned_resources(
         "Error - you cannot destroy resources that have not been provisioned yet."
         in result.stdout
     )
-    
+
     mock_provisioned_remote_state.use_lock.assert_called_once()
 
 
@@ -113,8 +113,9 @@ def test_cli_destroy_command_updates_matcha_state(runner, matcha_testing_directo
     with patch(
         "matcha_ml.cli.destroy.check_current_deployment_exists"
     ) as check_deployment_exists, patch.object(
-        AzureTemplateRunner, "state_file", matcha_state_file_path
+        TerraformConfig, "state_file", matcha_state_file_path
     ):
+        # mock_az_runner.return_value.state_file = matcha_state_file_path
         check_deployment_exists.return_value = True
         runner.invoke(
             app,

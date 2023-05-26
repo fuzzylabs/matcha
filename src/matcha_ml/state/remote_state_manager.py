@@ -17,13 +17,9 @@ from matcha_ml.cli.ui.status_message_builders import (
 )
 from matcha_ml.errors import MatchaError
 from matcha_ml.services.azure_service import AzureClient
+from matcha_ml.runners import RemoteStateRunner
 from matcha_ml.storage import AzureStorage
-from matcha_ml.templates.state_storage_template.run_state_storage_template import (
-    StateStorageTemplateRunner,
-)
-from matcha_ml.templates.state_storage_template.state_storage_template import (
-    StateStorageTemplate,
-)
+from matcha_ml.templates import RemoteStateTemplate
 
 DEFAULT_CONFIG_NAME = "matcha.config.json"
 LOCK_FILE_NAME = "matcha.lock"
@@ -194,8 +190,8 @@ class RemoteStateManager:
             prefix (str): Prefix used for all resources, or empty string to fill in.
             verbose (Optional[bool], optional): additional output is show when True. Defaults to False.
         """
-        template_runner = StateStorageTemplateRunner()
-        state_storage_template = StateStorageTemplate()
+        template_runner = RemoteStateRunner()
+        state_storage_template = RemoteStateTemplate()
 
         project_directory = os.getcwd()
         destination = os.path.join(
@@ -222,7 +218,7 @@ class RemoteStateManager:
     def deprovision_state_storage(self) -> None:
         """Destroy the state bucket provisioned."""
         # create a runner for deprovisioning resource with Terraform service.
-        template_runner = StateStorageTemplateRunner()
+        template_runner = RemoteStateRunner()
 
         template_runner.deprovision()
         print_status(

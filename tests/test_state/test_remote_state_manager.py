@@ -2,7 +2,6 @@
 import glob
 import json
 import os
-import shutil
 from typing import Dict, Iterator
 from unittest.mock import MagicMock, patch
 
@@ -10,20 +9,16 @@ import pytest
 from _pytest.capture import SysCapture
 
 from matcha_ml.errors import MatchaError
+from matcha_ml.runners import RemoteStateRunner
 from matcha_ml.state.remote_state_manager import (
     ALREADY_LOCKED_MESSAGE,
     DEFAULT_CONFIG_NAME,
     LOCK_FILE_NAME,
     RemoteStateBucketConfig,
     RemoteStateConfig,
-    RemoteStateManager,
 )
-from matcha_ml.templates.state_storage_template.run_state_storage_template import (
-    StateStorageTemplateRunner,
-)
-from matcha_ml.templates.state_storage_template.state_storage_template import (
-    SUBMODULE_NAMES,
-)
+from matcha_ml.state import RemoteStateManager
+from matcha_ml.templates.remote_state_template import SUBMODULE_NAMES
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 TEMPLATE_DIR = os.path.join(
@@ -215,7 +210,7 @@ def test_deprovision_state_storage(capsys: SysCapture) -> None:
         capsys (SysCapture): fixture to capture stdout and stderr
     """
     with patch(
-        "matcha_ml.templates.state_storage_template.run_state_storage_template.StateStorageTemplateRunner.deprovision"
+        "matcha_ml.runners.remote_state_runner.RemoteStateRunner.deprovision"
     ) as destroy:
         destroy.return_value = None
         remote_state_manager = RemoteStateManager()
@@ -226,7 +221,7 @@ def test_deprovision_state_storage(capsys: SysCapture) -> None:
 
         expected_output = "Destroying remote state management is complete!"
 
-        template_runner = StateStorageTemplateRunner()
+        template_runner = RemoteStateRunner()
         template_runner.deprovision.assert_called()
 
         assert expected_output in captured.out
@@ -423,10 +418,11 @@ def test_use_lock(
 
 
 def test_use_remote_state():
-    """Test use_remote_state context manager.
-    """
+    """Test use_remote_state context manager."""
     remote_state_manager = RemoteStateManager()
-    with patch.object(remote_state_manager,"upload") as mocked_upload, patch.object(remote_state_manager,"download") as mocked_downlaod:
+    with patch.object(remote_state_manager, "upload") as mocked_upload, patch.object(
+        remote_state_manager, "download"
+    ) as mocked_downlaod:
         with remote_state_manager.use_remote_state():
             mocked_downlaod.assert_called_once_with(os.getcwd())
         mocked_upload.assert_called_once_with(os.path.join(".matcha", "infrastructure"))

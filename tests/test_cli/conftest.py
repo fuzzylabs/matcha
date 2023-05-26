@@ -4,17 +4,12 @@ from unittest.mock import PropertyMock, patch
 
 import pytest
 
+from matcha_ml.runners import AzureRunner, RemoteStateRunner
 from matcha_ml.services.global_parameters_service import GlobalParameters
-from matcha_ml.templates.azure_template.run_azure_template import (
-    AzureTemplateRunner,
-)
-from matcha_ml.templates.state_storage_template.run_state_storage_template import (
-    StateStorageTemplateRunner,
-)
 
 INTERNAL_FUNCTION_STUBS = [
-    "matcha_ml.cli.provision.AzureTemplateRunner",
-    "matcha_ml.state.remote_state_manager.StateStorageTemplateRunner",
+    "matcha_ml.cli.provision.AzureRunner",
+    "matcha_ml.state.remote_state_manager.RemoteStateRunner",
 ]
 
 GLOBAL_PARAMETER_SERVICE_FUNCTION_STUB = (
@@ -23,11 +18,11 @@ GLOBAL_PARAMETER_SERVICE_FUNCTION_STUB = (
 
 
 @pytest.fixture(scope="class", autouse=True)
-def mocked_resource_template_runner() -> AzureTemplateRunner:
+def mocked_resource_template_runner() -> AzureRunner:
     """The Template Runner with mocked variables.
 
     Returns:
-        TemplateRunner: the mocked TemplateRunner.
+        AzureRunner: the mocked TemplateRunner.
     """
     with patch(
         f"{INTERNAL_FUNCTION_STUBS[0]}._initialize_terraform"
@@ -46,15 +41,15 @@ def mocked_resource_template_runner() -> AzureTemplateRunner:
         check_tf_install.return_value = None
         validate_tf_config.return_value = None
 
-        yield AzureTemplateRunner()
+        yield AzureRunner()
 
 
 @pytest.fixture(scope="class", autouse=True)
-def mocked_state_storage_template_runner() -> StateStorageTemplateRunner:
+def mocked_state_storage_template_runner() -> RemoteStateRunner:
     """The Template Runner with mocked variables.
 
     Returns:
-        TemplateRunner: the mocked TemplateRunner.
+        RemoteStateRunner: the mocked TemplateRunner.
     """
     with patch(
         f"{INTERNAL_FUNCTION_STUBS[1]}._initialize_terraform"
@@ -83,7 +78,7 @@ def mocked_state_storage_template_runner() -> StateStorageTemplateRunner:
         check_matcha_dir.return_value = None
         destroy_terraform.return_value = None
 
-        yield StateStorageTemplateRunner()
+        yield RemoteStateRunner()
 
 
 @pytest.fixture(autouse=True)
