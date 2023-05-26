@@ -261,8 +261,7 @@ class RemoteStateManager:
 
         yield None
 
-        matcha_resources_dir = os.path.join(".matcha", "infrastructure", "resources")
-        self.upload(matcha_resources_dir)
+        self.upload(os.path.join(".matcha", "infrastructure"))
 
     def lock(self) -> None:
         """Lock remote state.
