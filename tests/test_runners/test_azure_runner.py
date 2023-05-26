@@ -9,8 +9,8 @@ from unittest.mock import MagicMock
 import pytest
 from _pytest.capture import SysCapture
 
-from matcha_ml.services.terraform_service import TerraformConfig
 from matcha_ml.runners import AzureRunner
+from matcha_ml.services.terraform_service import TerraformConfig
 
 
 @pytest.fixture

@@ -17,7 +17,6 @@ from matcha_ml.cli.ui.status_message_builders import build_status
 from matcha_ml.errors import MatchaInputError
 from matcha_ml.runners.base_runner import BaseRunner
 
-
 RESOURCE_NAMES = [
     "experiment_tracker",
     "pipeline",
@@ -32,6 +31,7 @@ class AzureRunner(BaseRunner):
     """A Runner class provides methods that interface with the Terraform service to facilitate the provisioning and deprovisioning of resources."""
 
     def __init__(self) -> None:
+        """Initialize AzureRunner class."""
         super().__init__()
 
     def _build_resource_output(self, output_name: str) -> Tuple[str, str, str]:
@@ -56,7 +56,7 @@ class AzureRunner(BaseRunner):
             )
             raise MatchaInputError()
 
-        flavour_and_resource_name = output_name[len(resource_type) + 1:]
+        flavour_and_resource_name = output_name[len(resource_type) + 1 :]
 
         flavor, resource_name = flavour_and_resource_name.split("_", maxsplit=1)
         resource_name = resource_name.replace("_", "-")

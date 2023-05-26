@@ -10,7 +10,6 @@ from _pytest.capture import SysCapture
 from matcha_ml.errors import MatchaTerraformError
 from matcha_ml.runners.base_runner import BaseRunner
 
-
 CLASS_STUB = "matcha_ml.runners.base_runner.BaseRunner"
 
 

@@ -1,6 +1,6 @@
 """Run terraform templates to provision and deprovision resources."""
 import os
-from typing import Optional
+from typing import Optional, Tuple
 
 import typer
 
@@ -22,6 +22,11 @@ class BaseRunner:
     """A BaseRunner class provides methods that interface with the Terraform service to facilitate the provisioning and deprovisioning of resources."""
 
     def __init__(self, working_dir: Optional[str] = None) -> None:
+        """Initialize BaseRunner class.
+
+        Args:
+            working_dir (Optional[str]): Working directory for terraform. Defaults to None.
+        """
         if working_dir is not None:
             working_dir = working_dir
         else:
@@ -190,7 +195,7 @@ class BaseRunner:
         print_status(summary_message)
         return typer.confirm(f"Are you happy for '{verb}' to run?")
 
-    def provision(self) -> None:
+    def provision(self) -> Optional[Tuple[str, str, str]]:
         """Provision resources required for the deployment."""
         raise NotImplementedError
 

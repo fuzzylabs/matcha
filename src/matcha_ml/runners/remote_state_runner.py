@@ -10,10 +10,16 @@ class RemoteStateRunner(BaseRunner):
 
     def __init__(
         self,
-        working_dir=os.path.join(
+        working_dir: str = os.path.join(
             os.getcwd(), ".matcha", "infrastructure", "remote_state_storage"
         ),
     ) -> None:
+        """Initialize a RemoteStateRunner.
+
+        Args:
+            working_dir (str): Working directory for terraform.
+            Defaults to os.path.join(os.getcwd(), ".matcha", "infrastructure", "remote_state_storage").
+        """
         super().__init__(working_dir=working_dir)
 
     def _get_terraform_output(self) -> Tuple[str, str, str]:

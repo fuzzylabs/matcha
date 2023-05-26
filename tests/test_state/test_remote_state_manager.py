@@ -9,6 +9,7 @@ import pytest
 from _pytest.capture import SysCapture
 
 from matcha_ml.errors import MatchaError
+from matcha_ml.runners import RemoteStateRunner
 from matcha_ml.state.remote_state_manager import (
     ALREADY_LOCKED_MESSAGE,
     DEFAULT_CONFIG_NAME,
@@ -17,7 +18,6 @@ from matcha_ml.state.remote_state_manager import (
     RemoteStateConfig,
     RemoteStateManager,
 )
-from matcha_ml.runners import RemoteStateRunner
 from matcha_ml.templates.remote_state_template import SUBMODULE_NAMES
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
