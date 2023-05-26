@@ -82,17 +82,6 @@ def test_check_matcha_directory_exists(
         assert expected in captured.err
 
 
-def test_is_approved():
-    """Test if is_approved behaves as expected based on user's input."""
-    template_runner = BaseRunner()
-    with mock.patch("typer.confirm") as mock_confirm:
-        mock_confirm.return_value = True
-        assert template_runner.is_approved("provision")
-
-        mock_confirm.return_value = False
-        assert not template_runner.is_approved("provision")
-
-
 def test_initialize_terraform(capsys: SysCapture):
     """Test if service behaves as expected when initializing Terraform.
 

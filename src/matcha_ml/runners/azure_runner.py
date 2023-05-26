@@ -1,9 +1,11 @@
 """Run terraform templates to provision and deprovision resources."""
 import json
+import typer
 import uuid
 from collections import defaultdict
 from typing import Dict, Tuple
 
+from matcha_ml.cli.ui.emojis import Emojis
 from matcha_ml.cli.ui.print_messages import (
     print_error,
     print_json,
@@ -13,7 +15,10 @@ from matcha_ml.cli.ui.resource_message_builders import (
     dict_to_json,
     hide_sensitive_in_output,
 )
-from matcha_ml.cli.ui.status_message_builders import build_status
+from matcha_ml.cli.ui.status_message_builders import (
+    build_status,
+    build_resource_confirmation,
+)
 from matcha_ml.errors import MatchaInputError
 from matcha_ml.runners.base_runner import BaseRunner
 
@@ -33,6 +38,39 @@ class AzureRunner(BaseRunner):
     def __init__(self) -> None:
         """Initialize AzureRunner class."""
         super().__init__()
+
+    def is_approved(self, verb: str) -> bool:
+        """Get approval from user to modify resources on cloud.
+
+        Args:
+            verb (str): the verb to use in the approval message.
+
+        Returns:
+            bool: True if user approves, False otherwise.
+        """
+        summary_message = build_resource_confirmation(
+            header=f"The following resources will be {verb}ed",
+            resources=[
+                ("Azure Kubernetes Service (AKS)", "A kubernetes cluster"),
+                (
+                    "Two Storage Containers",
+                    "A storage container for experiment tracking artifacts and a second for model training artifacts",
+                ),
+                (
+                    "Seldon Core",
+                    "A framework for model deployment on top of a kubernetes cluster",
+                ),
+                (
+                    "Azure Container Registry",
+                    "A container registry for storing docker images",
+                ),
+                ("ZenServer", "A zenml server required for remote orchestration"),
+            ],
+            footer=f"{verb.capitalize()}ing the resources may take approximately 20 minutes. May we suggest you grab a cup of {Emojis.MATCHA.value}?",
+        )
+
+        print_status(summary_message)
+        return typer.confirm(f"Are you happy for '{verb}' to run?")
 
     def _build_resource_output(self, output_name: str) -> Tuple[str, str, str]:
         """Build resource output for each Terraform output.

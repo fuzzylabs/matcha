@@ -8,7 +8,6 @@ from matcha_ml.cli.ui.emojis import Emojis
 from matcha_ml.cli.ui.print_messages import print_error, print_status
 from matcha_ml.cli.ui.spinner import Spinner
 from matcha_ml.cli.ui.status_message_builders import (
-    build_resource_confirmation,
     build_status,
     build_substep_success_status,
 )
@@ -161,39 +160,6 @@ class BaseRunner:
 
             if ret_code != 0:
                 raise MatchaTerraformError(tf_error=err)
-
-    def is_approved(self, verb: str) -> bool:
-        """Get approval from user to modify resources on cloud.
-
-        Args:
-            verb (str): the verb to use in the approval message.
-
-        Returns:
-            bool: True if user approves, False otherwise.
-        """
-        summary_message = build_resource_confirmation(
-            header=f"The following resources will be {verb}ed",
-            resources=[
-                ("Azure Kubernetes Service (AKS)", "A kubernetes cluster"),
-                (
-                    "Two Storage Containers",
-                    "A storage container for experiment tracking artifacts and a second for model training artifacts",
-                ),
-                (
-                    "Seldon Core",
-                    "A framework for model deployment on top of a kubernetes cluster",
-                ),
-                (
-                    "Azure Container Registry",
-                    "A container registry for storing docker images",
-                ),
-                ("ZenServer", "A zenml server required for remote orchestration"),
-            ],
-            footer=f"{verb.capitalize()}ing the resources may take approximately 20 minutes. May we suggest you grab a cup of {Emojis.MATCHA.value}?",
-        )
-
-        print_status(summary_message)
-        return typer.confirm(f"Are you happy for '{verb}' to run?")
 
     def provision(self) -> Optional[Tuple[str, str, str]]:
         """Provision resources required for the deployment."""
