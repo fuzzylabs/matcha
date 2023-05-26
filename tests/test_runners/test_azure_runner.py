@@ -285,15 +285,13 @@ def test_deprovision(
     with open(matcha_state_file_dir, "w") as f:
         json.dump(expected_outputs_show_sensitive, f, indent=4)
 
-    with mock.patch("typer.confirm") as mock_confirm, mock.patch.object(
-        AzureRunner, "state_file", matcha_state_file_dir
-    ):
+    with mock.patch("typer.confirm") as mock_confirm:
+        template_runner.state_file = matcha_state_file_dir
         mock_confirm.return_value = False
         template_runner._destroy_terraform.assert_not_called()
 
-    with mock.patch("typer.confirm") as mock_confirm, mock.patch.object(
-        AzureRunner, "state_file", matcha_state_file_dir
-    ):
+    with mock.patch("typer.confirm") as mock_confirm:
+        template_runner.state_file = matcha_state_file_dir
         mock_confirm.return_value = True
         template_runner.deprovision()
         template_runner._destroy_terraform.assert_called()

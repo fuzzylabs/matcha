@@ -2,7 +2,6 @@
 import glob
 import json
 import os
-import shutil
 from typing import Dict, Iterator
 from unittest.mock import MagicMock, patch
 
@@ -17,8 +16,8 @@ from matcha_ml.state.remote_state_manager import (
     LOCK_FILE_NAME,
     RemoteStateBucketConfig,
     RemoteStateConfig,
-    RemoteStateManager,
 )
+from matcha_ml.state import RemoteStateManager
 from matcha_ml.templates.remote_state_template import SUBMODULE_NAMES
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -419,10 +418,11 @@ def test_use_lock(
 
 
 def test_use_remote_state():
-    """Test use_remote_state context manager.
-    """
+    """Test use_remote_state context manager."""
     remote_state_manager = RemoteStateManager()
-    with patch.object(remote_state_manager,"upload") as mocked_upload, patch.object(remote_state_manager,"download") as mocked_downlaod:
+    with patch.object(remote_state_manager, "upload") as mocked_upload, patch.object(
+        remote_state_manager, "download"
+    ) as mocked_downlaod:
         with remote_state_manager.use_remote_state():
             mocked_downlaod.assert_called_once_with(os.getcwd())
         mocked_upload.assert_called_once_with(os.path.join(".matcha", "infrastructure"))
