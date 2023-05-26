@@ -7,9 +7,13 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from _pytest.capture import SysCapture
+from azure.mgmt.confluent.models._confluent_management_client_enums import (  # type: ignore [import]
+    ProvisionState,
+)
 
 from matcha_ml.errors import MatchaError
 from matcha_ml.runners import RemoteStateRunner
+from matcha_ml.state import RemoteStateManager
 from matcha_ml.state.remote_state_manager import (
     ALREADY_LOCKED_MESSAGE,
     DEFAULT_CONFIG_NAME,
@@ -17,7 +21,6 @@ from matcha_ml.state.remote_state_manager import (
     RemoteStateBucketConfig,
     RemoteStateConfig,
 )
-from matcha_ml.state import RemoteStateManager
 from matcha_ml.templates.remote_state_template import SUBMODULE_NAMES
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -259,8 +262,12 @@ def test_is_state_provisioned_true(
     """
     os.chdir(valid_config_testing_directory)  # move to temporary working directory
     mock_azure_storage_instance.container_exists.return_value = True
-    remote_state = RemoteStateManager()
-    assert remote_state.is_state_provisioned()
+    with patch(
+        "matcha_ml.state.remote_state_manager.AzureClient.resource_group_state"
+    ) as rg_state:
+        rg_state.return_value = ProvisionState.SUCCEEDED
+        remote_state = RemoteStateManager()
+        assert remote_state.is_state_provisioned()
 
 
 def test_is_state_provisioned_no_config(matcha_testing_directory: str):
