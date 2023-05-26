@@ -99,7 +99,7 @@ class AzureStorage:
             blob_data.readinto(my_blob)
 
     def download_folder(self, container_name: str, dest_folder_path: str) -> None:
-        """Download a folder from Azure Storage Container.
+        """Downloads a folder from Azure Storage Container while ensuring that the local directory is cleared beforehand, ensuring that the local files match the remote files.
 
         Args:
             container_name (str): Azure storage container name
