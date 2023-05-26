@@ -5,14 +5,18 @@ import os
 from typing import Iterator, Optional
 
 from azure.core.exceptions import ResourceExistsError
+from azure.mgmt.confluent.models._confluent_management_client_enums import (  # type: ignore [import]
+    ProvisionState,
+)
 from dataclasses_json import DataClassJsonMixin
 
-from matcha_ml.cli.ui.print_messages import print_status
+from matcha_ml.cli.ui.print_messages import print_error, print_status
 from matcha_ml.cli.ui.status_message_builders import (
     build_step_success_status,
     build_warning_status,
 )
 from matcha_ml.errors import MatchaError
+from matcha_ml.services.azure_service import AzureClient
 from matcha_ml.storage import AzureStorage
 from matcha_ml.templates.state_storage_template.run_state_storage_template import (
     StateStorageTemplateRunner,
@@ -126,6 +130,28 @@ class RemoteStateManager:
 
         return self._azure_storage
 
+    def _resource_group_exists(self, resource_group_name: str) -> bool:
+        """Checks if an Azure resource group exists.
+
+        Args:
+            resource_group_name (str): Name of the Azure resource group to check
+
+        Returns:
+            bool: True, if the resource group exists
+        """
+        client = AzureClient()
+        rg_state = client.resource_group_state(resource_group_name)
+
+        if rg_state is None:
+            return False
+        elif rg_state == ProvisionState.SUCCEEDED:
+            return True
+        else:
+            print_error(
+                f"Error, resource group '{resource_group_name}' is currently in the state '{rg_state.value}' which is currently not handled by matcha. Please check your resources on Azure."
+            )
+            return True
+
     def _bucket_exists(self, container_name: str) -> bool:
         """Check if a bucket for remote state management exists.
 
@@ -144,6 +170,11 @@ class RemoteStateManager:
             bool: is state provisioned
         """
         if not self._configuration_file_exists():
+            return False
+
+        if not self._resource_group_exists(
+            self.configuration.remote_state_bucket.resource_group_name
+        ):
             return False
 
         if not self._bucket_exists(
