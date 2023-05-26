@@ -121,3 +121,48 @@ class AzureStorage:
                 os.makedirs(os.path.dirname(file_path), exist_ok=True)
 
             self.download_file(blob_client, file_path)
+
+    def _get_blob_client(self, container_name: str, blob_name: str) -> BlobClient:
+        """Get a blob client by name.
+
+        Args:
+            container_name (str): Azure storage container name
+            blob_name (str): blob name
+
+        Returns:
+            BlobClient: a blob client
+        """
+        return self._get_container_client(container_name).get_blob_client(blob_name)
+
+    def create_empty(self, container_name: str, blob_name: str) -> None:
+        """Create an empty blob in Azure Container.
+
+        Args:
+            container_name (str): Azure storage container name
+            blob_name (str): blob name
+
+        Raises:
+            azure.core.exceptions.ResourceExistsError: when blob already exists
+        """
+        self._get_blob_client(container_name, blob_name).upload_blob(data="")
+
+    def blob_exists(self, container_name: str, blob_name: str) -> bool:
+        """Check whether a blob exists in a container.
+
+        Args:
+            container_name (str): Azure storage container name
+            blob_name (str): blob name
+
+        Returns:
+             bool: True, if blob exists
+        """
+        return self._get_blob_client(container_name, blob_name).exists()
+
+    def delete_blob(self, container_name: str, blob_name: str) -> None:
+        """Delete blob by name.
+
+        Args:
+            container_name (str): Azure storage container name
+            blob_name (str): blob name
+        """
+        self._get_blob_client(container_name, blob_name).delete_blob()

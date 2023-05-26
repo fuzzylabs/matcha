@@ -4,21 +4,29 @@ import dataclasses
 import os
 from typing import Iterator, Optional
 
+from azure.core.exceptions import ResourceExistsError
 from dataclasses_json import DataClassJsonMixin
 
 from matcha_ml.cli.ui.print_messages import print_status
 from matcha_ml.cli.ui.status_message_builders import (
     build_step_success_status,
+    build_warning_status,
 )
 from matcha_ml.errors import MatchaError
 from matcha_ml.storage import AzureStorage
-from matcha_ml.templates.build_templates.state_storage_template import (
-    build_template,
-    build_template_configuration,
+from matcha_ml.templates.state_storage_template.run_state_storage_template import (
+    StateStorageTemplateRunner,
 )
-from matcha_ml.templates.run_state_storage_template import TemplateRunner
+from matcha_ml.templates.state_storage_template.state_storage_template import (
+    StateStorageTemplate,
+)
 
 DEFAULT_CONFIG_NAME = "matcha.config.json"
+LOCK_FILE_NAME = "matcha.lock"
+ALREADY_LOCKED_MESSAGE = (
+    "Remote state is already locked, maybe someone else is using matcha?"
+    "If you think this is a mistake, you can unlock the state by running `matcha force-unlock`."
+)
 
 
 @dataclasses.dataclass
@@ -155,7 +163,8 @@ class RemoteStateManager:
             prefix (str): Prefix used for all resources, or empty string to fill in.
             verbose (Optional[bool], optional): additional output is show when True. Defaults to False.
         """
-        template_runner = TemplateRunner()
+        template_runner = StateStorageTemplateRunner()
+        state_storage_template = StateStorageTemplate()
 
         project_directory = os.getcwd()
         destination = os.path.join(
@@ -168,8 +177,10 @@ class RemoteStateManager:
             "remote_state_storage",
         )
 
-        config = build_template_configuration(location, prefix)
-        build_template(config, template, destination, verbose)
+        config = state_storage_template.build_template_configuration(
+            location=location, prefix=prefix
+        )
+        state_storage_template.build_template(config, template, destination, verbose)
 
         account_name, container_name, resource_group_name = template_runner.provision()
         self._write_matcha_config(account_name, container_name, resource_group_name)
@@ -180,7 +191,7 @@ class RemoteStateManager:
     def deprovision_state_storage(self) -> None:
         """Destroy the state bucket provisioned."""
         # create a runner for deprovisioning resource with Terraform service.
-        template_runner = TemplateRunner()
+        template_runner = StateStorageTemplateRunner()
 
         template_runner.deprovision()
         print_status(
@@ -247,3 +258,42 @@ class RemoteStateManager:
         Upload the state when context is finished.
         """
         yield
+
+    def lock(self) -> None:
+        """Lock remote state.
+
+        Raises:
+            MatchaError: if the state is already locked
+        """
+        try:
+            self.azure_storage.create_empty(
+                container_name=self.configuration.remote_state_bucket.container_name,
+                blob_name=LOCK_FILE_NAME,
+            )
+        except ResourceExistsError:
+            raise MatchaError(ALREADY_LOCKED_MESSAGE)
+
+    def unlock(self) -> None:
+        """Unlock remote state."""
+        if not self.azure_storage.blob_exists(
+            container_name=self.configuration.remote_state_bucket.container_name,
+            blob_name=LOCK_FILE_NAME,
+        ):
+            print_status(
+                build_warning_status("Tried unlocking state, but it was not locked")
+            )
+            return
+        else:
+            self.azure_storage.delete_blob(
+                container_name=self.configuration.remote_state_bucket.container_name,
+                blob_name=LOCK_FILE_NAME,
+            )
+
+    @contextlib.contextmanager
+    def use_lock(self) -> Iterator[None]:
+        """Context manager to lock state."""
+        self.lock()
+        try:
+            yield
+        finally:
+            self.unlock()

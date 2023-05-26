@@ -1,8 +1,8 @@
 """Test suite to test the provision command and all its subcommands."""
 import json
 import os
-from typing import Dict, List
-from unittest.mock import patch
+from typing import Dict, Iterable, List
+from unittest.mock import MagicMock, patch
 
 import pytest
 from typer.testing import CliRunner
@@ -11,12 +11,16 @@ from matcha_ml.cli.cli import app
 
 
 @pytest.fixture(autouse=True)
-def mock_provisioned_remote_state():
-    """Mock remote state manager to have state provisioned."""
+def mock_provisioned_remote_state() -> Iterable[MagicMock]:
+    """Mock remote state manager to have state provisioned.
+
+    Returns:
+        MagicMock: mock of an RemoteStateManager instance
+    """
     with patch("matcha_ml.cli.cli.RemoteStateManager") as mock_state_manager_class:
         mock_state_manager = mock_state_manager_class.return_value
         mock_state_manager.is_state_provisioned.return_value = True
-        yield
+        yield mock_state_manager
 
 
 @pytest.fixture(autouse=True)
@@ -127,11 +131,14 @@ def test_cli_get_command_help(runner: CliRunner):
     assert "Get information for the provisioned resources." in result.stdout
 
 
-def test_cli_get_command_with_no_state_file(runner: CliRunner):
+def test_cli_get_command_with_no_state_file(
+    runner: CliRunner, mock_provisioned_remote_state: MagicMock
+):
     """Test cli for get command when the state file does not exist.
 
     Args:
         runner (CliRunner): typer CLI runner
+        mock_provisioned_remote_state (MagicMock): mock of an RemoteStateManager instance
     """
     state_file_path = os.path.join(
         ".matcha", "infrastructure", "resources", "matcha.state"
@@ -144,15 +151,20 @@ def test_cli_get_command_with_no_state_file(runner: CliRunner):
     assert result.exit_code == 0
     assert "Error: matcha.state file does not exist at" in str(result.stdout)
 
+    mock_provisioned_remote_state.use_lock.assert_called_once()
+
 
 def test_cli_get_command_hide_sensitive(
-    runner: CliRunner, expected_output_lines: List[str]
+    runner: CliRunner,
+    expected_output_lines: List[str],
+    mock_provisioned_remote_state: MagicMock,
 ):
     """Test cli get command when getting all resources with no `show-sensitive` option specified.
 
     Args:
         runner (CliRunner): typer CLI runner
         expected_output_lines (List[str]): expected output with sensitive value hidden
+        mock_provisioned_remote_state (MagicMock): mock of an RemoteStateManager instance
     """
     result = runner.invoke(app, ["get"])
 
@@ -162,15 +174,20 @@ def test_cli_get_command_hide_sensitive(
     for line in expected_output_lines:
         assert line in result.stdout
 
+    mock_provisioned_remote_state.use_lock.assert_called_once()
+
 
 def test_cli_get_command_show_sensitive(
-    runner: CliRunner, expected_output_lines: List[str]
+    runner: CliRunner,
+    expected_output_lines: List[str],
+    mock_provisioned_remote_state: MagicMock,
 ):
     """Test cli for get command when getting all resources with show-sensitive` option specified.
 
     Args:
         runner (CliRunner): typer CLI runner
         expected_output_lines (List[str]): expected output with sensitive value hidden
+        mock_provisioned_remote_state (MagicMock): mock of an RemoteStateManager instance
     """
     result = runner.invoke(app, ["get", "--show-sensitive"])
 
@@ -184,15 +201,20 @@ def test_cli_get_command_show_sensitive(
     for line in expected_output_lines:
         assert line in result.stdout
 
+    mock_provisioned_remote_state.use_lock.assert_called_once()
+
 
 def test_cli_get_command_with_resource(
-    runner: CliRunner, expected_output_lines: List[str]
+    runner: CliRunner,
+    expected_output_lines: List[str],
+    mock_provisioned_remote_state: MagicMock,
 ):
     """Test cli for get command with a specified resource.
 
     Args:
         runner (CliRunner): typer CLI runner
         expected_output_lines (List[str]): expected output with sensitive value hidden
+        mock_provisioned_remote_state (MagicMock): mock of an RemoteStateManager instance
     """
     # Invoke get command
     result = runner.invoke(app, ["get", "experiment-tracker"])
@@ -208,12 +230,17 @@ def test_cli_get_command_with_resource(
     for line in expected_output_lines[:5]:
         assert line not in result.stdout
 
+    mock_provisioned_remote_state.use_lock.assert_called_once()
 
-def test_cli_get_command_with_invalid_resource_name(runner: CliRunner):
+
+def test_cli_get_command_with_invalid_resource_name(
+    runner: CliRunner, mock_provisioned_remote_state: MagicMock
+):
     """Test cli for get command with a resource name that does not exist in the state file.
 
     Args:
         runner (CliRunner): typer CLI runner
+        mock_provisioned_remote_state (MagicMock): mock of an RemoteStateManager instance
     """
     # Invoke get command
     result = runner.invoke(app, ["get", "does-not-exist"])
@@ -224,15 +251,20 @@ def test_cli_get_command_with_invalid_resource_name(runner: CliRunner):
         in result.stdout
     )
 
+    mock_provisioned_remote_state.use_lock.assert_called_once()
+
 
 def test_cli_get_command_with_resource_and_property(
-    runner: CliRunner, expected_output_lines: List[str]
+    runner: CliRunner,
+    expected_output_lines: List[str],
+    mock_provisioned_remote_state: MagicMock,
 ):
     """Test cli for get command with a specified resource and resource property in default output format.
 
     Args:
         runner (CliRunner): typer CLI runner
         expected_output_lines (List[str]): expected output with sensitive value hidden
+        mock_provisioned_remote_state (MagicMock): mock of an RemoteStateManager instance
     """
     # Invoke get command
     result = runner.invoke(app, ["get", "experiment-tracker", "tracking-url"])
@@ -244,16 +276,20 @@ def test_cli_get_command_with_resource_and_property(
     for line in expected_output_lines[-1]:
         assert line in result.stdout
 
+    mock_provisioned_remote_state.use_lock.assert_called_once()
+
 
 def test_cli_get_command_with_resource_and_property_json(
     runner: CliRunner,
     expected_outputs_json: Dict[str, Dict[str, str]],
+    mock_provisioned_remote_state: MagicMock,
 ):
     """Test cli for get command with a specified resource and resource property in JSON output format.
 
     Args:
         runner (CliRunner): typer CLI runner
         expected_outputs_json (dict): expected output with sensitive value hidden in JSON output format
+        mock_provisioned_remote_state (MagicMock): mock of an RemoteStateManager instance
     """
     expected_output = json.dumps(
         expected_outputs_json["experiment-tracker"]["tracking-url"], indent=2
@@ -269,16 +305,20 @@ def test_cli_get_command_with_resource_and_property_json(
     # Assert JSON is present and correct in cli output
     assert expected_output in result.stdout
 
+    mock_provisioned_remote_state.use_lock.assert_called_once()
+
 
 def test_cli_get_command_json_no_show_sensitive(
     runner: CliRunner,
     expected_outputs_json: Dict[str, Dict[str, str]],
+    mock_provisioned_remote_state: MagicMock,
 ):
     """Test cli get command default in JSON output with no `show-sensitive` option specified.
 
     Args:
         runner (CliRunner): typer CLI runner
         expected_outputs_json (dict): expected output with sensitive value hidden in JSON output format
+        mock_provisioned_remote_state (MagicMock): mock of an RemoteStateManager instance
     """
     expected_output = json.dumps(expected_outputs_json, indent=2)
 
@@ -290,16 +330,20 @@ def test_cli_get_command_json_no_show_sensitive(
     # Assert JSON is present and correct in cli output
     assert expected_output in result.stdout
 
+    mock_provisioned_remote_state.use_lock.assert_called_once()
+
 
 def test_cli_get_command_yaml_no_show_sensitive(
     runner: CliRunner,
     expected_output_lines_yaml: List[str],
+    mock_provisioned_remote_state: MagicMock,
 ):
     """Test cli get command default in YAML output with `show-sensitive` option specified..
 
     Args:
         runner (CliRunner): typer CLI runner
         expected_output_lines_yaml (List[str]): expected output with sensitive value hidden in yaml output format
+        mock_provisioned_remote_state (MagicMock): mock of an RemoteStateManager instance
     """
     # Invoke get command
     result = runner.invoke(app, ["get", "--output", "yaml"])
@@ -310,16 +354,20 @@ def test_cli_get_command_yaml_no_show_sensitive(
     for line in expected_output_lines_yaml:
         assert line in result.stdout
 
+    mock_provisioned_remote_state.use_lock.assert_called_once()
+
 
 def test_cli_get_command_json_show_sensitive(
     runner: CliRunner,
     expected_outputs_json: Dict[str, Dict[str, str]],
+    mock_provisioned_remote_state: MagicMock,
 ):
     """Test cli get command default in JSON output with `show-sensitive` option specified..
 
     Args:
         runner (CliRunner): typer CLI runner
         expected_outputs_json (dict): expected output with sensitive value hidden in JSON output format
+        mock_provisioned_remote_state (MagicMock): mock of an RemoteStateManager instance
     """
     expected_outputs_json["pipeline"][
         "connection-string"
@@ -336,16 +384,20 @@ def test_cli_get_command_json_show_sensitive(
     # Assert JSON is present and correct in cli output
     assert expected_output in result.stdout
 
+    mock_provisioned_remote_state.use_lock.assert_called_once()
+
 
 def test_cli_get_command_yaml_show_sensitive(
     runner: CliRunner,
     expected_output_lines_yaml: List[str],
+    mock_provisioned_remote_state: MagicMock,
 ):
     """Test cli get command default in YAML output with `show-sensitive` option specified..
 
     Args:
         runner (CliRunner): typer CLI runner
         expected_output_lines_yaml (List[str]): expected output with sensitive value hidden in yaml output format
+        mock_provisioned_remote_state (MagicMock): mock of an RemoteStateManager instance
     """
     # Override fixture to expose sensitive value.
     expected_output_lines_yaml[4] = "connection-string: zenml_test_connection_string"
@@ -360,15 +412,20 @@ def test_cli_get_command_yaml_show_sensitive(
     for line in expected_output_lines_yaml:
         assert line in result.stdout
 
+    mock_provisioned_remote_state.use_lock.assert_called_once()
+
 
 def test_cli_get_command_no_show_sensitive_with_sensitive_resource(
-    runner: CliRunner, expected_output_lines: List[str]
+    runner: CliRunner,
+    expected_output_lines: List[str],
+    mock_provisioned_remote_state: MagicMock,
 ):
     """Test cli get command for when getting resource with sensitive value with no `show-sensitive` option specified.
 
     Args:
         runner (CliRunner): typer CLI runner
         expected_output_lines (List[str]): expected output with sensitive value hidden
+        mock_provisioned_remote_state (MagicMock): mock of an RemoteStateManager instance
     """
     result = runner.invoke(app, ["get", "pipeline"])
 
@@ -383,15 +440,20 @@ def test_cli_get_command_no_show_sensitive_with_sensitive_resource(
     for line in expected_output_lines[5:]:
         assert line not in result.stdout
 
+    mock_provisioned_remote_state.use_lock.assert_called_once()
+
 
 def test_cli_get_command_show_sensitive_with_resource(
-    runner: CliRunner, expected_output_lines: List[str]
+    runner: CliRunner,
+    expected_output_lines: List[str],
+    mock_provisioned_remote_state: MagicMock,
 ):
     """Test cli get command for when getting resource with sensitive value with `show-sensitive` option specified.
 
     Args:
         runner (CliRunner): typer CLI runner
         expected_output_lines (List[str]): expected output with sensitive value hidden
+        mock_provisioned_remote_state (MagicMock): mock of an RemoteStateManager instance
     """
     result = runner.invoke(app, ["get", "pipeline", "--show-sensitive"])
 
@@ -409,3 +471,5 @@ def test_cli_get_command_show_sensitive_with_resource(
     # expected_output_lines[5:] checks experiment tracker not in output.
     for line in expected_output_lines[5:]:
         assert line not in result.stdout
+
+    mock_provisioned_remote_state.use_lock.assert_called_once()
