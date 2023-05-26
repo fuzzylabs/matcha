@@ -8,7 +8,7 @@ import pytest
 import yaml
 
 from matcha_ml.cli.cli import app
-from matcha_ml.core.core import get
+from matcha_ml.core.core import get, remove_state_lock
 from matcha_ml.errors import MatchaError, MatchaInputError
 from matcha_ml.services.global_parameters_service import GlobalParameters
 
@@ -210,37 +210,13 @@ def test_opt_in_subcommand(
         assert dict(yaml.safe_load(f)) == expected_configuration
 
 
-def test_unlock_state_lock_called(runner, mock_unlock):
-    """Test that the unlock function is not called when a user runs matcha force-unlock and does confirm.
+def test_remove_state_lock_function(mock_unlock):
+    """Test that the unlock function is called once when emove_state_lock function is used.
 
     Args:
-        runner: Mock runner
         mock_unlock: pytest fixture to force unlock state file
     """
-
-    # Invoke force-unlock command with yes confirmation
-    result = runner.invoke(app, ["force-unlock"], input="Y\n")
-
-    # Exit code 0 means there was no error
-    assert result.exit_code == 0
+    remove_state_lock()
 
     # Check if unlock function from RemoteStateManager class is called
     mock_unlock.assert_called_once()
-
-
-def test_remove_state_lock_not_called(runner, mock_unlock):
-    """Test that the unlock function is not called when a user runs matcha force-unlock and does not confirm.
-
-    Args:
-        runner: Mock runner
-        mock_unlock: pytest fixture to force unlock state file
-    """
-
-    # Invoke force-unlock command with no confirmation
-    result = runner.invoke(app, ["force-unlock"], input="n\n")
-
-    # Exit code 0 means there was no error
-    assert result.exit_code == 0
-
-    # Check if unlock function from RemoteStateManager class is not called
-    mock_unlock.assert_not_called()
