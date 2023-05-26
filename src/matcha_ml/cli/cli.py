@@ -128,7 +128,7 @@ def destroy(
 
 @app.command()
 def force_unlock() -> None:
-    """Force unlock lock on remote matcha state on azure."""
+    """Force unlock remote matcha state on Azure."""
     delete = typer.confirm("Are you sure you want to remove the lock forcefully?")
     if not delete:
         raise typer.Exit()
