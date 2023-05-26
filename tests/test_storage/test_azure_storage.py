@@ -367,7 +367,7 @@ def test_get_blobs(mock_blob_service: BlobServiceClient) -> None:
     assert result == {"test_blob_name_1", "test_blob_name_2"}
 
 
-def test_sync_remote(mock_blob_service: BlobServiceClient):
+def test_sync_remote(mock_blob_service: BlobServiceClient) -> None:
     """Test that sync remote removes the expected the blob.
 
     Args:
