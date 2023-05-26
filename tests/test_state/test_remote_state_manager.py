@@ -423,10 +423,7 @@ def test_use_lock(
 
 
 def test_use_remote_state():
-    """Test use_remote_state context manager executes functionality between downlaod and upload.
-
-    Args:
-        matcha_testing_directory (str): temporary working directory path.
+    """Test use_remote_state context manager.
     """
     remote_state_manager = RemoteStateManager()
     with patch.object(remote_state_manager,"upload") as mocked_upload, patch.object(remote_state_manager,"download") as mocked_downlaod:

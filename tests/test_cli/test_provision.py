@@ -126,13 +126,11 @@ def test_cli_provision_command(
     """
     os.chdir(matcha_testing_directory)
 
-    print("A")
     # Invoke provision command
     result = runner.invoke(
         app, ["provision"], input="uksouth\nmatcha\ndefault\ndefault\nY\n"
     )
 
-    print("HERE")
     # Exit code 0 means there was no error
     assert result.exit_code == 0
 
