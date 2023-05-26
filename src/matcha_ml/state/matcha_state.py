@@ -7,7 +7,7 @@ from typing import Dict, List, Optional
 class MatchaStateService:
     """A matcha state service for handling to matcha.state file."""
 
-    matcha_state_dir = os.path.join(".matcha", "infrastructure", "matcha.state")
+    matcha_state_path = os.path.join(".matcha", "infrastructure", "matcha.state")
 
     def __init__(self) -> None:
         """MatchaStateService constructor."""
@@ -22,7 +22,7 @@ class MatchaStateService:
         Returns:
             bool: returns True if exists, otherwise False.
         """
-        return bool(os.path.isfile(cls.matcha_state_dir))
+        return bool(os.path.isfile(cls.matcha_state_path))
 
     @property
     def state_file(self) -> Dict[str, Dict[str, str]]:
@@ -31,7 +31,7 @@ class MatchaStateService:
         Returns:
             Dict[str, Dict[str, str]]: the state file in the format of a dictionary.
         """
-        with open(self.matcha_state_dir) as f:
+        with open(self.matcha_state_path) as f:
             self._state = dict(json.load(f))
             return dict(self._state)
 
@@ -77,3 +77,8 @@ class MatchaStateService:
             List[str]: a list of existing properties for a given resource.
         """
         return list(self._state.get(resource_name, {}).keys())
+
+    def remove_matcha_state_file(self) -> None:
+        """Removes the matcha.state file if it exists."""
+        if self.check_state_file_exists():
+            os.remove(self.matcha_state_path)
