@@ -94,54 +94,98 @@ def test_is_approved():
         assert not template_runner.is_approved("provision")
 
 
-# def test_initialize_terraform(capsys: SysCapture, template_runner: BaseRunner):
-#     """Test if service behaves as expected when initializing Terraform.
+def test_initialize_terraform(capsys: SysCapture):
+    """Test if service behaves as expected when initializing Terraform.
 
-#     Args:
-#         capsys (SysCapture): fixture to capture stdout and stderr
-#         template_runner (BaseRunner): a BaseRunner object instance
-#     """
-#     template_runner.tf_state_dir = MagicMock()
+    Args:
+        capsys (SysCapture): fixture to capture stdout and stderr
+    """
+    template_runner = BaseRunner()
+    template_runner.tf_state_dir = MagicMock()
 
-#     with mock.patch.object(template_runner.tf_state_dir, "exists", return_value=True):
-#         expected = "has already been initialized"
+    with mock.patch.object(template_runner.tf_state_dir, "exists", return_value=True):
+        expected = "has already been initialized"
 
-#         template_runner._initialize_terraform()
+        template_runner._initialize_terraform()
 
-#         captured = capsys.readouterr()
+        captured = capsys.readouterr()
 
-#         assert expected in captured.out
+        assert expected in captured.out
 
-#     with mock.patch.object(template_runner.tf_state_dir, "exists", return_value=False):
-#         template_runner.tfs.init = MagicMock(return_value=(0, "", ""))
-#         expected = " initialized!"
-#         template_runner._initialize_terraform()
+    with mock.patch.object(template_runner.tf_state_dir, "exists", return_value=False):
+        template_runner.tfs.init = MagicMock(return_value=(0, "", ""))
+        expected = " initialized!"
+        template_runner._initialize_terraform()
 
-#         captured = capsys.readouterr()
+        captured = capsys.readouterr()
 
-#         assert expected in captured.out
+        assert expected in captured.out
 
 
-# def test_apply_terraform(capsys: SysCapture, template_runner: BaseRunner):
-#     """Test if terraform applied is handled correctly during apply when provisioning resources.
+def test_apply_terraform(capsys: SysCapture):
+    """Test if terraform applied is handled correctly during apply when provisioning resources.
 
-#     Args:
-#         capsys (SysCapture): fixture to capture stdout and stderr
-#         template_runner (BaseRunner): a BaseRunner object instance
-#     """
-#     template_runner.tfs.apply = MagicMock(return_value=(0, "", ""))
-#     expected = "Your environment has been provisioned!"
+    Args:
+        capsys (SysCapture): fixture to capture stdout and stderr
+    """
+    template_runner = BaseRunner()
+    template_runner.tfs.apply = MagicMock(return_value=(0, "", ""))
+    expected = "Your environment has been provisioned!"
 
-#     template_runner._apply_terraform()
-#     captured = capsys.readouterr()
+    template_runner._apply_terraform()
+    captured = capsys.readouterr()
 
-#     assert expected in captured.out
+    assert expected in captured.out
 
-#     template_runner.tfs.apply = MagicMock(return_value=(1, "", "Apply failed"))
+    template_runner.tfs.apply = MagicMock(return_value=(1, "", "Apply failed"))
 
-#     with pytest.raises(MatchaTerraformError) as exc_info:
-#         template_runner._apply_terraform()
-#         assert (
-#             str(exc_info.value)
-#             == "Terraform failed because of the following error: 'Apply failed'."
-#         )
+    with pytest.raises(MatchaTerraformError) as exc_info:
+        template_runner._apply_terraform()
+        assert (
+            str(exc_info.value)
+            == "Terraform failed because of the following error: 'Apply failed'."
+        )
+
+
+def test_destroy_terraform(capsys: SysCapture):
+    """Test if terraform exception is captured when performing deprovision.
+
+    Args:
+        capsys (SysCapture): fixture to capture stdout and stderr
+        template_runner (AzureTemplateRunner): a AzureTemplateRunner object instance
+    """
+    template_runner = BaseRunner()
+    template_runner.tfs.destroy = MagicMock(return_value=(0, "", ""))
+
+    expected = "Destroying your resources"
+
+    template_runner._destroy_terraform(msg="your")
+
+    captured = capsys.readouterr()
+
+    template_runner.tfs.destroy.assert_called()
+
+    assert expected in captured.out
+
+    template_runner.tfs.destroy = MagicMock(return_value=(1, "", "Init failed"))
+
+    with pytest.raises(MatchaTerraformError) as exc_info:
+        template_runner._destroy_terraform()
+        assert (
+            str(exc_info.value)
+            == "Terraform failed because of the following error: 'Destroy failed'."
+        )
+
+
+def test_provision():
+    """Test provision function in BaseRunner class raises NotImplemented exception."""
+    template_runner = BaseRunner()
+    with pytest.raises(NotImplementedError):
+        template_runner.provision()
+
+
+def test_deprovision():
+    """Test deprovision function in BaseRunner class raises NotImplemented exception."""
+    template_runner = BaseRunner()
+    with pytest.raises(NotImplementedError):
+        template_runner.deprovision()
