@@ -24,12 +24,12 @@ def test_cli_force_unlock_command_help_option(runner: CliRunner) -> None:
 
 
 def test_cli_force_unlock_command_called(runner: CliRunner) -> None:
-    """Tests the cli force-unlock command is called.
+    """Tests the cli force-unlock command is called when running the user provides confirmation.
 
     Args:
         runner (CliRunner): typer CLI runner
     """
-    with patch(f"{INTERNAL_FUNCTION_STUB}.unlock_state_lock") as mock_unlock:
+    with patch(f"{INTERNAL_FUNCTION_STUB}.remove_state_lock") as mock_unlock:
         # Invoke force-unlock command with yes confirmation
         result = runner.invoke(app, ["force-unlock"], input="Y\n")
 
@@ -41,12 +41,12 @@ def test_cli_force_unlock_command_called(runner: CliRunner) -> None:
 
 
 def test_cli_force_unlock_command_not_called(runner: CliRunner) -> None:
-    """Tests the cli force-unlock command is not called.
+    """Tests the cli force-unlock command is not called when running the user does not confirm.
 
     Args:
         runner (CliRunner): typer CLI runner
     """
-    with patch(f"{INTERNAL_FUNCTION_STUB}.unlock_state_lock") as mock_unlock:
+    with patch(f"{INTERNAL_FUNCTION_STUB}.remove_state_lock") as mock_unlock:
         # Invoke force-unlock command with no confirmation
         result = runner.invoke(app, ["force-unlock"], input="n\n")
 

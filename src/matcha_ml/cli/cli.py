@@ -132,7 +132,7 @@ def force_unlock() -> None:
     delete = typer.confirm("Are you sure you want to remove the lock forcefully?")
     if not delete:
         raise typer.Exit()
-    core.unlock_state_lock()
+    core.remove_state_lock()
 
 
 def version_callback(value: bool) -> None:

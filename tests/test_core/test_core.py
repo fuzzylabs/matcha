@@ -211,7 +211,7 @@ def test_opt_in_subcommand(
 
 
 def test_unlock_state_lock_called(runner, mock_unlock):
-    """Test if unlock function in RemoteStateManager is called.
+    """Test if unlock function in RemoteStateManager is called when running the user provides confirmation.
 
     Args:
         runner: Mock runner
@@ -228,8 +228,8 @@ def test_unlock_state_lock_called(runner, mock_unlock):
     mock_unlock.assert_called_once()
 
 
-def test_unlock_state_lock_not_called(runner, mock_unlock):
-    """Test if unlock function in RemoteStateManager is not called.
+def test_remove_state_lock_not_called(runner, mock_unlock):
+    """Test if unlock function in RemoteStateManager is not called when running the user does not confirm.
 
     Args:
         runner: Mock runner

@@ -63,7 +63,7 @@ def analytics_opt_in() -> None:
     GlobalParameters().analytics_opt_out = False
 
 
-def unlock_state_lock() -> None:
+def remove_state_lock() -> None:
     """Unlock remote state."""
     remote_state = RemoteStateManager()
     remote_state.unlock()
