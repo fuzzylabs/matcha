@@ -1,6 +1,7 @@
 """Class to interact with Azure Storage."""
 import glob
 import os
+from typing import Set
 
 from azure.storage.blob import BlobClient, BlobServiceClient, ContainerClient
 
@@ -71,7 +72,7 @@ class AzureStorage:
         """
         container_client = self._get_container_client(container_name)
         # Get all existing blobs
-        blob_list = set(container_client.list_blob_names())
+        blob_list = self._get_blobs(container_name=container_name)
 
         for root, _, filenames in os.walk(src_folder_path):
             for filename in filenames:
@@ -166,3 +167,14 @@ class AzureStorage:
             blob_name (str): blob name
         """
         self._get_blob_client(container_name, blob_name).delete_blob()
+
+    def _get_blobs(self, container_name: str) -> Set[str]:
+        """A function for return a set of blob names.
+
+        Args:
+            container_name (str): the name of the blob container to look for blobs.
+
+        Returns:
+            Set[str]: a set of blob names in the container.
+        """
+        return set(self._get_container_client(container_name).list_blob_names())
