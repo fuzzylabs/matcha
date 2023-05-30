@@ -263,7 +263,7 @@ def test_is_state_provisioned_true(
     os.chdir(valid_config_testing_directory)  # move to temporary working directory
     mock_azure_storage_instance.container_exists.return_value = True
     with patch(
-        "matcha_ml.state.remote_state_manager.AzureClient.resource_group_state"
+        "matcha_ml.state.remote_state_manager.AzureStorage.AzureClient.resource_group_state"
     ) as rg_state:
         rg_state.return_value = ProvisionState.SUCCEEDED
         remote_state = RemoteStateManager()
