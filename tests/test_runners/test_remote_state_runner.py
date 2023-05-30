@@ -5,6 +5,7 @@ from unittest import mock
 from unittest.mock import MagicMock
 
 import pytest
+from _pytest.capture import SysCapture
 
 from matcha_ml.runners import RemoteStateRunner
 from matcha_ml.services.terraform_service import TerraformConfig
@@ -130,12 +131,15 @@ def test_deprovision(
 
 
 def test_clean_up(
-    template_runner: RemoteStateRunner, mock_matcha_template_folder: Tuple[str, str]
+    capsys: SysCapture,
+    template_runner: RemoteStateRunner,
+    mock_matcha_template_folder: Tuple[str, str],
 ):
     """Test that clean_up() removes the .matcha folder.
 
     Args:
-        template_runner (RemoteStateRunner): a RemoteStateRunner object instance
+        capsys (SysCapture): fixture to capture stdout and stderr.
+        template_runner (RemoteStateRunner): a RemoteStateRunner object instance.
         mock_matcha_template_folder (Tuple[str, str]): A tuple containing the paths to the the testing directory and the testing .matcha directory path.
     """
     testing_directory, mock_template_folder_path = mock_matcha_template_folder
@@ -148,3 +152,11 @@ def test_clean_up(
 
     # assert that .matcha no longer exists
     assert not os.path.exists(mock_template_folder_path)
+
+    template_runner._clean_up()
+
+    captured = capsys.readouterr()
+
+    expected_output = "Failed to remove the .matcha directory at"
+
+    assert expected_output in captured.err

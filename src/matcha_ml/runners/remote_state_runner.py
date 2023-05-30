@@ -3,6 +3,7 @@ import os
 import shutil
 from typing import Tuple
 
+from matcha_ml.cli.ui.print_messages import print_error
 from matcha_ml.runners.base_runner import BaseRunner
 
 
@@ -45,7 +46,12 @@ class RemoteStateRunner(BaseRunner):
     def _clean_up(self) -> None:
         """Remove the whole .matcha directory when destroy full is run."""
         matcha_template_dir = os.path.join(os.getcwd(), ".matcha")
-        shutil.rmtree(matcha_template_dir)
+        try:
+            shutil.rmtree(matcha_template_dir)
+        except FileNotFoundError:
+            print_error(
+                f"Failed to remove the .matcha directory at {matcha_template_dir}, directory not found."
+            )
 
     def provision(self) -> Tuple[str, str, str]:
         """Provision resources required for the deployment.
