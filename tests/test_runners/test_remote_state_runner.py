@@ -1,10 +1,11 @@
 """Test for interacting with terraform service to run the state storage template."""
 import os
-from typing import Callable, Dict, Union
+from typing import Callable, Dict, Tuple, Union
 from unittest import mock
 from unittest.mock import MagicMock
 
 import pytest
+from _pytest.capture import SysCapture
 
 from matcha_ml.runners import RemoteStateRunner
 from matcha_ml.services.terraform_service import TerraformConfig
@@ -97,12 +98,21 @@ def test_provision(template_runner: RemoteStateRunner):
         template_runner._get_terraform_output.assert_called()
 
 
-def test_deprovision(template_runner: RemoteStateRunner):
+def test_deprovision(
+    template_runner: RemoteStateRunner, mock_matcha_template_folder: Tuple[str, str]
+):
     """Test service can deprovision resources using terraform.
 
     Args:
         template_runner (RemoteStateRunner): a RemoteStateRunner object instance
+        mock_matcha_template_folder (Tuple[str, str]): A tuple containing the paths to the the testing directory and the testing .matcha directory path.
     """
+    testing_directory, mock_template_folder_path = mock_matcha_template_folder
+    os.chdir(testing_directory)
+
+    # Assert that .matcha folder exists
+    assert os.path.exists(mock_template_folder_path)
+
     template_runner._check_terraform_installation = MagicMock()
     template_runner._check_matcha_directory_exists = MagicMock()
     template_runner._destroy_terraform = MagicMock()
@@ -115,3 +125,38 @@ def test_deprovision(template_runner: RemoteStateRunner):
         mock_confirm.return_value = True
         template_runner.deprovision()
         template_runner._destroy_terraform.assert_called()
+
+    # assert that .matcha no longer exists
+    assert not os.path.exists(mock_template_folder_path)
+
+
+def test_clean_up(
+    capsys: SysCapture,
+    template_runner: RemoteStateRunner,
+    mock_matcha_template_folder: Tuple[str, str],
+):
+    """Test that clean_up() removes the .matcha folder.
+
+    Args:
+        capsys (SysCapture): fixture to capture stdout and stderr.
+        template_runner (RemoteStateRunner): a RemoteStateRunner object instance.
+        mock_matcha_template_folder (Tuple[str, str]): A tuple containing the paths to the the testing directory and the testing .matcha directory path.
+    """
+    testing_directory, mock_template_folder_path = mock_matcha_template_folder
+    os.chdir(testing_directory)
+
+    # Assert that .matcha folder exists
+    assert os.path.exists(mock_template_folder_path)
+
+    template_runner._clean_up()
+
+    # assert that .matcha no longer exists
+    assert not os.path.exists(mock_template_folder_path)
+
+    template_runner._clean_up()
+
+    captured = capsys.readouterr()
+
+    expected_output = "Failed to remove the .matcha directory at"
+
+    assert expected_output in captured.err

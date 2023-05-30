@@ -7,7 +7,7 @@ from typing import Iterator, Optional
 from azure.core.exceptions import ResourceExistsError
 from dataclasses_json import DataClassJsonMixin
 
-from matcha_ml.cli.ui.print_messages import print_status
+from matcha_ml.cli.ui.print_messages import print_error, print_status
 from matcha_ml.cli.ui.status_message_builders import (
     build_step_success_status,
     build_warning_status,
@@ -149,7 +149,7 @@ class RemoteStateManager:
 
         return True
 
-    def provision_state_storage(
+    def provision_remote_state(
         self, location: str, prefix: str, verbose: Optional[bool] = False
     ) -> None:
         """Provision the state bucket using templates.
@@ -184,12 +184,13 @@ class RemoteStateManager:
         print_status(build_step_success_status("Provisioning is complete!"))
         print()
 
-    def deprovision_state_storage(self) -> None:
+    def deprovision_remote_state(self) -> None:
         """Destroy the state bucket provisioned."""
         # create a runner for deprovisioning resource with Terraform service.
         template_runner = RemoteStateRunner()
 
         template_runner.deprovision()
+        self._remove_matcha_config()
         print_status(
             build_step_success_status("Destroying remote state management is complete!")
         )
@@ -223,6 +224,15 @@ class RemoteStateManager:
                 f"The matcha configuration is written to {self.config_path}"
             )
         )
+
+    def _remove_matcha_config(self) -> None:
+        """Remove the matcha.config.json file after destroy full is run."""
+        try:
+            os.remove(self.config_path)
+        except FileNotFoundError:
+            print_error(
+                f"Failed to remove the matcha.config.json file at {self.config_path}, file not found."
+            )
 
     def download(self, dest_folder_path: str) -> None:
         """Download the remote state into the local matcha state directory.
