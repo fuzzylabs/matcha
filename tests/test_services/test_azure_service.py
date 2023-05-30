@@ -2,6 +2,9 @@
 from unittest.mock import MagicMock
 
 import pytest
+from azure.mgmt.confluent.models._confluent_management_client_enums import (  # type: ignore [import]
+    ProvisionState,
+)
 
 from matcha_ml.errors import MatchaPermissionError
 from matcha_ml.services import AzureClient
@@ -119,11 +122,12 @@ def test_fetch_connection_string_function(mocked_azure_client):
 
 
 def test_resource_group_exists(mocked_azure_client: AzureClient):
-    """Test that resource group exists function returns True when the resource group given is in the PROVISIONED state.
+    """Test that resource group exists function returns True when the resource group given is in the SUCCEEDED state.
 
     Args:
         mocked_azure_client (AzureClient): the mocked AzureClient
     """
+    mocked_azure_client.resource_group_state.return_value = ProvisionState.SUCCEEDED
     assert mocked_azure_client.resource_group_exists("test-resources")
 
 
@@ -135,5 +139,5 @@ def test_resource_group_exists_returns_false_when_resource_group_does_not_exist(
     Args:
         mocked_azure_client (AzureClient): the mocked AzureClient
     """
-    mocked_azure_client.resource_group_state = MagicMock(return_value=None)
+    mocked_azure_client.resource_group_state.return_value = None
     assert not mocked_azure_client.resource_group_exists("test-resources")

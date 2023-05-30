@@ -3,7 +3,7 @@ import glob
 import json
 import os
 from typing import Dict, Iterator
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, PropertyMock, patch
 
 import pytest
 from _pytest.capture import SysCapture
@@ -433,3 +433,26 @@ def test_use_remote_state():
         with remote_state_manager.use_remote_state():
             mocked_downlaod.assert_called_once_with(os.getcwd())
         mocked_upload.assert_called_once_with(os.path.join(".matcha", "infrastructure"))
+
+
+def test_is_state_provisioned_returns_false_when_resource_group_does_not_exist(
+    valid_config_testing_directory: str, mock_azure_storage_instance: MagicMock
+):
+    """Test that is_state_provisioned returns False when the specified resource group does not exist.
+
+    Args:
+        valid_config_testing_directory (str): _description_
+        mock_azure_storage_instance (MagicMock): _description_
+    """
+    os.chdir(valid_config_testing_directory)  # move to temporary working directory
+    # Mock property resource_group_exists to return False (resource group does not exist)
+    type(mock_azure_storage_instance).resource_group_exists = PropertyMock(
+        return_value=False
+    )
+
+    remote_state = RemoteStateManager()
+
+    assert not remote_state.is_state_provisioned()
+
+    # Make sure the check for the storage container is not called
+    mock_azure_storage_instance.container_exists.assert_not_called()
