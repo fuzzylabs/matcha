@@ -203,7 +203,7 @@ def test_provision_state_storage(
     assert_matcha_config(matcha_testing_directory, expected_matcha_config)
 
 
-def test_deprovision_state_storage(
+def test_deprovision_remote_state(
     capsys: SysCapture, matcha_testing_directory: str
 ) -> None:
     """Test whether deprovision state storage behaves as expected.
@@ -223,7 +223,7 @@ def test_deprovision_state_storage(
 
         remote_state_manager = RemoteStateManager(config_path=mock_config_path)
 
-        remote_state_manager.deprovision_state_storage()
+        remote_state_manager.deprovision_remote_state()
 
         assert not os.path.exists(mock_config_path)
 

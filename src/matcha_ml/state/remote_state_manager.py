@@ -184,7 +184,7 @@ class RemoteStateManager:
         print_status(build_step_success_status("Provisioning is complete!"))
         print()
 
-    def deprovision_state_storage(self) -> None:
+    def deprovision_remote_state(self) -> None:
         """Destroy the state bucket provisioned."""
         # create a runner for deprovisioning resource with Terraform service.
         template_runner = RemoteStateRunner()

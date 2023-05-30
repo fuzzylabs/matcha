@@ -123,7 +123,7 @@ def destroy(
     destroy_resources()
 
     if full:
-        remote_state_manager.deprovision_state_storage()
+        remote_state_manager.deprovision_remote_state()
 
 
 @app.command()
