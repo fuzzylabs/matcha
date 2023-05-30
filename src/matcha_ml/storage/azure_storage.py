@@ -1,5 +1,5 @@
 """Class to interact with Azure Storage."""
-import glob
+import shutil
 import os
 from typing import Set
 
@@ -107,9 +107,10 @@ class AzureStorage:
             container_name (str): Azure storage container name
             dest_folder_path (str): Path to folder to download all the files
         """
-        # Clears the local directory by removing all files, ensuring that it exclusively contains the files retrieved from Azure remote storage
-        for file in glob.glob(os.path.join(dest_folder_path, "*")):
-            os.remove(file)
+        # Clears the local matcha directory by removing all files,
+        # ensuring that it exclusively contains the files retrieved from Azure remote storage
+        if os.path.exists(os.path.join(dest_folder_path, ".matcha")):
+            shutil.rmtree(os.path.join(dest_folder_path, ".matcha"))
 
         container_client = self._get_container_client(container_name)
 
