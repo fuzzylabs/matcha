@@ -13,7 +13,6 @@ from matcha_ml.cli.ui.print_messages import print_error
 from matcha_ml.errors import MatchaInputError
 from matcha_ml.services import AzureClient
 
-
 # TODO: dynamically set both of these variables
 LONGEST_RESOURCE_NAME = "artifactstore"
 MAXIMUM_RESOURCE_NAME_LEN = 24

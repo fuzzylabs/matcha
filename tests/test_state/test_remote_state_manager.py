@@ -3,13 +3,17 @@ import glob
 import json
 import os
 from typing import Dict, Iterator
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, PropertyMock, patch
 
 import pytest
 from _pytest.capture import SysCapture
+from azure.mgmt.confluent.models._confluent_management_client_enums import (  # type: ignore [import]
+    ProvisionState,
+)
 
 from matcha_ml.errors import MatchaError
 from matcha_ml.runners import RemoteStateRunner
+from matcha_ml.state import RemoteStateManager
 from matcha_ml.state.remote_state_manager import (
     ALREADY_LOCKED_MESSAGE,
     DEFAULT_CONFIG_NAME,
@@ -17,7 +21,6 @@ from matcha_ml.state.remote_state_manager import (
     RemoteStateBucketConfig,
     RemoteStateConfig,
 )
-from matcha_ml.state import RemoteStateManager
 from matcha_ml.templates.remote_state_template import SUBMODULE_NAMES
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -167,7 +170,7 @@ def assert_matcha_config(
     assert matcha_config == expected_config
 
 
-def test_provision_state_storage(
+def test_provision_remote_state(
     matcha_testing_directory: str, expected_matcha_config: Dict[str, Dict[str, str]]
 ):
     """Test that provision_state_storage behaves as expected.
@@ -185,7 +188,7 @@ def test_provision_state_storage(
         os.path.join(matcha_testing_directory, DEFAULT_CONFIG_NAME)
     )
 
-    remote_state_manager.provision_state_storage("uksouth", "matcha")
+    remote_state_manager.provision_remote_state("uksouth", "matcha")
 
     state_storage_destination_path = os.path.join(
         matcha_testing_directory, ".matcha", "infrastructure", "remote_state_storage"
@@ -203,19 +206,29 @@ def test_provision_state_storage(
     assert_matcha_config(matcha_testing_directory, expected_matcha_config)
 
 
-def test_deprovision_state_storage(capsys: SysCapture) -> None:
+def test_deprovision_remote_state(
+    capsys: SysCapture, matcha_testing_directory: str
+) -> None:
     """Test whether deprovision state storage behaves as expected.
 
     Args:
         capsys (SysCapture): fixture to capture stdout and stderr
+        matcha_testing_directory (str): temporary working directory for tests.
     """
     with patch(
         "matcha_ml.runners.remote_state_runner.RemoteStateRunner.deprovision"
     ) as destroy:
         destroy.return_value = None
-        remote_state_manager = RemoteStateManager()
+        mock_config_path = os.path.join(matcha_testing_directory, DEFAULT_CONFIG_NAME)
 
-        remote_state_manager.deprovision_state_storage()
+        with open(mock_config_path, "a"):
+            ...
+
+        remote_state_manager = RemoteStateManager(config_path=mock_config_path)
+
+        remote_state_manager.deprovision_remote_state()
+
+        assert not os.path.exists(mock_config_path)
 
         captured = capsys.readouterr()
 
@@ -259,8 +272,12 @@ def test_is_state_provisioned_true(
     """
     os.chdir(valid_config_testing_directory)  # move to temporary working directory
     mock_azure_storage_instance.container_exists.return_value = True
-    remote_state = RemoteStateManager()
-    assert remote_state.is_state_provisioned()
+    with patch(
+        "matcha_ml.state.remote_state_manager.AzureStorage.AzureClient.resource_group_state"
+    ) as rg_state:
+        rg_state.return_value = ProvisionState.SUCCEEDED
+        remote_state = RemoteStateManager()
+        assert remote_state.is_state_provisioned()
 
 
 def test_is_state_provisioned_no_config(matcha_testing_directory: str):
@@ -426,3 +443,49 @@ def test_use_remote_state():
         with remote_state_manager.use_remote_state():
             mocked_downlaod.assert_called_once_with(os.getcwd())
         mocked_upload.assert_called_once_with(os.path.join(".matcha", "infrastructure"))
+
+
+def test_is_state_provisioned_returns_false_when_resource_group_does_not_exist(
+    valid_config_testing_directory: str, mock_azure_storage_instance: MagicMock
+):
+    """Test that is_state_provisioned returns False when the specified resource group does not exist.
+
+    Args:
+        valid_config_testing_directory (str): temporary working directory path, with valid config file
+        mock_azure_storage_instance (MagicMock): mock of AzureStorage instance
+    """
+    os.chdir(valid_config_testing_directory)  # move to temporary working directory
+    # Mock property resource_group_exists to return False (resource group does not exist)
+    type(mock_azure_storage_instance).resource_group_exists = PropertyMock(
+        return_value=False
+    )
+
+    remote_state = RemoteStateManager()
+
+    assert not remote_state.is_state_provisioned()
+
+    # Make sure the check for the storage container is not called
+    mock_azure_storage_instance.container_exists.assert_not_called()
+
+ 
+def test_remove_matcha_config(capsys: SysCapture):
+    """Test the functionality of the `remove_matcha_config` function by verifying if it correctly catches the "File not found" error and throws the expected error message.
+
+    Args:
+        capsys (SysCapture): fixture to capture stdout and stderr
+    """
+    remote_state_manager = RemoteStateManager()
+
+    mock_non_exist_path = "not_exist"
+    # Verify path do not exists
+    assert not os.path.exists(mock_non_exist_path)
+
+    remote_state_manager.config_path = mock_non_exist_path
+
+    remote_state_manager._remove_matcha_config()
+
+    captured = capsys.readouterr()
+
+    expected_output = f"Failed to remove the matcha.config.json file at {mock_non_exist_path}, file not found."
+
+    assert expected_output in captured.err

@@ -77,8 +77,3 @@ class MatchaStateService:
             List[str]: a list of existing properties for a given resource.
         """
         return list(self._state.get(resource_name, {}).keys())
-
-    def remove_matcha_state_file(self) -> None:
-        """Removes the matcha.state file if it exists."""
-        if self.check_state_file_exists():
-            os.remove(self.matcha_state_path)

@@ -22,8 +22,11 @@ def mock_blob_service() -> BlobServiceClient:
         f"{CLASS_STUB}.BlobServiceClient.from_connection_string"
     ) as mock_blob_service, patch(
         f"{CLASS_STUB}.AzureClient.fetch_connection_string"
-    ) as mock_conn_str:
+    ) as mock_conn_str, patch(
+        f"{CLASS_STUB}.AzureClient.resource_group_exists"
+    ) as rg_exists:
         mock_conn_str.return_value = "mock-conn-str"
+        rg_exists.return_value = True
         yield mock_blob_service
 
 
