@@ -153,7 +153,7 @@ def test_upload_folder(
             os.listdir(matcha_testing_directory)
         )
 
-        # Check if the delete_blob function is called exactly once as only file does not exist
+        # Check if the delete_blob function is called exactly once as only one file does not exist
         assert mock_container_client.delete_blob.call_count == 1
 
 
