@@ -22,12 +22,17 @@ class AzureStorage:
             resource_group_name (str): Name of resource group containing given account name
         """
         self.az_client = AzureClient()
-        _conn_str = self.az_client.fetch_connection_string(
-            storage_account_name=account_name, resource_group_name=resource_group_name
+        self.resource_group_exists = self.az_client.resource_group_exists(
+            resource_group_name
         )
-        self.blob_service_client = BlobServiceClient.from_connection_string(
-            conn_str=_conn_str
-        )
+        if self.resource_group_exists:
+            _conn_str = self.az_client.fetch_connection_string(
+                storage_account_name=account_name,
+                resource_group_name=resource_group_name,
+            )
+            self.blob_service_client = BlobServiceClient.from_connection_string(
+                conn_str=_conn_str
+            )
 
     def _get_container_client(self, container_name: str) -> ContainerClient:
         """Get a container client using container name.

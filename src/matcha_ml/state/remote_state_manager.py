@@ -133,6 +133,14 @@ class RemoteStateManager:
         """
         return self.azure_storage.container_exists(container_name)
 
+    def _resource_group_exists(self) -> bool:
+        """Check if an Azure resource group already exists.
+
+        Returns:
+            bool: True, if the resource group exists
+        """
+        return self.azure_storage.resource_group_exists
+
     def is_state_provisioned(self) -> bool:
         """Check if remote state has already been provisioned.
 
@@ -140,6 +148,9 @@ class RemoteStateManager:
             bool: is state provisioned
         """
         if not self._configuration_file_exists():
+            return False
+
+        if not self._resource_group_exists():
             return False
 
         if not self._bucket_exists(

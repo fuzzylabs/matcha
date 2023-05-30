@@ -3,10 +3,13 @@ import glob
 import json
 import os
 from typing import Dict, Iterator
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, PropertyMock, patch
 
 import pytest
 from _pytest.capture import SysCapture
+from azure.mgmt.confluent.models._confluent_management_client_enums import (  # type: ignore [import]
+    ProvisionState,
+)
 
 from matcha_ml.errors import MatchaError
 from matcha_ml.runners import RemoteStateRunner
@@ -269,8 +272,12 @@ def test_is_state_provisioned_true(
     """
     os.chdir(valid_config_testing_directory)  # move to temporary working directory
     mock_azure_storage_instance.container_exists.return_value = True
-    remote_state = RemoteStateManager()
-    assert remote_state.is_state_provisioned()
+    with patch(
+        "matcha_ml.state.remote_state_manager.AzureStorage.AzureClient.resource_group_state"
+    ) as rg_state:
+        rg_state.return_value = ProvisionState.SUCCEEDED
+        remote_state = RemoteStateManager()
+        assert remote_state.is_state_provisioned()
 
 
 def test_is_state_provisioned_no_config(matcha_testing_directory: str):
@@ -438,6 +445,29 @@ def test_use_remote_state():
         mocked_upload.assert_called_once_with(os.path.join(".matcha", "infrastructure"))
 
 
+def test_is_state_provisioned_returns_false_when_resource_group_does_not_exist(
+    valid_config_testing_directory: str, mock_azure_storage_instance: MagicMock
+):
+    """Test that is_state_provisioned returns False when the specified resource group does not exist.
+
+    Args:
+        valid_config_testing_directory (str): temporary working directory path, with valid config file
+        mock_azure_storage_instance (MagicMock): mock of AzureStorage instance
+    """
+    os.chdir(valid_config_testing_directory)  # move to temporary working directory
+    # Mock property resource_group_exists to return False (resource group does not exist)
+    type(mock_azure_storage_instance).resource_group_exists = PropertyMock(
+        return_value=False
+    )
+
+    remote_state = RemoteStateManager()
+
+    assert not remote_state.is_state_provisioned()
+
+    # Make sure the check for the storage container is not called
+    mock_azure_storage_instance.container_exists.assert_not_called()
+
+ 
 def test_remove_matcha_config(capsys: SysCapture):
     """Test the functionality of the `remove_matcha_config` function by verifying if it correctly catches the "File not found" error and throws the expected error message.
 
