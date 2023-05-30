@@ -1,6 +1,5 @@
 """Run terraform templates to provision and deprovision resources."""
 import os
-import shutil
 from typing import Optional, Tuple
 
 import typer
@@ -161,11 +160,6 @@ class BaseRunner:
 
             if ret_code != 0:
                 raise MatchaTerraformError(tf_error=err)
-
-    def _clean_up(self) -> None:
-        """Remove the whole .matcha directory when destroy full is run."""
-        matcha_template_dir = os.path.join(os.getcwd(), ".matcha")
-        shutil.rmtree(matcha_template_dir)
 
     def provision(self) -> Optional[Tuple[str, str, str]]:
         """Provision resources required for the deployment."""

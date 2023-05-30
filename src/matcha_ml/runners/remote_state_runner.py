@@ -1,5 +1,6 @@
 """Run terraform templates to provision and deprovision state bucket resource."""
 import os
+import shutil
 from typing import Tuple
 
 from matcha_ml.runners.base_runner import BaseRunner
@@ -40,6 +41,11 @@ class RemoteStateRunner(BaseRunner):
         container_name = tf_outputs[f"{prefix}_container_name"]["value"]
 
         return account_name, container_name, resource_group_name
+
+    def _clean_up(self) -> None:
+        """Remove the whole .matcha directory when destroy full is run."""
+        matcha_template_dir = os.path.join(os.getcwd(), ".matcha")
+        shutil.rmtree(matcha_template_dir)
 
     def provision(self) -> Tuple[str, str, str]:
         """Provision resources required for the deployment.

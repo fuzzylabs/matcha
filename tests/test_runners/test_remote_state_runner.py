@@ -127,3 +127,24 @@ def test_deprovision(
 
     # assert that .matcha no longer exists
     assert not os.path.exists(mock_template_folder_path)
+
+
+def test_clean_up(
+    template_runner: RemoteStateRunner, mock_matcha_template_folder: Tuple[str, str]
+):
+    """Test that clean_up() removes the .matcha folder.
+
+    Args:
+        template_runner (RemoteStateRunner): a RemoteStateRunner object instance
+        mock_matcha_template_folder (Tuple[str, str]): A tuple containing the paths to the the testing directory and the testing .matcha directory path.
+    """
+    testing_directory, mock_template_folder_path = mock_matcha_template_folder
+    os.chdir(testing_directory)
+
+    # Assert that .matcha folder exists
+    assert os.path.exists(mock_template_folder_path)
+
+    template_runner._clean_up()
+
+    # assert that .matcha no longer exists
+    assert not os.path.exists(mock_template_folder_path)

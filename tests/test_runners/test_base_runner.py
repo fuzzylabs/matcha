@@ -1,6 +1,5 @@
 """Test for testing BaseRuner class."""
 import os
-from typing import Tuple
 from unittest import mock
 from unittest.mock import MagicMock
 
@@ -178,22 +177,3 @@ def test_deprovision():
     template_runner = BaseRunner()
     with pytest.raises(NotImplementedError):
         template_runner.deprovision()
-
-
-def test_clean_up(mock_matcha_template_folder: Tuple[str, str]):
-    """Test that clean_up() removes the .matcha folder.
-
-    Args:
-        mock_matcha_template_folder (Tuple[str, str]): A tuple containing the paths to the the testing directory and the testing .matcha directory path.
-    """
-    testing_directory, mock_template_folder_path = mock_matcha_template_folder
-    os.chdir(testing_directory)
-
-    # Assert that .matcha folder exists
-    assert os.path.exists(mock_template_folder_path)
-
-    template_runner = BaseRunner()
-    template_runner._clean_up()
-
-    # assert that .matcha no longer exists
-    assert not os.path.exists(mock_template_folder_path)
