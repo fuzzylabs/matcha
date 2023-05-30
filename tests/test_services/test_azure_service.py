@@ -116,3 +116,24 @@ def test_fetch_connection_string_function(mocked_azure_client):
 
     conn_str = mocked_azure_client.fetch_connection_string("testaccname", rg)
     assert conn_str == expected_conn_string
+
+
+def test_resource_group_exists(mocked_azure_client: AzureClient):
+    """Test that resource group exists function returns True when the resource group given is in the PROVISIONED state.
+
+    Args:
+        mocked_azure_client (AzureClient): the mocked AzureClient
+    """
+    assert mocked_azure_client.resource_group_exists("test-resources")
+
+
+def test_resource_group_exists_returns_false_when_resource_group_does_not_exist(
+    mocked_azure_client: AzureClient,
+):
+    """Test that resource group exists function returns False when the resource group given does not exist.
+
+    Args:
+        mocked_azure_client (AzureClient): the mocked AzureClient
+    """
+    mocked_azure_client.resource_group_state = MagicMock(return_value=None)
+    assert not mocked_azure_client.resource_group_exists("test-resources")
