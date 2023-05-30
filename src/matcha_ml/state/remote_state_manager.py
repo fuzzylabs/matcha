@@ -14,7 +14,6 @@ from matcha_ml.cli.ui.status_message_builders import (
 )
 from matcha_ml.errors import MatchaError
 from matcha_ml.runners import RemoteStateRunner
-from matcha_ml.services.azure_service import AzureClient
 from matcha_ml.storage import AzureStorage
 from matcha_ml.templates import RemoteStateTemplate
 
@@ -54,8 +53,6 @@ class RemoteStateManager:
     """
 
     _azure_storage: Optional[AzureStorage] = None
-
-    _azure_client: Optional[AzureClient] = None
 
     config_path: str
 
@@ -125,26 +122,6 @@ class RemoteStateManager:
 
         return self._azure_storage
 
-    @property
-    def azure_client(self) -> AzureClient:
-        """Azure Client property.
-
-        If it was not initialized before, it will be initialized
-
-        Returns:
-            AzureClient: to interact with Azure authentication and resource groups
-
-        Raises:
-            MatchaError: if AzureClient client failed to create
-        """
-        if self._azure_client is None:
-            try:
-                self._azure_client = AzureClient()
-            except Exception as e:
-                raise MatchaError(f"Error while creating Azure client: {e}")
-
-        return self._azure_client
-
     def _resource_group_exists(self, resource_group_name: str) -> bool:
         """Checks if an Azure resource group exists.
 
@@ -154,7 +131,7 @@ class RemoteStateManager:
         Returns:
             bool: True, if the resource group exists
         """
-        return self.azure_client.resource_group_exists(resource_group_name)
+        return self.azure_storage.az_client.resource_group_exists(resource_group_name)
 
     def _bucket_exists(self, container_name: str) -> bool:
         """Check if a bucket for remote state management exists.
