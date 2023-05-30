@@ -1,5 +1,7 @@
 """Class to interact with Azure Storage."""
+import glob
 import os
+from typing import Set
 
 from azure.storage.blob import BlobClient, BlobServiceClient, ContainerClient
 
@@ -62,19 +64,28 @@ class AzureStorage:
             blob_client.upload_blob(data=blob_data, overwrite=True)
 
     def upload_folder(self, container_name: str, src_folder_path: str) -> None:
-        """Upload a folder to Azure Storage Container.
+        """Upload a folder to an Azure Storage Container and delete any files that are not present `src_folder_path`.
 
         Args:
             container_name (str): Azure storage container name
             src_folder_path (str): Path to folder to upload all files from
         """
         container_client = self._get_container_client(container_name)
+        # Get all existing blobs
+        blob_set = self._get_blob_names(container_name=container_name)
 
         for root, _, filenames in os.walk(src_folder_path):
             for filename in filenames:
                 file_path = os.path.join(root, filename)
+
+                if file_path in blob_set:
+                    blob_set.remove(file_path)
+
                 blob_client = container_client.get_blob_client(blob=file_path)
                 self.upload_file(blob_client, file_path)
+
+        # Remove blobs that are not present in the local `src_folder_path``
+        self._sync_remote(container_name=container_name, blob_set=blob_set)
 
     def download_file(self, blob_client: BlobClient, dest_file: str) -> None:
         """Download a file from Azure Storage Container.
@@ -88,19 +99,27 @@ class AzureStorage:
             blob_data.readinto(my_blob)
 
     def download_folder(self, container_name: str, dest_folder_path: str) -> None:
-        """Download a folder from Azure Storage Container.
+        """Downloads a folder from Azure Storage Container.
+
+        Local directory is cleared beforehand, ensuring that the local files match the remote files.
 
         Args:
             container_name (str): Azure storage container name
             dest_folder_path (str): Path to folder to download all the files
         """
+        # Clears the local directory by removing all files, ensuring that it exclusively contains the files retrieved from Azure remote storage
+        for file in glob.glob(os.path.join(dest_folder_path, "*")):
+            os.remove(file)
+
         container_client = self._get_container_client(container_name)
 
         for blob in container_client.list_blobs():
             blob_client = container_client.get_blob_client(blob=str(blob.name))
             file_path = os.path.join(dest_folder_path, str(blob.name))
+
             if not os.path.exists(os.path.dirname(file_path)):
                 os.makedirs(os.path.dirname(file_path), exist_ok=True)
+
             self.download_file(blob_client, file_path)
 
     def _get_blob_client(self, container_name: str, blob_name: str) -> BlobClient:
@@ -147,3 +166,27 @@ class AzureStorage:
             blob_name (str): blob name
         """
         self._get_blob_client(container_name, blob_name).delete_blob()
+
+    def _get_blob_names(self, container_name: str) -> Set[str]:
+        """A function for return a set of blob names.
+
+        Args:
+            container_name (str): the name of the blob container to look for blobs.
+
+        Returns:
+            Set[str]: a set of blob names in the container.
+        """
+        return set(self._get_container_client(container_name).list_blob_names())
+
+    def _sync_remote(self, container_name: str, blob_set: Set[str]) -> None:
+        """Synchronizes the remote storage with the local files.
+
+        Args:
+            container_name (str): The name of the blob container to look for blobs.
+            blob_set (Set[str]): Set of blob names to be removed on the remote storage.
+        """
+        container_client = self._get_container_client(container_name=container_name)
+
+        # Remove blobs that are not present in the local `src_folder_path``
+        for blob in blob_set:
+            container_client.delete_blob(blob)
