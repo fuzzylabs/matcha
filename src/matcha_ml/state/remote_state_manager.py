@@ -5,19 +5,16 @@ import os
 from typing import Iterator, Optional
 
 from azure.core.exceptions import ResourceExistsError
-from azure.mgmt.confluent.models._confluent_management_client_enums import (  # type: ignore [import]
-    ProvisionState,
-)
 from dataclasses_json import DataClassJsonMixin
 
-from matcha_ml.cli.ui.print_messages import print_error, print_status
+from matcha_ml.cli.ui.print_messages import print_status
 from matcha_ml.cli.ui.status_message_builders import (
     build_step_success_status,
     build_warning_status,
 )
 from matcha_ml.errors import MatchaError
-from matcha_ml.services.azure_service import AzureClient
 from matcha_ml.runners import RemoteStateRunner
+from matcha_ml.services.azure_service import AzureClient
 from matcha_ml.storage import AzureStorage
 from matcha_ml.templates import RemoteStateTemplate
 
@@ -57,6 +54,8 @@ class RemoteStateManager:
     """
 
     _azure_storage: Optional[AzureStorage] = None
+
+    _azure_client: Optional[AzureClient] = None
 
     config_path: str
 
@@ -126,6 +125,26 @@ class RemoteStateManager:
 
         return self._azure_storage
 
+    @property
+    def azure_client(self) -> AzureClient:
+        """Azure Client property.
+
+        If it was not initialized before, it will be initialized
+
+        Returns:
+            AzureClient: to interact with Azure authentication and resource groups
+
+        Raises:
+            MatchaError: if AzureClient client failed to create
+        """
+        if self._azure_client is None:
+            try:
+                self._azure_client = AzureClient()
+            except Exception as e:
+                raise MatchaError(f"Error while creating Azure client: {e}")
+
+        return self._azure_client
+
     def _resource_group_exists(self, resource_group_name: str) -> bool:
         """Checks if an Azure resource group exists.
 
@@ -135,18 +154,7 @@ class RemoteStateManager:
         Returns:
             bool: True, if the resource group exists
         """
-        client = AzureClient()
-        rg_state = client.resource_group_state(resource_group_name)
-
-        if rg_state is None:
-            return False
-        elif rg_state == ProvisionState.SUCCEEDED:
-            return True
-        else:
-            print_error(
-                f"Error, resource group '{resource_group_name}' is currently in the state '{rg_state.value}' which is currently not handled by matcha. Please check your resources on Azure."
-            )
-            return True
+        return self.azure_client.resource_group_exists(resource_group_name)
 
     def _bucket_exists(self, container_name: str) -> bool:
         """Check if a bucket for remote state management exists.
