@@ -122,17 +122,6 @@ class RemoteStateManager:
 
         return self._azure_storage
 
-    def _resource_group_exists(self, resource_group_name: str) -> bool:
-        """Checks if an Azure resource group exists.
-
-        Args:
-            resource_group_name (str): Name of the Azure resource group to check
-
-        Returns:
-            bool: True, if the resource group exists
-        """
-        return self.azure_storage.az_client.resource_group_exists(resource_group_name)
-
     def _bucket_exists(self, container_name: str) -> bool:
         """Check if a bucket for remote state management exists.
 
@@ -153,9 +142,7 @@ class RemoteStateManager:
         if not self._configuration_file_exists():
             return False
 
-        if not self._resource_group_exists(
-            self.configuration.remote_state_bucket.resource_group_name
-        ):
+        if not self.azure_storage.resource_group_exists:
             return False
 
         if not self._bucket_exists(
