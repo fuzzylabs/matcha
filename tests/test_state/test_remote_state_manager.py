@@ -441,8 +441,8 @@ def test_is_state_provisioned_returns_false_when_resource_group_does_not_exist(
     """Test that is_state_provisioned returns False when the specified resource group does not exist.
 
     Args:
-        valid_config_testing_directory (str): _description_
-        mock_azure_storage_instance (MagicMock): _description_
+        valid_config_testing_directory (str): temporary working directory path, with valid config file
+        mock_azure_storage_instance (MagicMock): mock of AzureStorage instance
     """
     os.chdir(valid_config_testing_directory)  # move to temporary working directory
     # Mock property resource_group_exists to return False (resource group does not exist)
