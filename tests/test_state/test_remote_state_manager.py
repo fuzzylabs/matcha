@@ -170,7 +170,7 @@ def assert_matcha_config(
     assert matcha_config == expected_config
 
 
-def test_provision_state_storage(
+def test_provision_remote_state(
     matcha_testing_directory: str, expected_matcha_config: Dict[str, Dict[str, str]]
 ):
     """Test that provision_state_storage behaves as expected.
@@ -188,7 +188,7 @@ def test_provision_state_storage(
         os.path.join(matcha_testing_directory, DEFAULT_CONFIG_NAME)
     )
 
-    remote_state_manager.provision_state_storage("uksouth", "matcha")
+    remote_state_manager.provision_remote_state("uksouth", "matcha")
 
     state_storage_destination_path = os.path.join(
         matcha_testing_directory, ".matcha", "infrastructure", "remote_state_storage"
@@ -206,19 +206,29 @@ def test_provision_state_storage(
     assert_matcha_config(matcha_testing_directory, expected_matcha_config)
 
 
-def test_deprovision_state_storage(capsys: SysCapture) -> None:
+def test_deprovision_remote_state(
+    capsys: SysCapture, matcha_testing_directory: str
+) -> None:
     """Test whether deprovision state storage behaves as expected.
 
     Args:
         capsys (SysCapture): fixture to capture stdout and stderr
+        matcha_testing_directory (str): temporary working directory for tests.
     """
     with patch(
         "matcha_ml.runners.remote_state_runner.RemoteStateRunner.deprovision"
     ) as destroy:
         destroy.return_value = None
-        remote_state_manager = RemoteStateManager()
+        mock_config_path = os.path.join(matcha_testing_directory, DEFAULT_CONFIG_NAME)
 
-        remote_state_manager.deprovision_state_storage()
+        with open(mock_config_path, "a"):
+            ...
+
+        remote_state_manager = RemoteStateManager(config_path=mock_config_path)
+
+        remote_state_manager.deprovision_remote_state()
+
+        assert not os.path.exists(mock_config_path)
 
         captured = capsys.readouterr()
 
@@ -456,3 +466,26 @@ def test_is_state_provisioned_returns_false_when_resource_group_does_not_exist(
 
     # Make sure the check for the storage container is not called
     mock_azure_storage_instance.container_exists.assert_not_called()
+
+ 
+def test_remove_matcha_config(capsys: SysCapture):
+    """Test the functionality of the `remove_matcha_config` function by verifying if it correctly catches the "File not found" error and throws the expected error message.
+
+    Args:
+        capsys (SysCapture): fixture to capture stdout and stderr
+    """
+    remote_state_manager = RemoteStateManager()
+
+    mock_non_exist_path = "not_exist"
+    # Verify path do not exists
+    assert not os.path.exists(mock_non_exist_path)
+
+    remote_state_manager.config_path = mock_non_exist_path
+
+    remote_state_manager._remove_matcha_config()
+
+    captured = capsys.readouterr()
+
+    expected_output = f"Failed to remove the matcha.config.json file at {mock_non_exist_path}, file not found."
+
+    assert expected_output in captured.err

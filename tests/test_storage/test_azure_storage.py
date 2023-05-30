@@ -116,9 +116,13 @@ def test_upload_folder(
         matcha_testing_directory (str): Temporary directory
         mocked_azure_client (AzureClient): mocked azure client
     """
+    # Create a test set of azure files for mocking the return value of list_blob_names method
+    test_azure_files = {"file_not_exist"}
+
     # Create temp files inside temp directory
     for i in range(1, 3):
         tmp_file = os.path.join(matcha_testing_directory, f"temp{i}.txt")
+        test_azure_files.add(tmp_file)
         with open(tmp_file, "w"):
             pass
 
@@ -127,6 +131,9 @@ def test_upload_folder(
 
     # Mock blob client
     mock_blob_client = mock_container_client.get_blob_client.return_value
+
+    # Mock container client list_blob_names() method, only 1 file to delete
+    mock_container_client.list_blob_names.return_value = test_azure_files
 
     mock_az_storage = AzureStorage("testaccount", "test-rg")
     mock_az_storage.az_client = mocked_azure_client
@@ -138,10 +145,19 @@ def test_upload_folder(
         # Check if upload_blob function is called
         mock_blob_client.upload_blob.assert_called()
 
+        # Check if list_blob_names function is called
+        mock_container_client.list_blob_names.assert_called()
+
+        # Check if delete_blob function is called
+        mock_container_client.delete_blob.assert_called()
+
         # Check if upload_blob function is called exactly twice
         assert mock_blob_client.upload_blob.call_count == len(
             os.listdir(matcha_testing_directory)
         )
+
+        # Check if the delete_blob function is called exactly once as only one file does not exist
+        assert mock_container_client.delete_blob.call_count == 1
 
 
 def test_download_file(
@@ -184,6 +200,9 @@ def test_download_folder(
         matcha_testing_directory (str): Temporary directory
         mocked_azure_client (AzureClient): mocked azure client
     """
+    # Create a test set of azure files for mocking the return value of list_blobs method
+    files_on_azure = {"file_only_exist_azure"}
+
     # Create temp files inside temp directory
     for i in range(1, 3):
         tmp_file = os.path.join(matcha_testing_directory, f"temp{i}.txt")
@@ -198,7 +217,7 @@ def test_download_folder(
 
     # Mock list blobs function for container client
     mock_container_client.list_blobs.return_value = [
-        BlobProperties(name=n) for n in os.listdir(matcha_testing_directory)
+        BlobProperties(name=n) for n in files_on_azure
     ]
 
     mock_az_storage = AzureStorage("testaccount", "test-rg")
@@ -215,6 +234,9 @@ def test_download_folder(
         assert mock_blob_client.download_blob.call_count == len(
             os.listdir(matcha_testing_directory)
         )
+
+        # Check that there are only 1 files in local
+        assert len(os.listdir(matcha_testing_directory)) == 1
 
 
 def test_create_empty(mock_blob_service: BlobServiceClient) -> None:
@@ -318,3 +340,53 @@ def test_delete_blob(mock_blob_service: BlobServiceClient) -> None:
     )
     mock_container_client.get_blob_client.assert_called_with("testblob")
     mock_blob_client.delete_blob.assert_called_once_with()  # Check that blob is uploaded and empty
+
+
+def test_get_blob_names(mock_blob_service: BlobServiceClient) -> None:
+    """Test that the get_blobs function return the expected result.
+
+    Args:
+        mock_blob_service (BlobServiceClient): Mocked blob service client.
+    """
+    # Mock container client
+    mock_container_client = (
+        mock_blob_service.return_value.get_container_client.return_value
+    )
+
+    mock_list_blob_names = mock_container_client.list_blob_names
+
+    mock_list_blob_names.return_value = ["test_blob_name_1", "test_blob_name_2"]
+
+    az_storage = AzureStorage("testaccount", "test-rg")
+
+    result = az_storage._get_blob_names("testcontainer")
+
+    mock_container_client.list_blob_names.assert_called_once()
+
+    # Test that result returned is a set
+    assert isinstance(result, set)
+
+    # Test the result has expected value
+    assert result == {"test_blob_name_1", "test_blob_name_2"}
+
+
+def test_sync_remote(mock_blob_service: BlobServiceClient) -> None:
+    """Test that sync remote removes the expected the blob.
+
+    Args:
+        mock_blob_service (BlobServiceClient): Mocked blob service client.
+    """
+    # Mock container client
+    mock_container_client = (
+        mock_blob_service.return_value.get_container_client.return_value
+    )
+
+    mock_blob_set = {"blob_1"}
+
+    _ = mock_container_client.delete_blob.return_value
+
+    az_storage = AzureStorage("testaccount", "test-rg")
+
+    az_storage._sync_remote("testcontainer", mock_blob_set)
+
+    mock_container_client.delete_blob.assert_called_once_with("blob_1")
