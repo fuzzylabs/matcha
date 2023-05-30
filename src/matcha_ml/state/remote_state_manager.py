@@ -7,7 +7,7 @@ from typing import Iterator, Optional
 from azure.core.exceptions import ResourceExistsError
 from dataclasses_json import DataClassJsonMixin
 
-from matcha_ml.cli.ui.print_messages import print_status
+from matcha_ml.cli.ui.print_messages import print_error, print_status
 from matcha_ml.cli.ui.status_message_builders import (
     build_step_success_status,
     build_warning_status,
@@ -227,7 +227,12 @@ class RemoteStateManager:
 
     def _remove_matcha_config(self) -> None:
         """Remove the matcha.config.json file after destroy full is run."""
-        os.remove(self.config_path)
+        try:
+            os.remove(self.config_path)
+        except FileNotFoundError:
+            print_error(
+                f"Failed to remove the matcha.config.json file at {self.config_path}, file not found."
+            )
 
     def download(self, dest_folder_path: str) -> None:
         """Download the remote state into the local matcha state directory.

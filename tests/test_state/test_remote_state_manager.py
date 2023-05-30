@@ -436,3 +436,26 @@ def test_use_remote_state():
         with remote_state_manager.use_remote_state():
             mocked_downlaod.assert_called_once_with(os.getcwd())
         mocked_upload.assert_called_once_with(os.path.join(".matcha", "infrastructure"))
+
+
+def test_remove_matcha_config(capsys: SysCapture):
+    """Test the functionality of the `remove_matcha_config` function by verifying if it correctly catches the "File not found" error and throws the expected error message.
+
+    Args:
+        capsys (SysCapture): fixture to capture stdout and stderr
+    """
+    remote_state_manager = RemoteStateManager()
+
+    mock_non_exist_path = "not_exist"
+    # Verify path do not exists
+    assert not os.path.exists(mock_non_exist_path)
+
+    remote_state_manager.config_path = mock_non_exist_path
+
+    remote_state_manager._remove_matcha_config()
+
+    captured = capsys.readouterr()
+
+    expected_output = f"Failed to remove the matcha.config.json file at {mock_non_exist_path}, file not found."
+
+    assert expected_output in captured.err
