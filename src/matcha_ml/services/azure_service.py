@@ -262,15 +262,7 @@ class AzureClient:
         """
         rg_state = self.resource_group_state(resource_group_name)
 
-        if rg_state is None:
-            return False
-        elif rg_state == ProvisionState.SUCCEEDED:
-            return True
-        else:
-            print(
-                f"Error, resource group '{resource_group_name}' is currently in the state '{rg_state.value}' which is currently not handled by matcha. Please check your resources on Azure."
-            )
-            return True
+        return type(rg_state) is ProvisionState
 
     def fetch_regions(self) -> Set[str]:
         """Fetch the Azure regions.

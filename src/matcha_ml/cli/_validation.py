@@ -4,8 +4,12 @@ import os
 from difflib import get_close_matches
 from typing import List, Optional, Set, Union
 
+from azure.mgmt.confluent.models._confluent_management_client_enums import (  # type: ignore [import]
+    ProvisionState,
+)
 from typer import BadParameter
 
+from matcha_ml.cli.ui.print_messages import print_error
 from matcha_ml.errors import MatchaInputError
 from matcha_ml.services import AzureClient
 
@@ -227,7 +231,17 @@ def check_current_deployment_exists() -> bool:
         resource_group_name = data["cloud"]["prefix"] + "-resources"
 
         client = get_azure_client()
-        return client.resource_group_exists(resource_group_name)
+        rg_state = client.resource_group_state(resource_group_name)
+
+        if rg_state is None:
+            return False
+        elif rg_state == ProvisionState.SUCCEEDED:
+            return True
+        else:
+            print_error(
+                f"Error, resource group '{resource_group_name}' is currently in the state '{rg_state.value}' which is currently not handled by matcha. Please check your resources on Azure."
+            )
+            return True
     else:
         return False
 
