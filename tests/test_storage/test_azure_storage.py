@@ -339,7 +339,7 @@ def test_delete_blob(mock_blob_service: BlobServiceClient) -> None:
     mock_blob_client.delete_blob.assert_called_once_with()  # Check that blob is uploaded and empty
 
 
-def test_get_blobs(mock_blob_service: BlobServiceClient) -> None:
+def test_get_blob_names(mock_blob_service: BlobServiceClient) -> None:
     """Test that the get_blobs function return the expected result.
 
     Args:
@@ -356,7 +356,7 @@ def test_get_blobs(mock_blob_service: BlobServiceClient) -> None:
 
     az_storage = AzureStorage("testaccount", "test-rg")
 
-    result = az_storage._get_blobs("testcontainer")
+    result = az_storage._get_blob_names("testcontainer")
 
     mock_container_client.list_blob_names.assert_called_once()
 

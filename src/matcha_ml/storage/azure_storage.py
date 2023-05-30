@@ -72,7 +72,7 @@ class AzureStorage:
         """
         container_client = self._get_container_client(container_name)
         # Get all existing blobs
-        blob_set = self._get_blobs(container_name=container_name)
+        blob_set = self._get_blob_names(container_name=container_name)
 
         for root, _, filenames in os.walk(src_folder_path):
             for filename in filenames:
@@ -167,7 +167,7 @@ class AzureStorage:
         """
         self._get_blob_client(container_name, blob_name).delete_blob()
 
-    def _get_blobs(self, container_name: str) -> Set[str]:
+    def _get_blob_names(self, container_name: str) -> Set[str]:
         """A function for return a set of blob names.
 
         Args:
