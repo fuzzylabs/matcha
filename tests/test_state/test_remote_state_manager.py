@@ -167,7 +167,7 @@ def assert_matcha_config(
     assert matcha_config == expected_config
 
 
-def test_provision_state_storage(
+def test_provision_remote_state(
     matcha_testing_directory: str, expected_matcha_config: Dict[str, Dict[str, str]]
 ):
     """Test that provision_state_storage behaves as expected.
@@ -185,7 +185,7 @@ def test_provision_state_storage(
         os.path.join(matcha_testing_directory, DEFAULT_CONFIG_NAME)
     )
 
-    remote_state_manager.provision_state_storage("uksouth", "matcha")
+    remote_state_manager.provision_remote_state("uksouth", "matcha")
 
     state_storage_destination_path = os.path.join(
         matcha_testing_directory, ".matcha", "infrastructure", "remote_state_storage"

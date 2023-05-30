@@ -149,7 +149,7 @@ class RemoteStateManager:
 
         return True
 
-    def provision_state_storage(
+    def provision_remote_state(
         self, location: str, prefix: str, verbose: Optional[bool] = False
     ) -> None:
         """Provision the state bucket using templates.
