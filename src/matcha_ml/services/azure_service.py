@@ -262,7 +262,7 @@ class AzureClient:
         """
         rg_state = self.resource_group_state(resource_group_name)
 
-        return type(rg_state) is ProvisionState
+        return isinstance(rg_state, ProvisionState)
 
     def fetch_regions(self) -> Set[str]:
         """Fetch the Azure regions.
