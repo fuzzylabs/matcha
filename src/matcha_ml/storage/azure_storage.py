@@ -1,6 +1,6 @@
 """Class to interact with Azure Storage."""
-import glob
 import os
+import shutil
 from typing import Set
 
 from azure.storage.blob import BlobClient, BlobServiceClient, ContainerClient
@@ -118,9 +118,9 @@ class AzureStorage:
             container_name (str): Azure storage container name
             dest_folder_path (str): Path to folder to download all the files
         """
-        # Clears the local directory by removing all files, ensuring that it exclusively contains the files retrieved from Azure remote storage
-        for file in glob.glob(os.path.join(dest_folder_path, "*")):
-            os.remove(file)
+        # Sync local matcha directory with remote storage
+        matcha_resources_dir = os.path.join(".matcha", "infrastructure", "resources")
+        self._sync_local(os.path.join(dest_folder_path, matcha_resources_dir))
 
         container_client = self._get_container_client(container_name)
 
@@ -201,3 +201,15 @@ class AzureStorage:
         # Remove blobs that are not present in the local `src_folder_path``
         for blob in blob_set:
             container_client.delete_blob(blob)
+
+    def _sync_local(self, dest_folder_path: str) -> None:
+        """Synchronizes the local .matcha folder with the remote storage files.
+
+        Args:
+            dest_folder_path (str): Path to folder containing matcha resources
+        """
+        # Clears the local matcha directory by removing all files,
+        # ensuring that it exclusively contains the files retrieved from Azure remote storage
+        if os.path.exists(dest_folder_path):
+            matcha_template_dir = os.path.join(os.getcwd(), ".matcha")
+            shutil.rmtree(matcha_template_dir)
