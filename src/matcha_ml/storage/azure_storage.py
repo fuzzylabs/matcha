@@ -85,7 +85,7 @@ class AzureStorage:
             for filename in filenames:
                 file_path = os.path.join(root, filename)
 
-                # ignore uploading files in the ignore folders
+                # ignore uploading files in IGNORE_FOLDERS
                 if any(folder in root for folder in IGNORE_FOLDERS):
                     continue
 
