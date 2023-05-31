@@ -7,6 +7,8 @@ from azure.storage.blob import BlobClient, BlobServiceClient, ContainerClient
 
 from matcha_ml.services.azure_service import AzureClient
 
+IGNORE_FOLDERS = [".terraform"]
+
 
 class AzureStorage:
     """Class to interact with Azure blob storage."""
@@ -82,6 +84,10 @@ class AzureStorage:
         for root, _, filenames in os.walk(src_folder_path):
             for filename in filenames:
                 file_path = os.path.join(root, filename)
+
+                # ignore uploading files in the ignore folders
+                if any(folder in root for folder in IGNORE_FOLDERS):
+                    continue
 
                 if file_path in blob_set:
                     blob_set.remove(file_path)
