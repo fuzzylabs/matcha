@@ -2,7 +2,7 @@
 import json
 import uuid
 from collections import defaultdict
-from typing import Dict, Tuple
+from typing import Dict, List, Tuple
 
 import typer
 
@@ -40,7 +40,7 @@ class AzureRunner(BaseRunner):
         """Initialize AzureRunner class."""
         super().__init__()
 
-    def is_approved(self, verb: str, resources: list[tuple[str, str]]) -> bool:
+    def is_approved(self, verb: str, resources: List[Tuple[str, str]]) -> bool:
         """Get approval from user to modify resources on cloud.
 
         Args:
