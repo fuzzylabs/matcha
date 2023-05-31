@@ -1,10 +1,11 @@
 """Class to interact with Azure Storage."""
-import shutil
 import os
+import shutil
 from typing import Set
 
 from azure.storage.blob import BlobClient, BlobServiceClient, ContainerClient
 
+from matcha_ml.errors import MatchaError
 from matcha_ml.services.azure_service import AzureClient
 
 
@@ -112,10 +113,9 @@ class AzureStorage:
             container_name (str): Azure storage container name
             dest_folder_path (str): Path to folder to download all the files
         """
-        # Clears the local matcha directory by removing all files,
-        # ensuring that it exclusively contains the files retrieved from Azure remote storage
-        if os.path.exists(os.path.join(dest_folder_path, ".matcha")):
-            shutil.rmtree(os.path.join(dest_folder_path, ".matcha"))
+        # Sync local matcha directory with remote storage
+        matcha_resources_dir = os.path.join(".matcha", "infrastructure", "resources")
+        self._sync_local(os.path.join(dest_folder_path, matcha_resources_dir))
 
         container_client = self._get_container_client(container_name)
 
@@ -196,3 +196,22 @@ class AzureStorage:
         # Remove blobs that are not present in the local `src_folder_path``
         for blob in blob_set:
             container_client.delete_blob(blob)
+
+    def _sync_local(self, dest_folder_path: str) -> None:
+        """Synchronizes the local .matcha folder with the remote storage files.
+
+        Args:
+            dest_folder_path (str): Path to folder containing matcha resources
+
+        Raises:
+            MatchaError - If the `.matcha/infrasturcture/resources` directory is not found
+        """
+        # Clears the local matcha directory by removing all files,
+        # ensuring that it exclusively contains the files retrieved from Azure remote storage
+        if os.path.exists(dest_folder_path):
+            matcha_template_dir = os.path.join(os.getcwd(), ".matcha")
+            shutil.rmtree(matcha_template_dir)
+        else:
+            raise MatchaError(
+                f"Error - Failed to remove the .matcha directory as {dest_folder_path} directory not found."
+            )

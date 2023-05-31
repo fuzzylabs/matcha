@@ -5,6 +5,7 @@ from unittest.mock import patch
 import pytest
 from azure.storage.blob import BlobProperties, BlobServiceClient
 
+from matcha_ml.errors import MatchaError
 from matcha_ml.services.azure_service import AzureClient
 from matcha_ml.storage.azure_storage import AzureStorage
 
@@ -200,12 +201,25 @@ def test_download_folder(
         matcha_testing_directory (str): Temporary directory
         mocked_azure_client (AzureClient): mocked azure client
     """
+    matcha_remote_state_directory = os.path.join(
+        matcha_testing_directory, ".matcha", "infrastructure", "remote_state_storage"
+    )
+    matcha_resources_directory = os.path.join(
+        matcha_testing_directory, ".matcha", "infrastructure", "resources"
+    )
+    os.makedirs(matcha_remote_state_directory, exist_ok=True)
+    os.makedirs(matcha_resources_directory, exist_ok=True)
+    os.chdir(matcha_testing_directory)
+
+    assert os.path.exists(matcha_resources_directory)
+    assert os.path.exists(matcha_remote_state_directory)
+
     # Create a test set of azure files for mocking the return value of list_blobs method
     files_on_azure = {"file_only_exist_azure"}
 
     # Create temp files inside temp directory
     for i in range(1, 3):
-        tmp_file = os.path.join(matcha_testing_directory, f"temp{i}.txt")
+        tmp_file = os.path.join(matcha_resources_directory, f"temp{i}.txt")
         with open(tmp_file, "w"):
             pass
 
@@ -390,3 +404,59 @@ def test_sync_remote(mock_blob_service: BlobServiceClient) -> None:
     az_storage._sync_remote("testcontainer", mock_blob_set)
 
     mock_container_client.delete_blob.assert_called_once_with("blob_1")
+
+
+def test_sync_local(
+    mock_blob_service: BlobServiceClient, matcha_testing_directory: str
+) -> None:
+    """Test that sync local removes the matcha directory.
+
+    Args:
+        mock_blob_service (BlobServiceClient): Mocked blob service client.
+        matcha_testing_directory (str): Path to the matcha testing directory.
+    """
+    matcha_remote_state_directory = os.path.join(
+        matcha_testing_directory, ".matcha", "infrastructure", "remote_state_storage"
+    )
+    matcha_resources_directory = os.path.join(
+        matcha_testing_directory, ".matcha", "infrastructure", "resources"
+    )
+    os.makedirs(matcha_remote_state_directory, exist_ok=True)
+    os.makedirs(matcha_resources_directory, exist_ok=True)
+    os.chdir(matcha_testing_directory)
+
+    assert os.path.exists(matcha_resources_directory)
+    assert os.path.exists(matcha_remote_state_directory)
+
+    az_storage = AzureStorage("testaccount", "test-rg")
+
+    az_storage._sync_local(matcha_resources_directory)
+
+    assert not os.path.exists(matcha_resources_directory)
+    assert not os.path.exists(matcha_remote_state_directory)
+
+
+def test_sync_local_raises_error(
+    mock_blob_service: BlobServiceClient, matcha_testing_directory: str
+) -> None:
+    """Test that sync local raises error if the .matcha/infrastrucutre/resources directory does not exist.
+
+    Args:
+        mock_blob_service (BlobServiceClient): Mocked blob service client.
+        matcha_testing_directory (str): Path to the matcha testing directory.
+    """
+    matcha_remote_state_directory = os.path.join(
+        matcha_testing_directory, ".matcha", "infrastructure", "remote_state_storage"
+    )
+    matcha_resources_directory = os.path.join(
+        matcha_testing_directory, ".matcha", "infrastructure", "resources"
+    )
+    os.chdir(matcha_testing_directory)
+
+    assert not os.path.exists(matcha_resources_directory)
+    assert not os.path.exists(matcha_remote_state_directory)
+
+    az_storage = AzureStorage("testaccount", "test-rg")
+
+    with pytest.raises(MatchaError):
+        az_storage._sync_local(matcha_resources_directory)
