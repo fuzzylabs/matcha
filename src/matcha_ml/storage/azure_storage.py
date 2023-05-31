@@ -1,6 +1,6 @@
 """Class to interact with Azure Storage."""
+import glob
 import os
-import shutil
 from typing import Set
 
 from azure.storage.blob import BlobClient, BlobServiceClient, ContainerClient
@@ -86,7 +86,7 @@ class AzureStorage:
                 file_path = os.path.join(root, filename)
 
                 # ignore uploading files in IGNORE_FOLDERS
-                if any(folder in root for folder in IGNORE_FOLDERS):
+                if any(ignore_folder in root for ignore_folder in IGNORE_FOLDERS):
                     continue
 
                 if file_path in blob_set:
@@ -212,4 +212,10 @@ class AzureStorage:
         # ensuring that it exclusively contains the files retrieved from Azure remote storage
         if os.path.exists(dest_folder_path):
             matcha_template_dir = os.path.join(os.getcwd(), ".matcha")
-            shutil.rmtree(matcha_template_dir)
+            for path in glob.glob(matcha_template_dir, recursive=True):
+                # ignore deleting folders ignored in IGNORE_FOLDERS
+                if any(ignore_folder in path for ignore_folder in IGNORE_FOLDERS):
+                    continue
+
+                if os.path.isfile(path):
+                    os.remove(path)
