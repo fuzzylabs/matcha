@@ -207,5 +207,3 @@ class AzureStorage:
         if os.path.exists(dest_folder_path):
             matcha_template_dir = os.path.join(os.getcwd(), ".matcha")
             shutil.rmtree(matcha_template_dir)
-        else:
-            print("Skipping deleting the '.matcha' folder")
