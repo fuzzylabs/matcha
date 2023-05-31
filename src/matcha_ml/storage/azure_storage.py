@@ -81,7 +81,7 @@ class AzureStorage:
         # Get all existing blobs
         blob_set = self._get_blob_names(container_name=container_name)
 
-        for file_path in glob.glob(f"{src_folder_path}/**/*"):
+        for file_path in glob.glob(f"{src_folder_path}/**/*", recursive=True):
             # ignore uploading files in IGNORE_FOLDERS
             if any(ignore_folder in file_path for ignore_folder in IGNORE_FOLDERS):
                 continue

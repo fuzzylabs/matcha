@@ -441,7 +441,7 @@ def test_sync_local(
     az_storage = AzureStorage("testaccount", "test-rg")
     az_storage._sync_local(matcha_resources_dir)
 
-    # Check if terraform cache are not deleted
+    # Check if terraform cache are not deleted and all other files are deleted
     assert os.path.exists(matcha_resources_tf_cache_dir)
     assert os.path.exists(matcha_remote_state_tf_cache_dir)
     assert not os.path.exists(test_file_path)
