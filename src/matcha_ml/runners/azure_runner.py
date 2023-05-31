@@ -1,9 +1,10 @@
 """Run terraform templates to provision and deprovision resources."""
 import json
-import typer
 import uuid
 from collections import defaultdict
 from typing import Dict, Tuple
+
+import typer
 
 from matcha_ml.cli.ui.emojis import Emojis
 from matcha_ml.cli.ui.print_messages import (
@@ -16,8 +17,8 @@ from matcha_ml.cli.ui.resource_message_builders import (
     hide_sensitive_in_output,
 )
 from matcha_ml.cli.ui.status_message_builders import (
-    build_status,
     build_resource_confirmation,
+    build_status,
 )
 from matcha_ml.errors import MatchaInputError
 from matcha_ml.runners.base_runner import BaseRunner
@@ -39,7 +40,7 @@ class AzureRunner(BaseRunner):
         """Initialize AzureRunner class."""
         super().__init__()
 
-    def is_approved(self, verb: str, resources: list[str]) -> bool:
+    def is_approved(self, verb: str, resources: list[tuple[str, str]]) -> bool:
         """Get approval from user to modify resources on cloud.
 
         Args:
