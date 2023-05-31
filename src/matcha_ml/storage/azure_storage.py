@@ -81,19 +81,16 @@ class AzureStorage:
         # Get all existing blobs
         blob_set = self._get_blob_names(container_name=container_name)
 
-        for root, _, filenames in os.walk(src_folder_path):
-            for filename in filenames:
-                file_path = os.path.join(root, filename)
+        for file_path in glob.glob(f"{src_folder_path}/**/*"):
+            # ignore uploading files in IGNORE_FOLDERS
+            if any(ignore_folder in file_path for ignore_folder in IGNORE_FOLDERS):
+                continue
 
-                # ignore uploading files in IGNORE_FOLDERS
-                if any(ignore_folder in root for ignore_folder in IGNORE_FOLDERS):
-                    continue
+            if file_path in blob_set:
+                blob_set.remove(file_path)
 
-                if file_path in blob_set:
-                    blob_set.remove(file_path)
-
-                blob_client = container_client.get_blob_client(blob=file_path)
-                self.upload_file(blob_client, file_path)
+            blob_client = container_client.get_blob_client(blob=file_path)
+            self.upload_file(blob_client, file_path)
 
         # Remove blobs that are not present in the local `src_folder_path``
         self._sync_remote(container_name=container_name, blob_set=blob_set)
@@ -216,7 +213,7 @@ class AzureStorage:
         # ensuring that it exclusively contains the files retrieved from Azure remote storage
         if os.path.exists(dest_folder_path):
             matcha_template_dir = os.path.join(os.getcwd(), ".matcha")
-            for path in glob.glob(matcha_template_dir, recursive=True):
+            for path in glob.glob(f"{matcha_template_dir}/**/*", recursive=True):
                 # ignore deleting folders ignored in IGNORE_FOLDERS
                 if any(ignore_folder in path for ignore_folder in IGNORE_FOLDERS):
                     continue

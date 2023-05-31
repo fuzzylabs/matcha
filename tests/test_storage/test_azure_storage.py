@@ -200,25 +200,25 @@ def test_download_folder(
         matcha_testing_directory (str): Temporary directory
         mocked_azure_client (AzureClient): mocked azure client
     """
-    matcha_remote_state_directory = os.path.join(
+    matcha_remote_state_dir = os.path.join(
         matcha_testing_directory, ".matcha", "infrastructure", "remote_state_storage"
     )
-    matcha_resources_directory = os.path.join(
+    matcha_resources_dir = os.path.join(
         matcha_testing_directory, ".matcha", "infrastructure", "resources"
     )
-    os.makedirs(matcha_remote_state_directory, exist_ok=True)
-    os.makedirs(matcha_resources_directory, exist_ok=True)
+    os.makedirs(matcha_remote_state_dir, exist_ok=True)
+    os.makedirs(matcha_resources_dir, exist_ok=True)
     os.chdir(matcha_testing_directory)
 
-    assert os.path.exists(matcha_resources_directory)
-    assert os.path.exists(matcha_remote_state_directory)
+    assert os.path.exists(matcha_resources_dir)
+    assert os.path.exists(matcha_remote_state_dir)
 
     # Create a test set of azure files for mocking the return value of list_blobs method
     files_on_azure = {"file_only_exist_azure"}
 
     # Create temp files inside temp directory
     for i in range(1, 3):
-        tmp_file = os.path.join(matcha_resources_directory, f"temp{i}.txt")
+        tmp_file = os.path.join(matcha_resources_dir, f"temp{i}.txt")
         with open(tmp_file, "w"):
             pass
 
@@ -414,22 +414,34 @@ def test_sync_local(
         mock_blob_service (BlobServiceClient): Mocked blob service client.
         matcha_testing_directory (str): Path to the matcha testing directory.
     """
-    matcha_remote_state_directory = os.path.join(
+    matcha_remote_state_dir = os.path.join(
         matcha_testing_directory, ".matcha", "infrastructure", "remote_state_storage"
     )
-    matcha_resources_directory = os.path.join(
+    matcha_resources_dir = os.path.join(
         matcha_testing_directory, ".matcha", "infrastructure", "resources"
     )
-    os.makedirs(matcha_remote_state_directory, exist_ok=True)
-    os.makedirs(matcha_resources_directory, exist_ok=True)
+    matcha_resources_tf_cache_dir = os.path.join(matcha_resources_dir, ".terraform")
+    matcha_remote_state_tf_cache_dir = os.path.join(matcha_resources_dir, ".terraform")
+    test_file_path = os.path.join(matcha_resources_dir, "temp.txt")
+
+    os.makedirs(matcha_remote_state_dir, exist_ok=True)
+    os.makedirs(matcha_resources_dir, exist_ok=True)
+    os.makedirs(matcha_resources_tf_cache_dir, exist_ok=True)
+    os.makedirs(matcha_remote_state_tf_cache_dir, exist_ok=True)
+    with open(test_file_path, "w"):
+        pass
     os.chdir(matcha_testing_directory)
 
-    assert os.path.exists(matcha_resources_directory)
-    assert os.path.exists(matcha_remote_state_directory)
+    assert os.path.exists(matcha_resources_dir)
+    assert os.path.exists(matcha_remote_state_dir)
+    assert os.path.exists(matcha_resources_tf_cache_dir)
+    assert os.path.exists(matcha_remote_state_tf_cache_dir)
+    assert os.path.exists(test_file_path)
 
     az_storage = AzureStorage("testaccount", "test-rg")
+    az_storage._sync_local(matcha_resources_dir)
 
-    az_storage._sync_local(matcha_resources_directory)
-
-    assert not os.path.exists(matcha_resources_directory)
-    assert not os.path.exists(matcha_remote_state_directory)
+    # Check if terraform cache are not deleted
+    assert os.path.exists(matcha_resources_tf_cache_dir)
+    assert os.path.exists(matcha_remote_state_tf_cache_dir)
+    assert not os.path.exists(test_file_path)
