@@ -5,7 +5,6 @@ from unittest.mock import patch
 import pytest
 from azure.storage.blob import BlobProperties, BlobServiceClient
 
-from matcha_ml.errors import MatchaError
 from matcha_ml.services.azure_service import AzureClient
 from matcha_ml.storage.azure_storage import AzureStorage
 
@@ -434,29 +433,3 @@ def test_sync_local(
 
     assert not os.path.exists(matcha_resources_directory)
     assert not os.path.exists(matcha_remote_state_directory)
-
-
-def test_sync_local_raises_error(
-    mock_blob_service: BlobServiceClient, matcha_testing_directory: str
-) -> None:
-    """Test that sync local raises error if the .matcha/infrastrucutre/resources directory does not exist.
-
-    Args:
-        mock_blob_service (BlobServiceClient): Mocked blob service client.
-        matcha_testing_directory (str): Path to the matcha testing directory.
-    """
-    matcha_remote_state_directory = os.path.join(
-        matcha_testing_directory, ".matcha", "infrastructure", "remote_state_storage"
-    )
-    matcha_resources_directory = os.path.join(
-        matcha_testing_directory, ".matcha", "infrastructure", "resources"
-    )
-    os.chdir(matcha_testing_directory)
-
-    assert not os.path.exists(matcha_resources_directory)
-    assert not os.path.exists(matcha_remote_state_directory)
-
-    az_storage = AzureStorage("testaccount", "test-rg")
-
-    with pytest.raises(MatchaError):
-        az_storage._sync_local(matcha_resources_directory)

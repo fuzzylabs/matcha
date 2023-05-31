@@ -5,7 +5,6 @@ from typing import Set
 
 from azure.storage.blob import BlobClient, BlobServiceClient, ContainerClient
 
-from matcha_ml.errors import MatchaError
 from matcha_ml.services.azure_service import AzureClient
 
 
@@ -202,9 +201,6 @@ class AzureStorage:
 
         Args:
             dest_folder_path (str): Path to folder containing matcha resources
-
-        Raises:
-            MatchaError - If the `.matcha/infrasturcture/resources` directory is not found
         """
         # Clears the local matcha directory by removing all files,
         # ensuring that it exclusively contains the files retrieved from Azure remote storage
@@ -212,6 +208,4 @@ class AzureStorage:
             matcha_template_dir = os.path.join(os.getcwd(), ".matcha")
             shutil.rmtree(matcha_template_dir)
         else:
-            raise MatchaError(
-                f"Error - Failed to remove the .matcha directory as {dest_folder_path} directory not found."
-            )
+            print("Skipping deleting the '.matcha' folder")
