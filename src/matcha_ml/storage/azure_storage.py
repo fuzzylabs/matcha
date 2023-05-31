@@ -192,6 +192,8 @@ class AzureStorage:
     def _sync_remote(self, container_name: str, blob_set: Set[str]) -> None:
         """Synchronizes the remote storage with the local files.
 
+        It ignores uploading files in `.matcha` folder that are ignored in `IGNORED_FOLDERS`.
+
         Args:
             container_name (str): The name of the blob container to look for blobs.
             blob_set (Set[str]): Set of blob names to be removed on the remote storage.
@@ -204,6 +206,8 @@ class AzureStorage:
 
     def _sync_local(self, dest_folder_path: str) -> None:
         """Synchronizes the local .matcha folder with the remote storage files.
+
+        It ignores deleting files in `.matcha` folder that are not present in remote storage.
 
         Args:
             dest_folder_path (str): Path to folder containing matcha resources
