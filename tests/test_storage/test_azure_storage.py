@@ -243,13 +243,12 @@ def test_download_folder(
         # Check if download_blob function is called
         mock_blob_client.download_blob.assert_called()
 
-        # Check if download_blob function is called exactly twice
-        assert mock_blob_client.download_blob.call_count == len(
-            os.listdir(matcha_testing_directory)
-        )
+        # Check if download_blob function is called exactly number of files on azure
+        assert mock_blob_client.download_blob.call_count == len(files_on_azure)
 
-        # Check that there are only 1 files in local
-        assert len(os.listdir(matcha_testing_directory)) == 1
+        # Check that there are only 2 files in local
+        # empty .matcha folder and file_only_exist_azure file
+        assert len(os.listdir(matcha_testing_directory)) == len(files_on_azure) + 1
 
 
 def test_create_empty(mock_blob_service: BlobServiceClient) -> None:
