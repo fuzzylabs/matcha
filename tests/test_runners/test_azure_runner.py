@@ -170,10 +170,10 @@ def test_is_approved(template_runner: AzureRunner):
     """
     with mock.patch("typer.confirm") as mock_confirm:
         mock_confirm.return_value = True
-        assert template_runner.is_approved("provision")
+        assert template_runner.is_approved("provision", [])
 
         mock_confirm.return_value = False
-        assert not template_runner.is_approved("provision")
+        assert not template_runner.is_approved("provision", [])
 
 
 def test_write_outputs_state(

@@ -10,11 +10,13 @@ from matcha_ml.cli._validation import (
 )
 from matcha_ml.cli.destroy import destroy_resources
 from matcha_ml.cli.provision import provision_resources
+from matcha_ml.cli.ui.spinner import Spinner
 from matcha_ml.cli.ui.print_messages import (
     print_error,
     print_resource_output,
     print_status,
 )
+from matcha_ml.cli.ui.status_message_builders import build_warning_status
 from matcha_ml.cli.ui.resource_message_builders import (
     build_resource_output,
     hide_sensitive_in_output,
@@ -119,12 +121,47 @@ def destroy(
 ) -> None:
     """Destroy the provisioned cloud resources."""
     remote_state_manager = RemoteStateManager()
+    with Spinner("Preparing to destroy..."):
+        if full:
+            resources = [
+                    ("Azure Kubernetes Service (AKS)", "A kubernetes cluster"),
+                    (
+                        "Three Storage Containers",
+                        "Storage containers for tracking Matcha state, for experiment tracking artifacts and for model training artifacts",
+                    ),
+                    (
+                        "Seldon Core",
+                        "A framework for model deployment on top of a kubernetes cluster",
+                    ),
+                    (
+                        "Azure Container Registry",
+                        "A container registry for storing docker images",
+                    ),
+                    ("ZenServer", "A zenml server required for remote orchestration"),
+                ]
 
-    destroy_resources()
+            destroy_resources(resources=resources)
+            remote_state_manager.deprovision_remote_state()
+        else:
+            print_status(build_warning_status("Warning: a storage container holding Matcha state information will persist. To destroy ALL clound resources, run 'matcha destroy full'."))
+            resources = [
+                    ("Azure Kubernetes Service (AKS)", "A kubernetes cluster"),
+                    (
+                        "Two Storage Containers",
+                        "A storage container for experiment tracking artifacts and a second for model training artifacts",
+                    ),
+                    (
+                        "Seldon Core",
+                        "A framework for model deployment on top of a kubernetes cluster",
+                    ),
+                    (
+                        "Azure Container Registry",
+                        "A container registry for storing docker images",
+                    ),
+                    ("ZenServer", "A zenml server required for remote orchestration"),
+                ]
 
-    if full:
-        remote_state_manager.deprovision_remote_state()
-
+            destroy_resources(resources=resources)
 
 @app.command()
 def force_unlock() -> None:

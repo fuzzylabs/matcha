@@ -136,10 +136,9 @@ class BaseRunner:
 
             if ret_code != 0:
                 raise MatchaTerraformError(tf_error=err)
-
         print_status(
             build_substep_success_status(
-                f"{Emojis.CHECKMARK.value} Your environment has been provisioned!\n"
+                f"{Emojis.CHECKMARK.value} Resources for matcha to work have been provisioned!\n"
             )
         )
 

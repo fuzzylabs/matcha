@@ -11,8 +11,11 @@ from matcha_ml.runners import AzureRunner
 from matcha_ml.state import RemoteStateManager
 
 
-def destroy_resources() -> None:
+def destroy_resources(resources: list) -> None:
     """Destroy resources.
+
+    Args:
+        resources(list): the list of resources to be actioned by the verb to be provided to the user as a status message
 
     Raises:
         typer.Exit: Exit if matcha remote state has not been provisioned.
@@ -37,7 +40,7 @@ def destroy_resources() -> None:
                 )
                 raise typer.Exit()
 
-            if template_runner.is_approved(verb="destroy"):
+            if template_runner.is_approved(verb="destroy", resources=resources):
                 # deprovision the resources
                 template_runner.deprovision()
                 print_status(
