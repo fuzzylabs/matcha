@@ -217,7 +217,6 @@ class AzureStorage:
         if os.path.exists(dest_folder_path):
             matcha_template_dir = os.path.join(os.getcwd(), ".matcha")
             for path in glob.glob(f"{matcha_template_dir}/**/*", recursive=True):
-                # print(path, os.path.dirname(path))
                 # ignore deleting folders ignored in IGNORE_FOLDERS
                 if any(ignore_folder in path for ignore_folder in IGNORE_FOLDERS):
                     continue
