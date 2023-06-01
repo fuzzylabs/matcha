@@ -84,11 +84,9 @@ def provision_resources(
         )
         if not remove_local_config:
             raise typer.Exit()
-        remote_state_manager.remove_config_file()
-        remote_state_manager.azure_storage._sync_local(
-            os.path.join(os.getcwd(), ".matcha")
-        )
-        print("Synced local files.")
+        remote_state_manager.remove_matcha_config()
+        print("Synced local state config.")
+        # Re-initialise remote state manager with empty state file
         remote_state_manager = RemoteStateManager()
 
     # Check whether remote state storage has been provisioned

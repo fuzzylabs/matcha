@@ -166,24 +166,9 @@ class RemoteStateManager:
         Returns:
             bool: True, if state is stale
         """
-        # No config file means not stale
-        if not self._configuration_file_exists():
-            return False
-
-        # Config file and no resource group means it is stale
-        if not self._resource_group_exists():
-            return True
-
-        # Config, resource group and bucket exists means not state
-        if self._bucket_exists(self.configuration.remote_state_bucket.container_name):
-            return False
-
-        return True
-
-    def remove_config_file(self) -> None:
-        """Remove config file if it exists."""
-        if self._configuration_file_exists():
-            os.remove(self.config_path)
+        return bool(
+            self._configuration_file_exists() and not self._resource_group_exists()
+        )
 
     def provision_remote_state(
         self, location: str, prefix: str, verbose: Optional[bool] = False
@@ -226,7 +211,7 @@ class RemoteStateManager:
         template_runner = RemoteStateRunner()
 
         template_runner.deprovision()
-        self._remove_matcha_config()
+        self.remove_matcha_config()
         print_status(
             build_step_success_status("Destroying remote state management is complete!")
         )
@@ -261,7 +246,7 @@ class RemoteStateManager:
             )
         )
 
-    def _remove_matcha_config(self) -> None:
+    def remove_matcha_config(self) -> None:
         """Remove the matcha.config.json file after destroy full is run."""
         try:
             os.remove(self.config_path)
