@@ -1,4 +1,5 @@
 """The core functions for matcha."""
+import hashlib
 import os
 from typing import Dict, Optional
 
@@ -6,6 +7,29 @@ from matcha_ml.cli._validation import get_command_validation
 from matcha_ml.errors import MatchaError
 from matcha_ml.services.global_parameters_service import GlobalParameters
 from matcha_ml.state import MatchaStateService, RemoteStateManager
+
+
+def get_local_state_hash(matcha_state_path: str) -> str:
+    """Get hash of the local matcha state file.
+
+    Args:
+        matcha_state_path (str): Path to the matcha state file.
+
+    Raises:
+        MatchaError: if the matcha state file does not exist
+
+    Returns:
+        str: Hash contents of the blob in hexadecimal string
+    """
+    local_hash = None
+    local_state_path = os.path.join(os.getcwd(), matcha_state_path)
+
+    if os.path.exists(local_state_path):
+        with open(local_state_path, "rb") as fp:
+            local_hash = hashlib.md5(fp.read()).hexdigest()
+    else:
+        raise MatchaError(f"Error - matcha state file does not exist at {local_hash}")
+    return local_hash
 
 
 def get(

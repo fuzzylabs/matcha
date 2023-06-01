@@ -1,4 +1,5 @@
 """Matcha CLI."""
+import os
 from typing import Optional
 
 import typer
@@ -85,7 +86,20 @@ def get(
         Exit: Exit if matcha.state file does not exist.
         Exit: Exit if resource type or property does not exist in matcha.state.
     """
+    matcha_state_path = os.path.join(".matcha", "infrastructure", "matcha.state")
     remote_state = RemoteStateManager()
+
+    try:
+        local_hash = core.get_local_state_hash(matcha_state_path)
+    except MatchaError as e:
+        print_error(str(e))
+        raise typer.Exit()
+
+    remote_hash = remote_state.get_hash_remote_state(matcha_state_path)
+
+    if local_hash != remote_hash:
+        remote_state.download(os.getcwd())
+
     if not remote_state.is_state_provisioned():
         print_error("Error - matcha state has not been initialized, nothing to get.")
         raise typer.Exit()

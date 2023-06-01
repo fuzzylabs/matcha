@@ -126,7 +126,7 @@ class RemoteStateManager:
         """Check if a bucket for remote state management exists.
 
         Args:
-            container_name: Azure Storage container name
+            container_name (str): Azure Storage container name
 
         Returns:
             bool: True, if the bucket exists
@@ -140,6 +140,19 @@ class RemoteStateManager:
             bool: True, if the resource group exists
         """
         return self.azure_storage.resource_group_exists
+
+    def get_hash_remote_state(self, remote_path: str) -> str:
+        """_summary_.
+
+        Args:
+            remote_path (str) : Path to file on remote storage
+
+        Returns:
+            str: Hash content of file on remote storage in hexadecimal string
+        """
+        return self.azure_storage.get_hash_remote_state(
+            self.configuration.remote_state_bucket.container_name, remote_path
+        )
 
     def is_state_provisioned(self) -> bool:
         """Check if remote state has already been provisioned.
