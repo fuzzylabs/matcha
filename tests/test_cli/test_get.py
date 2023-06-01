@@ -148,9 +148,9 @@ def test_cli_get_command_with_no_state_file(
     result = runner.invoke(app, ["get"])
 
     assert result.exit_code == 0
-    assert "Error - matcha.state file does not exist at" in str(result.stdout)
+    assert "Error - matcha state file does not exist at" in str(result.stdout)
 
-    mock_provisioned_remote_state.use_lock.assert_called_once()
+    mock_provisioned_remote_state.use_lock.assert_not_called()
 
 
 # def test_cli_get_command_hide_sensitive(

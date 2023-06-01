@@ -28,7 +28,9 @@ def get_local_state_hash(matcha_state_path: str) -> str:
         with open(local_state_path, "rb") as fp:
             local_hash = hashlib.md5(fp.read()).hexdigest()
     else:
-        raise MatchaError(f"Error - matcha state file does not exist at {local_hash}")
+        raise MatchaError(
+            f"Error - matcha state file does not exist at {local_state_path}"
+        )
     return local_hash
 
 
