@@ -352,7 +352,7 @@ def test_cli_provision_command_with_verbose_arg(
             "Error: Resource group name prefix can only contain alphanumeric characters.",
         ),
         (
-            "uksouth\nareallyloingprefix\nvalid\ndefault\ndefault\nno\n",
+            "uksouth\nareallylongprefix\nvalid\ndefault\ndefault\nno\n",
             f"Resource group name prefix must be between 3 and {MAXIMUM_RESOURCE_NAME_LEN - len(LONGEST_RESOURCE_NAME)} characters long.",
         ),
     ],
@@ -528,12 +528,16 @@ def test_cli_provision_command_reuse(
     with open(os.path.join(resources_destination_path, "dummy.tf"), "a"):
         ...
 
-    # Invoke provision command for a second time, electing to reuse the existing .matcha directory and therefore retain the 'dummy.tf' file
-    runner.invoke(
-        app,
-        ["provision", "--location", "uksouth", "--prefix", "matcha"],
-        input="default\ndefault\nn\nY\n",
-    )
+    with patch(
+        "matcha_ml.state.remote_state_manager.RemoteStateManager._resource_group_exists"
+    ) as check_deployment_exists:
+        check_deployment_exists.return_value = True
+        # Invoke provision command for a second time, electing to reuse the existing .matcha directory and therefore retain the 'dummy.tf' file
+        runner.invoke(
+            app,
+            ["provision", "--location", "uksouth", "--prefix", "matcha"],
+            input="default\ndefault\nn\nY\n",
+        )
 
     # Checks the 'dummy.tf' file is present within the reused .matcha directory
     assert os.path.exists(os.path.join(resources_destination_path, "dummy.tf"))
@@ -626,3 +630,60 @@ def test_cli_provision_command_with_provisioned_resources(
     )
 
     assert mock_use_lock.call_count == RUN_TWICE
+
+
+def test_remote_state_removed_when_remote_state_is_stale_with_user_confirmation(
+    runner: CliRunner, matcha_testing_directory: str, mock_use_lock: MagicMock
+):
+    """_summary_.
+
+    Args:
+        runner (CliRunner): _description_
+        matcha_testing_directory (str): _description_
+        mock_use_lock (MagicMock): _description_
+    """
+    os.chdir(matcha_testing_directory)
+    matcha_config_file_path = os.path.join(
+        matcha_testing_directory, "matcha.config.json"
+    )
+
+    # Create a matcha.config.json file
+    with open(matcha_config_file_path, "w") as f:
+        matcha_config_contents = {
+            "remote_state_bucket": {
+                "account_name": "initialstatestacc",
+                "container_name": "initialstatestore",
+                "resource_group_name": "initial-resources",
+            }
+        }
+        json.dump(matcha_config_contents, f)
+
+    # Mock functions such that a deployment on Azure does not exist and overwrite the remote state config
+    with patch(
+        "matcha_ml.templates.azure_template.check_current_deployment_exists"
+    ) as check_deployment_exists, patch(
+        "matcha_ml.templates.azure_template.MatchaStateService.fetch_resources_from_state_file"
+    ) as fetch_resources_from_state_file:
+        check_deployment_exists.return_value = False
+        fetch_resources_from_state_file.return_value = {
+            "cloud": {"resource-group-name": "matcha-resources", "prefix": "matcha"}
+        }
+        runner.invoke(
+            app,
+            [
+                "provision",
+            ],
+            input="Y\nuksouth\ncoffee\ndefault\nninja\nno\nno\n",
+        )
+
+    with open(matcha_config_file_path) as f:
+        matcha_config_file_output = json.load(f)
+
+    assert matcha_config_file_output == {
+        "remote_state_bucket": {
+            "account_name": "test-account",
+            "container_name": "test-container",
+            "resource_group_name": "test-rg",
+        }
+    }
+    assert matcha_config_file_output != matcha_config_contents
