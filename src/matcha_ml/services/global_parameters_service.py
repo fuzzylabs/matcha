@@ -5,7 +5,8 @@ from typing import Any, Dict, Optional
 
 import yaml
 
-from matcha_ml.errors import MatchaPermissionError
+from matcha_ml.errors import MatchaError, MatchaPermissionError
+from matcha_ml.services._validation import _check_uuid
 
 
 class GlobalParameters:
@@ -38,6 +39,11 @@ class GlobalParameters:
         """Reads the config yaml file containing the global parameters."""
         with open(self.default_config_file_path) as file:
             yaml_data = yaml.safe_load(file)
+
+        try:
+            _check_uuid(yaml_data.get("user_id"))
+        except MatchaError as me:
+            raise MatchaError(str(me))
 
         self._user_id = yaml_data.get("user_id")
         self._analytics_opt_out = yaml_data.get("analytics_opt_out")
