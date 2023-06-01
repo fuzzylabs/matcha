@@ -160,6 +160,31 @@ class RemoteStateManager:
 
         return True
 
+    def is_state_stale(self) -> bool:
+        """Check if remote state has been destroyed.
+
+        Returns:
+            bool: True, if state is stale
+        """
+        # No config file means not stale
+        if not self._configuration_file_exists():
+            return False
+
+        # Config file and no resource group means it is stale
+        if not self._resource_group_exists():
+            return True
+
+        # Config, resource group and bucket exists means not state
+        if self._bucket_exists(self.configuration.remote_state_bucket.container_name):
+            return False
+
+        return True
+
+    def remove_config_file(self) -> None:
+        """Remove config file if it exists."""
+        if self._configuration_file_exists():
+            os.remove(self.config_path)
+
     def provision_remote_state(
         self, location: str, prefix: str, verbose: Optional[bool] = False
     ) -> None:
