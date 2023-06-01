@@ -142,7 +142,7 @@ class RemoteStateManager:
         return self.azure_storage.resource_group_exists
 
     def get_hash_remote_state(self, remote_path: str) -> str:
-        """_summary_.
+        """Get the hash of remote matcha state file.
 
         Args:
             remote_path (str) : Path to file on remote storage

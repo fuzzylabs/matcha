@@ -20,6 +20,9 @@ def mock_provisioned_remote_state() -> Iterable[MagicMock]:
     with patch("matcha_ml.cli.cli.RemoteStateManager") as mock_state_manager_class:
         mock_state_manager = mock_state_manager_class.return_value
         mock_state_manager.is_state_provisioned.return_value = True
+        mock_state_manager.get_local_state_hash.return_value = (
+            "470544910b3fe623e00d63e6314588a3"
+        )
         yield mock_state_manager
 
 
@@ -153,27 +156,27 @@ def test_cli_get_command_with_no_state_file(
     mock_provisioned_remote_state.use_lock.assert_not_called()
 
 
-# def test_cli_get_command_hide_sensitive(
-#     runner: CliRunner,
-#     expected_output_lines: List[str],
-#     mock_provisioned_remote_state: MagicMock,
-# ):
-#     """Test cli get command when getting all resources with no `show-sensitive` option specified.
+def test_cli_get_command_hide_sensitive(
+    runner: CliRunner,
+    expected_output_lines: List[str],
+    mock_provisioned_remote_state: MagicMock,
+):
+    """Test cli get command when getting all resources with no `show-sensitive` option specified.
 
-#     Args:
-#         runner (CliRunner): typer CLI runner
-#         expected_output_lines (List[str]): expected output with sensitive value hidden
-#         mock_provisioned_remote_state (MagicMock): mock of an RemoteStateManager instance
-#     """
-#     result = runner.invoke(app, ["get"])
+    Args:
+        runner (CliRunner): typer CLI runner
+        expected_output_lines (List[str]): expected output with sensitive value hidden
+        mock_provisioned_remote_state (MagicMock): mock of an RemoteStateManager instance
+    """
+    result = runner.invoke(app, ["get"])
 
-#     # Exit code 0 means there was no error
-#     assert result.exit_code == 0
+    # Exit code 0 means there was no error
+    assert result.exit_code == 0
 
-#     for line in expected_output_lines:
-#         assert line in result.stdout
+    for line in expected_output_lines:
+        assert line in result.stdout
 
-#     mock_provisioned_remote_state.use_lock.assert_called_once()
+    mock_provisioned_remote_state.use_lock.assert_called_once()
 
 
 # def test_cli_get_command_show_sensitive(

@@ -82,8 +82,8 @@ def get(
         show_sensitive (Optional[bool]): show hidden sensitive resource values when True. Defaults to False.
 
     Raises:
-        Exit: Exit if matcha remote state has not been provisioned.
         Exit: Exit if matcha.state file does not exist.
+        Exit: Exit if matcha remote state has not been provisioned.
         Exit: Exit if resource type or property does not exist in matcha.state.
     """
     matcha_state_path = os.path.join(".matcha", "infrastructure", "matcha.state")
