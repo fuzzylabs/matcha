@@ -125,39 +125,6 @@ class AzureRunner(BaseRunner):
             resources_json = dict_to_json(resources_dict)
             print_json(resources_json)
 
-    # def is_approved(self, verb: str) -> bool:
-    #     """Get approval from user to modify resources on cloud.
-
-    #     Args:
-    #         verb (str): the verb to use in the approval message.
-
-    #     Returns:
-    #         bool: True if user approves, False otherwise.
-    #     """
-    #     summary_message = build_resource_confirmation(
-    #         header=f"The following resources will be {verb}ed",
-    #         resources=[
-    #             ("Azure Kubernetes Service (AKS)", "A kubernetes cluster"),
-    #             (
-    #                 "Two Storage Containers",
-    #                 "A storage container for experiment tracking artifacts and a second for model training artifacts",
-    #             ),
-    #             (
-    #                 "Seldon Core",
-    #                 "A framework for model deployment on top of a kubernetes cluster",
-    #             ),
-    #             (
-    #                 "Azure Container Registry",
-    #                 "A container registry for storing docker images",
-    #             ),
-    #             ("ZenServer", "A zenml server required for remote orchestration"),
-    #         ],
-    #         footer=f"{verb.capitalize()}ing the resources may take approximately 20 minutes. May we suggest you grab a cup of {Emojis.MATCHA.value}?",
-    #     )
-
-    #     print_status(summary_message)
-    #     return typer.confirm(f"Are you happy for '{verb}' to run?")
-
     def _write_outputs_state_cloud_only(self) -> None:
         """Write the outputs of the Terraform deployment to the state JSON file."""
         with open(self.state_file) as f:

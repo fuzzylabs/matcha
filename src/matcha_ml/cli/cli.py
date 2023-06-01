@@ -8,19 +8,20 @@ from matcha_ml.cli._validation import (
     prefix_typer_callback,
     region_typer_callback,
 )
+from matcha_ml.cli.constants import RESOURCE_MSG, STATE_RESOURCE_MSG
 from matcha_ml.cli.destroy import destroy_resources
 from matcha_ml.cli.provision import provision_resources
-from matcha_ml.cli.ui.spinner import Spinner
 from matcha_ml.cli.ui.print_messages import (
     print_error,
     print_resource_output,
     print_status,
 )
-from matcha_ml.cli.ui.status_message_builders import build_warning_status
 from matcha_ml.cli.ui.resource_message_builders import (
     build_resource_output,
     hide_sensitive_in_output,
 )
+from matcha_ml.cli.ui.spinner import Spinner
+from matcha_ml.cli.ui.status_message_builders import build_warning_status
 from matcha_ml.core import core
 from matcha_ml.errors import MatchaError, MatchaInputError
 from matcha_ml.services.analytics_service import AnalyticsEvent, track
@@ -123,45 +124,16 @@ def destroy(
     remote_state_manager = RemoteStateManager()
     with Spinner("Preparing to destroy..."):
         if full:
-            resources = [
-                    ("Azure Kubernetes Service (AKS)", "A kubernetes cluster"),
-                    (
-                        "Three Storage Containers",
-                        "Storage containers for tracking Matcha state, for experiment tracking artifacts and for model training artifacts",
-                    ),
-                    (
-                        "Seldon Core",
-                        "A framework for model deployment on top of a kubernetes cluster",
-                    ),
-                    (
-                        "Azure Container Registry",
-                        "A container registry for storing docker images",
-                    ),
-                    ("ZenServer", "A zenml server required for remote orchestration"),
-                ]
-
-            destroy_resources(resources=resources)
+            destroy_resources(resources=RESOURCE_MSG + STATE_RESOURCE_MSG)
             remote_state_manager.deprovision_remote_state()
         else:
-            print_status(build_warning_status("Warning: a storage container holding Matcha state information will persist. To destroy ALL clound resources, run 'matcha destroy full'."))
-            resources = [
-                    ("Azure Kubernetes Service (AKS)", "A kubernetes cluster"),
-                    (
-                        "Two Storage Containers",
-                        "A storage container for experiment tracking artifacts and a second for model training artifacts",
-                    ),
-                    (
-                        "Seldon Core",
-                        "A framework for model deployment on top of a kubernetes cluster",
-                    ),
-                    (
-                        "Azure Container Registry",
-                        "A container registry for storing docker images",
-                    ),
-                    ("ZenServer", "A zenml server required for remote orchestration"),
-                ]
+            print_status(
+                build_warning_status(
+                    "Warning: a storage container holding Matcha state information will persist. To destroy ALL clound resources, run 'matcha destroy full'."
+                )
+            )
+            destroy_resources(resources=RESOURCE_MSG)
 
-            destroy_resources(resources=resources)
 
 @app.command()
 def force_unlock() -> None:

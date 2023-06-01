@@ -5,6 +5,7 @@ from typing import Optional, Tuple
 import typer
 
 from matcha_ml.cli._validation import prefix_typer_callback, region_typer_callback
+from matcha_ml.cli.constants import STATE_RESOURCE_MSG
 from matcha_ml.cli.ui.print_messages import print_status
 from matcha_ml.cli.ui.status_message_builders import (
     build_status,
@@ -109,23 +110,7 @@ def provision_resources(
             azure_template.build_template(config, template, destination, verbose)
 
         # Initializes the infrastructure provisioning process.
-        resources = [
-                ("Azure Kubernetes Service (AKS)", "A kubernetes cluster"),
-                (
-                    "Two Storage Containers",
-                    "A storage container for experiment tracking artifacts and a second for model training artifacts",
-                ),
-                (
-                    "Seldon Core",
-                    "A framework for model deployment on top of a kubernetes cluster",
-                ),
-                (
-                    "Azure Container Registry",
-                    "A container registry for storing docker images",
-                ),
-                ("ZenServer", "A zenml server required for remote orchestration"),
-            ]
-        if template_runner.is_approved(verb="provision", resources=resources):
+        if template_runner.is_approved(verb="provision", resources=STATE_RESOURCE_MSG):
             # provision resources by running the template
             template_runner.provision()
             print_status(build_step_success_status("Provisioning is complete!"))
