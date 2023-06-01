@@ -1,11 +1,13 @@
 """Class to interact with Azure Storage."""
+import glob
 import os
-import shutil
 from typing import Set
 
 from azure.storage.blob import BlobClient, BlobServiceClient, ContainerClient
 
 from matcha_ml.services.azure_service import AzureClient
+
+IGNORE_FOLDERS = [".terraform"]
 
 
 class AzureStorage:
@@ -82,6 +84,10 @@ class AzureStorage:
         for root, _, filenames in os.walk(src_folder_path):
             for filename in filenames:
                 file_path = os.path.join(root, filename)
+
+                # ignore uploading files in IGNORE_FOLDERS
+                if any(ignore_folder in file_path for ignore_folder in IGNORE_FOLDERS):
+                    continue
 
                 if file_path in blob_set:
                     blob_set.remove(file_path)
@@ -186,6 +192,8 @@ class AzureStorage:
     def _sync_remote(self, container_name: str, blob_set: Set[str]) -> None:
         """Synchronizes the remote storage with the local files.
 
+        It ignores uploading files in `.matcha` folder that are ignored in `IGNORED_FOLDERS`.
+
         Args:
             container_name (str): The name of the blob container to look for blobs.
             blob_set (Set[str]): Set of blob names to be removed on the remote storage.
@@ -199,6 +207,8 @@ class AzureStorage:
     def _sync_local(self, dest_folder_path: str) -> None:
         """Synchronizes the local .matcha folder with the remote storage files.
 
+        It ignores deleting files in `.matcha` folder that are not present in remote storage.
+
         Args:
             dest_folder_path (str): Path to folder containing matcha resources
         """
@@ -206,4 +216,10 @@ class AzureStorage:
         # ensuring that it exclusively contains the files retrieved from Azure remote storage
         if os.path.exists(dest_folder_path):
             matcha_template_dir = os.path.join(os.getcwd(), ".matcha")
-            shutil.rmtree(matcha_template_dir)
+            for path in glob.glob(f"{matcha_template_dir}/**/*", recursive=True):
+                # ignore deleting folders ignored in IGNORE_FOLDERS
+                if any(ignore_folder in path for ignore_folder in IGNORE_FOLDERS):
+                    continue
+
+                if os.path.isfile(path):
+                    os.remove(path)
