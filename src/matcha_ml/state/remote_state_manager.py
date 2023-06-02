@@ -192,9 +192,7 @@ class RemoteStateManager:
         account_name, container_name, resource_group_name = template_runner.provision()
         self._write_matcha_config(account_name, container_name, resource_group_name)
         print_status(
-            build_step_success_status(
-                "Provisioning of the remote state storage is complete!"
-            )
+            build_step_success_status("Provisioning Matcha reources is complete!")
         )
         print()
 

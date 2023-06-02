@@ -17,5 +17,6 @@ RESOURCE_MSG = [
 ]
 
 STATE_RESOURCE_MSG = [
-    ("Matcha State Container", "A storage container for tracking matcha state")
+    ("Azure Resource Group", "The resource group containing the provisioned resources"),
+    ("Matcha State Container", "A storage container for tracking matcha state"),
 ]

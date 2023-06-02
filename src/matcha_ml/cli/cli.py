@@ -124,7 +124,7 @@ def destroy(
     remote_state_manager = RemoteStateManager()
     with Spinner("Preparing to destroy..."):
         if full:
-            destroy_resources(resources=RESOURCE_MSG + STATE_RESOURCE_MSG)
+            destroy_resources(resources=STATE_RESOURCE_MSG + RESOURCE_MSG)
             remote_state_manager.deprovision_remote_state()
         else:
             print_status(
