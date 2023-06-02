@@ -20,7 +20,7 @@ def mock_provisioned_remote_state() -> Iterable[MagicMock]:
     with patch("matcha_ml.cli.cli.RemoteStateManager") as mock_state_manager_class:
         mock_state_manager = mock_state_manager_class.return_value
         mock_state_manager.is_state_provisioned.return_value = True
-        mock_state_manager.get_local_state_hash.return_value = (
+        mock_state_manager.get_hash_remote_state.return_value = (
             "470544910b3fe623e00d63e6314588a3"
         )
         yield mock_state_manager
@@ -475,3 +475,22 @@ def test_cli_get_command_show_sensitive_with_resource(
         assert line not in result.stdout
 
     mock_provisioned_remote_state.use_lock.assert_called_once()
+
+
+def test_get_cli_hash_mismatch(
+    runner: CliRunner, mock_provisioned_remote_state: MagicMock
+):
+    """Test cli get command when hash mismatch is detected.
+
+    Args:
+        runner (CliRunner): typer CLI runner
+        mock_provisioned_remote_state (MagicMock): mock of an RemoteStateManager instance
+    """
+    # A different hash to remote state file from local state file
+    mock_provisioned_remote_state.get_hash_remote_state.return_value = "123456789"
+    result = runner.invoke(app, ["get"])
+
+    assert result.exit_code == 0
+
+    # Check if remote state mananger trigger download function once upon hash mismatch
+    mock_provisioned_remote_state.download.assert_called_once()
