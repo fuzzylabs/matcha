@@ -23,7 +23,7 @@ def _check_uuid(uuid: str) -> bool:
         str(UUID(uuid, version=UUID_VERSION))
     except ValueError:
         raise MatchaError(
-            "Error - the user or environment unique identifier is maliformed."
+            "Error - the user or environment unique identifier is malformed."
         )
 
     return True
