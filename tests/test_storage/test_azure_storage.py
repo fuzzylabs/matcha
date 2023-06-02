@@ -467,6 +467,7 @@ def test_sync_remote_does_not_remove_matcha_lock_from_remote_storage(
 
     az_storage._sync_remote("testcontainer", mock_blob_set)
 
+    # Check that the delete_blob method is not called with the 'matcha.lock' file
     mock_container_client.delete_blob.assert_called_once_with("blob_1")
 
 
