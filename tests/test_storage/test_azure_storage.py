@@ -527,4 +527,4 @@ def test_download_folder_does_not_retrieve_matcha_lock_file(
 
         # Check that the matcha.lock file does not exist in local but "file_only_exist_azure" does
         assert "matcha.lock" not in os.listdir(matcha_testing_directory)
-        assert "file_only_exist_azure" not in os.listdir(matcha_testing_directory)
+        assert "file_only_exist_azure" in os.listdir(matcha_testing_directory)
