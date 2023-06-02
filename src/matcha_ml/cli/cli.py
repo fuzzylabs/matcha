@@ -1,5 +1,4 @@
 """Matcha CLI."""
-import os
 from typing import Optional
 
 import typer
@@ -84,45 +83,24 @@ def get(
         show_sensitive (Optional[bool]): show hidden sensitive resource values when True. Defaults to False.
 
     Raises:
-        Exit: Exit if matcha.state file does not exist.
         Exit: Exit if matcha remote state has not been provisioned.
+        Exit: Exit if matcha.state file does not exist.
         Exit: Exit if resource type or property does not exist in matcha.state.
     """
-    matcha_state_path = os.path.join(".matcha", "infrastructure", "matcha.state")
-    remote_state = RemoteStateManager()
-
     try:
-        local_hash = core.get_local_state_hash(matcha_state_path)
+        resources = core.get(resource_name, property_name)
+    except MatchaInputError as e:
+        print_error(str(e))
+        raise typer.Exit()
     except MatchaError as e:
         print_error(str(e))
         raise typer.Exit()
 
-    remote_hash = remote_state.get_hash_remote_state(matcha_state_path)
+    if not show_sensitive:
+        resources = hide_sensitive_in_output(resources)
 
-    if local_hash != remote_hash:
-        remote_state.download(os.getcwd())
-
-    if not remote_state.is_state_provisioned():
-        print_error("Error - matcha state has not been initialized, nothing to get.")
-        raise typer.Exit()
-
-    with remote_state.use_lock():
-        try:
-            resources = core.get(resource_name, property_name)
-        except MatchaInputError as e:
-            print_error(str(e))
-            raise typer.Exit()
-        except MatchaError as e:
-            print_error(str(e))
-            raise typer.Exit()
-
-        if not show_sensitive:
-            resources = hide_sensitive_in_output(resources)
-
-        resource_output = build_resource_output(
-            resources=resources, output_format=output
-        )
-        print_resource_output(resource_output=resource_output, output_format=output)
+    resource_output = build_resource_output(resources=resources, output_format=output)
+    print_resource_output(resource_output=resource_output, output_format=output)
 
 
 @app.command()

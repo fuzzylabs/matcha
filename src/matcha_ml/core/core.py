@@ -1,5 +1,4 @@
 """The core functions for matcha."""
-import hashlib
 import os
 from typing import Dict, Optional
 
@@ -7,31 +6,6 @@ from matcha_ml.cli._validation import get_command_validation
 from matcha_ml.errors import MatchaError
 from matcha_ml.services.global_parameters_service import GlobalParameters
 from matcha_ml.state import MatchaStateService, RemoteStateManager
-
-
-def get_local_state_hash(matcha_state_path: str) -> str:
-    """Get hash of the local matcha state file.
-
-    Args:
-        matcha_state_path (str): Path to the matcha state file.
-
-    Raises:
-        MatchaError: if the matcha state file does not exist
-
-    Returns:
-        str: Hash contents of the blob in hexadecimal string
-    """
-    local_hash = None
-    local_state_path = os.path.join(os.getcwd(), matcha_state_path)
-
-    if os.path.exists(local_state_path):
-        with open(local_state_path, "rb") as fp:
-            local_hash = hashlib.md5(fp.read()).hexdigest()
-    else:
-        raise MatchaError(
-            f"Error - matcha state file does not exist at {local_state_path}"
-        )
-    return local_hash
 
 
 def get(
@@ -54,11 +28,25 @@ def get(
         MatchaInputError: Raised when the resource or property name does not exist in the matcha.state file
     """
     matcha_state_service = MatchaStateService()
+    remote_state = RemoteStateManager()
+
+    if not remote_state.is_state_provisioned():
+        raise MatchaError(
+            "Error - matcha state has not been initialized, nothing to get."
+        )
 
     if not matcha_state_service.state_file_exists:
         raise MatchaError(
-            f"Error: matcha.state file does not exist at {os.path.join(os.getcwd(), '.matcha', 'infrastructure')} . Please run 'matcha provision' before trying to get the resource."
+            f"Error - matcha.state file does not exist at {os.path.join(os.getcwd(), '.matcha', 'infrastructure')} . Please run 'matcha provision' before trying to get the resource."
         )
+
+    local_hash = matcha_state_service.get_hash_local_state()
+    remote_hash = remote_state.get_hash_remote_state(
+        matcha_state_service.matcha_state_path
+    )
+
+    if local_hash != remote_hash:
+        remote_state.download(os.getcwd())
 
     if resource_name:
         get_command_validation(
@@ -72,9 +60,10 @@ def get(
             "property",
         )
 
-    result = matcha_state_service.fetch_resources_from_state_file(
-        resource_name, property_name
-    )
+    with remote_state.use_lock():
+        result = matcha_state_service.fetch_resources_from_state_file(
+            resource_name, property_name
+        )
 
     return result
 

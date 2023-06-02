@@ -17,7 +17,7 @@ def mock_provisioned_remote_state() -> Iterable[MagicMock]:
     Returns:
         MagicMock: mock of an RemoteStateManager instance
     """
-    with patch("matcha_ml.cli.cli.RemoteStateManager") as mock_state_manager_class:
+    with patch("matcha_ml.core.core.RemoteStateManager") as mock_state_manager_class:
         mock_state_manager = mock_state_manager_class.return_value
         mock_state_manager.is_state_provisioned.return_value = True
         mock_state_manager.get_hash_remote_state.return_value = (
@@ -151,7 +151,7 @@ def test_cli_get_command_with_no_state_file(
     result = runner.invoke(app, ["get"])
 
     assert result.exit_code == 0
-    assert "Error - matcha state file does not exist at" in str(result.stdout)
+    assert "Error - matcha.state file does not exist at" in str(result.stdout)
 
     mock_provisioned_remote_state.use_lock.assert_not_called()
 
