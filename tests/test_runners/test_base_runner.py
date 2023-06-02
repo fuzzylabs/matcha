@@ -118,7 +118,7 @@ def test_apply_terraform(capsys: SysCapture):
     """
     template_runner = BaseRunner()
     template_runner.tfs.apply = MagicMock(return_value=(0, "", ""))
-    expected = "Your environment has been provisioned!"
+    expected = "Resources for matcha to work have been provisioned!"
 
     template_runner._apply_terraform()
     captured = capsys.readouterr()

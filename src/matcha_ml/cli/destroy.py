@@ -1,4 +1,6 @@
 """Destroy CLI."""
+from typing import List, Tuple
+
 import typer
 
 from matcha_ml.cli._validation import check_current_deployment_exists
@@ -11,8 +13,11 @@ from matcha_ml.runners import AzureRunner
 from matcha_ml.state import RemoteStateManager
 
 
-def destroy_resources() -> None:
+def destroy_resources(resources: List[Tuple[str, str]]) -> None:
     """Destroy resources.
+
+    Args:
+        resources (List[Tuple[str,str]): the list of resources to be actioned by the verb to be provided to the user as a status message
 
     Raises:
         typer.Exit: Exit if matcha remote state has not been provisioned.
@@ -26,27 +31,24 @@ def destroy_resources() -> None:
         )
         raise typer.Exit()
 
-    with remote_state.use_lock():
-        with remote_state.use_remote_state():
-            # create a runner for deprovisioning resource with Terraform service.
-            template_runner = AzureRunner()
+    with remote_state.use_lock(), remote_state.use_remote_state():
+        # create a runner for deprovisioning resource with Terraform service.
+        template_runner = AzureRunner()
 
-            if not check_current_deployment_exists():
-                print_error(
-                    "Error - you cannot destroy resources that have not been provisioned yet."
-                )
-                raise typer.Exit()
+        if not check_current_deployment_exists():
+            print_error(
+                "Error - you cannot destroy resources that have not been provisioned yet."
+            )
+            raise typer.Exit()
 
-            if template_runner.is_approved(verb="destroy"):
-                # deprovision the resources
-                template_runner.deprovision()
-                print_status(
-                    build_step_success_status("Destroying resources is complete!")
+        if template_runner.is_approved(verb="destroy", resources=resources):
+            # deprovision the resources
+            template_runner.deprovision()
+            print_status(build_step_success_status("Destroying resources is complete!"))
+        else:
+            print_status(
+                build_status(
+                    "You decided to cancel - your resources will remain active! If you change your mind, then run 'matcha destroy' again."
                 )
-            else:
-                print_status(
-                    build_status(
-                        "You decided to cancel - your resources will remain active! If you change your mind, then run 'matcha destroy' again."
-                    )
-                )
-                raise typer.Exit()
+            )
+            raise typer.Exit()
