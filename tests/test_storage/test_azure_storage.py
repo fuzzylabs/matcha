@@ -444,3 +444,87 @@ def test_sync_local(
     assert os.path.exists(matcha_resources_tf_cache_dir)
     assert os.path.exists(matcha_remote_state_tf_cache_dir)
     assert not os.path.exists(test_file_path)
+
+
+def test_sync_remote_does_not_remove_matcha_lock_from_remote_storage(
+    mock_blob_service: BlobServiceClient,
+) -> None:
+    """Test that sync remote does not remove the matcha.lock file from the remote storage.
+
+    Args:
+        mock_blob_service (BlobServiceClient): Mocked blob service client.
+    """
+    # Mock container client
+    mock_container_client = (
+        mock_blob_service.return_value.get_container_client.return_value
+    )
+
+    mock_blob_set = {"blob_1", "matcha.lock"}
+
+    _ = mock_container_client.delete_blob.return_value
+
+    az_storage = AzureStorage("testaccount", "test-rg")
+
+    az_storage._sync_remote("testcontainer", mock_blob_set)
+
+    mock_container_client.delete_blob.assert_called_once_with("blob_1")
+
+
+def test_download_folder_does_not_retrieve_matcha_lock_file(
+    mock_blob_service: BlobServiceClient,
+    matcha_testing_directory: str,
+    mocked_azure_client: AzureClient,
+):
+    """Test that the AzureStorage download folder function does not download a matcha.lock file if it exists.
+
+    Args:
+        mock_blob_service (BlobServiceClient): Mocked blob service client
+        matcha_testing_directory (str): Temporary directory
+        mocked_azure_client (AzureClient): mocked azure client
+    """
+    matcha_remote_state_dir = os.path.join(
+        matcha_testing_directory, ".matcha", "infrastructure", "remote_state_storage"
+    )
+    matcha_resources_dir = os.path.join(
+        matcha_testing_directory, ".matcha", "infrastructure", "resources"
+    )
+    os.makedirs(matcha_remote_state_dir, exist_ok=True)
+    os.makedirs(matcha_resources_dir, exist_ok=True)
+    os.chdir(matcha_testing_directory)
+
+    assert os.path.exists(matcha_resources_dir)
+    assert os.path.exists(matcha_remote_state_dir)
+
+    # Create a test set of azure files, including a matcha.lock file, for mocking the return value of list_blobs method
+    files_on_azure = {"file_only_exist_azure", "matcha.lock"}
+
+    # Create temp files inside temp directory
+    for i in range(1, 3):
+        tmp_file = os.path.join(matcha_resources_dir, f"temp{i}.txt")
+        with open(tmp_file, "w"):
+            pass
+
+    # Mock container client
+    mock_container_client = mock_blob_service.get_container_client.return_value
+
+    # Mock blob client
+    mock_blob_client = mock_container_client.get_blob_client.return_value
+
+    # Mock list blobs function for container client
+    mock_container_client.list_blobs.return_value = [
+        BlobProperties(name=n) for n in files_on_azure
+    ]
+
+    mock_az_storage = AzureStorage("testaccount", "test-rg")
+    mock_az_storage.az_client = mocked_azure_client
+    # Mock _get_container_client function of AzureStorage class
+    with patch.object(AzureStorage, "_get_container_client") as mock_fn:
+        mock_fn.return_value = mock_container_client
+        mock_az_storage.download_folder("testcontainer", matcha_testing_directory)
+
+        # Check if download_blob function is called
+        mock_blob_client.download_blob.assert_called()
+
+        # Check that the matcha.lock file does not exist in local but "file_only_exist_azure" does
+        assert "matcha.lock" not in os.listdir(matcha_testing_directory)
+        assert "file_only_exist_azure" not in os.listdir(matcha_testing_directory)
