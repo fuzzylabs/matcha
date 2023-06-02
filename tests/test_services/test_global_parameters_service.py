@@ -31,21 +31,17 @@ def config_path(matcha_testing_directory) -> str:
     return os.path.join(matcha_testing_directory, ".config", "matcha-ml", "config.yaml")
 
 
-def test_class_is_singleton(matcha_testing_directory):
+def test_class_is_singleton(config_path):
     """Tests that the GlobalParameters is correctly implemented as a singleton.
 
     Args:
-        matcha_testing_directory (str): Mock testing directory location for the config file to be located
+        config_path (str): Mock testing directory location for the config file to be located
     """
     with mock.patch(
         f"{INTERNAL_FUNCTION_STUB}.default_config_file_path",
         new_callable=mock.PropertyMock,
     ) as file_path:
-        file_path.return_value = str(
-            os.path.join(
-                str(matcha_testing_directory), ".config", "matcha-ml", "config.yaml"
-            )
-        )
+        file_path.return_value = config_path
 
         first_instance = GlobalParameters()
         second_instance = GlobalParameters()
