@@ -87,28 +87,20 @@ def get(
         Exit: Exit if matcha.state file does not exist.
         Exit: Exit if resource type or property does not exist in matcha.state.
     """
-    remote_state = RemoteStateManager()
-    if not remote_state.is_state_provisioned():
-        print_error("Error - matcha state has not been initialized, nothing to get.")
+    try:
+        resources = core.get(resource_name, property_name)
+    except MatchaInputError as e:
+        print_error(str(e))
+        raise typer.Exit()
+    except MatchaError as e:
+        print_error(str(e))
         raise typer.Exit()
 
-    with remote_state.use_lock():
-        try:
-            resources = core.get(resource_name, property_name)
-        except MatchaInputError as e:
-            print_error(str(e))
-            raise typer.Exit()
-        except MatchaError as e:
-            print_error(str(e))
-            raise typer.Exit()
+    if not show_sensitive:
+        resources = hide_sensitive_in_output(resources)
 
-        if not show_sensitive:
-            resources = hide_sensitive_in_output(resources)
-
-        resource_output = build_resource_output(
-            resources=resources, output_format=output
-        )
-        print_resource_output(resource_output=resource_output, output_format=output)
+    resource_output = build_resource_output(resources=resources, output_format=output)
+    print_resource_output(resource_output=resource_output, output_format=output)
 
 
 @app.command()

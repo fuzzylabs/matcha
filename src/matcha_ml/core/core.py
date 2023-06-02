@@ -24,31 +24,49 @@ def get(
         Dict[str, Dict[str, str]]: the information of the provisioned resource.
 
     Raises:
+        MatchaError: Raised when the matcha state has not been initialized
         MatchaError: Raised when the matcha.state file does not exist
         MatchaInputError: Raised when the resource or property name does not exist in the matcha.state file
     """
     matcha_state_service = MatchaStateService()
+    remote_state = RemoteStateManager()
+
+    if not remote_state.is_state_provisioned():
+        raise MatchaError(
+            "Error - matcha state has not been initialized, nothing to get."
+        )
 
     if not matcha_state_service.state_file_exists:
         raise MatchaError(
-            f"Error: matcha.state file does not exist at {os.path.join(os.getcwd(), '.matcha', 'infrastructure')} . Please run 'matcha provision' before trying to get the resource."
+            f"Error - matcha.state file does not exist at {os.path.join(os.getcwd(), '.matcha', 'infrastructure')} . Please run 'matcha provision' before trying to get the resource."
         )
 
-    if resource_name:
-        get_command_validation(
-            resource_name, matcha_state_service.get_resource_names(), "resource type"
+    with remote_state.use_lock():
+        local_hash = matcha_state_service.get_hash_local_state()
+        remote_hash = remote_state.get_hash_remote_state(
+            matcha_state_service.matcha_state_path
         )
 
-    if resource_name and property_name:
-        get_command_validation(
-            property_name,
-            matcha_state_service.get_property_names(resource_name),
-            "property",
-        )
+        if local_hash != remote_hash:
+            remote_state.download(os.getcwd())
 
-    result = matcha_state_service.fetch_resources_from_state_file(
-        resource_name, property_name
-    )
+        if resource_name:
+            get_command_validation(
+                resource_name,
+                matcha_state_service.get_resource_names(),
+                "resource type",
+            )
+
+        if resource_name and property_name:
+            get_command_validation(
+                property_name,
+                matcha_state_service.get_property_names(resource_name),
+                "property",
+            )
+
+        result = matcha_state_service.fetch_resources_from_state_file(
+            resource_name, property_name
+        )
 
     return result
 

@@ -1,4 +1,5 @@
 """The matcha state interface."""
+import hashlib
 import json
 import os
 from typing import Dict, List, Optional
@@ -77,3 +78,14 @@ class MatchaStateService:
             List[str]: a list of existing properties for a given resource.
         """
         return list(self._state.get(resource_name, {}).keys())
+
+    def get_hash_local_state(self) -> str:
+        """Get hash of the local matcha state file.
+
+        Returns:
+            str: Hash contents of the blob in hexadecimal string
+        """
+        local_hash = None
+        with open(self.matcha_state_path, "rb") as fp:
+            local_hash = hashlib.md5(fp.read()).hexdigest()
+        return local_hash

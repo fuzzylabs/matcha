@@ -120,3 +120,15 @@ def test_check_state_file_does_not_exist(matcha_state_service: MatchaStateServic
 
     result = matcha_state_service.check_state_file_exists()
     assert result is False
+
+
+def test_get_hash_local_state(matcha_state_service: MatchaStateService):
+    """Test get hash of the local state file.
+
+    Args:
+        matcha_state_service (MatchaStateService): The matcha_state_service testing instance.
+    """
+    expected_hash = "031318ef84db0275c7d26230a51eb459"
+    result_hash = matcha_state_service.get_hash_local_state()
+
+    assert result_hash == expected_hash

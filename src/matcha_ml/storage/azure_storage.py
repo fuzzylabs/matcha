@@ -1,6 +1,8 @@
 """Class to interact with Azure Storage."""
 import glob
+import hashlib
 import os
+import tempfile
 from typing import Set
 
 from azure.storage.blob import BlobClient, BlobServiceClient, ContainerClient
@@ -188,6 +190,26 @@ class AzureStorage:
             Set[str]: a set of blob names in the container.
         """
         return set(self._get_container_client(container_name).list_blob_names())
+
+    def get_hash_remote_state(self, container_name: str, blob_name: str) -> str:
+        """Get hash of remote matcha state file.
+
+        Args:
+            container_name (str): Azure storage container name
+            blob_name (str): blob name
+
+        Returns:
+            str: Hash contents of the blob in hexadecimal string
+        """
+        remote_hash = None
+        blob_client = self._get_blob_client(
+            container_name=container_name, blob_name=blob_name
+        )
+        with tempfile.NamedTemporaryFile() as tmp:
+            self.download_file(blob_client, tmp.name)
+            with open(tmp.name, "rb") as fp:
+                remote_hash = hashlib.md5(fp.read()).hexdigest()
+        return remote_hash
 
     def _sync_remote(self, container_name: str, blob_set: Set[str]) -> None:
         """Synchronizes the remote storage with the local files.

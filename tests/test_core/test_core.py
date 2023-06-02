@@ -1,8 +1,9 @@
 """Test suite to test the core matcha commands and all its subcommands."""
 import json
 import os
-from typing import Dict, Union, Iterator
+from typing import Dict, Iterable, Iterator, Union
 from unittest import mock
+from unittest.mock import MagicMock
 
 import pytest
 import yaml
@@ -11,7 +12,6 @@ from matcha_ml.cli.cli import app
 from matcha_ml.core.core import get, remove_state_lock
 from matcha_ml.errors import MatchaError, MatchaInputError
 from matcha_ml.services.global_parameters_service import GlobalParameters
-from matcha_ml.state.remote_state_manager import LOCK_FILE_NAME
 
 INTERNAL_FUNCTION_STUB = "matcha_ml.services.global_parameters_service.GlobalParameters"
 
@@ -69,8 +69,26 @@ def teardown_singleton():
     GlobalParameters._instance = None
 
 
+@pytest.fixture(autouse=True)
+def mock_provisioned_remote_state() -> Iterable[MagicMock]:
+    """Mock remote state manager to have state provisioned.
+
+    Returns:
+        MagicMock: mock of an RemoteStateManager instance
+    """
+    with mock.patch(
+        "matcha_ml.core.core.RemoteStateManager"
+    ) as mock_state_manager_class:
+        mock_state_manager = mock_state_manager_class.return_value
+        mock_state_manager.is_state_provisioned.return_value = True
+        mock_state_manager.get_hash_remote_state.return_value = (
+            "470544910b3fe623e00d63e6314588a3"
+        )
+        yield mock_state_manager
+
+
 @pytest.fixture
-def mock_azure_storage_instance() -> Iterator[mock.MagicMock]:
+def mock_azure_storage_instance() -> Iterator[MagicMock]:
     """Mock Azure Storage instance.
 
     Yields:
@@ -92,17 +110,24 @@ def expected_configuration() -> Dict[str, Union[str, bool]]:
     return {"analytics_opt_out": False, "user_id": "dummy_user_id"}
 
 
-def test_get_resources(expected_outputs: dict):
+def test_get_resources(
+    mock_provisioned_remote_state: MagicMock, expected_outputs: dict
+):
     """Test get resources function with no resource specified.
 
     Args:
+        mock_provisioned_remote_state (MagicMock): mock of an RemoteStateManager instance
         expected_outputs (dict): The expected output from the matcha state file.
     """
     assert expected_outputs == get(None, None)
 
 
-def test_get_resources_without_state_file():
-    """Test get resources function when a state file does not exist."""
+def test_get_resources_without_state_file(mock_provisioned_remote_state: MagicMock):
+    """Test get resources function when a state file does not exist.
+
+    Args:
+        mock_provisioned_remote_state (MagicMock): mock of an RemoteStateManager instance
+    """
     state_file_path = os.path.join(".matcha", "infrastructure", "matcha.state")
     os.remove(state_file_path)
 
@@ -110,7 +135,7 @@ def test_get_resources_without_state_file():
         get(None, None)
 
 
-def test_get_resources_with_resource_name():
+def test_get_resources_with_resource_name(mock_provisioned_remote_state: MagicMock):
     """Test get resources function with resource name specified."""
     expected_output = {
         "experiment-tracker": {"flavor": "mlflow", "tracking-url": "mlflow_test_url"}
@@ -119,14 +144,26 @@ def test_get_resources_with_resource_name():
     assert expected_output == get("experiment-tracker", None)
 
 
-def test_get_resources_with_invalid_resource_name():
-    """Test get resources function with an invalid resource name specified."""
+def test_get_resources_with_invalid_resource_name(
+    mock_provisioned_remote_state: MagicMock,
+):
+    """Test get resources function with an invalid resource name specified.
+
+    Args:
+        mock_provisioned_remote_state (MagicMock): mock of an RemoteStateManager instance
+    """
     with pytest.raises(MatchaInputError):
         get("invalid-resource", None)
 
 
-def test_get_resources_with_resource_name_and_property_name():
-    """Test get resources function with resource name and resource property specified."""
+def test_get_resources_with_resource_name_and_property_name(
+    mock_provisioned_remote_state: MagicMock,
+):
+    """Test get resources function with resource name and resource property specified.
+
+    Args:
+        mock_provisioned_remote_state (MagicMock): mock of an RemoteStateManager instance
+    """
     expected_output = {"experiment-tracker": {"tracking-url": "mlflow_test_url"}}
 
     assert expected_output == get("experiment-tracker", "tracking-url")
@@ -216,27 +253,35 @@ def test_opt_in_subcommand(
         assert dict(yaml.safe_load(f)) == expected_configuration
 
 
-def test_remove_state_lock_function():
-    """Test that the unlock function is called once when emove_state_lock function is used."""
-    with mock.patch("matcha_ml.core.core.RemoteStateManager.unlock") as mock_unlock:
-        remove_state_lock()
+def test_remove_state_lock_function(mock_provisioned_remote_state: MagicMock):
+    """Test that the unlock function is called once when emove_state_lock function is used.
+
+    Args:
+        mock_provisioned_remote_state (MagicMock): mock of an RemoteStateManager instance
+    """
+    # with mock.patch("matcha_ml.core.core.RemoteStateManager.unlock") as mock_unlock:
+    remove_state_lock()
 
     # Check if unlock function from RemoteStateManager class is called only once
-    mock_unlock.assert_called_once()
+    mock_provisioned_remote_state.unlock.assert_called_once()
 
 
-def test_remove_state_lock_function_warning(mock_azure_storage_instance):
-    """Test that the unlock function is called once when emove_state_lock function is used."""
-    with mock.patch("matcha_ml.core.core.RemoteStateManager.unlock") as mock_unlock:
-        mock_azure_storage_instance.blob_exists.return_value = False
-        mock_azure_storage_instance.delete_blob.side_effect = Exception(
-            "Does not exist"
-        )
+def test_remove_state_lock_function_warning(
+    mock_azure_storage_instance: MagicMock, mock_provisioned_remote_state: MagicMock
+):
+    """Test that the unlock function is called once when emove_state_lock function is used.
 
-        remove_state_lock()
+    Args:
+        mock_azure_storage_instance (MagicMock): mock of an AzureStorage instance
+        mock_provisioned_remote_state (MagicMock): mock of an RemoteStateManager instance
+    """
+    mock_azure_storage_instance.blob_exists.return_value = False
+    mock_azure_storage_instance.delete_blob.side_effect = Exception("Does not exist")
 
-        # Check if delete_blob function from AzureStorage class is not called
-        mock_azure_storage_instance.delete_blob.assert_not_called()
+    remove_state_lock()
+
+    # Check if delete_blob function from AzureStorage class is not called
+    mock_azure_storage_instance.delete_blob.assert_not_called()
 
     # Check if unlock function from RemoteStateManager class is called only once
-    mock_unlock.assert_called_once()
+    mock_provisioned_remote_state.unlock.assert_called_once()
