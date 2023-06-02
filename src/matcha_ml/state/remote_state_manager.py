@@ -12,10 +12,10 @@ from matcha_ml.cli.ui.status_message_builders import (
     build_step_success_status,
     build_warning_status,
 )
+from matcha_ml.constants import LOCK_FILE_NAME
 from matcha_ml.errors import MatchaError
 from matcha_ml.runners import RemoteStateRunner
 from matcha_ml.storage import AzureStorage
-from matcha_ml.storage.azure_storage import LOCK_FILE_NAME
 from matcha_ml.templates import RemoteStateTemplate
 
 DEFAULT_CONFIG_NAME = "matcha.config.json"

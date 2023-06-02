@@ -5,10 +5,10 @@ from typing import Set
 
 from azure.storage.blob import BlobClient, BlobServiceClient, ContainerClient
 
+from matcha_ml.constants import LOCK_FILE_NAME
 from matcha_ml.services.azure_service import AzureClient
 
 IGNORE_FOLDERS = [".terraform"]
-LOCK_FILE_NAME = "matcha.lock"
 
 
 class AzureStorage:
