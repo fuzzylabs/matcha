@@ -9,6 +9,7 @@ from matcha_ml.cli.ui.print_messages import print_status
 from matcha_ml.cli.ui.status_message_builders import (
     build_status,
     build_step_success_status,
+    build_warning_status,
 )
 from matcha_ml.runners import AzureRunner
 from matcha_ml.state import RemoteStateManager
@@ -77,7 +78,7 @@ def provision_resources(
     remote_state_manager = RemoteStateManager()
 
     if remote_state_manager.is_state_stale():
-        print(
+        build_warning_status(
             "Matcha has detected a stale state file. This means that your local configuration is out of sync with the remote state, the resource group may have been removed."
         )
         remove_local_config = typer.confirm(
