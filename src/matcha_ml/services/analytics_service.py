@@ -41,7 +41,15 @@ def track(event_name: AnalyticsEvent) -> Callable[..., Any]:
 
         @functools.wraps(func)
         def inner(*args: Any, **kwargs: Any) -> Any:
-            """Inner decorator function."""
+            """The internal function that does the logic of capturing analytics and executing the function that's being wrapped.
+
+            Raises:
+                MatchaError: Raised when the matcha_state_uuid is invalid.
+                error_code: Raised when an error occurs when running the wrapped function.
+
+            Returns:
+                Any: the result of the wrapped function.
+            """
             global_params = GlobalParameters()
 
             if not global_params.analytics_opt_out:

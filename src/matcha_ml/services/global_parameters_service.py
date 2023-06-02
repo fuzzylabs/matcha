@@ -1,7 +1,7 @@
 """Global parameter service for creating and modifying a users global config files."""
 import os
-import uuid
 from typing import Any, Dict, Optional
+from uuid import uuid4
 
 import yaml
 
@@ -36,7 +36,11 @@ class GlobalParameters:
         return cls._instance
 
     def _read_global_config(self) -> None:
-        """Reads the config yaml file containing the global parameters."""
+        """Reads the config yaml file containing the global parameters.
+
+        Raises:
+            MatchaError: Raised when the user_id uuid is an invalid uuid.
+        """
         with open(self.default_config_file_path) as file:
             yaml_data = yaml.safe_load(file)
 
@@ -86,7 +90,7 @@ class GlobalParameters:
             str: Unqiue user ID string
         """
         if self._user_id is None:
-            self._user_id = str(uuid.uuid4())
+            self._user_id = str(uuid4())
         return self._user_id
 
     @property

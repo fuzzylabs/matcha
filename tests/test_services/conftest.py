@@ -4,6 +4,8 @@ import uuid
 
 import pytest
 
+UUID_VERSION = 4
+
 
 @pytest.fixture(scope="module", autouse=True)
 def random_state():
@@ -18,4 +20,4 @@ def uuid_for_testing() -> uuid.UUID:
     Returns:
         uuid.UUID: a UUID4 which remains the same across tests.
     """
-    return uuid.UUID(int=random.getrandbits(128), version=4)
+    return uuid.UUID(int=random.getrandbits(128), version=UUID_VERSION)
