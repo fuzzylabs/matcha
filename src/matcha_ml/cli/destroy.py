@@ -17,7 +17,7 @@ def destroy_resources(resources: List[Tuple[str, str]]) -> None:
     """Destroy resources.
 
     Args:
-        resources (list[str]): the list of resources to be actioned by the verb to be provided to the user as a status message
+        resources (List[Tuple[str,str]): the list of resources to be actioned by the verb to be provided to the user as a status message
 
     Raises:
         typer.Exit: Exit if matcha remote state has not been provisioned.
