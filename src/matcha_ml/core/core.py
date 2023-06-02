@@ -40,27 +40,29 @@ def get(
             f"Error - matcha.state file does not exist at {os.path.join(os.getcwd(), '.matcha', 'infrastructure')} . Please run 'matcha provision' before trying to get the resource."
         )
 
-    local_hash = matcha_state_service.get_hash_local_state()
-    remote_hash = remote_state.get_hash_remote_state(
-        matcha_state_service.matcha_state_path
-    )
-
-    if local_hash != remote_hash:
-        remote_state.download(os.getcwd())
-
-    if resource_name:
-        get_command_validation(
-            resource_name, matcha_state_service.get_resource_names(), "resource type"
-        )
-
-    if resource_name and property_name:
-        get_command_validation(
-            property_name,
-            matcha_state_service.get_property_names(resource_name),
-            "property",
-        )
-
     with remote_state.use_lock():
+        local_hash = matcha_state_service.get_hash_local_state()
+        remote_hash = remote_state.get_hash_remote_state(
+            matcha_state_service.matcha_state_path
+        )
+
+        if local_hash != remote_hash:
+            remote_state.download(os.getcwd())
+
+        if resource_name:
+            get_command_validation(
+                resource_name,
+                matcha_state_service.get_resource_names(),
+                "resource type",
+            )
+
+        if resource_name and property_name:
+            get_command_validation(
+                property_name,
+                matcha_state_service.get_property_names(resource_name),
+                "property",
+            )
+
         result = matcha_state_service.fetch_resources_from_state_file(
             resource_name, property_name
         )

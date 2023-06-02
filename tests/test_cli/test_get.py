@@ -23,6 +23,7 @@ def mock_provisioned_remote_state() -> Iterable[MagicMock]:
         mock_state_manager.get_hash_remote_state.return_value = (
             "470544910b3fe623e00d63e6314588a3"
         )
+        mock_state_manager.use_lock.return_value = MagicMock()
         yield mock_state_manager
 
 
