@@ -13,11 +13,12 @@ GLOBAL_PARAMETER_SERVICE_FUNCTION_STUB = (
 
 
 @pytest.fixture(autouse=True)
-def mocked_global_parameters_service(matcha_testing_directory):
+def mocked_global_parameters_service(matcha_testing_directory, uuid_for_testing):
     """Mocked global parameters service.
 
     Args:
         matcha_testing_directory (str): Temporary directory for testing.
+        uuid_for_testing (uuid.UUID): a UUID which acts as a mock for the user_id
 
     Yields:
         GlobalParameters: GlobalParameters object with mocked properties.
@@ -32,13 +33,13 @@ def mocked_global_parameters_service(matcha_testing_directory):
         file_path.return_value = str(
             os.path.join(str(matcha_testing_directory), ".matcha-ml", "config.yaml")
         )
-        user_id.return_value = "TestUserID"
+        user_id.return_value = str(uuid_for_testing)
 
         yield GlobalParameters()
 
 
 def test_segment_track_recieves_the_correct_arguments(
-    runner, matcha_testing_directory, mocked_segment_track_decorator
+    runner, matcha_testing_directory, mocked_segment_track_decorator, uuid_for_testing
 ):
     """Test no the Segment track function recieves the expected arguments when a user is opted in to analytics.
 
@@ -46,6 +47,7 @@ def test_segment_track_recieves_the_correct_arguments(
         runner (CliRunner): typer CLI runner
         matcha_testing_directory (str): temporary working directory.
         mocked_segment_track_decorator (MagicMock): mocked Segment track call found in 'matcha_ml.services.analytics_service.analytics.track'
+        uuid_for_testing (uuid.UUID): a UUID which acts as a mock for the matcha_state_id
     """
     os.chdir(matcha_testing_directory)
 
@@ -61,7 +63,7 @@ def test_segment_track_recieves_the_correct_arguments(
 
     tracked_arguments = mocked_segment_track_decorator.call_args.args
     # Check that the Segment track arguments are as expected
-    assert "TestUserID" in tracked_arguments
+    assert str(uuid_for_testing) in tracked_arguments
     assert "destroy" in tracked_arguments
     assert {
         "time_taken",

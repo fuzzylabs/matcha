@@ -60,18 +60,19 @@ def test_new_config_file_creation(matcha_testing_directory):
         assert os.path.exists(config_file_path)
 
 
-def test_existing_config_file(matcha_testing_directory):
+def test_existing_config_file(matcha_testing_directory, uuid_for_testing):
     """Tests that the class variables are updated when there is an existing config file.
 
     Args:
         matcha_testing_directory (str): Mock testing directory location for the config file to be located
+        uuid_for_testing (uuid.UUID): a UUID which acts as a mock for the user_id
     """
     config_file_path = os.path.join(
         matcha_testing_directory, ".matcha-ml", "config.yaml"
     )
 
     data = {
-        "user_id": "TestUserID",
+        "user_id": str(uuid_for_testing),
         "analytics_opt_out": False,
     }
 
@@ -90,10 +91,10 @@ def test_existing_config_file(matcha_testing_directory):
 
         config_instance = GlobalParameters()
         assert config_instance.config_file == {
-            "user_id": "TestUserID",
+            "user_id": str(uuid_for_testing),
             "analytics_opt_out": False,
         }
-        assert config_instance.user_id == "TestUserID"
+        assert config_instance.user_id == str(uuid_for_testing)
         assert config_instance.analytics_opt_out is False
 
 

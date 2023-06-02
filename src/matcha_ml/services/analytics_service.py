@@ -9,6 +9,8 @@ from typing import Any, Callable, Optional
 
 from segment import analytics
 
+from matcha_ml.errors import MatchaError
+from matcha_ml.services._validation import _check_uuid
 from matcha_ml.services.global_parameters_service import GlobalParameters
 from matcha_ml.state import MatchaStateService
 
@@ -39,7 +41,15 @@ def track(event_name: AnalyticsEvent) -> Callable[..., Any]:
 
         @functools.wraps(func)
         def inner(*args: Any, **kwargs: Any) -> Any:
-            """Inner decorator function."""
+            """The internal function that does the logic of capturing analytics and executing the function that's being wrapped.
+
+            Raises:
+                MatchaError: Raised when the matcha_state_uuid is invalid.
+                error_code: Raised when an error occurs when running the wrapped function.
+
+            Returns:
+                Any: the result of the wrapped function.
+            """
             global_params = GlobalParameters()
 
             if not global_params.analytics_opt_out:
@@ -60,6 +70,11 @@ def track(event_name: AnalyticsEvent) -> Callable[..., Any]:
                     matcha_state_id_dict = matcha_state_service.state_file.get("id")
                     if matcha_state_id_dict is not None:
                         matcha_state_uuid = matcha_state_id_dict.get("matcha_uuid")
+
+                        try:
+                            _check_uuid(str(matcha_state_uuid))
+                        except MatchaError as me:
+                            raise MatchaError(str(me))
 
                 analytics.track(
                     global_params.user_id,
