@@ -20,7 +20,6 @@ from matcha_ml.cli.ui.resource_message_builders import (
     build_resource_output,
     hide_sensitive_in_output,
 )
-from matcha_ml.cli.ui.spinner import Spinner
 from matcha_ml.cli.ui.status_message_builders import build_warning_status
 from matcha_ml.core import core
 from matcha_ml.errors import MatchaError, MatchaInputError
@@ -122,17 +121,16 @@ def destroy(
 ) -> None:
     """Destroy the provisioned cloud resources."""
     remote_state_manager = RemoteStateManager()
-    with Spinner("Preparing to destroy..."):
-        if full:
-            destroy_resources(resources=STATE_RESOURCE_MSG + RESOURCE_MSG)
-            remote_state_manager.deprovision_remote_state()
-        else:
-            print_status(
-                build_warning_status(
-                    "Warning: a storage container holding Matcha state information will persist. To destroy ALL clound resources, run 'matcha destroy full'."
-                )
+    if full:
+        destroy_resources(resources=STATE_RESOURCE_MSG + RESOURCE_MSG)
+        remote_state_manager.deprovision_remote_state()
+    else:
+        print_status(
+            build_warning_status(
+                "Warning: a storage container holding Matcha state information will persist. To destroy ALL clound resources, run 'matcha destroy full'."
             )
-            destroy_resources(resources=RESOURCE_MSG)
+        )
+        destroy_resources(resources=RESOURCE_MSG)
 
 
 @app.command()

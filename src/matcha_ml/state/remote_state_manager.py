@@ -8,6 +8,7 @@ from azure.core.exceptions import ResourceExistsError
 from dataclasses_json import DataClassJsonMixin
 
 from matcha_ml.cli.ui.print_messages import print_error, print_status
+from matcha_ml.cli.ui.spinner import Spinner
 from matcha_ml.cli.ui.status_message_builders import (
     build_step_success_status,
     build_warning_status,
@@ -275,11 +276,13 @@ class RemoteStateManager:
         Downloads the state before executing the code.
         Upload the state when context is finished.
         """
-        self.download(os.getcwd())
+        with Spinner("Downloading Matcha resources..."):
+            self.download(os.getcwd())
 
         yield None
 
-        self.upload(os.path.join(".matcha", "infrastructure"))
+        with Spinner("Uploading Matcha resources..."):
+            self.upload(os.path.join(".matcha", "infrastructure"))
 
     def lock(self) -> None:
         """Lock remote state.
