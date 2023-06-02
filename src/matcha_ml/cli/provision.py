@@ -78,8 +78,10 @@ def provision_resources(
     remote_state_manager = RemoteStateManager()
 
     if remote_state_manager.is_state_stale():
-        build_warning_status(
-            "Matcha has detected a stale state file. This means that your local configuration is out of sync with the remote state, the resource group may have been removed."
+        print_status(
+            build_warning_status(
+                "Matcha has detected a stale state file. This means that your local configuration is out of sync with the remote state, the resource group may have been removed."
+            )
         )
         remove_local_config = typer.confirm(
             "Do you want to remove the existing local config and continue?"
