@@ -83,11 +83,12 @@ def provision_resources(
                 "Matcha has detected a stale state file. This means that your local configuration is out of sync with the remote state, the resource group may have been removed."
             )
         )
-        remove_local_config = typer.confirm(
+
+        if not typer.confirm(
             "Do you want to remove the existing local config and continue?"
-        )
-        if not remove_local_config:
+        ):
             raise typer.Exit()
+
         remote_state_manager.remove_matcha_config()
         # Re-initialise remote state manager with empty state file
         remote_state_manager = RemoteStateManager()
