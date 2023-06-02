@@ -633,14 +633,13 @@ def test_cli_provision_command_with_provisioned_resources(
 
 
 def test_remote_state_removed_when_remote_state_is_stale_with_user_confirmation(
-    runner: CliRunner, matcha_testing_directory: str, mock_use_lock: MagicMock
+    runner: CliRunner, matcha_testing_directory: str
 ):
-    """_summary_.
+    """Tests that the matcha.config.json file is removed when the remote state is stale and the user confirms removal.
 
     Args:
-        runner (CliRunner): _description_
-        matcha_testing_directory (str): _description_
-        mock_use_lock (MagicMock): _description_
+        runner (CliRunner): typer CLI runner
+        matcha_testing_directory (str): temporary working directory
     """
     os.chdir(matcha_testing_directory)
     matcha_config_file_path = os.path.join(

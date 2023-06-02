@@ -72,6 +72,7 @@ def provision_resources(
 
     Raises:
         typer.Exit: if approval is not given by user.
+        typer.Exit: if approval for removing a stale state is not given by user.
     """
     remote_state_manager = RemoteStateManager()
 
@@ -85,7 +86,6 @@ def provision_resources(
         if not remove_local_config:
             raise typer.Exit()
         remote_state_manager.remove_matcha_config()
-        print("Synced local state config.")
         # Re-initialise remote state manager with empty state file
         remote_state_manager = RemoteStateManager()
 
