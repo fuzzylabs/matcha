@@ -482,10 +482,48 @@ def test_remove_matcha_config(capsys: SysCapture):
 
     remote_state_manager.config_path = mock_non_exist_path
 
-    remote_state_manager._remove_matcha_config()
+    remote_state_manager.remove_matcha_config()
 
     captured = capsys.readouterr()
 
     expected_output = f"Failed to remove the matcha.config.json file at {mock_non_exist_path}, file not found."
 
     assert expected_output in captured.err
+
+
+def test_is_state_stale_false(valid_config_testing_directory: str):
+    """Test is_state_stale method returns False, when the user has a state file which has a resource group and container provisioned.
+
+    Args:
+        valid_config_testing_directory (str): temporary working directory path, with valid config file
+    """
+    os.chdir(valid_config_testing_directory)  # move to temporary working directory
+
+    with patch(
+        "matcha_ml.state.remote_state_manager.RemoteStateManager._configuration_file_exists"
+    ) as config_file_exists, patch(
+        "matcha_ml.state.remote_state_manager.RemoteStateManager._resource_group_exists"
+    ) as resource_group_exists:
+        config_file_exists.return_value = True
+        resource_group_exists.return_value = True
+        remote_state = RemoteStateManager()
+        assert not remote_state.is_state_stale()
+
+
+def test_is_state_stale_no_resource_group(matcha_testing_directory: str):
+    """Test is_state_stale method returns True, when the specified resource group does not exist.
+
+    Args:
+        matcha_testing_directory (str): temporary working directory path
+    """
+    os.chdir(matcha_testing_directory)  # move to temporary working directory
+
+    with patch(
+        "matcha_ml.state.remote_state_manager.RemoteStateManager._configuration_file_exists"
+    ) as config_file_exists, patch(
+        "matcha_ml.state.remote_state_manager.RemoteStateManager._resource_group_exists"
+    ) as resource_group_exists:
+        config_file_exists.return_value = True
+        resource_group_exists.return_value = False
+        remote_state = RemoteStateManager()
+        assert remote_state.is_state_stale()

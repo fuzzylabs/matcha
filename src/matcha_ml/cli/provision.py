@@ -10,6 +10,7 @@ from matcha_ml.cli.ui.print_messages import print_status
 from matcha_ml.cli.ui.status_message_builders import (
     build_status,
     build_step_success_status,
+    build_warning_status,
 )
 from matcha_ml.runners import AzureRunner
 from matcha_ml.state import RemoteStateManager
@@ -73,8 +74,25 @@ def provision_resources(
 
     Raises:
         typer.Exit: if approval is not given by user.
+        typer.Exit: if approval for removing a stale state is not given by user.
     """
     remote_state_manager = RemoteStateManager()
+
+    if remote_state_manager.is_state_stale():
+        print_status(
+            build_warning_status(
+                "Matcha has detected a stale state file. This means that your local configuration is out of sync with the remote state, the resource group may have been removed."
+            )
+        )
+
+        if not typer.confirm(
+            "Do you want to remove the existing local config and continue?"
+        ):
+            raise typer.Exit()
+
+        remote_state_manager.remove_matcha_config()
+        # Re-initialise remote state manager with empty state file
+        remote_state_manager = RemoteStateManager()
 
     # Check whether remote state storage has been provisioned
     if not remote_state_manager.is_state_provisioned():

@@ -160,6 +160,16 @@ class RemoteStateManager:
 
         return True
 
+    def is_state_stale(self) -> bool:
+        """Check if remote state has been destroyed.
+
+        Returns:
+            bool: True, if state is stale
+        """
+        return bool(
+            self._configuration_file_exists() and not self._resource_group_exists()
+        )
+
     def provision_remote_state(
         self, location: str, prefix: str, verbose: Optional[bool] = False
     ) -> None:
@@ -202,7 +212,7 @@ class RemoteStateManager:
         template_runner = RemoteStateRunner()
 
         template_runner.deprovision()
-        self._remove_matcha_config()
+        self.remove_matcha_config()
         print_status(
             build_step_success_status("Destroying Matcha resources is complete!")
         )
@@ -237,7 +247,7 @@ class RemoteStateManager:
             )
         )
 
-    def _remove_matcha_config(self) -> None:
+    def remove_matcha_config(self) -> None:
         """Remove the matcha.config.json file after destroy full is run."""
         try:
             os.remove(self.config_path)
