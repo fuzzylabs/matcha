@@ -8,6 +8,7 @@ from matcha_ml.cli._validation import (
     prefix_typer_callback,
     region_typer_callback,
 )
+from matcha_ml.cli.constants import RESOURCE_MSG, STATE_RESOURCE_MSG
 from matcha_ml.cli.destroy import destroy_resources
 from matcha_ml.cli.provision import provision_resources
 from matcha_ml.cli.ui.print_messages import (
@@ -19,6 +20,7 @@ from matcha_ml.cli.ui.resource_message_builders import (
     build_resource_output,
     hide_sensitive_in_output,
 )
+from matcha_ml.cli.ui.status_message_builders import build_warning_status
 from matcha_ml.core import core
 from matcha_ml.errors import MatchaError, MatchaInputError
 from matcha_ml.services.analytics_service import AnalyticsEvent, track
@@ -119,11 +121,16 @@ def destroy(
 ) -> None:
     """Destroy the provisioned cloud resources."""
     remote_state_manager = RemoteStateManager()
-
-    destroy_resources()
-
     if full:
+        destroy_resources(resources=STATE_RESOURCE_MSG + RESOURCE_MSG)
         remote_state_manager.deprovision_remote_state()
+    else:
+        print_status(
+            build_warning_status(
+                "Warning: a storage container holding Matcha state information will persist. To destroy ALL clound resources, run 'matcha destroy full'."
+            )
+        )
+        destroy_resources(resources=RESOURCE_MSG)
 
 
 @app.command()

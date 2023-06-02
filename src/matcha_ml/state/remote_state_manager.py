@@ -191,8 +191,9 @@ class RemoteStateManager:
 
         account_name, container_name, resource_group_name = template_runner.provision()
         self._write_matcha_config(account_name, container_name, resource_group_name)
-
-        print_status(build_step_success_status("Provisioning is complete!"))
+        print_status(
+            build_step_success_status("Provisioning Matcha reources is complete!")
+        )
         print()
 
     def deprovision_remote_state(self) -> None:
@@ -203,7 +204,7 @@ class RemoteStateManager:
         template_runner.deprovision()
         self._remove_matcha_config()
         print_status(
-            build_step_success_status("Destroying remote state management is complete!")
+            build_step_success_status("Destroying Matcha resources is complete!")
         )
 
     def _write_matcha_config(

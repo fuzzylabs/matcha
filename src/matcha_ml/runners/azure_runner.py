@@ -1,9 +1,10 @@
 """Run terraform templates to provision and deprovision resources."""
 import json
-import typer
 import uuid
 from collections import defaultdict
-from typing import Dict, Tuple
+from typing import Dict, List, Tuple
+
+import typer
 
 from matcha_ml.cli.ui.emojis import Emojis
 from matcha_ml.cli.ui.print_messages import (
@@ -16,8 +17,8 @@ from matcha_ml.cli.ui.resource_message_builders import (
     hide_sensitive_in_output,
 )
 from matcha_ml.cli.ui.status_message_builders import (
-    build_status,
     build_resource_confirmation,
+    build_status,
 )
 from matcha_ml.errors import MatchaInputError
 from matcha_ml.runners.base_runner import BaseRunner
@@ -39,33 +40,19 @@ class AzureRunner(BaseRunner):
         """Initialize AzureRunner class."""
         super().__init__()
 
-    def is_approved(self, verb: str) -> bool:
+    def is_approved(self, verb: str, resources: List[Tuple[str, str]]) -> bool:
         """Get approval from user to modify resources on cloud.
 
         Args:
             verb (str): the verb to use in the approval message.
+            resources(list): the list of resources to be actioned by the verb to be provided to the user as a status message
 
         Returns:
             bool: True if user approves, False otherwise.
         """
         summary_message = build_resource_confirmation(
             header=f"The following resources will be {verb}ed",
-            resources=[
-                ("Azure Kubernetes Service (AKS)", "A kubernetes cluster"),
-                (
-                    "Two Storage Containers",
-                    "A storage container for experiment tracking artifacts and a second for model training artifacts",
-                ),
-                (
-                    "Seldon Core",
-                    "A framework for model deployment on top of a kubernetes cluster",
-                ),
-                (
-                    "Azure Container Registry",
-                    "A container registry for storing docker images",
-                ),
-                ("ZenServer", "A zenml server required for remote orchestration"),
-            ],
+            resources=resources,
             footer=f"{verb.capitalize()}ing the resources may take approximately 20 minutes. May we suggest you grab a cup of {Emojis.MATCHA.value}?",
         )
 
@@ -137,39 +124,6 @@ class AzureRunner(BaseRunner):
             resources_dict = hide_sensitive_in_output(json.loads(fp.read()))
             resources_json = dict_to_json(resources_dict)
             print_json(resources_json)
-
-    def is_approved(self, verb: str) -> bool:
-        """Get approval from user to modify resources on cloud.
-
-        Args:
-            verb (str): the verb to use in the approval message.
-
-        Returns:
-            bool: True if user approves, False otherwise.
-        """
-        summary_message = build_resource_confirmation(
-            header=f"The following resources will be {verb}ed",
-            resources=[
-                ("Azure Kubernetes Service (AKS)", "A kubernetes cluster"),
-                (
-                    "Two Storage Containers",
-                    "A storage container for experiment tracking artifacts and a second for model training artifacts",
-                ),
-                (
-                    "Seldon Core",
-                    "A framework for model deployment on top of a kubernetes cluster",
-                ),
-                (
-                    "Azure Container Registry",
-                    "A container registry for storing docker images",
-                ),
-                ("ZenServer", "A zenml server required for remote orchestration"),
-            ],
-            footer=f"{verb.capitalize()}ing the resources may take approximately 20 minutes. May we suggest you grab a cup of {Emojis.MATCHA.value}?",
-        )
-
-        print_status(summary_message)
-        return typer.confirm(f"Are you happy for '{verb}' to run?")
 
     def _write_outputs_state_cloud_only(self) -> None:
         """Write the outputs of the Terraform deployment to the state JSON file."""

@@ -232,7 +232,7 @@ def test_deprovision_remote_state(
 
         captured = capsys.readouterr()
 
-        expected_output = "Destroying remote state management is complete!"
+        expected_output = "Destroying Matcha resources is complete!"
 
         template_runner = RemoteStateRunner()
         template_runner.deprovision.assert_called()
@@ -467,7 +467,7 @@ def test_is_state_provisioned_returns_false_when_resource_group_does_not_exist(
     # Make sure the check for the storage container is not called
     mock_azure_storage_instance.container_exists.assert_not_called()
 
- 
+
 def test_remove_matcha_config(capsys: SysCapture):
     """Test the functionality of the `remove_matcha_config` function by verifying if it correctly catches the "File not found" error and throws the expected error message.
 
