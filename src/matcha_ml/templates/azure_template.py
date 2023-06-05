@@ -7,6 +7,7 @@ import typer
 
 from matcha_ml.cli._validation import check_current_deployment_exists
 from matcha_ml.cli.ui.print_messages import print_status
+from matcha_ml.errors import MatchaError
 from matcha_ml.state import MatchaStateService
 from matcha_ml.templates.base_template import BaseTemplate, TemplateVariables
 
@@ -56,13 +57,15 @@ class AzureTemplate(BaseTemplate):
                         "cloud", "prefix"
                     )["cloud"]["prefix"]
                 )
-                warning_msg = f"\nWARNING: Matcha has detected that a deployment already exists in Azure with the resource group name '{resource_group_name}'. Use 'matcha destroy' to remove these resources before trying to provision."
-                confirmation_msg = "\nIf you continue, you will create a orphan resource. You should destroy the resources before proceeding.\n\nDo you want to override the existing configuration?"
+                warning_msg = f"\nWARNING: Matcha has detected that a deployment already exists in Azure with the resource group name '{resource_group_name}'."
+                print_status(warning_msg)
+                raise MatchaError(
+                    "Use 'matcha destroy' to remove the existing resources before trying to provision again."
+                )
             else:
                 warning_msg = "\nMatcha has detected that the you already have resources configured for provisioning."
                 confirmation_msg = "\nIf you choose to override the existing configuration, the existing configuration will be deleted. Otherwise, the configuration will be reused.\n\nDo you want to override the existing configuration?"
-
-            print_status(warning_msg)
+                print_status(warning_msg)
 
             return not typer.confirm(confirmation_msg)
         else:
