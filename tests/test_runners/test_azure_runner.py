@@ -266,6 +266,7 @@ def test_deprovision(
     """
     template_runner._check_terraform_installation = MagicMock()
     template_runner._check_matcha_directory_exists = MagicMock()
+    template_runner._initialize_terraform = MagicMock()
     template_runner._destroy_terraform = MagicMock()
     matcha_state_file_dir = os.path.join(
         matcha_testing_directory, ".matcha", "infrastructure", "matcha.state"

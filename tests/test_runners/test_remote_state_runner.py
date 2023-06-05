@@ -115,6 +115,7 @@ def test_deprovision(
 
     template_runner._check_terraform_installation = MagicMock()
     template_runner._check_matcha_directory_exists = MagicMock()
+    template_runner._initialize_terraform = MagicMock()
     template_runner._destroy_terraform = MagicMock()
 
     with mock.patch("typer.confirm") as mock_confirm:
