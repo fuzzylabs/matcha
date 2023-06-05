@@ -119,7 +119,7 @@ def destroy(
     else:
         print_status(
             build_warning_status(
-                "Warning: a storage container holding Matcha state information will persist. To destroy ALL clound resources, run 'matcha destroy full'."
+                "Warning: a storage container holding Matcha state information will persist. To destroy ALL cloud resources, run 'matcha destroy full'."
             )
         )
         destroy_resources(resources=RESOURCE_MSG)
