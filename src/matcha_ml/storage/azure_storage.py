@@ -7,6 +7,7 @@ from typing import Set
 
 from azure.storage.blob import BlobClient, BlobServiceClient, ContainerClient
 
+from matcha_ml.constants import LOCK_FILE_NAME
 from matcha_ml.services.azure_service import AzureClient
 
 IGNORE_FOLDERS = [".terraform"]
@@ -127,6 +128,8 @@ class AzureStorage:
         container_client = self._get_container_client(container_name)
 
         for blob in container_client.list_blobs():
+            if LOCK_FILE_NAME in str(blob.name):
+                continue
             blob_client = container_client.get_blob_client(blob=str(blob.name))
             file_path = os.path.join(dest_folder_path, str(blob.name))
 
@@ -224,6 +227,9 @@ class AzureStorage:
 
         # Remove blobs that are not present in the local `src_folder_path``
         for blob in blob_set:
+            # Ensure that the lock file is not being prematurely removed from the remote bucket
+            if LOCK_FILE_NAME in blob:
+                continue
             container_client.delete_blob(blob)
 
     def _sync_local(self, dest_folder_path: str) -> None:

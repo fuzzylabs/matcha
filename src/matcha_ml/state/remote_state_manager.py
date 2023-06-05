@@ -12,13 +12,13 @@ from matcha_ml.cli.ui.status_message_builders import (
     build_step_success_status,
     build_warning_status,
 )
+from matcha_ml.constants import LOCK_FILE_NAME
 from matcha_ml.errors import MatchaError
 from matcha_ml.runners import RemoteStateRunner
 from matcha_ml.storage import AzureStorage
 from matcha_ml.templates import RemoteStateTemplate
 
 DEFAULT_CONFIG_NAME = "matcha.config.json"
-LOCK_FILE_NAME = "matcha.lock"
 ALREADY_LOCKED_MESSAGE = (
     "Remote state is already locked, maybe someone else is using matcha?"
     "If you think this is a mistake, you can unlock the state by running 'matcha force-unlock'."
