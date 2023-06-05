@@ -3,11 +3,8 @@ import json
 import os
 from typing import Optional
 
-import typer
-
 from matcha_ml.cli._validation import check_current_deployment_exists
 from matcha_ml.cli.ui.print_messages import print_status
-from matcha_ml.errors import MatchaError
 from matcha_ml.state import MatchaStateService
 from matcha_ml.templates.base_template import BaseTemplate, TemplateVariables
 
@@ -40,36 +37,24 @@ class AzureTemplate(BaseTemplate):
         """
         super().__init__(SUBMODULE_NAMES)
 
-    def reuse_configuration(self, path: str) -> bool:
-        """Check if a configuration already exists, and prompt user to override or reuse it.
+    def check_current_configuration_is_provisioned(self, path: str) -> bool:
+        """Check if a deployed configuration already exists.
 
         Args:
             path (str): path to the infrastructure configuration
 
         Returns:
-            bool: decision to reuse the existing configuration
+            bool: True, if the current configuration is provisioned
         """
-        if os.path.exists(path):
-            if check_current_deployment_exists():
-                matcha_state_service = MatchaStateService()
-                resource_group_name = (
-                    matcha_state_service.fetch_resources_from_state_file(
-                        "cloud", "prefix"
-                    )["cloud"]["prefix"]
-                )
-                warning_msg = f"\nWARNING: Matcha has detected that a deployment already exists in Azure with the resource group name '{resource_group_name}'."
-                print_status(warning_msg)
-                raise MatchaError(
-                    "Use 'matcha destroy' to remove the existing resources before trying to provision again."
-                )
-            else:
-                warning_msg = "\nMatcha has detected that the you already have resources configured for provisioning."
-                confirmation_msg = "\nIf you choose to override the existing configuration, the existing configuration will be deleted. Otherwise, the configuration will be reused.\n\nDo you want to override the existing configuration?"
-                print_status(warning_msg)
-
-            return not typer.confirm(confirmation_msg)
-        else:
-            return False
+        if os.path.exists(path) and check_current_deployment_exists():
+            matcha_state_service = MatchaStateService()
+            resource_group_name = matcha_state_service.fetch_resources_from_state_file(
+                "cloud", "prefix"
+            )["cloud"]["prefix"]
+            warning_msg = f"\nWARNING: Matcha has detected that a deployment already exists in Azure with the resource group name '{resource_group_name}'."
+            print_status(warning_msg)
+            return True
+        return False
 
     def build_template(
         self,

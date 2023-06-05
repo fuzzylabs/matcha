@@ -12,6 +12,7 @@ from matcha_ml.cli.ui.status_message_builders import (
     build_step_success_status,
     build_warning_status,
 )
+from matcha_ml.errors import MatchaError
 from matcha_ml.runners import AzureRunner
 from matcha_ml.state import RemoteStateManager
 from matcha_ml.templates import AzureTemplate
@@ -117,15 +118,19 @@ def provision_resources(
         # Create a azure template object
         azure_template = AzureTemplate()
 
-        if not azure_template.reuse_configuration(destination):
-            location, prefix, password = fill_provision_variables(
-                location, prefix, password
+        if azure_template.check_current_configuration_is_provisioned(destination):
+            raise MatchaError(
+                "Use 'matcha destroy' to remove the existing resources before trying to provision again."
             )
 
-            config = azure_template.build_template_configuration(
-                location=location, prefix=prefix, password=password
-            )
-            azure_template.build_template(config, template, destination, verbose)
+        location, prefix, password = fill_provision_variables(
+            location, prefix, password
+        )
+
+        config = azure_template.build_template_configuration(
+            location=location, prefix=prefix, password=password
+        )
+        azure_template.build_template(config, template, destination, verbose)
 
         # Initializes the infrastructure provisioning process.
         if template_runner.is_approved(verb="provision", resources=RESOURCE_MSG):

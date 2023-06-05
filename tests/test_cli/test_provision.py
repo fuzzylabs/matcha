@@ -501,58 +501,6 @@ def test_cli_provision_command_with_password_mismatch(
     mock_use_lock.assert_called_once()
 
 
-def test_cli_provision_command_reuse(
-    runner: CliRunner, matcha_testing_directory: str, mock_use_lock: MagicMock
-):
-    """Test provision command to reuse the configuration file within the .matcha directory.
-
-    Args:
-        runner (CliRunner): typer CLI runner
-        matcha_testing_directory (str): temporary working directory.
-        mock_use_lock (MagicMock): mock use_lock context manager
-    """
-    os.chdir(matcha_testing_directory)
-
-    # Invoke provision command for the first time which creates the .matcha directory
-    runner.invoke(
-        app,
-        ["provision", "--location", "uksouth", "--prefix", "matcha"],
-        input="default\ndefault\nY\n",
-    )
-
-    resources_destination_path = os.path.join(
-        matcha_testing_directory, ".matcha", "infrastructure", "resources"
-    )
-
-    # Touch a 'dummy.tf' file in the infrastructure configuration directory within the .matcha directory
-    with open(os.path.join(resources_destination_path, "dummy.tf"), "a"):
-        ...
-
-    with patch(
-        "matcha_ml.state.remote_state_manager.RemoteStateManager._resource_group_exists"
-    ) as check_deployment_exists:
-        check_deployment_exists.return_value = True
-        # Invoke provision command for a second time, electing to reuse the existing .matcha directory and therefore retain the 'dummy.tf' file
-        runner.invoke(
-            app,
-            ["provision", "--location", "uksouth", "--prefix", "matcha"],
-            input="default\ndefault\nn\nY\n",
-        )
-
-    # Checks the 'dummy.tf' file is present within the reused .matcha directory
-    assert os.path.exists(os.path.join(resources_destination_path, "dummy.tf"))
-
-    resources_expected_tf_vars = {
-        "location": "uksouth",
-        "prefix": "matcha",
-        "password": "default",
-    }
-
-    assert_infrastructure(resources_destination_path, resources_expected_tf_vars)
-
-    assert mock_use_lock.call_count == RUN_TWICE
-
-
 def test_cli_provision_command_with_provisioned_resources(
     runner: CliRunner, matcha_testing_directory: str, mock_use_lock: MagicMock
 ):
@@ -563,6 +511,7 @@ def test_cli_provision_command_with_provisioned_resources(
         matcha_testing_directory (str): temporary working directory.
         mock_use_lock (MagicMock): mock use_lock context manager
     """
+    # TODO UPDATE TEST
     os.chdir(matcha_testing_directory)
 
     # Invoke provision command for the first time which creates the .matcha directory
