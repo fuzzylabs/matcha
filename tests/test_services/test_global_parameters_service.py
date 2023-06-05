@@ -18,19 +18,30 @@ def teardown_singleton():
     GlobalParameters._instance = None
 
 
-def test_class_is_singleton(matcha_testing_directory):
+@pytest.fixture
+def config_path(matcha_testing_directory) -> str:
+    """The location for the configuration as a fixture.
+
+    Args:
+        matcha_testing_directory (str): a mock testing directory, created for testing purposes
+
+    Returns:
+        str: the path for the config.
+    """
+    return os.path.join(matcha_testing_directory, ".config", "matcha-ml", "config.yaml")
+
+
+def test_class_is_singleton(config_path):
     """Tests that the GlobalParameters is correctly implemented as a singleton.
 
     Args:
-        matcha_testing_directory (str): Mock testing directory location for the config file to be located
+        config_path (str): Mock testing directory location for the config file to be located
     """
     with mock.patch(
         f"{INTERNAL_FUNCTION_STUB}.default_config_file_path",
         new_callable=mock.PropertyMock,
     ) as file_path:
-        file_path.return_value = str(
-            os.path.join(str(matcha_testing_directory), ".matcha-ml", "config.yaml")
-        )
+        file_path.return_value = config_path
 
         first_instance = GlobalParameters()
         second_instance = GlobalParameters()
@@ -40,54 +51,47 @@ def test_class_is_singleton(matcha_testing_directory):
         assert first_instance.analytics_opt_out is second_instance.analytics_opt_out
 
 
-def test_new_config_file_creation(matcha_testing_directory):
+def test_new_config_file_creation(config_path):
     """Tests that a new file is created if it does not exist when the global parameters object is instantiated.
 
     Args:
-        matcha_testing_directory (str): Mock testing directory location for the config file to be located
+        config_path (str): Mock testing directory location for the config file to be located
     """
-    config_file_path = os.path.join(
-        matcha_testing_directory, ".matcha-ml", "config.yaml"
-    )
     with mock.patch(
         f"{INTERNAL_FUNCTION_STUB}.default_config_file_path",
         new_callable=mock.PropertyMock,
     ) as file_path:
-        file_path.return_value = config_file_path
+        file_path.return_value = config_path
 
-        assert not os.path.exists(config_file_path)
+        assert not os.path.exists(config_path)
         _ = GlobalParameters()
-        assert os.path.exists(config_file_path)
+        assert os.path.exists(config_path)
 
 
-def test_existing_config_file(matcha_testing_directory, uuid_for_testing):
+def test_existing_config_file(config_path, uuid_for_testing):
     """Tests that the class variables are updated when there is an existing config file.
 
     Args:
-        matcha_testing_directory (str): Mock testing directory location for the config file to be located
+        config_path (str): Mock testing directory location for the config file to be located
         uuid_for_testing (uuid.UUID): a UUID which acts as a mock for the user_id
     """
-    config_file_path = os.path.join(
-        matcha_testing_directory, ".matcha-ml", "config.yaml"
-    )
-
     data = {
         "user_id": str(uuid_for_testing),
         "analytics_opt_out": False,
     }
 
     # Create the '.matcha-ml' config directory
-    os.makedirs(os.path.dirname(config_file_path), exist_ok=True)
+    os.makedirs(os.path.dirname(config_path), exist_ok=True)
 
     # Create config file and populate with the current class variables
-    with open(config_file_path, "w") as file:
+    with open(config_path, "w") as file:
         yaml.dump(data, file)
 
     with mock.patch(
         f"{INTERNAL_FUNCTION_STUB}.default_config_file_path",
         new_callable=mock.PropertyMock,
     ) as file_path:
-        file_path.return_value = config_file_path
+        file_path.return_value = config_path
 
         config_instance = GlobalParameters()
         assert config_instance.config_file == {
@@ -98,21 +102,17 @@ def test_existing_config_file(matcha_testing_directory, uuid_for_testing):
         assert config_instance.analytics_opt_out is False
 
 
-def test_opt_out(matcha_testing_directory):
+def test_opt_out(config_path):
     """Tests that the opt out function changes the class variables and the global config file.
 
     Args:
-        matcha_testing_directory (str): Mock testing directory location for the Global Parameteres file to be located
+        config_path (str): Mock testing directory location for the Global Parameteres file to be located
     """
-    config_file_path = os.path.join(
-        matcha_testing_directory, ".matcha-ml", "config.yaml"
-    )
-
     with mock.patch(
         f"{INTERNAL_FUNCTION_STUB}.default_config_file_path",
         new_callable=mock.PropertyMock,
     ) as file_path:
-        file_path.return_value = config_file_path
+        file_path.return_value = config_path
 
         config_instance = GlobalParameters()
 
@@ -125,20 +125,18 @@ def test_opt_out(matcha_testing_directory):
         assert config_instance.analytics_opt_out is True
 
 
-def test_config_file_write_permissions(matcha_testing_directory):
+def test_config_file_write_permissions(matcha_testing_directory, config_path):
     """Tests the permissions error thrown where the user does not have permission to write a config file.
 
     Args:
-        matcha_testing_directory (str): Mock testing directory location for the config file to be located
+        matcha_testing_directory (str): Mock testing directory.
+        config_path (str): the location in which the configuration will be stored.
     """
-    config_file_path = os.path.join(
-        matcha_testing_directory, ".matcha-ml", "config.yaml"
-    )
     with mock.patch(
         f"{INTERNAL_FUNCTION_STUB}.default_config_file_path",
         new_callable=mock.PropertyMock,
     ) as file_path:
-        file_path.return_value = config_file_path
+        file_path.return_value = config_path
 
         # Alters the permissions on the testing directory to be read-only
         os.chmod(matcha_testing_directory, S_IREAD)

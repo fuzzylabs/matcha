@@ -119,8 +119,9 @@ class GlobalParameters:
         Returns:
             The default global configuration directory.
         """
-        home_path = os.path.expanduser("~")
-        return os.path.join(home_path, ".matcha-ml", "config.yaml")
+        config_path = os.path.join(os.path.expanduser("~"), ".config")
+
+        return os.path.join(config_path, "matcha-ml", "config.yaml")
 
     @property
     def config_file(self) -> Dict[str, Any]:
