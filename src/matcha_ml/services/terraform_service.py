@@ -118,13 +118,12 @@ class TerraformService:
         return Path(self.config.var_file).exists()
 
     def get_tf_state_dir(self) -> Path:
-        """Get the path of the terraform.tfstate file generated on completion of `terraform init`.
+        """Get the path to the `.terraform` folder generated on completion of `terraform init`.
 
         Returns:
-            Path: a Path object that represents the path to the terraform.tfstate file
-        directory.
+            Path: a Path object that represents the path to the `.terraform` folder.
         """
-        return Path(os.path.join(self.config.working_dir, "terraform.tfstate"))
+        return Path(os.path.join(self.config.working_dir, ".terraform"))
 
     def init(self) -> Tuple[int, str, str]:
         """Run `terraform init` with the initialised Terraform client from the python_terraform module.
