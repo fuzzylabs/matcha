@@ -40,6 +40,9 @@ def get(
         # if the state file doesn't exist, then download it from the remote
         remote_state.download(os.getcwd())
 
+        # reinitialise to create the necessary variables
+        remote_state = RemoteStateManager()
+
     with remote_state.use_lock():
         local_hash = matcha_state_service.get_hash_local_state()
         remote_hash = remote_state.get_hash_remote_state(
