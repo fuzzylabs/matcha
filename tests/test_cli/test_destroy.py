@@ -12,7 +12,7 @@ from matcha_ml.cli.cli import app
 def mock_remote_state_manager() -> Iterable[MagicMock]:
     """Mock remote state manager to have state provisioned.
 
-    Returns:
+    Yields:
         MagicMock: mock of an RemoteStateManager instance
     """
     with patch("matcha_ml.cli.destroy.RemoteStateManager") as mock_state_manager_class:
