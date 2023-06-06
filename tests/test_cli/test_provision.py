@@ -19,6 +19,8 @@ TEMPLATE_DIR = os.path.join(
 
 RUN_TWICE = 2
 
+REMOTE_STATE_MANAGER_PREFIX = "matcha_ml.state.remote_state_manager.RemoteStateManager"
+
 
 @pytest.fixture(autouse=True)
 def mock_provisioned_remote_state():
@@ -511,10 +513,10 @@ def test_cli_provision_command_with_provisioned_resources(
         matcha_testing_directory (str): temporary working directory.
         mock_use_lock (MagicMock): mock use_lock context manager
     """
-    # TODO UPDATE TEST
+    # change to matcha testing directory
     os.chdir(matcha_testing_directory)
 
-    # Invoke provision command for the first time which creates the .matcha directory
+    # invoke the provision command for the first time, which creates the .matcha directory
     runner.invoke(
         app,
         [
@@ -533,21 +535,20 @@ def test_cli_provision_command_with_provisioned_resources(
         matcha_testing_directory, ".matcha", "infrastructure", "resources"
     )
 
-    # Touch a 'dummy.tf' file in the infrastructure configuration directory within the .matcha directory
-    with open(os.path.join(resources_destination_path, "dummy.tf"), "a"):
+    # create a dummy terraform file within the resources directory in .matcha
+    dummy_file_path = os.path.join(resources_destination_path, "dummy.tf")
+    with open(dummy_file_path, "a"):
         ...
 
-    # Mock functions such that a deployment on Azure exists
+    assert os.path.exists(dummy_file_path)
+
+    # we need to mock an Azure deployment here so Matcha exits when we expect it to
     with patch(
-        "matcha_ml.templates.azure_template.check_current_deployment_exists"
-    ) as check_deployment_exists, patch(
-        "matcha_ml.templates.azure_template.MatchaStateService.fetch_resources_from_state_file"
-    ) as fetch_resources_from_state_file:
-        check_deployment_exists.return_value = True
-        fetch_resources_from_state_file.return_value = {
-            "cloud": {"resource-group-name": "matcha-resources", "prefix": "matcha"}
-        }
-        # Invoke provision command for a second time, which overwrites the existing .matcha directory and removes the 'dummy.tf' file
+        f"{REMOTE_STATE_MANAGER_PREFIX}.is_state_provisioned"
+    ) as is_state_provisioned:
+        is_state_provisioned.return_value = True
+
+        # the result here should be that Matcha exits displaying a warning that the resources are already provisioned
         result = runner.invoke(
             app,
             [
@@ -559,26 +560,12 @@ def test_cli_provision_command_with_provisioned_resources(
                 "--password",
                 "ninja",
             ],
-            input="Y\nY\n",
         )
 
-    # Checks the 'dummy.tf' file is not present within the overwritten .matcha directory
-    assert not os.path.exists(os.path.join(resources_destination_path, "dummy.tf"))
-
-    resources_expected_tf_vars = {
-        "location": "uksouth",
-        "prefix": "matcha",
-        "password": "ninja",
-    }
-
-    assert_infrastructure(resources_destination_path, resources_expected_tf_vars)
-
     assert (
-        "WARNING: Matcha has detected that a deployment already exists in Azure"
+        "WARNING - Matcha has detected that there are resources already provisioned."
         in result.stdout
     )
-
-    assert mock_use_lock.call_count == RUN_TWICE
 
 
 def test_remote_state_removed_when_remote_state_is_stale_with_user_confirmation(

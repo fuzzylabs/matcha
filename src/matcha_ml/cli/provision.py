@@ -12,7 +12,6 @@ from matcha_ml.cli.ui.status_message_builders import (
     build_step_success_status,
     build_warning_status,
 )
-from matcha_ml.errors import MatchaError
 from matcha_ml.runners import AzureRunner
 from matcha_ml.state import RemoteStateManager
 from matcha_ml.templates import AzureTemplate
@@ -78,29 +77,21 @@ def provision_resources(
         typer.Exit: if approval for removing a stale state is not given by user.
     """
     remote_state_manager = RemoteStateManager()
+    is_provisioned = remote_state_manager.is_state_provisioned()
 
-    if remote_state_manager.is_state_stale():
+    if is_provisioned:
         print_status(
             build_warning_status(
-                "Matcha has detected a stale state file. This means that your local configuration is out of sync with the remote state, the resource group may have been removed."
+                "WARNING - Matcha has detected that there are resources already provisioned. Use 'matcha destroy' to remove the existing resources before trying to provision again."
             )
         )
+        raise typer.Exit()
 
-        if not typer.confirm(
-            "Do you want to remove the existing local config and continue?"
-        ):
-            raise typer.Exit()
-
-        remote_state_manager.remove_matcha_config()
-        # Re-initialise remote state manager with empty state file
-        remote_state_manager = RemoteStateManager()
-
-    # Check whether remote state storage has been provisioned
-    if not remote_state_manager.is_state_provisioned():
+    if not is_provisioned:
         location, prefix, _ = fill_provision_variables(
             location=location, prefix=prefix, password="temp"
         )
-        # Provision a state storage if it's not provisioned
+
         remote_state_manager.provision_remote_state(location, prefix)
 
     with remote_state_manager.use_lock(), remote_state_manager.use_remote_state():
@@ -117,11 +108,6 @@ def provision_resources(
 
         # Create a azure template object
         azure_template = AzureTemplate()
-
-        if azure_template.check_current_configuration_is_provisioned(destination):
-            raise MatchaError(
-                "Use 'matcha destroy' to remove the existing resources before trying to provision again."
-            )
 
         location, prefix, password = fill_provision_variables(
             location, prefix, password

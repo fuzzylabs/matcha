@@ -3,9 +3,6 @@ import json
 import os
 from typing import Optional
 
-from matcha_ml.cli._validation import check_current_deployment_exists
-from matcha_ml.cli.ui.print_messages import print_status
-from matcha_ml.state import MatchaStateService
 from matcha_ml.templates.base_template import BaseTemplate, TemplateVariables
 
 SUBMODULE_NAMES = [
@@ -36,25 +33,6 @@ class AzureTemplate(BaseTemplate):
             submodule_names (List[str]): A list of submodule names.
         """
         super().__init__(SUBMODULE_NAMES)
-
-    def check_current_configuration_is_provisioned(self, path: str) -> bool:
-        """Check if a deployed configuration already exists.
-
-        Args:
-            path (str): path to the infrastructure configuration
-
-        Returns:
-            bool: True, if the current configuration is provisioned
-        """
-        if os.path.exists(path) and check_current_deployment_exists():
-            matcha_state_service = MatchaStateService()
-            resource_group_name = matcha_state_service.fetch_resources_from_state_file(
-                "cloud", "prefix"
-            )["cloud"]["prefix"]
-            warning_msg = f"\nWARNING: Matcha has detected that a deployment already exists in Azure with the resource group name '{resource_group_name}'."
-            print_status(warning_msg)
-            return True
-        return False
 
     def build_template(
         self,

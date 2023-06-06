@@ -27,7 +27,7 @@ def destroy_resources(resources: List[Tuple[str, str]]) -> None:
     remote_state = RemoteStateManager()
     if not remote_state.is_state_provisioned():
         print_error(
-            "Error - matcha state has not been initialized, nothing to destroy."
+            "Error - resources that have not been provisioned cannot be destroy. Run 'matcha provision' to get started!"
         )
         raise typer.Exit()
 

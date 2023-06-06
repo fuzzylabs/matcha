@@ -1,5 +1,4 @@
 """Test suite to test the azure template."""
-
 import pytest
 
 from matcha_ml.templates import AzureTemplate
@@ -13,7 +12,3 @@ def azure_template() -> AzureTemplate:
         AzureTemplate: the Azure template.
     """
     return AzureTemplate()
-
-
-# def test_check_current_configuration_is_provisioned()
-# TODO
