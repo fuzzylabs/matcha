@@ -150,6 +150,6 @@ class AzureRunner(BaseRunner):
         """Destroy the provisioned resources."""
         self._check_matcha_directory_exists()
         self._check_terraform_installation()
-        self._initialize_terraform(msg="Matcha")
+        self._initialize_terraform(msg="Matcha", destroy=True)
         self._destroy_terraform(msg="Matcha")
         self._write_outputs_state_cloud_only()

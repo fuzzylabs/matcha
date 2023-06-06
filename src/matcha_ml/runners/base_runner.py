@@ -71,20 +71,22 @@ class BaseRunner:
         """
         self.tfs.verify_kubectl_config_file(base_path)
 
-    def _initialize_terraform(self, msg: str = "") -> None:
+    def _initialize_terraform(self, msg: str = "", destroy: bool = False) -> None:
         """Run terraform init to initialize Terraform .
 
         Raises:
             MatchaTerraformError: if 'terraform init' failed.
             msg (str) : Message to display. Default is empty string.
+            destroy (bool): whether this function is being called in a destructive context
         """
         if self.tf_state_dir.exists():
-            # this directory gets created after a successful init command
-            print_status(
-                build_status(
-                    f"matcha {Emojis.MATCHA.value} has already been initialized. Skipping this step..."
+            if not destroy:
+                # this directory gets created after a successful init command
+                print_status(
+                    build_status(
+                        f"matcha {Emojis.MATCHA.value} has already been initialized. Skipping this step..."
+                    )
                 )
-            )
 
         else:
             print_status(

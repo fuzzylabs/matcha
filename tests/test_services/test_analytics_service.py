@@ -51,12 +51,7 @@ def test_segment_track_recieves_the_correct_arguments(
     """
     os.chdir(matcha_testing_directory)
 
-    # Invoke destroy command
-    with patch(
-        "matcha_ml.templates.azure_template.check_current_deployment_exists"
-    ) as check_deployment_exists:
-        check_deployment_exists.return_value = False
-        runner.invoke(app, ["destroy"])
+    runner.invoke(app, ["destroy"])
 
     # Check that the mocked segment track was called
     mocked_segment_track_decorator.assert_called()
@@ -87,12 +82,9 @@ def test_tracking_does_not_happen_when_opted_out(
 
     # Invoke destroy command with a GlobalParameter opting out of data collection
     with patch(
-        "matcha_ml.templates.azure_template.check_current_deployment_exists"
-    ) as check_deployment_exists, patch(
         f"{GLOBAL_PARAMETER_SERVICE_FUNCTION_STUB}.analytics_opt_out",
         new_callable=PropertyMock,
     ):
-        check_deployment_exists.return_value = False
         runner.invoke(app, ["destroy"])
 
     # Check that the mocked segment track was not called
