@@ -1,0 +1,8 @@
+:root {
+    --md-primary-fg-color: #8211ff;
+    --md-typeset-a-color: #8211ff;
+}
+
+header footer {
+  padding: 12px;
+}
