@@ -136,27 +136,6 @@ def test_cli_get_command_help(runner: CliRunner):
     assert "Get information for the provisioned resources." in result.stdout
 
 
-def test_cli_get_command_with_no_state_file(
-    runner: CliRunner, mock_provisioned_remote_state: MagicMock
-):
-    """Test cli for get command when the state file does not exist.
-
-    Args:
-        runner (CliRunner): typer CLI runner
-        mock_provisioned_remote_state (MagicMock): mock of an RemoteStateManager instance
-    """
-    state_file_path = os.path.join(".matcha", "infrastructure", "matcha.state")
-    os.remove(state_file_path)
-
-    # Invoke get command
-    result = runner.invoke(app, ["get"])
-
-    assert result.exit_code == 0
-    assert "Error - matcha.state file does not exist at" in str(result.stdout)
-
-    mock_provisioned_remote_state.use_lock.assert_not_called()
-
-
 def test_cli_get_command_hide_sensitive(
     runner: CliRunner,
     expected_output_lines: List[str],

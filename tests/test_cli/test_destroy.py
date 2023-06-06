@@ -50,12 +50,7 @@ def test_cli_destroy_command_with_no_provisioned_resources(
 
     mock_remote_state_manager.is_state_provisioned.return_value = True
 
-    # Invoke destroy command
-    with patch(
-        "matcha_ml.templates.azure_template.check_current_deployment_exists"
-    ) as check_deployment_exists:
-        check_deployment_exists.return_value = False
-        result = runner.invoke(app, ["destroy"])
+    result = runner.invoke(app, ["destroy"])
 
     assert (
         "Error - you cannot destroy resources that have not been provisioned yet."

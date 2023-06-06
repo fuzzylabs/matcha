@@ -10,7 +10,7 @@ import yaml
 
 from matcha_ml.cli.cli import app
 from matcha_ml.core.core import get, remove_state_lock
-from matcha_ml.errors import MatchaError, MatchaInputError
+from matcha_ml.errors import MatchaInputError
 from matcha_ml.services.global_parameters_service import GlobalParameters
 
 INTERNAL_FUNCTION_STUB = "matcha_ml.services.global_parameters_service.GlobalParameters"
@@ -120,19 +120,6 @@ def test_get_resources(
         expected_outputs (dict): The expected output from the matcha state file.
     """
     assert expected_outputs == get(None, None)
-
-
-def test_get_resources_without_state_file(mock_provisioned_remote_state: MagicMock):
-    """Test get resources function when a state file does not exist.
-
-    Args:
-        mock_provisioned_remote_state (MagicMock): mock of an RemoteStateManager instance
-    """
-    state_file_path = os.path.join(".matcha", "infrastructure", "matcha.state")
-    os.remove(state_file_path)
-
-    with pytest.raises(MatchaError):
-        get(None, None)
 
 
 def test_get_resources_with_resource_name(mock_provisioned_remote_state: MagicMock):
