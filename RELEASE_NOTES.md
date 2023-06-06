@@ -1,3 +1,35 @@
+# v0.2.5
+
+# &#129309; Matcha goes multi-user!
+
+In this version, we're introducing remote state management. What this means is that more than one user can use and interact with Azure resources provisioned using Matcha.
+
+Our goal is to build a tool that is useful and as usable as possible and to understand this, we're also introducing analytics. These analytics enable us to anonymously understand how the tool is being used. We've provided detailed information about this in [our documentation](https://mymatcha.ai/privacy/)
+
+Date: 6th June 2023
+
+## Features
+
+### &#129489;&#8205;&#127891; Remote State Management
+
+Instead of state being managed locally, meaning that only a single user could use Matcha to provision and interact with resources, state is now managed on Azure. For this to work, we're provisioning an additional bucket on Azure to act as a state oracle.
+
+When a set of resources are provisioned, a `matcha.config.json` file will be created - this enables Matcha to communicate with the resources and must be included in your version control to enable resource sharing between users.
+
+How this works under the hood has been described in detail [here](https://mymatcha.ai/inside-matcha/)
+
+### Analytics
+
+We want to make a tool that is both useful and usable. To achieve this, it's important that we understand how the tool is being used by the community.
+
+By collecting fully anonymised usage data, i.e., logging a command being run, it'll enable us to accelerate development and demonstrate value both for us and potential partners.
+
+This version implements that functionality.
+
+We've explained what we're collecting and why in our documentation - see [here](https://mymatcha.ai/privacy/). Users are automatically opted-in to the collection of the usage data, however, we've implemented functionality to opt-out: `matcha analytics opt-out`
+
+See all changes here: https://github.com/fuzzylabs/matcha/compare/v0.2.4...v0.2.5
+
 # 0.2.4
 
 &#128293; This version contains a hot fix for matcha get command, so it does not throw an error when run without arguments.
