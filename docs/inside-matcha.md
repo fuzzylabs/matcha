@@ -1,6 +1,6 @@
 # :thinking: How does Matcha work?
 
-Matcha is a tool which will provision an MLOps environment for you to use. To do that, we make use of various open source tools and libraries. Here, we'll provide a deep dive into how Matcha actually works.
+Matcha is a tool that will provision an MLOps environment for you to use. To do that, we make use of various open source tools and libraries. Here, we'll provide a deep dive into how Matcha actually works.
 
 Below is a diagram describing what happens when you use each of the commands implemented by Matcha.
 
@@ -27,12 +27,9 @@ To enable multiple users to use the same set of provisioned resources, the user 
 
 ## `get`
 
-Through `get`, the user can fetch information about their provisioned resources. In its current form, `get` interacts with the `matcha.state` file. We envision that this will interact with a remote state file, enabling a multi-user shared MLOps environment - this is on our roadmap.
-
-The user can use `get` to configure their workflow, for example, by getting the endpoint for their MLFlow experiment tracker.
+Through `get`, the user can fetch information about their provisioned resources. Matcha `get` interacts with the `matcha.state` file, which is stored locally and in the cloud. The local `matcha.state` file will be synchronised with the cloud file to ensure that changes to the provisioned state are reflected in each user's environment.
+The user can use `get` to request information on specific resourcs or properties by using the built-in arguments, and specify the format in which that information is returned by using the `--output` option. For more details, run `matcha get --help`. This enables the user to configure their workflow, for example, by getting the endpoint for their MLFlow experiment tracker.
 
 ## `destroy`
 
-Once the user has finished with their provisioned environment, `destroy` enables them to tear down the resources.
-
-It works by calling the `destroy` Terraform command vai the `python-terraform` library, which interacts with the configured Terraform files in the `.matcha/` directory.
+Once the user has finished with their provisioned environment, `destroy` enables them to tear down the resources. It works by calling the `destroy` Terraform command vai the `python-terraform` library, which interacts with the configured Terraform files in the `.matcha/` directory.
