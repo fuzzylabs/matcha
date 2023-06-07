@@ -2,11 +2,8 @@
 import json
 import uuid
 from collections import defaultdict
-from typing import Dict, List, Tuple
+from typing import Dict, Tuple
 
-import typer
-
-from matcha_ml.cli.ui.emojis import Emojis
 from matcha_ml.cli.ui.print_messages import (
     print_error,
     print_json,
@@ -17,7 +14,6 @@ from matcha_ml.cli.ui.resource_message_builders import (
     hide_sensitive_in_output,
 )
 from matcha_ml.cli.ui.status_message_builders import (
-    build_resource_confirmation,
     build_status,
 )
 from matcha_ml.errors import MatchaInputError
