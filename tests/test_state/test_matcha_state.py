@@ -183,7 +183,10 @@ def test_fetch_resources_from_state_file_with_resource_and_property(
     )
     assert state.components and len(state.components) == 1
 
-    state.components[0] == experiment_tracker_state_component
+    assert (
+        state.components[0].properties[0]
+        == experiment_tracker_state_component.properties[0]
+    )
 
 
 def test_check_state_file_exists(matcha_state_service: MatchaStateService):
