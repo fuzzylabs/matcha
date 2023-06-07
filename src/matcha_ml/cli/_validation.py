@@ -1,5 +1,4 @@
 """Validation for cli inputs."""
-import os
 from difflib import get_close_matches
 from typing import List, Optional, Set, Union
 
@@ -14,7 +13,6 @@ from matcha_ml.services import AzureClient
 # TODO: dynamically set both of these variables
 LONGEST_RESOURCE_NAME = "artifactstore"
 MAXIMUM_RESOURCE_NAME_LEN = 24
-MATCHA_STATE_PATH = os.path.join(".matcha", "infrastructure", "matcha.state")
 
 
 def get_azure_client() -> AzureClient:

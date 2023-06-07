@@ -4,11 +4,13 @@ import json
 import os
 from typing import Dict, List, Optional
 
+from matcha_ml.constants import MATCHA_STATE_PATH
+
 
 class MatchaStateService:
     """A matcha state service for handling to matcha.state file."""
 
-    matcha_state_path = os.path.join(".matcha", "infrastructure", "matcha.state")
+    matcha_state_path = MATCHA_STATE_PATH
 
     def __init__(self) -> None:
         """MatchaStateService constructor."""
