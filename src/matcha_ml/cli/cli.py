@@ -3,7 +3,7 @@ from typing import Optional
 
 import typer
 
-from matcha_ml import __version__
+from matcha_ml import __version__, core
 from matcha_ml.cli._validation import (
     prefix_typer_callback,
     region_typer_callback,
@@ -20,7 +20,6 @@ from matcha_ml.cli.ui.resource_message_builders import (
     build_resource_output,
     hide_sensitive_in_output,
 )
-from matcha_ml.core import core
 from matcha_ml.errors import MatchaError, MatchaInputError
 from matcha_ml.services.analytics_service import AnalyticsEvent, track
 from matcha_ml.state import RemoteStateManager
