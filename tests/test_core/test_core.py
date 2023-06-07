@@ -9,7 +9,7 @@ import pytest
 import yaml
 
 from matcha_ml.cli.cli import app
-from matcha_ml.core.core import get, remove_state_lock
+from matcha_ml.core import get, remove_state_lock
 from matcha_ml.errors import MatchaInputError
 from matcha_ml.services.global_parameters_service import GlobalParameters
 
