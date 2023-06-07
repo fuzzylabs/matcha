@@ -332,7 +332,6 @@ def test_cli_provision_command_with_verbose_arg(
         "Template variables were added",
         "Template configuration has finished!",
     ]:
-        print(result.stdout)
         assert verbose_output in result.stdout
 
     mock_use_lock.assert_called_once()

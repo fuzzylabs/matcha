@@ -2,21 +2,12 @@
 import os
 
 from matcha_ml.errors import MatchaInputError
-from matcha_ml.services.azure_service import AzureClient
+from matcha_ml.services import AzureClient
 
 # TODO: dynamically set both of these variables
 LONGEST_RESOURCE_NAME = "artifactstore"
 MAXIMUM_RESOURCE_NAME_LEN = 24
 MATCHA_STATE_PATH = os.path.join(".matcha", "infrastructure", "matcha.state")
-
-
-def get_azure_client() -> AzureClient:
-    """Fetch an Azure Client.
-
-    Returns:
-        AzureClient: the azure client interface.
-    """
-    return AzureClient()
 
 
 def _is_alphanumeric(prefix: str) -> bool:
@@ -90,42 +81,17 @@ def _is_valid_prefix(prefix: str) -> str:
     return prefix
 
 
-# def region_validation(region: str) -> bool:
-#     """Perform validation on a possible region to provision resources to.
+def is_valid_region(region: str) -> bool:
+    """Perform validation on a possible region to provision resources to.
 
-#     Args:
-#         region (str): the possible region.
+    Args:
+        region (str): the possible region.
 
-#     Raises:
-#         MatchaInputError: when the region isn't found but a close match is.
-#         MatchaInputError: when the region isn't found and there's no match
+    Raises:
+        MatchaInputError: when the region isn't found
 
-#     Returns:
-#         bool: True, if the region is valid
-#     """
-#     azure_client = AzureClient()
-
-#     if azure_client.is_valid_region(region):
-#         return True
-#     else:
-#         return False
-
-
-# def region_validation(region: str) -> str:
-#     """Perform validation on a possible region to provision resources to.
-
-#     Args:
-#         region (str): the possible region.
-
-#     Raises:
-#         MatchaInputError: when the region isn't found
-
-#     Returns:
-#         str: the region if valid
-#     """
-#     azure_client = AzureClient()
-
-#     if azure_client.is_valid_region(region):
-#         return region
-#     else:
-#         raise MatchaInputError(f"A region named '{region}' does not exist.")
+    Returns:
+        bool: True, if the region is valid
+    """
+    azure_client = AzureClient()
+    return bool(azure_client.is_valid_region(region))

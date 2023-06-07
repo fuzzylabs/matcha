@@ -4,24 +4,13 @@ from typing import List, Optional, Set, Union
 
 from typer import BadParameter
 
-from matcha_ml.core._validation import (
-    _is_valid_prefix,
-)
+from matcha_ml.core._validation import _is_valid_prefix, is_valid_region
 from matcha_ml.errors import MatchaInputError
 from matcha_ml.services import AzureClient
 
 # TODO: dynamically set both of these variables
 LONGEST_RESOURCE_NAME = "artifactstore"
 MAXIMUM_RESOURCE_NAME_LEN = 24
-
-
-def get_azure_client() -> AzureClient:
-    """Fetch an Azure Client.
-
-    Returns:
-        AzureClient: the azure client interface.
-    """
-    return AzureClient()
 
 
 def find_closest_matches(
@@ -55,11 +44,10 @@ def region_validation(region: str) -> str:
     Returns:
         str: the region if valid
     """
-    azure_client = get_azure_client()
-
-    if azure_client.is_valid_region(region):
+    if is_valid_region(region):
         return region
     else:
+        azure_client = AzureClient()
         closest = find_closest_matches(region, azure_client.fetch_regions())
 
         if closest:
@@ -127,7 +115,7 @@ def prefix_typer_callback(prefix: str) -> str:
     except MatchaInputError as e:
         raise BadParameter(str(e))
 
-    azure_client = get_azure_client()
+    azure_client = AzureClient()
 
     if not azure_client.is_valid_resource_group(prefix):
         raise BadParameter(

@@ -2,7 +2,7 @@
 import os
 import tempfile
 from typing import Iterator
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import pytest
 from azure.mgmt.confluent.models._confluent_management_client_enums import (
@@ -42,7 +42,7 @@ def matcha_testing_directory() -> Iterator[str]:
     temp_dir.cleanup()
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(autouse=True)
 def mocked_azure_client() -> AzureClient:
     """The Azure Client with mocked variables.
 
@@ -57,7 +57,11 @@ def mocked_azure_client() -> AzureClient:
         f"{INTERNAL_FUNCTION_STUB}._fetch_user_roles"
     ) as roles, patch(
         f"{INTERNAL_FUNCTION_STUB}.fetch_storage_access_key"
-    ) as key:
+    ) as key, patch(
+        f"{INTERNAL_FUNCTION_STUB}.fetch_regions"
+    ) as valid_regions, patch(
+        f"{INTERNAL_FUNCTION_STUB}.fetch_resource_group_names"
+    ) as current_rg_names:
         auth.return_value = True
         sub.return_value = "id"
         rg.return_value = None
@@ -67,26 +71,10 @@ def mocked_azure_client() -> AzureClient:
             f"/subscriptions/id/providers/Microsoft.Authorization/roleDefinitions/{ROLE_ID_MAPPING['Contributor']}",
         ]
         key.return_value = "key"
+        valid_regions.return_value = {"ukwest", "uksouth"}
+        current_rg_names.return_value = {"rand-resources"}
 
         yield AzureClient()
-
-
-@pytest.fixture(scope="class", autouse=True)
-def mocked_azure_client_components(mocked_azure_client):
-    """A fixture for mocking components in the validation that use the Azure Client.
-
-    Args:
-        mocked_azure_client (AzureClient): the mocked AzureClient fixture in conftest
-    """
-    with patch("matcha_ml.cli._validation.get_azure_client") as mock:
-        mock.return_value = mocked_azure_client
-        mock.return_value.fetch_regions = MagicMock(
-            return_value=({"uksouth", "ukwest"})
-        )
-        mock.return_value.fetch_resource_group_names = MagicMock(
-            return_value=({"rand-resources"})
-        )
-        yield mock
 
 
 @pytest.fixture(autouse=True)
