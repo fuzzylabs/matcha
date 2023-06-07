@@ -8,8 +8,8 @@ from unittest.mock import MagicMock, patch
 import pytest
 from typer.testing import CliRunner
 
-from matcha_ml.cli._validation import LONGEST_RESOURCE_NAME, MAXIMUM_RESOURCE_NAME_LEN
 from matcha_ml.cli.cli import app
+from matcha_ml.core._validation import LONGEST_RESOURCE_NAME, MAXIMUM_RESOURCE_NAME_LEN
 from matcha_ml.templates.azure_template import SUBMODULE_NAMES
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
