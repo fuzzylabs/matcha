@@ -86,7 +86,7 @@ def get(
         Exit: Exit if resource type or property does not exist in matcha.state.
     """
     try:
-        resources = core.get(resource_name, property_name)
+        resources = core.get(resource_name, property_name).to_dict()
     except MatchaInputError as e:
         print_error(str(e))
         raise typer.Exit()
@@ -97,7 +97,9 @@ def get(
     if not show_sensitive:
         resources = hide_sensitive_in_output(resources)
 
-    resource_output = build_resource_output(resources=resources, output_format=output)
+    resource_output = build_resource_output(
+        matcha_state=resources, output_format=output
+    )
     print_resource_output(resource_output=resource_output, output_format=output)
 
 

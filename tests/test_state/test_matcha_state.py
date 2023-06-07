@@ -277,3 +277,15 @@ def test_convert_to_matcha_state_object(
         state_object.components, state_file_as_object.components
     ):
         assert _compare_object(state_actual, state_expected)
+
+
+def test_matcha_state_to_dict(
+    expected_outputs: dict, state_file_as_object: MatchaState
+):
+    """Test that converting the MatchState object to a dictionary works as expected.
+
+    Args:
+        expected_outputs (dict): the expected state as a dictionary
+        state_file_as_object (MatchaState): the state as a MatchaState object.
+    """
+    assert state_file_as_object.to_dict() == expected_outputs

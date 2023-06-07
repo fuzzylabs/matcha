@@ -35,6 +35,22 @@ class MatchaState:
 
     components: List[MatchaStateComponent]
 
+    def to_dict(self) -> Dict[str, Dict[str, str]]:
+        """Convert the MatchaState object to a dictionary.
+
+        Used for integration with legacy code - will be removed.
+
+        Returns:
+            Dict[str, Dict[str, str]]: the MatchaState as a dictionary.
+        """
+        state_dictionary = {}
+        for component in self.components:
+            state_dictionary[component.resource.name] = {
+                property.name: property.value for property in component.properties
+            }
+
+        return state_dictionary
+
 
 class MatchaStateService:
     """A matcha state service for handling to matcha.state file."""
