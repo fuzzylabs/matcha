@@ -2,7 +2,38 @@
 import hashlib
 import json
 import os
+from dataclasses import dataclass
 from typing import Dict, List, Optional
+
+
+@dataclass
+class MatchaResource:
+    """A class to represent a resource in the state."""
+
+    name: str
+
+
+@dataclass
+class MatchaResourceProperty:
+    """A class to represent a resource property in the state."""
+
+    name: str
+    value: str
+
+
+@dataclass
+class MatchaStateComponent:
+    """A class to represent a component in the state."""
+
+    resource: MatchaResource
+    properties: List[MatchaResourceProperty]
+
+
+@dataclass
+class MatchaState:
+    """A class to represent the state as a whole."""
+
+    components: List[MatchaStateComponent]
 
 
 class MatchaStateService:
@@ -36,11 +67,36 @@ class MatchaStateService:
             self._state = dict(json.load(f))
             return dict(self._state)
 
+    def _convert_to_matcha_state_object(
+        self, state_dict: Dict[str, Dict[str, str]]
+    ) -> MatchaState:
+        """An internal function to convert a dictionary representation of the state file to an object version.
+
+        Args:
+            state_dict (Dict[str, Dict[str, str]]): the raw state file as a dictionary.
+
+        Returns:
+            MatchaState: the state file in it's object form.
+        """
+        state_components: List[MatchaStateComponent] = []
+        for resource, properties in state_dict.items():
+            state_components.append(
+                MatchaStateComponent(
+                    resource=MatchaResource(name=resource),
+                    properties=[
+                        MatchaResourceProperty(name=key, value=value)
+                        for key, value in properties.items()
+                    ],
+                )
+            )
+
+        return MatchaState(components=state_components)
+
     def fetch_resources_from_state_file(
         self,
         resource_name: Optional[str] = None,
         property_name: Optional[str] = None,
-    ) -> Dict[str, Dict[str, str]]:
+    ) -> MatchaState:
         """Either return all of the resources or resource specified by the resource name.
 
         Args:
@@ -48,17 +104,21 @@ class MatchaStateService:
             property_name (Optional[str]): the property to get from the specified resource. Defaults to None.
 
         Returns:
-            Dict[str, Dict[str, str]]: resources in the format of a dictionary.
+            MatchaState: the state.
         """
         if resource_name is None:
-            return self._state
+            return self._convert_to_matcha_state_object(self._state)
 
         if property_name is None:
-            return {str(resource_name): dict(self._state[resource_name])}
+            return self._convert_to_matcha_state_object(
+                {str(resource_name): dict(self._state[resource_name])}
+            )
 
         property_value = self._state.get(resource_name, {})[property_name]
 
-        return {resource_name: {property_name: property_value}}
+        return self._convert_to_matcha_state_object(
+            {resource_name: {property_name: property_value}}
+        )
 
     def get_resource_names(self) -> List[str]:
         """Method for returning all existing resource names.
