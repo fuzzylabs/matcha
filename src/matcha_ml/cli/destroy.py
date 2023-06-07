@@ -4,6 +4,7 @@ from typing import List, Tuple
 import typer
 
 from matcha_ml.cli._validation import check_current_deployment_exists
+from matcha_ml.cli.ui.functions import is_approved
 from matcha_ml.cli.ui.print_messages import print_error, print_status
 from matcha_ml.cli.ui.status_message_builders import (
     build_status,
@@ -41,7 +42,7 @@ def destroy_resources(resources: List[Tuple[str, str]]) -> None:
             )
             raise typer.Exit()
 
-        if template_runner.is_approved(verb="destroy", resources=resources):
+        if is_approved(verb="destroy", resources=resources):
             # deprovision the resources
             template_runner.deprovision()
             print_status(build_step_success_status("Destroying resources is complete!"))
