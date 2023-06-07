@@ -9,6 +9,7 @@ from unittest.mock import MagicMock
 import pytest
 from _pytest.capture import SysCapture
 
+from matcha_ml.constants import MATCHA_STATE_PATH
 from matcha_ml.runners import AzureRunner
 from matcha_ml.services.terraform_service import TerraformConfig
 
@@ -141,9 +142,7 @@ def terraform_test_config(matcha_testing_directory: str) -> TerraformConfig:
     os.makedirs(infrastructure_directory, exist_ok=True)
 
     # Create a dummy matcha state file
-    matcha_state_path = os.path.join(
-        matcha_testing_directory, ".matcha", "infrastructure", "matcha.state"
-    )
+    matcha_state_path = os.path.join(matcha_testing_directory, MATCHA_STATE_PATH)
 
     dummy_data = {"cloud": {"prefix": "random", "location": "uksouth"}}
     with open(matcha_state_path, "w") as fp:
