@@ -1,4 +1,4 @@
-"""UI functions."""
+"""UI user approval functions."""
 from typing import List, Tuple
 
 import typer
@@ -12,7 +12,7 @@ from matcha_ml.cli.ui.status_message_builders import (
 )
 
 
-def get_modify_resource_approval(verb: str, resources: List[Tuple[str, str]]) -> bool:
+def is_user_approved(verb: str, resources: List[Tuple[str, str]]) -> bool:
     """Get approval from user within the CLI.
 
     Args:
