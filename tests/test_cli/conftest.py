@@ -8,7 +8,7 @@ from matcha_ml.runners import AzureRunner, RemoteStateRunner
 from matcha_ml.services.global_parameters_service import GlobalParameters
 
 INTERNAL_FUNCTION_STUBS = [
-    "matcha_ml.cli.provision.AzureRunner",
+    "matcha_ml.core.core.AzureRunner",
     "matcha_ml.state.remote_state_manager.RemoteStateRunner",
 ]
 

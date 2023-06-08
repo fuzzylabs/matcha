@@ -10,7 +10,7 @@ from matcha_ml.cli._validation import (
 )
 from matcha_ml.cli.constants import RESOURCE_MSG, STATE_RESOURCE_MSG
 from matcha_ml.cli.destroy import destroy_resources
-from matcha_ml.cli.provision import provision_resources
+from matcha_ml.cli.provision import fill_provision_variables
 from matcha_ml.cli.ui.print_messages import (
     print_error,
     print_resource_output,
@@ -20,7 +20,12 @@ from matcha_ml.cli.ui.resource_message_builders import (
     build_resource_output,
     hide_sensitive_in_output,
 )
+from matcha_ml.cli.ui.status_message_builders import (
+    build_status,
+    build_step_success_status,
+)
 from matcha_ml.errors import MatchaError, MatchaInputError
+from matcha_ml.runners import AzureRunner
 from matcha_ml.services.analytics_service import AnalyticsEvent, track
 from matcha_ml.state import RemoteStateManager
 
@@ -34,7 +39,6 @@ app.add_typer(
 
 
 @app.command()
-@track(event_name=AnalyticsEvent.PROVISION)
 def provision(
     location: str = typer.Option(
         callback=region_typer_callback,
@@ -55,11 +59,21 @@ def provision(
     ),
 ) -> None:
     """Provision cloud resources with a template."""
-    provision_resources(location, prefix, password, verbose)
+    location, prefix, password = fill_provision_variables(location, prefix, password)
+    template_runner = AzureRunner()
+    if template_runner.is_approved(verb="provision", resources=RESOURCE_MSG):
+        core.provision(location, prefix, password, verbose)
+        print_status(build_step_success_status("Provisioning is complete!"))
+    else:
+        print_status(
+            build_status(
+                "You decided to cancel - if you change your mind, then run 'matcha provision' again."
+            )
+        )
+        raise typer.Exit()
 
 
 @app.command(help="Get information for the provisioned resources.")
-@track(event_name=AnalyticsEvent.GET)
 def get(
     resource_name: Optional[str] = typer.Argument(None),
     property_name: Optional[str] = typer.Argument(None),

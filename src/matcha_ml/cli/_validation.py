@@ -4,7 +4,7 @@ from typing import List, Optional, Set, Union
 
 from typer import BadParameter
 
-from matcha_ml.core._validation import _is_valid_prefix, is_valid_region
+from matcha_ml.core._validation import is_valid_prefix, is_valid_region
 from matcha_ml.errors import MatchaInputError
 from matcha_ml.services import AzureClient
 
@@ -107,7 +107,7 @@ def prefix_typer_callback(prefix: str) -> str:
     prefix = _to_lowercase(prefix)
 
     try:
-        _is_valid_prefix(prefix)
+        is_valid_prefix(prefix)
     except MatchaInputError as e:
         raise BadParameter(str(e))
 

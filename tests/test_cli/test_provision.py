@@ -26,7 +26,7 @@ REMOTE_STATE_MANAGER_PREFIX = "matcha_ml.state.remote_state_manager.RemoteStateM
 def mock_provisioned_remote_state():
     """Mock remote state manager to have state provisioned."""
     with patch(
-        "matcha_ml.cli.provision.RemoteStateManager.is_state_provisioned"
+        "matcha_ml.core.core.RemoteStateManager.is_state_provisioned"
     ) as mock_is_state_provisioned:
         mock_is_state_provisioned.return_value = False
         yield
@@ -35,9 +35,7 @@ def mock_provisioned_remote_state():
 @pytest.fixture(autouse=True)
 def mock_use_lock():
     """Mock use_lock state context manager."""
-    with patch(
-        "matcha_ml.cli.provision.RemoteStateManager.use_lock"
-    ) as mocked_use_lock:
+    with patch("matcha_ml.core.core.RemoteStateManager.use_lock") as mocked_use_lock:
         yield mocked_use_lock
 
 
@@ -45,7 +43,7 @@ def mock_use_lock():
 def mock_use_remote_state():
     """Mock use_lock state context manager."""
     with patch(
-        "matcha_ml.cli.provision.RemoteStateManager.use_remote_state"
+        "matcha_ml.core.core.RemoteStateManager.use_remote_state"
     ) as mocked_use_remote_state:
         yield mocked_use_remote_state
 
@@ -380,7 +378,7 @@ def test_cli_provision_command_prefix_rule(
 
     assert expected_output in result.stdout
 
-    mock_use_lock.assert_called_once()
+    mock_use_lock.assert_not_called()
 
 
 def test_cli_provision_command_with_existing_prefix_name(
@@ -405,7 +403,7 @@ def test_cli_provision_command_with_existing_prefix_name(
     )
     assert expected_error_message in result.stdout
 
-    mock_use_lock.assert_called_once()
+    mock_use_lock.assert_not_called()
 
 
 def test_cli_provision_command_override(
@@ -499,7 +497,7 @@ def test_cli_provision_command_with_password_mismatch(
 
     assert "Error: The two entered values do not match." in result.stdout
 
-    mock_use_lock.assert_called_once()
+    mock_use_lock.assert_not_called()
 
 
 def test_cli_provision_command_with_provisioned_resources(
@@ -515,33 +513,7 @@ def test_cli_provision_command_with_provisioned_resources(
     # change to matcha testing directory
     os.chdir(matcha_testing_directory)
 
-    # invoke the provision command for the first time, which creates the .matcha directory
-    runner.invoke(
-        app,
-        [
-            "provision",
-            "--location",
-            "uksouth",
-            "--prefix",
-            "matcha",
-            "--password",
-            "ninja",
-        ],
-        input="Y\n",
-    )
-
-    resources_destination_path = os.path.join(
-        matcha_testing_directory, ".matcha", "infrastructure", "resources"
-    )
-
-    # create a dummy terraform file within the resources directory in .matcha
-    dummy_file_path = os.path.join(resources_destination_path, "dummy.tf")
-    with open(dummy_file_path, "a"):
-        ...
-
-    assert os.path.exists(dummy_file_path)
-
-    # we need to mock an Azure deployment here so Matcha exits when we expect it to
+    # we need to mock an Azure deployment already exists
     with patch(
         f"{REMOTE_STATE_MANAGER_PREFIX}.is_state_provisioned"
     ) as is_state_provisioned:
@@ -559,9 +531,10 @@ def test_cli_provision_command_with_provisioned_resources(
                 "--password",
                 "ninja",
             ],
+            input="Y\n",
         )
 
     assert (
-        "WARNING - Matcha has detected that there are resources already provisioned."
-        in result.stdout
+        "Error - Matcha has detected that there are resources already provisioned."
+        in str(result.exception)
     )

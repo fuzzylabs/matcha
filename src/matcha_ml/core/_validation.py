@@ -60,7 +60,7 @@ PREFIX_RULES = {
 }
 
 
-def _is_valid_prefix(prefix: str) -> str:
+def is_valid_prefix(prefix: str) -> str:
     """Check for whether a prefix is valid.
 
     Args:
