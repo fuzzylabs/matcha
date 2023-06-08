@@ -2,4 +2,4 @@
 from .azure_runner import AzureRunner
 from .remote_state_runner import RemoteStateRunner
 
-__all__ = ["AzureRunner", "RemoteStateRunner"]
+__all__ = ["RemoteStateRunner", "AzureRunner"]

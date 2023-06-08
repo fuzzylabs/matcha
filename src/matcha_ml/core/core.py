@@ -1,17 +1,18 @@
 """The core functions for matcha."""
 import os
-from typing import Dict, Optional
+from typing import Optional
 
 from matcha_ml.cli._validation import get_command_validation
 from matcha_ml.errors import MatchaError
 from matcha_ml.services.global_parameters_service import GlobalParameters
 from matcha_ml.state import MatchaStateService, RemoteStateManager
+from matcha_ml.state.matcha_state import MatchaState
 
 
 def get(
     resource_name: Optional[str],
     property_name: Optional[str],
-) -> Dict[str, Dict[str, str]]:
+) -> MatchaState:
     """Return the information of the provisioned resource based on the resource name specified.
 
     Return all resources if no resource name is specified.
@@ -21,7 +22,7 @@ def get(
         property_name (Optional[str]): the property of the resource to get.
 
     Returns:
-        Dict[str, Dict[str, str]]: the information of the provisioned resource.
+        MatchaState: the information of the provisioned resource.
 
     Raises:
         MatchaError: Raised when the matcha state has not been initialized
