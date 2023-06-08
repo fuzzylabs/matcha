@@ -1,5 +1,4 @@
 """"Validation for core commands."""
-import os
 
 from matcha_ml.errors import MatchaInputError
 from matcha_ml.services import AzureClient
@@ -7,7 +6,6 @@ from matcha_ml.services import AzureClient
 # TODO: dynamically set both of these variables
 LONGEST_RESOURCE_NAME = "artifactstore"
 MAXIMUM_RESOURCE_NAME_LEN = 24
-MATCHA_STATE_PATH = os.path.join(".matcha", "infrastructure", "matcha.state")
 
 
 def _is_alphanumeric(prefix: str) -> bool:

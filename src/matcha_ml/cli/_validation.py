@@ -8,10 +8,6 @@ from matcha_ml.core._validation import _is_valid_prefix, is_valid_region
 from matcha_ml.errors import MatchaInputError
 from matcha_ml.services import AzureClient
 
-# TODO: dynamically set both of these variables
-LONGEST_RESOURCE_NAME = "artifactstore"
-MAXIMUM_RESOURCE_NAME_LEN = 24
-
 
 def find_closest_matches(
     pattern: str, possibilities: Union[Set[str], List[str]], number_to_find: int = 1
