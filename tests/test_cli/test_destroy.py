@@ -48,16 +48,16 @@ def test_cli_destroy_command_with_no_provisioned_resources(
     """
     os.chdir(matcha_testing_directory)
 
-    mock_remote_state_manager.is_state_provisioned.return_value = True
+    mock_remote_state_manager.is_state_provisioned.return_value = False
 
     result = runner.invoke(app, ["destroy"])
 
     assert (
-        "Error - you cannot destroy resources that have not been provisioned yet."
+        "Error - resources that have not been provisioned cannot be destroyed."
         in result.stdout
     )
 
-    mock_remote_state_manager.use_lock.assert_called_once()
+    mock_remote_state_manager.use_lock.assert_not_called()
 
 
 def test_cli_destroy_with_nothing_provisioned(
@@ -74,6 +74,6 @@ def test_cli_destroy_with_nothing_provisioned(
     result = runner.invoke(app, ["destroy"])
 
     assert (
-        "Error - resources that have not been provisioned cannot be destroy."
+        "Error - resources that have not been provisioned cannot be destroyed."
         in result.stdout
     )

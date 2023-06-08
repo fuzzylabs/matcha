@@ -9,6 +9,7 @@ import pytest
 import yaml
 
 from matcha_ml.cli.cli import app
+from matcha_ml.constants import MATCHA_STATE_PATH
 from matcha_ml.core import get, remove_state_lock
 from matcha_ml.errors import MatchaInputError
 from matcha_ml.services.global_parameters_service import GlobalParameters
@@ -27,7 +28,6 @@ def mock_state_file(matcha_testing_directory: str):
 
     matcha_infrastructure_dir = os.path.join(".matcha", "infrastructure", "resources")
     os.makedirs(matcha_infrastructure_dir)
-    matcha_state_path = os.path.join(".matcha", "infrastructure", "matcha.state")
 
     state_file_resources = {
         "cloud": {"flavor": "azure", "resource-group-name": "test_resources"},
@@ -39,7 +39,7 @@ def mock_state_file(matcha_testing_directory: str):
         "experiment-tracker": {"flavor": "mlflow", "tracking-url": "mlflow_test_url"},
     }
 
-    with open(matcha_state_path, "w") as f:
+    with open(MATCHA_STATE_PATH, "w") as f:
         json.dump(state_file_resources, f)
 
 
