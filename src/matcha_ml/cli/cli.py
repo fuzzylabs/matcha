@@ -24,8 +24,8 @@ from matcha_ml.cli.ui.status_message_builders import (
     build_status,
     build_step_success_status,
 )
+from matcha_ml.cli.ui.user_approval_functions import is_user_approved
 from matcha_ml.errors import MatchaError, MatchaInputError
-from matcha_ml.runners import AzureRunner
 from matcha_ml.services.analytics_service import AnalyticsEvent, track
 from matcha_ml.state import RemoteStateManager
 
@@ -60,8 +60,7 @@ def provision(
 ) -> None:
     """Provision cloud resources with a template."""
     location, prefix, password = fill_provision_variables(location, prefix, password)
-    template_runner = AzureRunner()
-    if template_runner.is_approved(verb="provision", resources=RESOURCE_MSG):
+    if is_user_approved(verb="provision", resources=RESOURCE_MSG):
         core.provision(location, prefix, password, verbose)
         print_status(build_step_success_status("Provisioning is complete!"))
     else:
