@@ -6,7 +6,7 @@ import typer
 
 from matcha_ml.cli._validation import prefix_typer_callback, region_typer_callback
 from matcha_ml.cli.constants import RESOURCE_MSG
-from matcha_ml.cli.ui.functions import is_approved
+from matcha_ml.cli.ui.functions import get_modify_resource_approval
 from matcha_ml.cli.ui.print_messages import print_status
 from matcha_ml.cli.ui.status_message_builders import (
     build_status,
@@ -120,7 +120,7 @@ def provision_resources(
         azure_template.build_template(config, template, destination, verbose)
 
         # Initializes the infrastructure provisioning process.
-        if is_approved(verb="provision", resources=RESOURCE_MSG):
+        if get_modify_resource_approval(verb="provision", resources=RESOURCE_MSG):
             # provision resources by running the template
             template_runner.provision()
             print_status(build_step_success_status("Provisioning is complete!"))

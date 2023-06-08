@@ -12,7 +12,7 @@ from matcha_ml.cli.ui.status_message_builders import (
 )
 
 
-def is_approved(verb: str, resources: List[Tuple[str, str]]) -> bool:
+def get_modify_resource_approval(verb: str, resources: List[Tuple[str, str]]) -> bool:
     """Get approval from user within the CLI.
 
     Args:
