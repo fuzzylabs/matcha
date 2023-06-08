@@ -226,9 +226,6 @@ class RemoteStateManager:
 
         template_runner.deprovision()
         self.remove_matcha_config()
-        print_status(
-            build_step_success_status("Destroying Matcha resources is complete!")
-        )
 
     def _write_matcha_config(
         self, account_name: str, container_name: str, resource_group_name: str

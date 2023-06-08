@@ -9,7 +9,6 @@ from matcha_ml.cli._validation import (
     region_typer_callback,
 )
 from matcha_ml.cli.constants import RESOURCE_MSG, STATE_RESOURCE_MSG
-from matcha_ml.cli.destroy import destroy_resources
 from matcha_ml.cli.provision import provision_resources
 from matcha_ml.cli.ui.print_messages import (
     print_error,
@@ -105,8 +104,16 @@ def get(
 @app.command()
 @track(event_name=AnalyticsEvent.DESTROY)
 def destroy() -> None:
-    """Destroy the provisioned cloud resources."""
-    destroy_resources(resources=STATE_RESOURCE_MSG + RESOURCE_MSG)
+    """Destroy the provisioned cloud resources.
+
+    Raises:
+        Exit: Exit if core.destroy throws a MatchaError.
+    """
+    try:
+        core.destroy(resources=STATE_RESOURCE_MSG + RESOURCE_MSG)
+    except MatchaError as e:
+        print_error(str(e))
+        raise typer.Exit()
 
 
 @app.command()
