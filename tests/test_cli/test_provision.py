@@ -8,8 +8,8 @@ from unittest.mock import MagicMock, patch
 import pytest
 from typer.testing import CliRunner
 
-from matcha_ml.cli._validation import LONGEST_RESOURCE_NAME, MAXIMUM_RESOURCE_NAME_LEN
 from matcha_ml.cli.cli import app
+from matcha_ml.core._validation import LONGEST_RESOURCE_NAME, MAXIMUM_RESOURCE_NAME_LEN
 from matcha_ml.templates.azure_template import SUBMODULE_NAMES
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -332,7 +332,6 @@ def test_cli_provision_command_with_verbose_arg(
         "Template variables were added",
         "Template configuration has finished!",
     ]:
-        print(result.stdout)
         assert verbose_output in result.stdout
 
     mock_use_lock.assert_called_once()
