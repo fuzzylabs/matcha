@@ -217,7 +217,7 @@ python inference.py --user 100 --movie 100
 
 This will result in a score, which represents how strongly we recommend movie ID `100` to user ID `100`.
 
-# Destroying
+## Destroying
 
 The final thing you'll want to do is decommission the infrastructure that Matcha has set up during this guide. Matcha includes a `destroy` command which will remove everything that has been provisioned, which avoids running up an Azure bill!
 
