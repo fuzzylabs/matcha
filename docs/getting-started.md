@@ -144,6 +144,20 @@ Experiment tracker
 
 By default, Matcha will hide sensitive resource properties. If you need one of these properties, then you can add the `--show-sensitive` flag to your `get` command.
 
+# Sharing resources
+
+If you're working in a team and wish to use the same resources (e.g. the same experiment tracking server) you can share the deployed resources with Matcha.
+
+To do so, add the `matcha.config.json` file to your GitHub repository (or similar), note that this does not contain any sensitive information such as passwords or server endpoints.
+
+Other users can pull this file and when they run Matcha commands in the same directory Matcha will automatically pull the provisioned state information allowing them to use the resources. This means you don't have to provision seperate resources for each team member.
+
+<div align="center">
+    <img src="img/getting-started/shared_state.png" width="400"></img>
+</div>
+
+As long as the user has the correct permissions to access the resource group and have set the correct active Azure subscription they will be able to download the shared state within the `.matcha` directory.
+
 # Training and deploying
 
 Now that you've reached this point, you'll have provisioned the following infrastructure into Azure:
@@ -207,14 +221,8 @@ This will result in a score, which represents how strongly we recommend movie ID
 
 The final thing you'll want to do is decommission the infrastructure that Matcha has set up during this guide. Matcha includes a `destroy` command which will remove everything that has been provisioned, which avoids running up an Azure bill!
 
-To destroy the provisioned resources only, run:
-
 ```bash
 matcha destroy
 ```
 
-To destroy both the provisioned resources and remote state management, run:
-
-```bash
-matcha destroy full
-```
+Note that this command is irreversible will remove all the resources deployed by `matcha provision` including the resource group, so make sure you save any data you wish to keep before running this command.
