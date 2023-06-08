@@ -153,7 +153,7 @@ To do so, add the `matcha.config.json` file to your GitHub repository (or simila
 Other users can pull this file and when they run Matcha commands in the same directory Matcha will automatically pull the provisioned state information allowing them to use the resources. This means you don't have to provision seperate resources for each team member.
 
 <div align="center">
-    <img src="img/getting-started/shared_state.png" width="400"></img>
+    <img src="/img/getting-started/shared-state.png" width="400"></img>
 </div>
 
 As long as the user has the correct permissions to access the resource group and have set the correct active Azure subscription they will be able to download the shared state within the `.matcha` directory.
