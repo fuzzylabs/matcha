@@ -202,7 +202,6 @@ def test_get_resources_with_resource_name_and_property_name(
         mock_provisioned_remote_state (MagicMock): mock of a RemoteStateManager instance.
         experiment_tracker_state_component (MatchaStateComponent): the experiment tracker state component.
     """
-    # assert expected_output == get("experiment-tracker", "tracking-url")
     get_result = get(resource_name="experiment-tracker", property_name="flavor")
 
     assert get_result and len(get_result.components) == 1
@@ -315,7 +314,6 @@ def test_remove_state_lock_function(mock_provisioned_remote_state: MagicMock):
     Args:
         mock_provisioned_remote_state (MagicMock): mock of a RemoteStateManager instance
     """
-    # with mock.patch("matcha_ml.core.core.RemoteStateManager.unlock") as mock_unlock:
     remove_state_lock()
 
     # Check if unlock function from RemoteStateManager class is called only once
