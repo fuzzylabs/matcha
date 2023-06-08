@@ -23,20 +23,21 @@ def destroy_resources(resources: List[Tuple[str, str]]) -> None:
         typer.Exit: if an existing deployment does not exist.
         typer.Exit: if approval is not given by user.
     """
-    remote_state = RemoteStateManager()
-    if not remote_state.is_state_provisioned():
+    remote_state_manager = RemoteStateManager()
+    if not remote_state_manager.is_state_provisioned():
         print_error(
             "Error - resources that have not been provisioned cannot be destroyed. Run 'matcha provision' to get started!"
         )
         raise typer.Exit()
 
-    with remote_state.use_lock(), remote_state.use_remote_state():
+    with remote_state_manager.use_lock(), remote_state_manager.use_remote_state():
         # create a runner for deprovisioning resource with Terraform service.
         template_runner = AzureRunner()
 
         if template_runner.is_approved(verb="destroy", resources=resources):
             # deprovision the resources
             template_runner.deprovision()
+            remote_state_manager.deprovision_remote_state()
             print_status(build_step_success_status("Destroying resources is complete!"))
         else:
             print_status(
