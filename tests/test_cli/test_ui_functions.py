@@ -12,7 +12,7 @@ def test_user_approves():
         assert is_user_approved("provision", [])
 
 
-def test_user_does_approves():
+def test_user_does_not_approves():
     """Test if is_user_approved behaves as expected where user does not provide approval."""
     with mock.patch("typer.confirm") as mock_confirm:
         mock_confirm.return_value = False
