@@ -5,8 +5,10 @@ import os
 import pytest
 
 from matcha_ml.constants import MATCHA_STATE_PATH
+from matcha_ml.errors import MatchaError
 from matcha_ml.state import MatchaStateService
 from matcha_ml.state.matcha_state import (
+    MISSING_STATE_ERROR_MSG,
     MatchaResource,
     MatchaResourceProperty,
     MatchaState,
@@ -121,17 +123,48 @@ def experiment_tracker_state_component() -> MatchaStateComponent:
     )
 
 
-def test_state_file_getter(
-    matcha_state_service: MatchaStateService, expected_outputs: dict
-):
-    """Test whether the state file getter behaves and return as expected.
+def test_state_service_initialisation(state_file_as_object: MatchaState):
+    """Test that object initialisation works as expected when a state file exists.
 
     Args:
-        matcha_state_service (MatchaStateService): The matcha_state_service testing instance.
-        expected_outputs (dict): The expected state file.
+        state_file_as_object (MatchaState): the state file as a MatchState instance
     """
-    result = matcha_state_service.state_file
-    assert result == expected_outputs
+    service = MatchaStateService()
+
+    assert service._state
+    assert service._state == state_file_as_object
+
+
+def test_state_service_initialisation_no_state_file():
+    """Test that object initalisation raises an error when the state file does not exist."""
+    os.remove(MATCHA_STATE_PATH)
+
+    with pytest.raises(MatchaError) as err:
+        _ = MatchaStateService()
+
+    assert str(err.value) == MISSING_STATE_ERROR_MSG
+
+
+def test_read_state_expected(state_file_as_object: MatchaState):
+    """Test that reading the state file produces the correct MatchaState object.
+
+    Args:
+        state_file_as_object (MatchaState): the state file as a MatchaState instance.
+    """
+    service = MatchaStateService()
+
+    assert service._state
+    assert service._read_state() == state_file_as_object
+
+
+def test_read_state_no_state_file():
+    """Test that reading the state file raises an error when the state file does not exist."""
+    os.remove(MATCHA_STATE_PATH)
+
+    with pytest.raises(MatchaError) as err:
+        _ = MatchaStateService()
+
+    assert str(err.value) == MISSING_STATE_ERROR_MSG
 
 
 def test_fetch_resources_from_state_file_full(
@@ -195,7 +228,7 @@ def test_check_state_file_exists(matcha_state_service: MatchaStateService):
     Args:
         matcha_state_service (MatchaStateService): The matcha_state_service testing instance.
     """
-    result = matcha_state_service.check_state_file_exists()
+    result = matcha_state_service.state_exists()
     assert result is True
 
 
@@ -207,7 +240,7 @@ def test_check_state_file_does_not_exist(matcha_state_service: MatchaStateServic
     """
     os.remove(MATCHA_STATE_PATH)
 
-    result = matcha_state_service.check_state_file_exists()
+    result = matcha_state_service.state_exists()
     assert result is False
 
 
@@ -229,6 +262,9 @@ def test_get_resource_names_expected(matcha_state_service: MatchaStateService):
     Args:
         matcha_state_service (MatchaStateService): The Matcha state service testing instance.
     """
+    names = matcha_state_service.get_resource_names()
+
+    assert names and isinstance(names, list)
     assert "cloud" in matcha_state_service.get_resource_names()
 
 
@@ -240,41 +276,34 @@ def test_get_resource_names_resource_not_present(
     Args:
         matcha_state_service (MatchaStateService): The Matcha state service testing instance.
     """
-    assert "not a resource" not in matcha_state_service.get_resource_names()
+    names = matcha_state_service.get_resource_names()
+
+    assert names and isinstance(names, list)
+    assert "not a resource" not in names
 
 
-def test_convert_to_matcha_state_object(
-    matcha_state_service: MatchaStateService, state_file_as_object: MatchaState
-):
-    """Test that converting the Matcha state to a MatchaState object works as expected.
+def test_get_property_names_expected(matcha_state_service: MatchaStateService):
+    """Tests that the correct property names are being returned.
 
     Args:
-        matcha_state_service (MatchaStateService): The Matcha state service testing instance.
-        state_file_as_object (MatchaState): The Matcha state as a MatchaState object.
+        matcha_state_service (MatchaStateService): the Matcha state service testing instance.
     """
+    names = matcha_state_service.get_property_names(resource_name="cloud")
 
-    def _compare_object(
-        matcha_state_component: MatchaStateComponent, expected: MatchaStateComponent
-    ) -> bool:
-        """A utility function to test equality between two MatchaStateComponent objects.
+    assert names and isinstance(names, list)
+    assert "resource-group-name" in names
 
-        Args:
-            matcha_state_component (MatchaStateComponent): the object being tested.
-            expected (MatchaStateComponent): the ground truth object.
 
-        Returns:
-            bool: True if they are equal, false otherwise.
-        """
-        return matcha_state_component == expected
+def test_get_property_names_not_present(matcha_state_service: MatchaStateService):
+    """Test that the correct property names are being returned.
 
-    state_object = matcha_state_service._convert_to_matcha_state_object(
-        matcha_state_service.state_file
-    )
+    Args:
+        matcha_state_service (MatchaStateService): the Matcha state service testing instance.
+    """
+    names = matcha_state_service.get_property_names(resource_name="cloud")
 
-    for state_actual, state_expected in zip(
-        state_object.components, state_file_as_object.components
-    ):
-        assert _compare_object(state_actual, state_expected)
+    assert names and isinstance(names, list)
+    assert "not a property" not in names
 
 
 def test_matcha_state_to_dict(
@@ -286,4 +315,22 @@ def test_matcha_state_to_dict(
         expected_outputs (dict): the expected state as a dictionary
         state_file_as_object (MatchaState): the state as a MatchaState object.
     """
-    assert state_file_as_object.to_dict() == expected_outputs
+    as_dict = state_file_as_object.to_dict()
+
+    assert as_dict and isinstance(as_dict, dict)
+    assert as_dict == expected_outputs
+
+
+def test_matcha_state_from_dict(
+    expected_outputs: dict, state_file_as_object: MatchaState
+):
+    """Test that a MatchaState object can be created from a dictionary.
+
+    Args:
+        expected_outputs (dict): the state as a dictionary
+        state_file_as_object (MatchaState): the state as a MatchaState object.
+    """
+    state = MatchaState.from_dict(state_dict=expected_outputs)
+
+    assert state and isinstance(state, MatchaState)
+    assert state == state_file_as_object

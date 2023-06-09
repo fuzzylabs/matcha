@@ -9,8 +9,6 @@ from typing import Any, Callable, Optional
 
 from segment import analytics
 
-from matcha_ml.errors import MatchaError
-from matcha_ml.services._validation import _check_uuid
 from matcha_ml.services.global_parameters_service import GlobalParameters
 from matcha_ml.state import MatchaStateService
 
@@ -66,15 +64,25 @@ def track(event_name: AnalyticsEvent) -> Callable[..., Any]:
 
                 # Get the matcha.state UUID if it exists
                 matcha_state_uuid: Optional[str] = None
-                if matcha_state_service.check_state_file_exists():
-                    matcha_state_id_dict = matcha_state_service.state_file.get("id")
-                    if matcha_state_id_dict is not None:
-                        matcha_state_uuid = matcha_state_id_dict.get("matcha_uuid")
+                if matcha_state_service.state_exists():
+                    (
+                        matcha_state_service.fetch_resources_from_state_file(
+                            resource_name="id"
+                        )
+                    )
+                    # TODO - fix this (requires getting the specific property).
+                    # if matcha_state_id_dict is not None:
+                    #     # matcha_state_uuid = matcha_state_id_dict.get("matcha_uuid")
+                    #     matcha_state_uuid = (
+                    #         matcha_state_service.fetch_resources_from_state_file(
+                    #             resource_name="matcha_uuid"
+                    #         )
+                    #     )
 
-                        try:
-                            _check_uuid(str(matcha_state_uuid))
-                        except MatchaError as me:
-                            raise MatchaError(str(me))
+                    #     try:
+                    #         _check_uuid(str(matcha_state_uuid))
+                    #     except MatchaError as me:
+                    #         raise MatchaError(str(me))
 
                 analytics.track(
                     global_params.user_id,

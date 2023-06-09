@@ -1,4 +1,6 @@
 """The matcha state interface."""
+from __future__ import annotations
+
 import hashlib
 import json
 import os
@@ -6,6 +8,9 @@ from dataclasses import dataclass
 from typing import Dict, List, Optional
 
 from matcha_ml.constants import MATCHA_STATE_PATH
+from matcha_ml.errors import MatchaError
+
+MISSING_STATE_ERROR_MSG = "No state file exists, you need to 'provision' resources or 'get' from already provisioned resources."
 
 
 @dataclass
@@ -53,52 +58,19 @@ class MatchaState:
 
         return state_dictionary
 
-
-class MatchaStateService:
-    """A matcha state service for handling to matcha.state file."""
-
-    matcha_state_path = MATCHA_STATE_PATH
-
-    def __init__(self) -> None:
-        """MatchaStateService constructor."""
-        self.state_file_exists = self.check_state_file_exists()
-        if self.state_file_exists:
-            self._state = self.state_file
-
-    @classmethod
-    def check_state_file_exists(cls) -> bool:
-        """Check if state file exists.
-
-        Returns:
-            bool: returns True if exists, otherwise False.
-        """
-        return bool(os.path.isfile(cls.matcha_state_path))
-
-    @property
-    def state_file(self) -> Dict[str, Dict[str, str]]:
-        """Getter of the state file.
-
-        Returns:
-            Dict[str, Dict[str, str]]: the state file in the format of a dictionary.
-        """
-        with open(self.matcha_state_path) as f:
-            self._state = dict(json.load(f))
-            return dict(self._state)
-
-    def _convert_to_matcha_state_object(
-        self, state_dict: Dict[str, Dict[str, str]]
-    ) -> MatchaState:
-        """An internal function to convert a dictionary representation of the state file to an object version.
+    @staticmethod
+    def from_dict(state_dict: Dict[str, Dict[str, str]]) -> MatchaState:
+        """A function to convert a dictionary representation of state to a MatchaState instance.
 
         Args:
-            state_dict (Dict[str, Dict[str, str]]): the raw state file as a dictionary.
+            state_dict (Dict[str, Dict[str, str]]): the dictionary representation of state.
 
         Returns:
-            MatchaState: the state file in it's object form.
+            MatchaState: the MatchaState representation of state.
         """
-        state_components: List[MatchaStateComponent] = []
+        components: List[MatchaStateComponent] = []
         for resource, properties in state_dict.items():
-            state_components.append(
+            components.append(
                 MatchaStateComponent(
                     resource=MatchaResource(name=resource),
                     properties=[
@@ -108,7 +80,49 @@ class MatchaStateService:
                 )
             )
 
-        return MatchaState(components=state_components)
+        return MatchaState(components=components)
+
+
+class MatchaStateService:
+    """A matcha state service for handling to matcha.state file."""
+
+    matcha_state_path = MATCHA_STATE_PATH
+
+    def __init__(self) -> None:
+        """Constructor for the MatchaStateService.
+
+        Raises:
+            MatchaError: if the state file does not exist.
+        """
+        if self.state_exists():
+            self._state = self._read_state()
+        else:
+            raise MatchaError(MISSING_STATE_ERROR_MSG)
+
+    @classmethod
+    def state_exists(cls) -> bool:
+        """Check if state file exists.
+
+        Returns:
+            bool: returns True if exists, otherwise False.
+        """
+        return bool(os.path.isfile(cls.matcha_state_path))
+
+    def _read_state(self) -> MatchaState:
+        """Read the state from the local file system.
+
+        Raises:
+            MatchaError: if the state doesn't exist locally.
+
+        Returns:
+            MatchaState: the state for the provisioned resources.
+        """
+        if not self.state_exists():
+            raise MatchaError(MISSING_STATE_ERROR_MSG)
+
+        with open(self.matcha_state_path) as in_file:
+            self._state = MatchaState.from_dict(json.load(in_file))
+        return self._state
 
     def fetch_resources_from_state_file(
         self,
@@ -125,18 +139,16 @@ class MatchaStateService:
             MatchaState: the state.
         """
         if resource_name is None:
-            return self._convert_to_matcha_state_object(self._state)
+            return self._state
 
         if property_name is None:
-            return self._convert_to_matcha_state_object(
-                {str(resource_name): dict(self._state[resource_name])}
+            return MatchaState.from_dict(
+                {str(resource_name): dict(self._state.to_dict()[resource_name])}
             )
 
-        property_value = self._state.get(resource_name, {})[property_name]
+        property_value = self._state.to_dict().get(resource_name, {})[property_name]
 
-        return self._convert_to_matcha_state_object(
-            {resource_name: {property_name: property_value}}
-        )
+        return MatchaState.from_dict({resource_name: {property_name: property_value}})
 
     def get_resource_names(self) -> List[str]:
         """Method for returning all existing resource names.
@@ -144,7 +156,7 @@ class MatchaStateService:
         Returns:
             List[str]: a list of existing resource names.
         """
-        return list(self._state.keys())
+        return [component.resource.name for component in self._state.components]
 
     def get_property_names(self, resource_name: str) -> List[str]:
         """Method for returning all existing properties for a given resource.
@@ -155,7 +167,11 @@ class MatchaStateService:
         Returns:
             List[str]: a list of existing properties for a given resource.
         """
-        return list(self._state.get(resource_name, {}).keys())
+        return [
+            property.name
+            for component in self._state.components
+            for property in component.properties
+        ]
 
     def get_hash_local_state(self) -> str:
         """Get hash of the local matcha state file.
