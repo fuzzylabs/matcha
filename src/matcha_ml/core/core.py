@@ -37,7 +37,7 @@ def get(
             "Error - matcha state has not been initialized, nothing to get."
         )
 
-    if not matcha_state_service.state_file_exists:
+    if not matcha_state_service.state_exists():
         # if the state file doesn't exist, then download it from the remote
         remote_state.download(os.getcwd())
 
