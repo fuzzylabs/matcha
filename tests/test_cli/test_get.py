@@ -227,7 +227,7 @@ def test_cli_get_command_with_invalid_resource_name(
     # Invoke get command
     result = runner.invoke(app, ["get", "does-not-exist"])
     assert result.exit_code == 0
-    assert "Error" and "resource type" in result.stdout
+    assert "Error" and "resource type" and "does-not-exist" in result.stdout
 
     mock_provisioned_remote_state.use_lock.assert_called_once()
 
