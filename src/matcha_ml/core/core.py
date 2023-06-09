@@ -137,7 +137,7 @@ def provision(
             "Error - Matcha has detected that there are resources already provisioned. Use 'matcha destroy' to remove the existing resources before trying to provision again."
         )
 
-    # Input checks
+    # Input variable checks
     try:
         prefix = prefix.lower()
         _ = is_valid_prefix(prefix)
@@ -160,7 +160,6 @@ def provision(
             os.path.dirname(__file__), os.pardir, "infrastructure", "resources"
         )
 
-        # Create a azure template object
         azure_template = AzureTemplate()
 
         config = azure_template.build_template_configuration(
@@ -168,7 +167,6 @@ def provision(
         )
         azure_template.build_template(config, template, destination, verbose)
 
-        # provision resources by running the template
         template_runner.provision()
 
         matcha_state_service = MatchaStateService()

@@ -80,7 +80,7 @@ def is_valid_prefix(prefix: str) -> str:
 
     if not azure_client.is_valid_resource_group(prefix):
         raise MatchaInputError(
-            "You entered a resource group name prefix that have been used before, prefix must be unique."
+            "You entered a resource group name prefix that has been used before, the prefix must be unique."
         )
 
     return prefix

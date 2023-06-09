@@ -346,7 +346,7 @@ def test_cli_provision_command_with_existing_prefix_name(
         matcha_testing_directory (str): temporary working directory
         mock_use_lock (MagicMock): mock use_lock context manager
     """
-    expected_error_message = "Error: You entered a resource group name prefix that have been used before, prefix must be unique."
+    expected_error_message = "Error: You entered a resource group name prefix that has been used before, the prefix must be unique."
     os.chdir(matcha_testing_directory)
 
     result = runner.invoke(
