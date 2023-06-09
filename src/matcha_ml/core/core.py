@@ -6,7 +6,7 @@ from matcha_ml.cli._validation import get_command_validation
 from matcha_ml.cli.ui.print_messages import print_status
 from matcha_ml.cli.ui.status_message_builders import build_warning_status
 from matcha_ml.core._validation import is_valid_prefix, is_valid_region
-from matcha_ml.errors import MatchaError
+from matcha_ml.errors import MatchaError, MatchaInputError
 from matcha_ml.runners import AzureRunner
 from matcha_ml.services.analytics_service import AnalyticsEvent, track
 from matcha_ml.services.global_parameters_service import GlobalParameters
@@ -125,7 +125,6 @@ def provision(
     remote_state_manager = RemoteStateManager()
 
     if remote_state_manager.is_state_stale():
-        # raise MatchaError("Matcha has detected a stale state file. This means that your local configuration is out of sync with the remote state, the resource group may have been removed.")
         print_status(
             build_warning_status(
                 "Matcha has detected a stale state file. This means that your local configuration is out of sync with the remote state, the resource group may have been removed. Deleting existing state config."
@@ -139,8 +138,11 @@ def provision(
         )
 
     # Input checks
-    _ = is_valid_prefix(prefix)
-    _ = is_valid_region(location)
+    try:
+        _ = is_valid_prefix(prefix)
+        _ = is_valid_region(location)
+    except MatchaInputError as e:
+        raise e
 
     # Provision resource group and remote state storage
     remote_state_manager.provision_remote_state(location, prefix)

@@ -8,7 +8,6 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from matcha_ml.constants import MATCHA_STATE_PATH
 from matcha_ml.core import provision
 from matcha_ml.core._validation import LONGEST_RESOURCE_NAME, MAXIMUM_RESOURCE_NAME_LEN
 from matcha_ml.errors import MatchaError, MatchaInputError
@@ -32,32 +31,6 @@ RUN_TWICE = 2
 REMOTE_STATE_MANAGER_PREFIX = "matcha_ml.state.remote_state_manager.RemoteStateManager"
 
 INTERNAL_FUNCTION_STUB = "matcha_ml.services.global_parameters_service.GlobalParameters"
-
-
-@pytest.fixture()
-def mock_state_file(matcha_testing_directory: str):
-    """A fixture for mocking a test state file in the test directory.
-
-    Args:
-        matcha_testing_directory (str): the test directory
-    """
-    os.chdir(matcha_testing_directory)
-
-    matcha_infrastructure_dir = os.path.join(".matcha", "infrastructure", "resources")
-    os.makedirs(matcha_infrastructure_dir)
-
-    state_file_resources = {
-        "cloud": {"flavor": "azure", "resource-group-name": "test_resources"},
-        "container-registry": {
-            "flavor": "azure",
-            "registry-name": "azure_registry_name",
-            "registry-url": "azure_container_registry",
-        },
-        "experiment-tracker": {"flavor": "mlflow", "tracking-url": "mlflow_test_url"},
-    }
-
-    with open(MATCHA_STATE_PATH, "w") as f:
-        json.dump(state_file_resources, f)
 
 
 @pytest.fixture
