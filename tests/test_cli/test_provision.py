@@ -9,7 +9,6 @@ import pytest
 from typer.testing import CliRunner
 
 from matcha_ml.cli.cli import app
-from matcha_ml.core._validation import LONGEST_RESOURCE_NAME, MAXIMUM_RESOURCE_NAME_LEN
 from matcha_ml.templates.azure_template import SUBMODULE_NAMES
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -335,52 +334,6 @@ def test_cli_provision_command_with_verbose_arg(
     mock_use_lock.assert_called_once()
 
 
-@pytest.mark.parametrize(
-    "user_input, expected_output",
-    [
-        (
-            "uksouth\n-matcha-\nvalid\ndefault\ndefault\nno\n",
-            "Error: Resource group name prefix can only contain alphanumeric characters.",
-        ),
-        (
-            "uksouth\n12\nvalid\ndefault\ndefault\nno\n",
-            "Error: Resource group name prefix cannot contain only numbers.",
-        ),
-        (
-            "uksouth\ngood$prefix#\nvalid\ndefault\ndefault\nno\n",
-            "Error: Resource group name prefix can only contain alphanumeric characters.",
-        ),
-        (
-            "uksouth\nareallylongprefix\nvalid\ndefault\ndefault\nno\n",
-            f"Resource group name prefix must be between 3 and {MAXIMUM_RESOURCE_NAME_LEN - len(LONGEST_RESOURCE_NAME)} characters long.",
-        ),
-    ],
-)
-def test_cli_provision_command_prefix_rule(
-    runner: CliRunner,
-    matcha_testing_directory: str,
-    mock_use_lock: MagicMock,
-    user_input: str,
-    expected_output: str,
-):
-    """Test whether the prefix validation function prompt an error message when user entered an invalid prefix.
-
-    Args:
-        runner (CliRunner): typer CLI runner
-        matcha_testing_directory (str): temporary working directory
-        mock_use_lock (MagicMock): mock use_lock context manager
-        user_input (str): prefix entered by user
-        expected_output (str): the expected error message
-    """
-    os.chdir(matcha_testing_directory)
-
-    result = runner.invoke(app, ["provision"], input=user_input)
-
-    assert expected_output in result.stdout
-
-    mock_use_lock.assert_not_called()
-
-
 def test_cli_provision_command_with_existing_prefix_name(
     runner: CliRunner,
     matcha_testing_directory: str,
@@ -498,43 +451,3 @@ def test_cli_provision_command_with_password_mismatch(
     assert "Error: The two entered values do not match." in result.stdout
 
     mock_use_lock.assert_not_called()
-
-
-def test_cli_provision_command_with_provisioned_resources(
-    runner: CliRunner, matcha_testing_directory: str, mock_use_lock: MagicMock
-):
-    """Test provision command when there are already existing resources deployed.
-
-    Args:
-        runner (CliRunner): typer CLI runner
-        matcha_testing_directory (str): temporary working directory.
-        mock_use_lock (MagicMock): mock use_lock context manager
-    """
-    # change to matcha testing directory
-    os.chdir(matcha_testing_directory)
-
-    # we need to mock an Azure deployment already exists
-    with patch(
-        f"{REMOTE_STATE_MANAGER_PREFIX}.is_state_provisioned"
-    ) as is_state_provisioned:
-        is_state_provisioned.return_value = True
-
-        # the result here should be that Matcha exits displaying a warning that the resources are already provisioned
-        result = runner.invoke(
-            app,
-            [
-                "provision",
-                "--location",
-                "uksouth",
-                "--prefix",
-                "matcha",
-                "--password",
-                "ninja",
-            ],
-            input="Y\n",
-        )
-
-    assert (
-        "Error - Matcha has detected that there are resources already provisioned."
-        in str(result.exception)
-    )

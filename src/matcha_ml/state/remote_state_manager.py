@@ -264,6 +264,7 @@ class RemoteStateManager:
         """Remove the matcha.config.json file after destroy full is run."""
         try:
             os.remove(self.config_path)
+            self._azure_storage = None
         except FileNotFoundError:
             print_error(
                 f"Failed to remove the matcha.config.json file at {self.config_path}, file not found."

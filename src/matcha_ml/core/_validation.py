@@ -76,6 +76,13 @@ def is_valid_prefix(prefix: str) -> str:
         if not checker["func"](prefix):  # type: ignore
             raise MatchaInputError(checker["message"])
 
+    azure_client = AzureClient()
+
+    if not azure_client.is_valid_resource_group(prefix):
+        raise MatchaInputError(
+            "You entered a resource group name prefix that have been used before, prefix must be unique."
+        )
+
     return prefix
 
 

@@ -111,13 +111,6 @@ def prefix_typer_callback(prefix: str) -> str:
     except MatchaInputError as e:
         raise BadParameter(str(e))
 
-    azure_client = AzureClient()
-
-    if not azure_client.is_valid_resource_group(prefix):
-        raise BadParameter(
-            "You entered a resource group name prefix that have been used before, prefix must be unique."
-        )
-
     return prefix
 
 

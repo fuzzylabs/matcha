@@ -132,8 +132,6 @@ def provision(
             )
         )
         remote_state_manager.remove_matcha_config()
-        # Re-initialise remote state manager with empty state file
-        remote_state_manager = RemoteStateManager()
 
     if remote_state_manager.is_state_provisioned():
         raise MatchaError(
@@ -141,6 +139,7 @@ def provision(
         )
 
     # Input checks
+    print("AAAAAA", is_valid_prefix(prefix))
     _ = is_valid_prefix(prefix)
     _ = is_valid_region(location)
 
