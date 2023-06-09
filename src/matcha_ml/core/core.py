@@ -139,6 +139,7 @@ def provision(
 
     # Input checks
     try:
+        prefix = prefix.lower()
         _ = is_valid_prefix(prefix)
         _ = is_valid_region(location)
     except MatchaInputError as e:
