@@ -139,7 +139,6 @@ def provision(
         )
 
     # Input checks
-    print("AAAAAA", is_valid_prefix(prefix))
     _ = is_valid_prefix(prefix)
     _ = is_valid_region(location)
 
