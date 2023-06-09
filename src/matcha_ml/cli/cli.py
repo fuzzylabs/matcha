@@ -87,6 +87,7 @@ def get(
     """
     try:
         resources = core.get(resource_name, property_name).to_dict()
+        print(resources)
     except MatchaInputError as e:
         print_error(str(e))
         raise typer.Exit()

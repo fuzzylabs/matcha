@@ -35,6 +35,32 @@ class MatchaStateComponent:
     resource: MatchaResource
     properties: List[MatchaResourceProperty]
 
+    def find_property(self, property_name: str) -> MatchaResourceProperty:
+        """Given a property name, find the property that matches it.
+
+        Note: this is works under the assumption of none-duplicated properties.
+
+        Args:
+            property_name (str): the name of the property.
+
+        Raises:
+            MatchaError: if the property could not be found.
+
+        Returns:
+            MatchaResourceProperty: the property that matches the property_name parameter.
+        """
+        property = next(
+            filter(lambda property: property.name == property_name, self.properties),
+            None,
+        )
+
+        if property is None:
+            raise MatchaError(
+                f"The property with the name '{property_name}' could not be found."
+            )
+
+        return property
+
 
 @dataclass
 class MatchaState:
@@ -149,6 +175,33 @@ class MatchaStateService:
         property_value = self._state.to_dict().get(resource_name, {})[property_name]
 
         return MatchaState.from_dict({resource_name: {property_name: property_value}})
+
+    def get_component(self, resource_name: str) -> MatchaStateComponent:
+        """Get a component of the state given a resource name.
+
+        Args:
+            resource_name (str): the components resource name
+
+        Raises:
+            MatchaError: if the component cannot be found in the state.
+
+        Returns:
+            MatchaStateComponent: the state component matching the resource name parameter.
+        """
+        component = next(
+            filter(
+                lambda component: component.resource.name == resource_name,
+                self._state.components,
+            ),
+            None,
+        )
+
+        if component is None:
+            raise MatchaError(
+                f"The component with the name '{resource_name}' could not be found in the state."
+            )
+
+        return component
 
     def get_resource_names(self) -> List[str]:
         """Method for returning all existing resource names.

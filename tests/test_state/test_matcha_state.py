@@ -1,6 +1,7 @@
 """Tests for Matcha State Service."""
 import json
 import os
+from typing import Any
 
 import pytest
 
@@ -123,6 +124,19 @@ def experiment_tracker_state_component() -> MatchaStateComponent:
     )
 
 
+def assert_object(obj: Any, expected_type: Any) -> bool:
+    """Utility function for asserting that an object isn't None and of the correct type.
+
+    Args:
+        obj (Any): the object under test
+        expected_type (Any): the expected type of the object
+
+    Returns:
+        bool: true if the object is not None and of the expected type, otherwise false.
+    """
+    return obj and isinstance(obj, expected_type)
+
+
 def test_state_service_initialisation(state_file_as_object: MatchaState):
     """Test that object initialisation works as expected when a state file exists.
 
@@ -131,7 +145,7 @@ def test_state_service_initialisation(state_file_as_object: MatchaState):
     """
     service = MatchaStateService()
 
-    assert service._state
+    assert assert_object(service, MatchaStateService)
     assert service._state == state_file_as_object
 
 
@@ -153,7 +167,7 @@ def test_read_state_expected(state_file_as_object: MatchaState):
     """
     service = MatchaStateService()
 
-    assert service._state
+    assert assert_object(service._state, MatchaState)
     assert service._read_state() == state_file_as_object
 
 
@@ -264,7 +278,7 @@ def test_get_resource_names_expected(matcha_state_service: MatchaStateService):
     """
     names = matcha_state_service.get_resource_names()
 
-    assert names and isinstance(names, list)
+    assert assert_object(names, list)
     assert "cloud" in matcha_state_service.get_resource_names()
 
 
@@ -278,7 +292,7 @@ def test_get_resource_names_resource_not_present(
     """
     names = matcha_state_service.get_resource_names()
 
-    assert names and isinstance(names, list)
+    assert assert_object(names, list)
     assert "not a resource" not in names
 
 
@@ -290,7 +304,7 @@ def test_get_property_names_expected(matcha_state_service: MatchaStateService):
     """
     names = matcha_state_service.get_property_names(resource_name="cloud")
 
-    assert names and isinstance(names, list)
+    assert assert_object(names, list)
     assert "resource-group-name" in names
 
 
@@ -302,7 +316,7 @@ def test_get_property_names_not_present(matcha_state_service: MatchaStateService
     """
     names = matcha_state_service.get_property_names(resource_name="cloud")
 
-    assert names and isinstance(names, list)
+    assert assert_object(names, list)
     assert "not a property" not in names
 
 
@@ -317,7 +331,7 @@ def test_matcha_state_to_dict(
     """
     as_dict = state_file_as_object.to_dict()
 
-    assert as_dict and isinstance(as_dict, dict)
+    assert assert_object(as_dict, dict)
     assert as_dict == expected_outputs
 
 
@@ -332,5 +346,72 @@ def test_matcha_state_from_dict(
     """
     state = MatchaState.from_dict(state_dict=expected_outputs)
 
-    assert state and isinstance(state, MatchaState)
+    assert assert_object(state, MatchaState)
     assert state == state_file_as_object
+
+
+def test_get_component_expected(
+    matcha_state_service: MatchaStateService,
+    experiment_tracker_state_component: MatchaStateComponent,
+):
+    """Test that a component is found when a valid resource name is given.
+
+    Args:
+        matcha_state_service (MatchaStateService): the Matcha state service testing instance.
+        experiment_tracker_state_component (MatchaStateComponent): the expected result of the test.
+    """
+    component = matcha_state_service.get_component(resource_name="experiment-tracker")
+
+    assert assert_object(component, MatchaStateComponent)
+    assert component == experiment_tracker_state_component
+
+
+def test_get_component_not_found(matcha_state_service: MatchaStateService):
+    """Test that a component which is invalid isn't found and an error is raised.
+
+    Args:
+        matcha_state_service (MatchaStateService): the Matcha state service testing instance.
+    """
+    invalid_resource_name = "not a resource"
+    with pytest.raises(MatchaError) as err:
+        _ = matcha_state_service.get_component(resource_name=invalid_resource_name)
+
+    assert (
+        str(err.value)
+        == "The component with the name 'not a resource' could not be found in the state."
+    )
+
+
+def test_state_component_find_property_expected(
+    experiment_tracker_state_component: MatchaStateComponent,
+):
+    """Test that a property is found when a valid property name is given to the function.
+
+    Args:
+        experiment_tracker_state_component (MatchaStateComponent): the component used for finding a property.
+    """
+    expected = experiment_tracker_state_component.properties[0]
+    result = experiment_tracker_state_component.find_property(property_name="flavor")
+
+    assert assert_object(result, MatchaResourceProperty)
+    assert result == expected
+
+
+def test_state_component_find_property_not_found(
+    experiment_tracker_state_component: MatchaStateComponent,
+):
+    """Test that a property which is invalid isn't found and an error is raised.
+
+    Args:
+        experiment_tracker_state_component (MatchaStateComponent): the component used for finding a property
+    """
+    invalid_property_name = "invalid"
+    with pytest.raises(MatchaError) as err:
+        _ = experiment_tracker_state_component.find_property(
+            property_name=invalid_property_name
+        )
+
+    assert (
+        str(err.value)
+        == f"The property with the name '{invalid_property_name}' could not be found."
+    )

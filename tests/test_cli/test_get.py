@@ -150,6 +150,10 @@ def test_cli_get_command_hide_sensitive(
     """
     result = runner.invoke(app, ["get"])
 
+    print(result.stdout)
+    print("Result", result)
+    print("Exit code", result.exit_code)
+
     # Exit code 0 means there was no error
     assert result.exit_code == 0
 
@@ -229,7 +233,7 @@ def test_cli_get_command_with_invalid_resource_name(
 
     assert result.exit_code == 0
     assert (
-        "Error - a resource type with the name 'does-not-exist' does not exist."
+        "Error - a resource type with the name \x1b[32m'does-not-exist'\x1b[0m does not exist.\n"
         in result.stdout
     )
 
