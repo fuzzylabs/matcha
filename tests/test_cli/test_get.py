@@ -226,10 +226,9 @@ def test_cli_get_command_with_invalid_resource_name(
     """
     # Invoke get command
     result = runner.invoke(app, ["get", "does-not-exist"])
-
     assert result.exit_code == 0
     assert (
-        "Error - a resource type with the name 'does-not-exist' does not exist."
+        "Error - a resource type with the name \x1b[32m'does-not-exist'\x1b[0m does not exist.\n"
         in result.stdout
     )
 
