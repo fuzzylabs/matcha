@@ -125,11 +125,12 @@ def provision(
     remote_state_manager = RemoteStateManager()
 
     if remote_state_manager.is_state_stale():
-        print_status(
-            build_warning_status(
-                "Matcha has detected a stale state file. This means that your local configuration is out of sync with the remote state, the resource group may have been removed. Deleting existing state config."
+        if verbose:
+            print_status(
+                build_warning_status(
+                    "Matcha has detected a stale state file. This means that your local configuration is out of sync with the remote state, the resource group may have been removed. Deleting existing state config."
+                )
             )
-        )
         remote_state_manager.remove_matcha_config()
 
     if remote_state_manager.is_state_provisioned():
