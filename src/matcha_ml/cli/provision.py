@@ -12,6 +12,7 @@ from matcha_ml.cli.ui.status_message_builders import (
     build_step_success_status,
     build_warning_status,
 )
+from matcha_ml.cli.ui.user_approval_functions import is_user_approved
 from matcha_ml.runners import AzureRunner
 from matcha_ml.state import RemoteStateManager
 from matcha_ml.templates import AzureTemplate
@@ -119,7 +120,7 @@ def provision_resources(
         azure_template.build_template(config, template, destination, verbose)
 
         # Initializes the infrastructure provisioning process.
-        if template_runner.is_approved(verb="provision", resources=RESOURCE_MSG):
+        if is_user_approved(verb="provision", resources=RESOURCE_MSG):
             # provision resources by running the template
             template_runner.provision()
             print_status(build_step_success_status("Provisioning is complete!"))

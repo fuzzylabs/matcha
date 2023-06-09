@@ -8,6 +8,7 @@ from matcha_ml.cli.ui.status_message_builders import (
     build_status,
     build_step_success_status,
 )
+from matcha_ml.cli.ui.user_approval_functions import is_user_approved
 from matcha_ml.errors import MatchaError
 from matcha_ml.runners import AzureRunner
 from matcha_ml.services.global_parameters_service import GlobalParameters
@@ -104,7 +105,7 @@ def destroy(resources: List[Tuple[str, str]]) -> None:
         # create a runner for deprovisioning resource with Terraform service.
         template_runner = AzureRunner()
 
-        if template_runner.is_approved(verb="destroy", resources=resources):
+        if is_user_approved(verb="destroy", resources=resources):
             # deprovision the resources
             template_runner.deprovision()
             remote_state_manager.deprovision_remote_state()

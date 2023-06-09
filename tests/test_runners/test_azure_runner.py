@@ -161,20 +161,6 @@ def template_runner() -> AzureRunner:
     return AzureRunner()
 
 
-def test_is_approved(template_runner: AzureRunner):
-    """Test if is_approved behaves as expected based on user's input.
-
-    Args:
-        template_runner (AzureRunner): a AzureRunner object instance
-    """
-    with mock.patch("typer.confirm") as mock_confirm:
-        mock_confirm.return_value = True
-        assert template_runner.is_approved("provision", [])
-
-        mock_confirm.return_value = False
-        assert not template_runner.is_approved("provision", [])
-
-
 def test_write_outputs_state(
     template_runner: AzureRunner,
     terraform_test_config: TerraformConfig,
