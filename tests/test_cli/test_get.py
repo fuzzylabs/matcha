@@ -233,7 +233,7 @@ def test_cli_get_command_with_invalid_resource_name(
 
     assert result.exit_code == 0
     assert (
-        "Error - a resource type with the name \x1b[32m'does-not-exist'\x1b[0m does not exist.\n"
+        "Error - a resource type with the name 'does-not-exist' does not exist."
         in result.stdout
     )
 

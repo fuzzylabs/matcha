@@ -108,9 +108,13 @@ def get(
 @track(event_name=AnalyticsEvent.DESTROY)
 def destroy() -> None:
     """Destroy the provisioned cloud resources."""
+    print("HELLO 1")
     remote_state_manager = RemoteStateManager()
+    print("HELLO 2")
     destroy_resources(resources=STATE_RESOURCE_MSG + RESOURCE_MSG)
+    print("HELLO 3")
     remote_state_manager.deprovision_remote_state()
+    print("HELLO 4")
 
 
 @app.command()

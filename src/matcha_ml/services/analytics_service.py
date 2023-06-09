@@ -50,7 +50,10 @@ def track(event_name: AnalyticsEvent) -> Callable[..., Any]:
             Returns:
                 Any: the result of the wrapped function.
             """
+            print("In the inner function!")
             global_params = GlobalParameters()
+
+            print("global params", global_params._analytics_opt_out)
 
             if not global_params.analytics_opt_out:
                 ts = perf_counter()
@@ -67,11 +70,13 @@ def track(event_name: AnalyticsEvent) -> Callable[..., Any]:
                 # Get the matcha.state UUID if it exists
                 matcha_state_uuid: Optional[str] = None
                 if matcha_state_service.state_exists():
+                    print("State file exists")
                     try:
                         state_id_component = matcha_state_service.get_component("id")
                     except MatchaError:
                         state_id_component = None
 
+                    print("state id component", state_id_component)
                     if state_id_component is not None:
                         matcha_state_uuid = state_id_component.find_property(
                             property_name="matcha_uuid"
@@ -97,6 +102,7 @@ def track(event_name: AnalyticsEvent) -> Callable[..., Any]:
             else:
                 result = func(*args, **kwargs)
 
+            print("At the end!")
             return result
 
         return inner

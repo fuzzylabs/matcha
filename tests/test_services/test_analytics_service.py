@@ -1,6 +1,6 @@
 """Tests for analytics service."""
 import os
-from unittest.mock import PropertyMock, patch
+from unittest.mock import MagicMock, PropertyMock, patch
 
 import pytest
 
@@ -51,10 +51,17 @@ def test_segment_track_recieves_the_correct_arguments(
     """
     os.chdir(matcha_testing_directory)
 
-    runner.invoke(app, ["destroy"])
+    with patch("matcha_ml.cli.cli.RemoteStateManager") as remote_state_manager, patch(
+        "matcha_ml.cli.cli.destroy_resources"
+    ) as destroy_resoures:
+        remote_state_manager.return_value = MagicMock()
+        destroy_resoures.return_value = MagicMock()
+        result = runner.invoke(app, ["destroy"])
 
-    # Check that the mocked segment track was called
-    mocked_segment_track_decorator.assert_called()
+        print(result.stdout)
+
+        # Check that the mocked segment track was called
+        mocked_segment_track_decorator.assert_called()
 
     tracked_arguments = mocked_segment_track_decorator.call_args.args
     # Check that the Segment track arguments are as expected
