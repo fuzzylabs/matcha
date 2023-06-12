@@ -61,9 +61,7 @@ def test_segment_track_recieves_the_correct_arguments(
     ) as destroy_resoures:
         remote_state_manager.return_value = MagicMock()
         destroy_resoures.return_value = MagicMock()
-        result = runner.invoke(app, ["destroy"])
-
-        print(result.stdout)
+        _ = runner.invoke(app, ["destroy"])
 
         # Check that the mocked segment track was called
         mocked_segment_track_decorator.assert_called()
