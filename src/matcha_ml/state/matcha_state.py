@@ -168,13 +168,18 @@ class MatchaStateService:
             return self._state
 
         if property_name is None:
-            return MatchaState.from_dict(
-                {str(resource_name): dict(self._state.to_dict()[resource_name])}
+            return MatchaState(
+                components=[self.get_component(resource_name=resource_name)]
             )
 
-        property_value = self._state.to_dict().get(resource_name, {})[property_name]
+        component = self.get_component(resource_name=resource_name)
+        property = component.find_property(property_name=property_name)
 
-        return MatchaState.from_dict({resource_name: {property_name: property_value}})
+        return MatchaState(
+            components=[
+                MatchaStateComponent(resource=component.resource, properties=[property])
+            ]
+        )
 
     def get_component(self, resource_name: str) -> MatchaStateComponent:
         """Get a component of the state given a resource name.
