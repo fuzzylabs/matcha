@@ -1,4 +1,5 @@
 """Reusable fixtures."""
+import json
 import os
 import tempfile
 from typing import Iterator
@@ -12,6 +13,7 @@ from typer.testing import CliRunner
 
 from matcha_ml.services import AzureClient
 from matcha_ml.services.azure_service import ROLE_ID_MAPPING
+from matcha_ml.state.matcha_state import MATCHA_STATE_PATH
 
 INTERNAL_FUNCTION_STUB = "matcha_ml.services.AzureClient"
 
@@ -90,3 +92,29 @@ def mocked_segment_track_decorator():
         track_analytics.return_value = None
 
         yield track_analytics
+
+
+@pytest.fixture()
+def mock_state_file(matcha_testing_directory: str):
+    """A fixture for mocking a test state file in the test directory.
+
+    Args:
+        matcha_testing_directory (str): the test directory
+    """
+    os.chdir(matcha_testing_directory)
+
+    matcha_infrastructure_dir = os.path.join(".matcha", "infrastructure", "resources")
+    os.makedirs(matcha_infrastructure_dir)
+
+    state_file_resources = {
+        "cloud": {"flavor": "azure", "resource-group-name": "test_resources"},
+        "container-registry": {
+            "flavor": "azure",
+            "registry-name": "azure_registry_name",
+            "registry-url": "azure_container_registry",
+        },
+        "experiment-tracker": {"flavor": "mlflow", "tracking-url": "mlflow_test_url"},
+    }
+
+    with open(MATCHA_STATE_PATH, "w") as f:
+        json.dump(state_file_resources, f)
