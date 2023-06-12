@@ -74,7 +74,7 @@ def mocked_state_storage_template_runner() -> RemoteStateRunner:
     """The Template Runner with mocked variables.
 
     Returns:
-        RemoteStateRunner: the mocked TemplateRunner.
+        RemoteStateRunner: the mocked RemoteStateRunner.
     """
     with patch(
         f"{INTERNAL_FUNCTION_STUBS[1]}._initialize_terraform"

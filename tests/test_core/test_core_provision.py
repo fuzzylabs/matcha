@@ -278,3 +278,42 @@ def test_provision_with_provisioned_resources(matcha_testing_directory: str):
         "Error - Matcha has detected that there are resources already provisioned."
         in str(e)
     )
+
+
+def test_stale_remote_state_file_is_removed(matcha_testing_directory: str):
+    """Test.
+
+    Args:
+        matcha_testing_directory (str): temporary working directory.
+    """
+    os.chdir(matcha_testing_directory)
+
+    # Add stale config file
+    config_file_contents = {
+        "remote_state_bucket": {
+            "account_name": "matcha-account",
+            "container_name": "matcha-container",
+            "resource_group_name": "matcha-rg",
+        }
+    }
+    with open("matcha.config.json", "w") as f:
+        json.dump(config_file_contents, f)
+
+    expected_config_file_contents = {
+        "remote_state_bucket": {
+            "account_name": "test-account",
+            "container_name": "test-container",
+            "resource_group_name": "test-rg",
+        }
+    }
+
+    with mock.patch(
+        f"{REMOTE_STATE_MANAGER_PREFIX}._resource_group_exists"
+    ) as is_rg_provisioned:
+        is_rg_provisioned.return_value = False
+        _ = provision(location="uksouth", prefix="test", password="default")
+
+    with open("matcha.config.json") as f:
+        config_file_contents = json.load(f)
+
+    assert expected_config_file_contents == config_file_contents
