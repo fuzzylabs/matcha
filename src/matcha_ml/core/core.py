@@ -1,14 +1,8 @@
 """The core functions for matcha."""
 import os
-from typing import List, Optional, Tuple
+from typing import Optional
 
 from matcha_ml.cli._validation import get_command_validation
-from matcha_ml.cli.ui.print_messages import print_error, print_status
-from matcha_ml.cli.ui.status_message_builders import (
-    build_status,
-    build_step_success_status,
-)
-from matcha_ml.cli.ui.user_approval_functions import is_user_approved
 from matcha_ml.errors import MatchaError
 from matcha_ml.runners import AzureRunner
 from matcha_ml.services.global_parameters_service import GlobalParameters
@@ -83,38 +77,22 @@ def get(
     return result
 
 
-def destroy(resources: List[Tuple[str, str]]) -> None:
+def destroy() -> None:
     """Destroy resources.
-
-    Args:
-        resources (List[Tuple[str,str]): the list of resources to be actioned by the verb to be provided to the user as a status message
 
     Raises:
         Matcha Error: where no state has been provisioned.
     """
     remote_state_manager = RemoteStateManager()
-    if not remote_state_manager.is_state_provisioned():
-        print_error(
-            "Error - resources that have not been provisioned cannot be destroyed. Run 'matcha provision' to get started!"
-        )
-        raise MatchaError(
-            "Error - resources that have not been provisioned cannot be destroyed. Run 'matcha provision' to get started!"
-        )
+    template_runner = AzureRunner()
 
     with remote_state_manager.use_lock(), remote_state_manager.use_remote_state():
-        # create a runner for deprovisioning resource with Terraform service.
-        template_runner = AzureRunner()
-
-        if is_user_approved(verb="destroy", resources=resources):
-            # deprovision the resources
+        if remote_state_manager.is_state_provisioned():
             template_runner.deprovision()
             remote_state_manager.deprovision_remote_state()
-            print_status(build_step_success_status("Destroying resources is complete!"))
         else:
-            print_status(
-                build_status(
-                    "You decided to cancel - your resources will remain active! If you change your mind, then run 'matcha destroy' again."
-                )
+            raise MatchaError(
+                "Error - resources that have not been provisioned cannot be destroyed. Run 'matcha provision' to get started!"
             )
 
 

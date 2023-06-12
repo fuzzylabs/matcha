@@ -19,6 +19,11 @@ from matcha_ml.cli.ui.resource_message_builders import (
     build_resource_output,
     hide_sensitive_in_output,
 )
+from matcha_ml.cli.ui.status_message_builders import (
+    build_status,
+    build_step_success_status,
+)
+from matcha_ml.cli.ui.user_approval_functions import is_user_approved
 from matcha_ml.errors import MatchaError, MatchaInputError
 from matcha_ml.services.analytics_service import AnalyticsEvent, track
 
@@ -109,11 +114,21 @@ def destroy() -> None:
     Raises:
         Exit: Exit if core.destroy throws a MatchaError.
     """
-    try:
-        core.destroy(resources=STATE_RESOURCE_MSG + RESOURCE_MSG)
-    except MatchaError as e:
-        print_error(str(e))
-        raise typer.Exit()
+    print("here first")
+    if is_user_approved(verb="destroy", resources=RESOURCE_MSG + STATE_RESOURCE_MSG):
+        print("here")
+        try:
+            core.destroy()
+            print_status(build_step_success_status("Destroying resources is complete!"))
+        except MatchaError as e:
+            print_error(str(e))
+            raise typer.Exit()
+    else:
+        print_status(
+            build_status(
+                "You decided to cancel - your resources will remain active! If you change your mind, then run 'matcha destroy' again."
+            )
+        )
 
 
 @app.command()
