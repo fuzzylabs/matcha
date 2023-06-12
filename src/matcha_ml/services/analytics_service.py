@@ -66,7 +66,7 @@ def track(event_name: AnalyticsEvent) -> Callable[..., Any]:
                 try:
                     matcha_state_service = MatchaStateService()
                 except Exception as e:
-                    print(e)
+                    error_code = e
 
                 # Get the matcha.state UUID if it exists
                 matcha_state_uuid: Optional[str] = None
