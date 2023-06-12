@@ -150,10 +150,6 @@ def test_cli_get_command_hide_sensitive(
     """
     result = runner.invoke(app, ["get"])
 
-    print(result.stdout)
-    print("Result", result)
-    print("Exit code", result.exit_code)
-
     # Exit code 0 means there was no error
     assert result.exit_code == 0
 

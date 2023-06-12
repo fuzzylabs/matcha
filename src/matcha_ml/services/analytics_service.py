@@ -9,7 +9,6 @@ from typing import Any, Callable, Optional
 
 from segment import analytics
 
-# from segment.analytics import track
 from matcha_ml.errors import MatchaError
 from matcha_ml.services._validation import _check_uuid
 from matcha_ml.services.global_parameters_service import GlobalParameters
@@ -84,7 +83,7 @@ def track(event_name: AnalyticsEvent) -> Callable[..., Any]:
                         try:
                             _check_uuid(str(matcha_state_uuid))
                         except MatchaError as err:
-                            raise MatchaError(str(err))
+                            raise err
 
                 analytics.track(
                     global_params.user_id,

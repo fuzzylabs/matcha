@@ -2,6 +2,7 @@
 import json
 import os
 import tempfile
+from pathlib import Path
 from typing import Iterator
 from unittest.mock import patch
 
@@ -95,7 +96,7 @@ def mocked_segment_track_decorator():
 
 
 @pytest.fixture()
-def mock_state_file(matcha_testing_directory: str):
+def mock_state_file(matcha_testing_directory: str) -> Path:
     """A fixture for mocking a test state file in the test directory.
 
     Args:
@@ -118,3 +119,5 @@ def mock_state_file(matcha_testing_directory: str):
 
     with open(MATCHA_STATE_PATH, "w") as f:
         json.dump(state_file_resources, f)
+
+    return Path(MATCHA_STATE_PATH)
