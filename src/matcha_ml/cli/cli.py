@@ -62,7 +62,6 @@ def provision(
 
 
 @app.command(help="Get information for the provisioned resources.")
-@track(event_name=AnalyticsEvent.GET)
 def get(
     resource_name: Optional[str] = typer.Argument(None),
     property_name: Optional[str] = typer.Argument(None),
@@ -107,16 +106,13 @@ def get(
 
 
 @app.command()
-@track(event_name=AnalyticsEvent.DESTROY)
 def destroy() -> None:
     """Destroy the provisioned cloud resources.
 
     Raises:
         Exit: Exit if core.destroy throws a MatchaError.
     """
-    print("here first")
     if is_user_approved(verb="destroy", resources=RESOURCE_MSG + STATE_RESOURCE_MSG):
-        print("here")
         try:
             core.destroy()
             print_status(build_step_success_status("Destroying resources is complete!"))

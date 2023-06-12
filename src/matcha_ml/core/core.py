@@ -5,11 +5,13 @@ from typing import Optional
 from matcha_ml.cli._validation import get_command_validation
 from matcha_ml.errors import MatchaError
 from matcha_ml.runners import AzureRunner
+from matcha_ml.services.analytics_service import AnalyticsEvent, track
 from matcha_ml.services.global_parameters_service import GlobalParameters
 from matcha_ml.state import MatchaStateService, RemoteStateManager
 from matcha_ml.state.matcha_state import MatchaState
 
 
+@track(event_name=AnalyticsEvent.GET)
 def get(
     resource_name: Optional[str],
     property_name: Optional[str],
@@ -77,6 +79,7 @@ def get(
     return result
 
 
+@track(event_name=AnalyticsEvent.DESTROY)
 def destroy() -> None:
     """Destroy resources.
 

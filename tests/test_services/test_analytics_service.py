@@ -1,13 +1,14 @@
 """Tests for analytics service."""
 import os
-from unittest.mock import PropertyMock, patch
+from unittest.mock import MagicMock, PropertyMock, patch
 
 import pytest
 
 from matcha_ml.cli.cli import app
 from matcha_ml.services.global_parameters_service import GlobalParameters
 
-GLOBAL_PARAMETER_SERVICE_FUNCTION_STUB = (
+CORE_FUNCTION_STUB = "matcha_ml.core.core"
+GLOBAL_PARAMETER_SERVICE_CORE_FUNCTION_STUB = (
     "matcha_ml.services.analytics_service.GlobalParameters"
 )
 
@@ -24,10 +25,10 @@ def mocked_global_parameters_service(matcha_testing_directory, uuid_for_testing)
         GlobalParameters: GlobalParameters object with mocked properties.
     """
     with patch(
-        f"{GLOBAL_PARAMETER_SERVICE_FUNCTION_STUB}.default_config_file_path",
+        f"{GLOBAL_PARAMETER_SERVICE_CORE_FUNCTION_STUB}.default_config_file_path",
         new_callable=PropertyMock,
     ) as file_path, patch(
-        f"{GLOBAL_PARAMETER_SERVICE_FUNCTION_STUB}.user_id",
+        f"{GLOBAL_PARAMETER_SERVICE_CORE_FUNCTION_STUB}.user_id",
         new_callable=PropertyMock,
     ) as user_id:
         file_path.return_value = str(
@@ -51,21 +52,27 @@ def test_segment_track_recieves_the_correct_arguments(
     """
     os.chdir(matcha_testing_directory)
 
-    runner.invoke(app, ["destroy"])
+    with patch(f"{CORE_FUNCTION_STUB}.AzureRunner") as azure_runner, patch(
+        f"{CORE_FUNCTION_STUB}.RemoteStateManager"
+    ) as remote_state_manager:
+        azure_runner.return_value = MagicMock()
+        remote_state_manager.return_value = MagicMock()
 
-    # Check that the mocked segment track was called
-    mocked_segment_track_decorator.assert_called()
+        runner.invoke(app, ["destroy"], input="Y\n")
 
-    tracked_arguments = mocked_segment_track_decorator.call_args.args
-    # Check that the Segment track arguments are as expected
-    assert str(uuid_for_testing) in tracked_arguments
-    assert "destroy" in tracked_arguments
-    assert {
-        "time_taken",
-        "error_type",
-        "command_succeeded",
-        "matcha_state_uuid",
-    } == set(tracked_arguments[2].keys())
+        # Check that the mocked segment track was called
+        mocked_segment_track_decorator.assert_called()
+
+        tracked_arguments = mocked_segment_track_decorator.call_args.args
+        # Check that the Segment track arguments are as expected
+        assert str(uuid_for_testing) in tracked_arguments
+        assert "destroy" in tracked_arguments
+        assert {
+            "time_taken",
+            "error_type",
+            "command_succeeded",
+            "matcha_state_uuid",
+        } == set(tracked_arguments[2].keys())
 
 
 def test_tracking_does_not_happen_when_opted_out(
@@ -82,7 +89,7 @@ def test_tracking_does_not_happen_when_opted_out(
 
     # Invoke destroy command with a GlobalParameter opting out of data collection
     with patch(
-        f"{GLOBAL_PARAMETER_SERVICE_FUNCTION_STUB}.analytics_opt_out",
+        f"{GLOBAL_PARAMETER_SERVICE_CORE_FUNCTION_STUB}.analytics_opt_out",
         new_callable=PropertyMock,
     ):
         runner.invoke(app, ["destroy"])
