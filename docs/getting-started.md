@@ -144,19 +144,26 @@ Experiment tracker
 
 By default, Matcha will hide sensitive resource properties. If you need one of these properties, then you can add the `--show-sensitive` flag to your `get` command.
 
-# Sharing resources
+# &#129309; Sharing Resources
 
-If you're working in a team and wish to use the same resources (e.g. the same experiment tracking server) you can share the deployed resources with Matcha.
+You'll notice that a configuration file is create as part of the provisioning process - it's called `matcha.config.json`. This file stores the information necessary for Matcha to link up to your provisioned resources.
 
-To do so, add the `matcha.config.json` file to your GitHub repository (or similar), note that this does not contain any sensitive information such as passwords or server endpoints.
+To share these resources, you need to add this file to your project repository (GitHub or similar).
 
-Other users can pull this file and when they run Matcha commands in the same directory Matcha will automatically pull the provisioned state information allowing them to use the resources. This means you don't have to provision seperate resources for each team member.
+> Note: this file does not contain any sensitive information such as passwords or server endpoints.
+
+The other users that you're sharing the resources with will then need to ensure this configuration file exists locally, in the same directory where the file was originally created.
+
+Matcha uses this file to find and pull the provisioned state information, which will allow multiple users to use the same provisioned resources.
 
 <div align="center">
     <img src="/img/getting-started/shared-state.png" width="400"></img>
 </div>
 
-As long as the user has the correct permissions to access the resource group and have set the correct active Azure subscription they will be able to download the shared state within the `.matcha` directory.
+In order to access the shared state (including secrets) the user needs to do two things:
+
+1. Set the active Azure subscription to the one that contains the resource group.
+2. Ensure they have access to both the resource group and the storage bucket.
 
 # Training and deploying
 
@@ -225,4 +232,4 @@ The final thing you'll want to do is decommission the infrastructure that Matcha
 matcha destroy
 ```
 
-Note that this command is irreversible will remove all the resources deployed by `matcha provision` including the resource group, so make sure you save any data you wish to keep before running this command.
+> Note that this command is irreversible will remove all the resources deployed by `matcha provision` including the resource group, so make sure you save any data you wish to keep before running this command.
