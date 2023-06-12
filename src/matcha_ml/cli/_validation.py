@@ -4,7 +4,7 @@ from typing import List, Optional, Set, Union
 
 from typer import BadParameter
 
-from matcha_ml.core._validation import _is_valid_prefix, is_valid_region
+from matcha_ml.core._validation import is_valid_prefix, is_valid_region
 from matcha_ml.errors import MatchaInputError
 from matcha_ml.services import AzureClient
 
@@ -107,16 +107,9 @@ def prefix_typer_callback(prefix: str) -> str:
     prefix = _to_lowercase(prefix)
 
     try:
-        _is_valid_prefix(prefix)
+        is_valid_prefix(prefix)
     except MatchaInputError as e:
         raise BadParameter(str(e))
-
-    azure_client = AzureClient()
-
-    if not azure_client.is_valid_resource_group(prefix):
-        raise BadParameter(
-            "You entered a resource group name prefix that have been used before, prefix must be unique."
-        )
 
     return prefix
 
