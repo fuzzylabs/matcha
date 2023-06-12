@@ -110,7 +110,7 @@ def test_cli_provision_command_help(runner: CliRunner):
     assert result.exit_code == 0
 
     # Assert string is present in cli output
-    assert "Provision cloud resources with a template." in result.stdout
+    assert "Provision cloud resources." in result.stdout
 
 
 def test_cli_provision_command(

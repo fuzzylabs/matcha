@@ -75,7 +75,7 @@ def fill_provision_variables(
     return location, prefix, password
 
 
-@app.command()
+@app.command(help="Provision cloud resources.")
 def provision(
     location: str = typer.Option(
         callback=region_typer_callback,
@@ -95,10 +95,24 @@ def provision(
         False, help="Get more detailed information from matcha provision!"
     ),
 ) -> None:
-    """Provision cloud resources with a template."""
+    """Provision cloud resources.
+
+    Args:
+        location (Optional[str]): Azure location in which all resources will be provisioned.
+        prefix (Optional[str]): Prefix used for all resources.
+        password (Optional[str]): Password for ZenServer.
+        verbose (Optional[bool]): additional output is show when True. Defaults to False.
+
+    Raises:
+        Exit: Exit if resources are already provisioned.
+    """
     location, prefix, password = fill_provision_variables(location, prefix, password)
     if is_user_approved(verb="provision", resources=RESOURCE_MSG):
-        core.provision(location, prefix, password, verbose)
+        try:
+            _ = core.provision(location, prefix, password, verbose)
+        except MatchaError as e:
+            print_error(str(e))
+            raise typer.Exit()
         print_status(build_step_success_status("Provisioning is complete!"))
     else:
         print_status(
