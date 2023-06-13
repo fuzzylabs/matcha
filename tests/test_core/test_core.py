@@ -169,6 +169,7 @@ def test_get_resources_with_resource_and_property_names_with_capitals(
     expected_output = {"experiment-tracker": {"tracking-url": "mlflow_test_url"}}
     assert expected_output == get("Experiment-tracker", "TRacking-url")
 
+
 def test_opt_out_subcommand(
     runner,
     matcha_testing_directory: str,
