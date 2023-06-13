@@ -8,14 +8,14 @@ from matcha_ml.core._validation import (
     _check_length,
     _is_alphanumeric,
     _is_not_digits,
-    _is_valid_prefix,
+    is_valid_prefix,
 )
 from matcha_ml.errors import MatchaInputError
 
 
 def test_is_valid_prefix_expected():
     """Test that the is valid prefix functions behaves as expected with correct input."""
-    assert _is_valid_prefix("matcha") == "matcha"
+    assert is_valid_prefix("matcha") == "matcha"
 
 
 @pytest.mark.parametrize(
@@ -93,6 +93,6 @@ def test_is_valid_prefix_invalid(
         expectation (MatchaInputError): the error that is expected to be raised.
     """
     with pytest.raises(expectation) as err:
-        _is_valid_prefix(prefix)
+        is_valid_prefix(prefix)
 
     assert str(err.value) == error_msg

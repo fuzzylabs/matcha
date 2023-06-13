@@ -215,7 +215,9 @@ class RemoteStateManager:
         account_name, container_name, resource_group_name = template_runner.provision()
         self._write_matcha_config(account_name, container_name, resource_group_name)
         print_status(
-            build_step_success_status("Provisioning Matcha reources is complete!")
+            build_step_success_status(
+                "Provisioning Matcha resource group and remote state is complete!"
+            )
         )
         print()
 
@@ -258,9 +260,10 @@ class RemoteStateManager:
         )
 
     def remove_matcha_config(self) -> None:
-        """Remove the matcha.config.json file after destroy full is run."""
+        """Remove the matcha.config.json file."""
         try:
             os.remove(self.config_path)
+            self._azure_storage = None
         except FileNotFoundError:
             print_error(
                 f"Failed to remove the matcha.config.json file at {self.config_path}, file not found."

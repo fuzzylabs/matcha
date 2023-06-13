@@ -1,5 +1,12 @@
 """Matcha core functionality module."""
-from .core import analytics_opt_in, analytics_opt_out, destroy, get, remove_state_lock
+from .core import (
+    analytics_opt_in,
+    analytics_opt_out,
+    destroy,
+    get,
+    provision,
+    remove_state_lock,
+)
 
 __all__ = [
     "get",
@@ -7,4 +14,5 @@ __all__ = [
     "analytics_opt_out",
     "remove_state_lock",
     "destroy",
+    "provision",
 ]

@@ -1,4 +1,4 @@
-"""Reusable fixtures for test_cli."""
+"""Reusable fixtures for test_core."""
 import os
 from unittest.mock import PropertyMock, patch
 
@@ -15,6 +15,31 @@ INTERNAL_FUNCTION_STUBS = [
 GLOBAL_PARAMETER_SERVICE_FUNCTION_STUB = (
     "matcha_ml.services.analytics_service.GlobalParameters"
 )
+
+
+@pytest.fixture(autouse=True)
+def mocked_global_parameters_service(matcha_testing_directory):
+    """Mocked global parameters service.
+
+    Args:
+        matcha_testing_directory (str): Temporary directory for testing.
+
+    Yields:
+        GlobalParameters: GlobalParameters object with mocked properties.
+    """
+    with patch(
+        f"{GLOBAL_PARAMETER_SERVICE_FUNCTION_STUB}.default_config_file_path",
+        new_callable=PropertyMock,
+    ) as file_path, patch(
+        f"{GLOBAL_PARAMETER_SERVICE_FUNCTION_STUB}.user_id",
+        new_callable=PropertyMock,
+    ) as user_id:
+        file_path.return_value = str(
+            os.path.join(str(matcha_testing_directory), ".matcha-ml", "config.yaml")
+        )
+        user_id.return_value = "TestUserID"
+
+        yield GlobalParameters
 
 
 @pytest.fixture(scope="class", autouse=True)
@@ -49,7 +74,7 @@ def mocked_state_storage_template_runner() -> RemoteStateRunner:
     """The Template Runner with mocked variables.
 
     Returns:
-        RemoteStateRunner: the mocked TemplateRunner.
+        RemoteStateRunner: the mocked RemoteStateRunner.
     """
     with patch(
         f"{INTERNAL_FUNCTION_STUBS[1]}._initialize_terraform"
@@ -79,28 +104,3 @@ def mocked_state_storage_template_runner() -> RemoteStateRunner:
         destroy_terraform.return_value = None
 
         yield RemoteStateRunner()
-
-
-@pytest.fixture(autouse=True)
-def mocked_global_parameters_service(matcha_testing_directory):
-    """Mocked global parameters service.
-
-    Args:
-        matcha_testing_directory (str): Temporary directory for testing.
-
-    Yields:
-        GlobalParameters: GlobalParameters object with mocked properties.
-    """
-    with patch(
-        f"{GLOBAL_PARAMETER_SERVICE_FUNCTION_STUB}.default_config_file_path",
-        new_callable=PropertyMock,
-    ) as file_path, patch(
-        f"{GLOBAL_PARAMETER_SERVICE_FUNCTION_STUB}.user_id",
-        new_callable=PropertyMock,
-    ) as user_id:
-        file_path.return_value = str(
-            os.path.join(str(matcha_testing_directory), ".matcha-ml", "config.yaml")
-        )
-        user_id.return_value = "TestUserID"
-
-        yield GlobalParameters

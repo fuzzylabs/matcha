@@ -60,7 +60,7 @@ PREFIX_RULES = {
 }
 
 
-def _is_valid_prefix(prefix: str) -> str:
+def is_valid_prefix(prefix: str) -> str:
     """Check for whether a prefix is valid.
 
     Args:
@@ -75,6 +75,13 @@ def _is_valid_prefix(prefix: str) -> str:
     for rule, checker in PREFIX_RULES.items():
         if not checker["func"](prefix):  # type: ignore
             raise MatchaInputError(checker["message"])
+
+    azure_client = AzureClient()
+
+    if not azure_client.is_valid_resource_group(prefix):
+        raise MatchaInputError(
+            "You entered a resource group name prefix that has been used before, the prefix must be unique."
+        )
 
     return prefix
 
