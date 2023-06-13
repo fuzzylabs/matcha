@@ -175,7 +175,10 @@ def test_get_resources(
     assert matcha_state == get(None, None)
 
 
-def test_get_resources_resource_name_with_capitals(mock_provisioned_remote_state: MagicMock):
+def test_get_resources_resource_name_with_capitals(
+        mock_provisioned_remote_state: MagicMock,
+        experiment_tracker_state_component: MatchaStateComponent,
+):
     """Test get resources with a resource name containing errant capital letter(s).
 
     Args:
@@ -239,7 +242,8 @@ def test_get_resources_with_invalid_resource_name(
 
 
 def test_get_resources_with_resource_and_property_names_with_capitals(
-        mock_provisioned_remote_state: MagicMock
+        mock_provisioned_remote_state: MagicMock,
+        experiment_tracker_state_component: MatchaStateComponent,
 ):
     """Test get resources function with resource name and resource property specified with arguments containing errant
     capital letter(s).
