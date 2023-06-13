@@ -1,6 +1,23 @@
 """Test suite to test the CLI."""
+from typing import Iterable
+from unittest.mock import MagicMock, patch
+
+import pytest
+
 from matcha_ml import __version__
 from matcha_ml.cli.cli import app
+
+
+@pytest.fixture(autouse=True)
+def mock_remote_state_manager() -> Iterable[MagicMock]:
+    """Mock remote state manager to have state provisioned.
+
+    Yields:
+        MagicMock: mock of an RemoteStateManager instance
+    """
+    with patch("matcha_ml.core.core.RemoteStateManager") as mock_state_manager_class:
+        mock_state_manager = mock_state_manager_class.return_value
+        yield mock_state_manager
 
 
 def test_cli_no_args(runner):
@@ -44,7 +61,7 @@ def test_cli_invalid_argument(runner):
     # Invoke invalid option dummy
     result = runner.invoke(app, ["--dummy"])
 
-    # Exit code other than 0 means there was an error in exectuion of program
+    # Exit code other than 0 means there was an error in execution of program
     assert result.exit_code != 0
 
     # Check if error message is present in output

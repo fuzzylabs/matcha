@@ -7,6 +7,7 @@ import pytest
 from matcha_ml.cli.cli import app
 from matcha_ml.services.global_parameters_service import GlobalParameters
 
+CORE_FUNCTION_STUB = "matcha_ml.core.core"
 GLOBAL_PARAMETER_SERVICE_FUNCTION_STUB = (
     "matcha_ml.services.analytics_service.GlobalParameters"
 )
@@ -56,27 +57,27 @@ def test_segment_track_recieves_the_correct_arguments(
     """
     os.chdir(matcha_testing_directory)
 
-    with patch("matcha_ml.cli.cli.RemoteStateManager") as remote_state_manager, patch(
-        "matcha_ml.cli.cli.destroy_resources"
-    ) as destroy_resoures:
+    with patch(f"{CORE_FUNCTION_STUB}.AzureRunner") as azure_runner, patch(
+        f"{CORE_FUNCTION_STUB}.RemoteStateManager"
+    ) as remote_state_manager:
+        azure_runner.return_value = MagicMock()
         remote_state_manager.return_value = MagicMock()
-        destroy_resoures.return_value = MagicMock()
-        _ = runner.invoke(app, ["destroy"])
+
+        runner.invoke(app, ["destroy"], input="Y\n")
 
         # Check that the mocked segment track was called
         mocked_segment_track_decorator.assert_called()
 
-    tracked_arguments = mocked_segment_track_decorator.call_args.args
-
-    # Check that the Segment track arguments are as expected
-    assert str(uuid_for_testing) in tracked_arguments
-    assert "destroy" in tracked_arguments
-    assert {
-        "time_taken",
-        "error_type",
-        "command_succeeded",
-        "matcha_state_uuid",
-    } == set(tracked_arguments[2].keys())
+        tracked_arguments = mocked_segment_track_decorator.call_args.args
+        # Check that the Segment track arguments are as expected
+        assert str(uuid_for_testing) in tracked_arguments
+        assert "destroy" in tracked_arguments
+        assert {
+            "time_taken",
+            "error_type",
+            "command_succeeded",
+            "matcha_state_uuid",
+        } == set(tracked_arguments[2].keys())
 
 
 def test_tracking_does_not_happen_when_opted_out(
