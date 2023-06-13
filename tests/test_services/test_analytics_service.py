@@ -8,7 +8,7 @@ from matcha_ml.cli.cli import app
 from matcha_ml.services.global_parameters_service import GlobalParameters
 
 CORE_FUNCTION_STUB = "matcha_ml.core.core"
-GLOBAL_PARAMETER_SERVICE_CORE_FUNCTION_STUB = (
+GLOBAL_PARAMETER_SERVICE_FUNCTION_STUB = (
     "matcha_ml.services.analytics_service.GlobalParameters"
 )
 
@@ -25,10 +25,10 @@ def mocked_global_parameters_service(matcha_testing_directory, uuid_for_testing)
         GlobalParameters: GlobalParameters object with mocked properties.
     """
     with patch(
-        f"{GLOBAL_PARAMETER_SERVICE_CORE_FUNCTION_STUB}.default_config_file_path",
+        f"{GLOBAL_PARAMETER_SERVICE_FUNCTION_STUB}.default_config_file_path",
         new_callable=PropertyMock,
     ) as file_path, patch(
-        f"{GLOBAL_PARAMETER_SERVICE_CORE_FUNCTION_STUB}.user_id",
+        f"{GLOBAL_PARAMETER_SERVICE_FUNCTION_STUB}.user_id",
         new_callable=PropertyMock,
     ) as user_id:
         file_path.return_value = str(
@@ -89,7 +89,7 @@ def test_tracking_does_not_happen_when_opted_out(
 
     # Invoke destroy command with a GlobalParameter opting out of data collection
     with patch(
-        f"{GLOBAL_PARAMETER_SERVICE_CORE_FUNCTION_STUB}.analytics_opt_out",
+        f"{GLOBAL_PARAMETER_SERVICE_FUNCTION_STUB}.analytics_opt_out",
         new_callable=PropertyMock,
     ):
         runner.invoke(app, ["destroy"])
