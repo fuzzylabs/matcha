@@ -94,7 +94,7 @@ def test_prefix_typer_callback_expected(prefix: str, expectation: str):
         ),
         (
             "rand",
-            "You entered a resource group name prefix that have been used before, prefix must be unique.",
+            "You entered a resource group name prefix that has been used before, the prefix must be unique.",
             BadParameter,
         ),
     ],

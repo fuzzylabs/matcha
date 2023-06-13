@@ -323,7 +323,7 @@ def test_remove_state_lock_function(mock_provisioned_remote_state: MagicMock):
 def test_remove_state_lock_function_warning(
     mock_azure_storage_instance: MagicMock, mock_provisioned_remote_state: MagicMock
 ):
-    """Test that the unlock function is called once when emove_state_lock function is used.
+    """Test that the unlock function is called once when remove_state_lock function is used.
 
     Args:
         mock_azure_storage_instance (MagicMock): mock of an AzureStorage instance
