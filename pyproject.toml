@@ -154,3 +154,4 @@ ignore_missing_imports = true
 
 [tool.ruff.pylint]
 max-branches = 13
+max-args = 6

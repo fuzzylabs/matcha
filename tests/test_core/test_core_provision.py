@@ -2,6 +2,7 @@
 import glob
 import json
 import os
+from pathlib import Path
 from typing import Dict, Iterator, Union
 from unittest import mock
 from unittest.mock import MagicMock
@@ -232,6 +233,7 @@ def test_provision_copies_infrastructure_templates_with_specified_values(
     ],
 )
 def test_provision_raises_exception_for_invalid_prefixes(
+    mock_state_file: Path,
     matcha_testing_directory: str,
     mock_use_lock: MagicMock,
     location: str,
@@ -241,6 +243,7 @@ def test_provision_raises_exception_for_invalid_prefixes(
     """Test whether the prefix validation function prompt an error message when user entered an invalid prefix.
 
     Args:
+        mock_state_file (Path): a mocked state file
         matcha_testing_directory (str): temporary working directory
         mock_use_lock (MagicMock): mock use_lock context manager
         location (str): provisioning location
@@ -255,11 +258,14 @@ def test_provision_raises_exception_for_invalid_prefixes(
     mock_use_lock.assert_not_called()
 
 
-def test_provision_with_provisioned_resources(matcha_testing_directory: str):
+def test_provision_with_provisioned_resources(
+    matcha_testing_directory: str, mock_state_file: Path
+):
     """Test provision command when there are already existing resources deployed.
 
     Args:
         matcha_testing_directory (str): temporary working directory.
+        mock_state_file (Path): a mocked state file
     """
     # change to matcha testing directory
     os.chdir(matcha_testing_directory)
