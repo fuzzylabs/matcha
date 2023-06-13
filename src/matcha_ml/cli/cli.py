@@ -9,7 +9,6 @@ from matcha_ml.cli._validation import (
     region_typer_callback,
 )
 from matcha_ml.cli.constants import RESOURCE_MSG, STATE_RESOURCE_MSG
-from matcha_ml.cli.destroy import destroy_resources
 from matcha_ml.cli.ui.print_messages import (
     print_error,
     print_resource_output,
@@ -25,8 +24,6 @@ from matcha_ml.cli.ui.status_message_builders import (
 )
 from matcha_ml.cli.ui.user_approval_functions import is_user_approved
 from matcha_ml.errors import MatchaError, MatchaInputError
-from matcha_ml.services.analytics_service import AnalyticsEvent, track
-from matcha_ml.state import RemoteStateManager
 
 app = typer.Typer(no_args_is_help=True, pretty_exceptions_show_locals=False)
 analytics_app = typer.Typer(no_args_is_help=True, pretty_exceptions_show_locals=False)
@@ -168,12 +165,25 @@ def get(
 
 
 @app.command()
-@track(event_name=AnalyticsEvent.DESTROY)
 def destroy() -> None:
-    """Destroy the provisioned cloud resources."""
-    remote_state_manager = RemoteStateManager()
-    destroy_resources(resources=STATE_RESOURCE_MSG + RESOURCE_MSG)
-    remote_state_manager.deprovision_remote_state()
+    """Destroy the provisioned cloud resources.
+
+    Raises:
+        Exit: Exit if core.destroy throws a MatchaError.
+    """
+    if is_user_approved(verb="destroy", resources=RESOURCE_MSG + STATE_RESOURCE_MSG):
+        try:
+            core.destroy()
+            print_status(build_step_success_status("Destroying resources is complete!"))
+        except MatchaError as e:
+            print_error(str(e))
+            raise typer.Exit()
+    else:
+        print_status(
+            build_status(
+                "You decided to cancel - your resources will remain active! If you change your mind, then run 'matcha destroy' again."
+            )
+        )
 
 
 @app.command()

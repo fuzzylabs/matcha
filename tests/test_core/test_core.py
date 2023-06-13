@@ -309,7 +309,7 @@ def test_opt_in_subcommand(
 
 
 def test_remove_state_lock_function(mock_provisioned_remote_state: MagicMock):
-    """Test that the unlock function is called once when emove_state_lock function is used.
+    """Test that the unlock function is called once when remove_state_lock function is used.
 
     Args:
         mock_provisioned_remote_state (MagicMock): mock of a RemoteStateManager instance
