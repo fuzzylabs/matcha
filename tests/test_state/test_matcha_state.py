@@ -98,17 +98,15 @@ def experiment_tracker_state_component() -> MatchaStateComponent:
     )
 
 
-def assert_object(obj: Any, expected_type: Any) -> bool:
+def assert_object(obj: Any, expected_type: Any) -> None:
     """Utility function for asserting that an object isn't None and of the correct type.
 
     Args:
         obj (Any): the object under test
         expected_type (Any): the expected type of the object
-
-    Returns:
-        bool: true if the object is not None and of the expected type, otherwise false.
     """
-    return obj is not None and isinstance(obj, expected_type)
+    assert obj is not None
+    assert isinstance(obj, expected_type)
 
 
 def test_state_service_initialisation(
@@ -122,7 +120,7 @@ def test_state_service_initialisation(
     """
     service = MatchaStateService()
 
-    assert assert_object(service, MatchaStateService)
+    assert_object(service, MatchaStateService)
     assert service._state == state_file_as_object
 
 
@@ -149,7 +147,7 @@ def test_read_state_expected(mock_state_file: Path, state_file_as_object: Matcha
     """
     service = MatchaStateService()
 
-    assert assert_object(service._state, MatchaState)
+    assert_object(service._state, MatchaState)
     assert service._read_state() == state_file_as_object
 
 
@@ -283,7 +281,7 @@ def test_get_resource_names_expected(
     """
     names = matcha_state_service.get_resource_names()
 
-    assert assert_object(names, list)
+    assert_object(names, list)
     assert "cloud" in matcha_state_service.get_resource_names()
 
 
@@ -299,7 +297,7 @@ def test_get_resource_names_resource_not_present(
     """
     names = matcha_state_service.get_resource_names()
 
-    assert assert_object(names, list)
+    assert_object(names, list)
     assert "not a resource" not in names
 
 
@@ -314,7 +312,7 @@ def test_get_property_names_expected(
     """
     names = matcha_state_service.get_property_names(resource_name="cloud")
 
-    assert assert_object(names, list)
+    assert_object(names, list)
     assert "resource-group-name" in names
 
 
@@ -329,7 +327,7 @@ def test_get_property_names_not_present(
     """
     names = matcha_state_service.get_property_names(resource_name="cloud")
 
-    assert assert_object(names, list)
+    assert_object(names, list)
     assert "not a property" not in names
 
 
@@ -345,7 +343,7 @@ def test_matcha_state_to_dict(
     """
     as_dict = state_file_as_object.to_dict()
 
-    assert assert_object(as_dict, dict)
+    assert_object(as_dict, dict)
     assert as_dict == expected_outputs
 
 
@@ -361,7 +359,7 @@ def test_matcha_state_from_dict(
     """
     state = MatchaState.from_dict(state_dict=expected_outputs)
 
-    assert assert_object(state, MatchaState)
+    assert_object(state, MatchaState)
     assert state == state_file_as_object
 
 
@@ -379,7 +377,7 @@ def test_get_component_expected(
     """
     component = matcha_state_service.get_component(resource_name="experiment-tracker")
 
-    assert assert_object(component, MatchaStateComponent)
+    assert_object(component, MatchaStateComponent)
     assert component == experiment_tracker_state_component
 
 
@@ -415,7 +413,7 @@ def test_state_component_find_property_expected(
     expected = experiment_tracker_state_component.properties[0]
     result = experiment_tracker_state_component.find_property(property_name="flavor")
 
-    assert assert_object(result, MatchaResourceProperty)
+    assert_object(result, MatchaResourceProperty)
     assert result == expected
 
 
