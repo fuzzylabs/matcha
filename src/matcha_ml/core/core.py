@@ -28,6 +28,12 @@ def get(
         MatchaError: Raised when the matcha.state file does not exist
         MatchaInputError: Raised when the resource or property name does not exist in the matcha.state file
     """
+    if resource_name:
+        resource_name = resource_name.lower()
+
+    if property_name:
+        property_name = property_name.lower()
+
     matcha_state_service = MatchaStateService()
     remote_state = RemoteStateManager()
 

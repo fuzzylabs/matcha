@@ -130,6 +130,13 @@ def test_get_resources_with_resource_name(mock_provisioned_remote_state: MagicMo
 
     assert expected_output == get("experiment-tracker", None)
 
+def test_get_resources_resource_name_with_capitals(mock_provisioned_remote_state: MagicMock):
+    """Test get resources with a resource name containing errant capital letter(s)."""
+    expected_output = {
+        "experiment-tracker": {"flavor": "mlflow", "tracking-url": "mlflow_test_url"}
+    }
+    assert expected_output == get("Experiment-tracker", None)
+
 
 def test_get_resources_with_invalid_resource_name(
     mock_provisioned_remote_state: MagicMock,
@@ -155,6 +162,12 @@ def test_get_resources_with_resource_name_and_property_name(
 
     assert expected_output == get("experiment-tracker", "tracking-url")
 
+
+def test_get_resources_with_resource_and_property_names_with_capitals(
+        mock_provisioned_remote_state: MagicMock
+):
+    expected_output = {"experiment-tracker": {"tracking-url": "mlflow_test_url"}}
+    assert expected_output == get("Experiment-tracker", "TRacking-url")
 
 def test_opt_out_subcommand(
     runner,
