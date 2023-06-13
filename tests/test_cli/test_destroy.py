@@ -1,5 +1,6 @@
 """Test suite to test the destroy command."""
 import os
+from pathlib import Path
 from typing import Iterable
 from unittest.mock import MagicMock, patch
 
@@ -37,7 +38,10 @@ def test_cli_destroy_command_help(runner):
 
 
 def test_cli_destroy_command_with_no_provisioned_resources(
-    runner, matcha_testing_directory, mock_remote_state_manager: MagicMock
+    runner,
+    matcha_testing_directory,
+    mock_remote_state_manager: MagicMock,
+    mock_state_file: Path,
 ):
     """Test destroy command when there no existing resources deployed.
 
@@ -45,6 +49,7 @@ def test_cli_destroy_command_with_no_provisioned_resources(
         runner (CliRunner): typer CLI runner
         matcha_testing_directory (str): temporary working directory.
         mock_remote_state_manager (MagicMock): mock of an RemoteStateManager instance.
+        mock_state_file (Path): a mocked state file in the test directory
     """
     os.chdir(matcha_testing_directory)
 

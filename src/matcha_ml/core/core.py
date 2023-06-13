@@ -91,16 +91,16 @@ def destroy() -> None:
         Matcha Error: where no state has been provisioned.
     """
     remote_state_manager = RemoteStateManager()
-    template_runner = AzureRunner()
 
+    if not remote_state_manager.is_state_provisioned():
+        raise MatchaError(
+            "Error - resources that have not been provisioned cannot be destroyed. Run 'matcha provision' to get started!"
+        )
+
+    template_runner = AzureRunner()
     with remote_state_manager.use_lock(), remote_state_manager.use_remote_state():
-        if remote_state_manager.is_state_provisioned():
-            template_runner.deprovision()
-            remote_state_manager.deprovision_remote_state()
-        else:
-            raise MatchaError(
-                "Error - resources that have not been provisioned cannot be destroyed. Run 'matcha provision' to get started!"
-            )
+        template_runner.deprovision()
+        remote_state_manager.deprovision_remote_state()
 
 
 def analytics_opt_out() -> None:

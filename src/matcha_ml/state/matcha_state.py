@@ -229,6 +229,7 @@ class MatchaStateService:
             property.name
             for component in self._state.components
             for property in component.properties
+            if component.resource.name == resource_name
         ]
 
     def get_hash_local_state(self) -> str:
