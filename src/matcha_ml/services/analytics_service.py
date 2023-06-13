@@ -62,19 +62,29 @@ def track(event_name: AnalyticsEvent) -> Callable[..., Any]:
                     error_code = e
                 te = perf_counter()
 
-                matcha_state_service = MatchaStateService()
+                try:
+                    matcha_state_service = MatchaStateService()
+                except Exception as e:
+                    matcha_state_service = None
+                    error_code = e
 
                 # Get the matcha.state UUID if it exists
                 matcha_state_uuid: Optional[str] = None
-                if matcha_state_service.check_state_file_exists():
-                    matcha_state_id_dict = matcha_state_service.state_file.get("id")
-                    if matcha_state_id_dict is not None:
-                        matcha_state_uuid = matcha_state_id_dict.get("matcha_uuid")
+                if matcha_state_service and matcha_state_service.state_exists():
+                    try:
+                        state_id_component = matcha_state_service.get_component("id")
+                    except MatchaError:
+                        state_id_component = None
+
+                    if state_id_component is not None:
+                        matcha_state_uuid = state_id_component.find_property(
+                            property_name="matcha_uuid"
+                        ).value
 
                         try:
                             _check_uuid(str(matcha_state_uuid))
-                        except MatchaError as me:
-                            raise MatchaError(str(me))
+                        except MatchaError as err:
+                            raise err
 
                 analytics.track(
                     global_params.user_id,

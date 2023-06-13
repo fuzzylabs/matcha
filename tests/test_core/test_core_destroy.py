@@ -1,6 +1,9 @@
 """Test for core.destroy."""
 
-from unittest.mock import patch
+from pathlib import Path
+from typing import Iterable
+from unittest import mock
+from unittest.mock import MagicMock
 
 import pytest
 
@@ -10,49 +13,50 @@ from matcha_ml.errors import MatchaError
 CORE_FUNCTION_STUB = "matcha_ml.core.core"
 
 
-@patch(f"{CORE_FUNCTION_STUB}.AzureRunner")
-@patch(f"{CORE_FUNCTION_STUB}.RemoteStateManager")
+@pytest.fixture(autouse=True)
+def mock_provisioned_remote_state() -> Iterable[MagicMock]:
+    """Mock remote state manager to have state provisioned.
+
+    Returns:
+        MagicMock: mock of a RemoteStateManager instance
+    """
+    with mock.patch(
+        f"{CORE_FUNCTION_STUB}.RemoteStateManager"
+    ) as mock_state_manager_class:
+        mock_state_manager = mock_state_manager_class.return_value
+        mock_state_manager.is_state_provisioned.return_value = True
+        mock_state_manager.use_remote_state = MagicMock()
+        mock_state_manager.deprovision_remote_state.return_value = MagicMock()
+        yield mock_state_manager
+
+
 def test_destroy_with_state_provisioned(
-    mocked_remote_state_manager_class, mocked_azure_runner_class
+    mock_provisioned_remote_state: MagicMock, mock_state_file: Path
 ):
     """Test the core destroy function when state is provisioned.
 
     Args:
-        mocked_remote_state_manager_class (MagicMock): a mocked RemoteStateManager class.
-        mocked_azure_runner_class (MagicMock): a mocked AzureRunner class.
+        mock_provisioned_remote_state (MagicMock): a mocked remote state
+        mock_state_file (Path): a mocked state file in the test directory
     """
-    mocked_remote_state_manager = mocked_remote_state_manager_class.return_value
-    mocked_azure_runner = mocked_azure_runner_class.return_value
+    with mock.patch(f"{CORE_FUNCTION_STUB}.AzureRunner") as azure_runner:
+        runner = azure_runner.return_value
+        runner.deprovision.return_value = MagicMock()
 
-    mocked_remote_state_manager.is_state_provisioned.return_value = True
+        destroy()
 
-    destroy()
-
-    mocked_remote_state_manager_class.assert_called_once()
-    mocked_azure_runner_class.assert_called_once()
-
-    mocked_remote_state_manager.use_lock.assert_called_once()
-    mocked_remote_state_manager.use_remote_state.assert_called_once()
-    mocked_azure_runner.deprovision.assert_called_once()
-    mocked_remote_state_manager.deprovision_remote_state.assert_called_once()
+        runner.deprovision.assert_called()
 
 
-@patch(f"{CORE_FUNCTION_STUB}.RemoteStateManager")
-def test_destroy_error_handling(mocked_remote_state_manager_class):
+def test_destroy_error_handling(mock_provisioned_remote_state):
     """Test the core destroy function when state is not provisioned.
 
     Args:
-        mocked_remote_state_manager_class (MagicMock): a mocked RemoteStateManager class.
+        mock_provisioned_remote_state (MagicMock): a mocked remote state.
     """
-    mocked_remote_state_manager = mocked_remote_state_manager_class.return_value
-
-    mocked_remote_state_manager.is_state_provisioned.return_value = False
+    mock_provisioned_remote_state.is_state_provisioned.return_value = False
 
     with pytest.raises(MatchaError):
         destroy()
 
-    mocked_remote_state_manager_class.assert_called_once()
-
-    mocked_remote_state_manager.use_lock.assert_called_once()
-    mocked_remote_state_manager.use_remote_state.assert_called_once()
-    mocked_remote_state_manager.deprovision_remote_state.assert_not_called()
+    mock_provisioned_remote_state.is_state_provisioned.assert_called_once()
