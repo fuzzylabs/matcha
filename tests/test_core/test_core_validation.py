@@ -1,4 +1,4 @@
-"""Tests for cli._validation."""
+"""Tests for core._validation."""
 
 import pytest
 
