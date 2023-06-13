@@ -3,12 +3,12 @@ from typing import List, Tuple
 
 import typer
 
-from matcha_ml.cli._validation import check_current_deployment_exists
 from matcha_ml.cli.ui.print_messages import print_error, print_status
 from matcha_ml.cli.ui.status_message_builders import (
     build_status,
     build_step_success_status,
 )
+from matcha_ml.cli.ui.user_approval_functions import is_user_approved
 from matcha_ml.runners import AzureRunner
 from matcha_ml.state import RemoteStateManager
 
@@ -27,7 +27,7 @@ def destroy_resources(resources: List[Tuple[str, str]]) -> None:
     remote_state = RemoteStateManager()
     if not remote_state.is_state_provisioned():
         print_error(
-            "Error - resources that have not been provisioned cannot be destroy. Run 'matcha provision' to get started!"
+            "Error - resources that have not been provisioned cannot be destroyed. Run 'matcha provision' to get started!"
         )
         raise typer.Exit()
 
@@ -35,13 +35,7 @@ def destroy_resources(resources: List[Tuple[str, str]]) -> None:
         # create a runner for deprovisioning resource with Terraform service.
         template_runner = AzureRunner()
 
-        if not check_current_deployment_exists():
-            print_error(
-                "Error - you cannot destroy resources that have not been provisioned yet."
-            )
-            raise typer.Exit()
-
-        if template_runner.is_approved(verb="destroy", resources=resources):
+        if is_user_approved(verb="destroy", resources=resources):
             # deprovision the resources
             template_runner.deprovision()
             print_status(build_step_success_status("Destroying resources is complete!"))

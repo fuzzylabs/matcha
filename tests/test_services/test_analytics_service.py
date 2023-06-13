@@ -1,12 +1,13 @@
 """Tests for analytics service."""
 import os
-from unittest.mock import PropertyMock, patch
+from unittest.mock import MagicMock, PropertyMock, patch
 
 import pytest
 
 from matcha_ml.cli.cli import app
 from matcha_ml.services.global_parameters_service import GlobalParameters
 
+CORE_FUNCTION_STUB = "matcha_ml.core.core"
 GLOBAL_PARAMETER_SERVICE_FUNCTION_STUB = (
     "matcha_ml.services.analytics_service.GlobalParameters"
 )
@@ -39,7 +40,11 @@ def mocked_global_parameters_service(matcha_testing_directory, uuid_for_testing)
 
 
 def test_segment_track_recieves_the_correct_arguments(
-    runner, matcha_testing_directory, mocked_segment_track_decorator, uuid_for_testing
+    runner,
+    matcha_testing_directory,
+    mocked_segment_track_decorator,
+    uuid_for_testing,
+    mock_state_file,
 ):
     """Test no the Segment track function recieves the expected arguments when a user is opted in to analytics.
 
@@ -48,24 +53,31 @@ def test_segment_track_recieves_the_correct_arguments(
         matcha_testing_directory (str): temporary working directory.
         mocked_segment_track_decorator (MagicMock): mocked Segment track call found in 'matcha_ml.services.analytics_service.analytics.track'
         uuid_for_testing (uuid.UUID): a UUID which acts as a mock for the matcha_state_id
+        mock_state_file (None): a mocked state file in the test directory.
     """
     os.chdir(matcha_testing_directory)
 
-    runner.invoke(app, ["destroy"])
+    with patch(f"{CORE_FUNCTION_STUB}.AzureRunner") as azure_runner, patch(
+        f"{CORE_FUNCTION_STUB}.RemoteStateManager"
+    ) as remote_state_manager:
+        azure_runner.return_value = MagicMock()
+        remote_state_manager.return_value = MagicMock()
 
-    # Check that the mocked segment track was called
-    mocked_segment_track_decorator.assert_called()
+        runner.invoke(app, ["destroy"], input="Y\n")
 
-    tracked_arguments = mocked_segment_track_decorator.call_args.args
-    # Check that the Segment track arguments are as expected
-    assert str(uuid_for_testing) in tracked_arguments
-    assert "destroy" in tracked_arguments
-    assert {
-        "time_taken",
-        "error_type",
-        "command_succeeded",
-        "matcha_state_uuid",
-    } == set(tracked_arguments[2].keys())
+        # Check that the mocked segment track was called
+        mocked_segment_track_decorator.assert_called()
+
+        tracked_arguments = mocked_segment_track_decorator.call_args.args
+        # Check that the Segment track arguments are as expected
+        assert str(uuid_for_testing) in tracked_arguments
+        assert "destroy" in tracked_arguments
+        assert {
+            "time_taken",
+            "error_type",
+            "command_succeeded",
+            "matcha_state_uuid",
+        } == set(tracked_arguments[2].keys())
 
 
 def test_tracking_does_not_happen_when_opted_out(

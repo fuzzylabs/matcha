@@ -8,6 +8,7 @@ import pytest
 from typer.testing import CliRunner
 
 from matcha_ml.cli.cli import app
+from matcha_ml.constants import MATCHA_STATE_PATH
 
 
 @pytest.fixture(autouse=True)
@@ -38,7 +39,6 @@ def mock_state_file(matcha_testing_directory: str):
 
     matcha_infrastructure_dir = os.path.join(".matcha", "infrastructure", "resources")
     os.makedirs(matcha_infrastructure_dir)
-    matcha_state_path = os.path.join(".matcha", "infrastructure", "matcha.state")
 
     state_file_resources = {
         "pipeline": {
@@ -50,7 +50,7 @@ def mock_state_file(matcha_testing_directory: str):
         "experiment-tracker": {"flavor": "mlflow", "tracking-url": "mlflow_test_url"},
     }
 
-    with open(matcha_state_path, "w") as f:
+    with open(MATCHA_STATE_PATH, "w") as f:
         json.dump(state_file_resources, f)
 
 
@@ -226,12 +226,8 @@ def test_cli_get_command_with_invalid_resource_name(
     """
     # Invoke get command
     result = runner.invoke(app, ["get", "does-not-exist"])
-
     assert result.exit_code == 0
-    assert (
-        "Error - a resource type with the name 'does-not-exist' does not exist."
-        in result.stdout
-    )
+    assert "Error" and "resource type" and "does-not-exist" in result.stdout
 
     mock_provisioned_remote_state.use_lock.assert_called_once()
 

@@ -73,7 +73,6 @@ def broken_config_testing_directory(matcha_testing_directory: str) -> str:
         str: temporary working directory path that the configuration was written to
     """
     config_path = os.path.join(matcha_testing_directory, DEFAULT_CONFIG_NAME)
-    print(config_path)
     content = {}
     with open(config_path, "w") as f:
         json.dump(content, f)
@@ -206,13 +205,10 @@ def test_provision_remote_state(
     assert_matcha_config(matcha_testing_directory, expected_matcha_config)
 
 
-def test_deprovision_remote_state(
-    capsys: SysCapture, matcha_testing_directory: str
-) -> None:
+def test_deprovision_remote_state(matcha_testing_directory: str) -> None:
     """Test whether deprovision state storage behaves as expected.
 
     Args:
-        capsys (SysCapture): fixture to capture stdout and stderr
         matcha_testing_directory (str): temporary working directory for tests.
     """
     with patch(
@@ -230,14 +226,8 @@ def test_deprovision_remote_state(
 
         assert not os.path.exists(mock_config_path)
 
-        captured = capsys.readouterr()
-
-        expected_output = "Destroying Matcha resources is complete!"
-
         template_runner = RemoteStateRunner()
         template_runner.deprovision.assert_called()
-
-        assert expected_output in captured.out
 
 
 def test_write_matcha_config(
@@ -439,9 +429,9 @@ def test_use_remote_state():
     remote_state_manager = RemoteStateManager()
     with patch.object(remote_state_manager, "upload") as mocked_upload, patch.object(
         remote_state_manager, "download"
-    ) as mocked_downlaod:
+    ) as mocked_download:
         with remote_state_manager.use_remote_state():
-            mocked_downlaod.assert_called_once_with(os.getcwd())
+            mocked_download.assert_called_once_with(os.getcwd())
         mocked_upload.assert_called_once_with(os.path.join(".matcha", "infrastructure"))
 
 

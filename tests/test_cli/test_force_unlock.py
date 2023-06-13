@@ -1,10 +1,11 @@
 """Test suite for matcha cli force-unlock command."""
 from unittest.mock import patch
+
 from typer.testing import CliRunner
 
 from matcha_ml.cli.cli import app
 
-INTERNAL_FUNCTION_STUB = "matcha_ml.core.core"
+INTERNAL_FUNCTION_STUB = "matcha_ml.core"
 
 
 def test_cli_force_unlock_command_help_option(runner: CliRunner) -> None:
