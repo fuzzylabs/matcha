@@ -81,7 +81,7 @@ def get(
 
 @track(event_name=AnalyticsEvent.DESTROY)
 def destroy() -> None:
-    """Destroy resources.
+    """Destroys provisioned resources in the cloud.
 
     Raises:
         Matcha Error: where no state has been provisioned.
