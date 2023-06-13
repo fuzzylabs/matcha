@@ -176,11 +176,17 @@ def test_get_resources(
 
 
 def test_get_resources_resource_name_with_capitals(mock_provisioned_remote_state: MagicMock):
-    """Test get resources with a resource name containing errant capital letter(s)."""
-    expected_output = {
-        "experiment-tracker": {"flavor": "mlflow", "tracking-url": "mlflow_test_url"}
-    }
-    assert expected_output == get("Experiment-tracker", None)
+    """Test get resources with a resource name containing errant capital letter(s).
+
+    Args:
+        mock_provisioned_remote_state (MagicMock): mock of a RemoteStateManager instance.
+        experimental_tracker_state_component(MatchaStateComponent): the experiment tracker state components.
+    """
+    get_result = get(resource_name="Experiment-Tracker", property_name=None)
+
+    assert get_result and len(get_result.components) == 1
+
+    assert get_result.components[0] == experiment_tracker_state_component
 
 
 def test_get_resources_with_resource_name(
@@ -235,8 +241,21 @@ def test_get_resources_with_invalid_resource_name(
 def test_get_resources_with_resource_and_property_names_with_capitals(
         mock_provisioned_remote_state: MagicMock
 ):
-    expected_output = {"experiment-tracker": {"tracking-url": "mlflow_test_url"}}
-    assert expected_output == get("Experiment-tracker", "TRacking-url")
+    """Test get resources function with resource name and resource property specified with arguments containing errant
+    capital letter(s).
+
+        Args:
+            mock_provisioned_remote_state (MagicMock): mock of a RemoteStateManager instance.
+            experiment_tracker_state_component (MatchaStateComponent): the experiment tracker state component.
+        """
+    get_result = get(resource_name="Experiment-Tracker", property_name="Flavor")
+
+    assert get_result and len(get_result.components) == 1
+
+    assert (
+            get_result.components[0].properties[0]
+            == experiment_tracker_state_component.properties[0]
+    )
 
 
 def test_opt_out_subcommand(
