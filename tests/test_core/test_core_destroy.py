@@ -18,8 +18,8 @@ def test_destroy_with_state_provisioned(
     """Test the core destroy function when state is provisioned.
 
     Args:
-        mocked_remote_state_manager_class (RemoteStateManager): a mocked RemoteStateManager class.
-        mocked_azure_runner_class (AzureRunner): a mocked AzureRunner class.
+        mocked_remote_state_manager_class (MagicMock): a mocked RemoteStateManager class.
+        mocked_azure_runner_class (MagicMock): a mocked AzureRunner class.
     """
     mocked_remote_state_manager = mocked_remote_state_manager_class.return_value
     mocked_azure_runner = mocked_azure_runner_class.return_value
@@ -42,7 +42,7 @@ def test_destroy_error_handling(mocked_remote_state_manager_class):
     """Test the core destroy function when state is not provisioned.
 
     Args:
-        mocked_remote_state_manager_class (RemoteStateManager): a mocked RemoteStateManager class.
+        mocked_remote_state_manager_class (MagicMock): a mocked RemoteStateManager class.
     """
     mocked_remote_state_manager = mocked_remote_state_manager_class.return_value
 

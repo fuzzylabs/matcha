@@ -8,14 +8,14 @@ import pytest
 from matcha_ml.cli.cli import app
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture()
 def mock_remote_state_manager() -> Iterable[MagicMock]:
     """Mock remote state manager to have state provisioned.
 
     Yields:
         MagicMock: mock of an RemoteStateManager instance.
     """
-    with patch("matcha_ml.cli.destroy.RemoteStateManager") as mock_state_manager_class:
+    with patch("matcha_ml.core.core.RemoteStateManager") as mock_state_manager_class:
         mock_state_manager = mock_state_manager_class.return_value
         yield mock_state_manager
 
@@ -50,28 +50,7 @@ def test_cli_destroy_command_with_no_provisioned_resources(
 
     mock_remote_state_manager.is_state_provisioned.return_value = False
 
-    result = runner.invoke(app, ["destroy"])
-
-    assert (
-        "Error - resources that have not been provisioned cannot be destroyed."
-        in result.stdout
-    )
-
-    mock_remote_state_manager.use_lock.assert_not_called()
-
-
-def test_cli_destroy_with_nothing_provisioned(
-    runner, mock_remote_state_manager: MagicMock
-):
-    """Test the destroy command with no resources exist at all.
-
-    Args:
-        runner (CliRunner): typer CLI runner.
-        mock_remote_state_manager (MagicMock): mock of a RemoteStateManager instance.
-    """
-    mock_remote_state_manager.is_state_provisioned.return_value = False
-
-    result = runner.invoke(app, ["destroy"])
+    result = runner.invoke(app, ["destroy"], input="Y\n")
 
     assert (
         "Error - resources that have not been provisioned cannot be destroyed."
