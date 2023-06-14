@@ -1,5 +1,6 @@
 """Tests for Matcha State Service."""
 import os
+import uuid
 from pathlib import Path
 from typing import Any
 
@@ -76,6 +77,37 @@ def state_file_as_object() -> MatchaState:
                 properties=[
                     MatchaResourceProperty("flavor", "mlflow"),
                     MatchaResourceProperty("tracking-url", "mlflow_test_url"),
+                ],
+            ),
+        ]
+    )
+
+
+@pytest.fixture
+def simplified_state_file_as_object(uuid_for_testing: uuid.UUID) -> MatchaState:
+    """A simplified fixture to represent the Matcha state as a MatchaState object.
+
+    Args:
+        uuid_for_testing (uuid.UUID): Fixted valid UUID for testing.
+
+    Returns:
+        MatchaState: the Matcha state testing fixture.
+    """
+    return MatchaState(
+        components=[
+            MatchaStateComponent(
+                resource=MatchaResource("cloud"),
+                properties=[
+                    MatchaResourceProperty("flavor", "azure"),
+                    MatchaResourceProperty("resource-group-name", "test_resources"),
+                    MatchaResourceProperty("prefix", "test"),
+                    MatchaResourceProperty("location", "ukwest"),
+                ],
+            ),
+            MatchaStateComponent(
+                resource=MatchaResource("id"),
+                properties=[
+                    MatchaResourceProperty("matcha_uuid", str(uuid_for_testing)),
                 ],
             ),
         ]
@@ -437,3 +469,30 @@ def test_state_component_find_property_not_found(
         str(err.value)
         == f"The property with the name '{invalid_property_name}' could not be found."
     )
+
+
+def test_matcha_state_build_state_from_terraform_output(
+    simplified_state_file_as_object: MatchaState,
+):
+    """Test that a MatchaState object with the correct format is returned from the build_state_from_terraform_output function.
+
+    Args:
+        simplified_state_file_as_object (MatchaState): _description_
+    """
+    terraform_client_output = {
+        "cloud_azure_resource_group_name": {
+            "value": "test_resources",
+        },
+        "cloud_azure_prefix": {
+            "value": "test",
+        },
+        "cloud_azure_location": {
+            "value": "ukwest",
+        },
+    }
+    matcha_state = MatchaStateService.build_state_from_terraform_output(
+        terraform_client_output
+    )
+
+    assert isinstance(matcha_state, MatchaState)
+    assert matcha_state == simplified_state_file_as_object
