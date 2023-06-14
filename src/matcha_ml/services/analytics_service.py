@@ -5,14 +5,15 @@ This approach to collecting usage data was inspired by ZenML; source: https://gi
 import functools
 from enum import Enum
 from time import perf_counter
-from typing import Any, Callable, Optional
+from typing import Any, Callable, Optional, Tuple
+from warnings import warn
 
 from segment import analytics
 
 from matcha_ml.errors import MatchaError
 from matcha_ml.services._validation import _check_uuid
 from matcha_ml.services.global_parameters_service import GlobalParameters
-from matcha_ml.state import MatchaStateService
+from matcha_ml.state import MatchaStateService, MatchaState
 
 analytics.write_key = "qwBKAvY6MEUvv5XIs4rE07ohf5neT3sx"
 
@@ -23,6 +24,23 @@ class AnalyticsEvent(str, Enum):
     PROVISION = "provision"
     DESTROY = "destroy"
     GET = "get"
+
+
+def execute_analytics_event(func: Callable, *args, **kwargs) -> Tuple[Optional[MatchaState], Any]:
+    """Exists to Temporarily fix misleading error messages coming from track decorator.
+
+    Args:
+        func (Callable): The function decorated by track.
+    Returns:
+        The result of the call to func, the error code.
+    """
+    error_code = None
+    result = None
+    try:
+        result = func(*args, **kwargs)
+    except Exception as e:
+        error_code = e
+    return result, error_code
 
 
 def track(event_name: AnalyticsEvent) -> Callable[..., Any]:
@@ -51,16 +69,18 @@ def track(event_name: AnalyticsEvent) -> Callable[..., Any]:
                 Any: the result of the wrapped function.
             """
             global_params = GlobalParameters()
+            result = None
+            error_code = None
+            te = None
+            ts = None
+            if event_name.value not in [event.value for event in AnalyticsEvent]:
+                warn("Event not recognised by analytics service.")
 
             if not global_params.analytics_opt_out:
-                ts = perf_counter()
-                error_code = None
-                result = None
-                try:
-                    result = func(*args, **kwargs)
-                except Exception as e:
-                    error_code = e
-                te = perf_counter()
+                if event_name.value in [event_name.PROVISION, event_name.GET]:
+                    ts = perf_counter()
+                    result, error_code = execute_analytics_event(func, *args, **kwargs)
+                    te = perf_counter()
 
                 try:
                     matcha_state_service = MatchaStateService()
@@ -85,6 +105,11 @@ def track(event_name: AnalyticsEvent) -> Callable[..., Any]:
                             _check_uuid(str(matcha_state_uuid))
                         except MatchaError as err:
                             raise err
+
+                if event_name.value in [event_name.DESTROY]:
+                    ts = perf_counter()
+                    result, error_code = execute_analytics_event(func, *args, **kwargs)
+                    te = perf_counter()
 
                 analytics.track(
                     global_params.user_id,
