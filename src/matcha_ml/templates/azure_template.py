@@ -1,8 +1,7 @@
 """Build a template for provisioning resources on Azure using terraform files."""
-import json
-import os
 from typing import Optional
 
+from matcha_ml.state import MatchaState, MatchaStateService
 from matcha_ml.templates.base_template import BaseTemplate, TemplateVariables
 
 SUBMODULE_NAMES = [
@@ -52,11 +51,8 @@ class AzureTemplate(BaseTemplate):
         super().build_template(config, template_src, destination, verbose)
 
         # Add matcha.state file one directory above the template
-        state_file_destination = os.path.join(destination, os.pardir, "matcha.state")
-
         config_dict = vars(config)
         _ = config_dict.pop("password", None)
         initial_state_file_dict = {"cloud": config_dict}
-
-        with open(state_file_destination, "w") as f:
-            json.dump(initial_state_file_dict, f)
+        matcha_state = MatchaState.from_dict(initial_state_file_dict)
+        MatchaStateService.create_state_file(matcha_state)

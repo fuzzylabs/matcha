@@ -33,7 +33,6 @@ class BaseRunner:
         self.terraform_config = TerraformConfig(working_dir=working_dir)
         self.tfs = TerraformService(self.terraform_config)
         self.tf_state_dir = self.tfs.get_tf_state_dir()
-        self.state_file = self.tfs.config.state_file
 
     def _check_terraform_installation(self) -> None:
         """Checks if terraform is installed on the host system.

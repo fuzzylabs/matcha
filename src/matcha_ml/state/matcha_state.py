@@ -4,13 +4,25 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import uuid
+from collections import defaultdict
 from dataclasses import dataclass
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 
+from matcha_ml.cli.ui.print_messages import print_error
 from matcha_ml.constants import MATCHA_STATE_PATH
-from matcha_ml.errors import MatchaError
+from matcha_ml.errors import MatchaError, MatchaInputError
 
 MISSING_STATE_ERROR_MSG = "No state file exists, you need to 'provision' resources or 'get' from already provisioned resources."
+
+RESOURCE_NAMES = [
+    "experiment_tracker",
+    "pipeline",
+    "orchestrator",
+    "cloud",
+    "container_registry",
+    "model_deployer",
+]
 
 
 @dataclass
@@ -133,6 +145,96 @@ class MatchaStateService:
             bool: returns True if exists, otherwise False.
         """
         return bool(os.path.isfile(cls.matcha_state_path))
+
+    @staticmethod
+    def _parse_terraform_output_resource_name(output_name: str) -> Tuple[str, str, str]:
+        """Build resource output for each Terraform output.
+
+        Format for Terraform output names is:
+        <resource>_<flavor>_<property>
+        where <resource> is a name found in RESOURCE_NAMES
+
+        Args:
+            output_name (str): the name of the Terraform output.
+
+        Returns:
+            Tuple[str, str, str]: the resource output for matcha.state.
+        """
+        resource_type: str
+
+        for key in RESOURCE_NAMES:
+            if key in output_name:
+                resource_type = key
+                break
+
+        if resource_type is None:
+            print_error(
+                "A valid resource type for the output '{output_name}' does not exist."
+            )
+            raise MatchaInputError()
+
+        flavour_and_resource_name = output_name[len(resource_type) + 1 :]
+
+        flavor, resource_name = flavour_and_resource_name.split("_", maxsplit=1)
+        resource_name = resource_name.replace("_", "-")
+        resource_type = resource_type.replace("_", "-")
+
+        return resource_type, flavor, resource_name
+
+    @staticmethod
+    def build_state_from_terraform_output(
+        terraform_output: Dict[str, str]
+    ) -> MatchaState:
+        """Builds a MatchaState class from a terraform output dictionary.
+
+        Args:
+            terraform_output (Dict[str, str]): Terraform output variables as a dictionary "
+
+        Returns:
+            MatchaState: Terraform output variables in a MatchaState dataclass format.
+        """
+        state_outputs: Dict[str, Dict[str, str]] = defaultdict(dict)
+
+        for output_name, properties in terraform_output.items():
+            (
+                resource_type,
+                flavor,
+                resource_name,
+            ) = MatchaStateService._parse_terraform_output_resource_name(output_name)
+            state_outputs[resource_type].setdefault("flavor", flavor)
+            state_outputs[resource_type][resource_name] = properties["value"]
+
+        # Create a unique matcha state identifier
+        state_outputs["id"] = {"matcha_uuid": str(uuid.uuid4())}
+
+        return MatchaState.from_dict(state_outputs)
+
+    @staticmethod
+    def create_state_file(matcha_state: MatchaState) -> None:
+        """Creates a new matcha.state file.
+
+        Args:
+            matcha_state (MatchaState): State dataclass object to be written to the state file.
+        """
+        os.makedirs(
+            os.path.dirname(MatchaStateService.matcha_state_path), exist_ok=True
+        )
+
+        with open(MatchaStateService.matcha_state_path, "w") as f:
+            json.dump(matcha_state.to_dict(), f, indent=4)
+
+    def update_state_file(self, matcha_state: MatchaState) -> None:
+        # TODO
+        """Read and update the matcha state file with new provisioned resources.
+
+        Args:
+            matcha_state (MatchaState): State dataclass object to be written to the state file.
+        """
+        # with open(self.matcha_state_path, "r") as f:
+        #     existing = json.load(f)
+
+        with open(self.matcha_state_path, "w") as f:
+            json.dump(matcha_state, f, indent=4)
 
     def _read_state(self) -> MatchaState:
         """Read the state from the local file system.
