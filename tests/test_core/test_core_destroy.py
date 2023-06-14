@@ -21,7 +21,7 @@ def mock_provisioned_remote_state() -> Iterable[MagicMock]:
         MagicMock: mock of a RemoteStateManager instance
     """
     with mock.patch(
-        "matcha_ml.core.core.RemoteStateManager"
+        f"{CORE_FUNCTION_STUB}.RemoteStateManager"
     ) as mock_state_manager_class:
         mock_state_manager = mock_state_manager_class.return_value
         mock_state_manager.is_state_provisioned.return_value = True
@@ -39,7 +39,7 @@ def test_destroy_with_state_provisioned(
         mock_provisioned_remote_state (MagicMock): a mocked remote state
         mock_state_file (Path): a mocked state file in the test directory
     """
-    with mock.patch("matcha_ml.core.core.AzureRunner") as azure_runner:
+    with mock.patch(f"{CORE_FUNCTION_STUB}.AzureRunner") as azure_runner:
         runner = azure_runner.return_value
         runner.deprovision.return_value = MagicMock()
 

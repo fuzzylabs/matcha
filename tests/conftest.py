@@ -126,7 +126,6 @@ def mock_state_file(matcha_testing_directory: str) -> Path:
 
     return Path(MATCHA_STATE_PATH)
 
-
 @pytest.fixture(autouse=True)
 def random_state():
     """A fixture to ensure the random state is fixed for the tests."""
