@@ -12,8 +12,7 @@ from matcha_ml.cli.ui.status_message_builders import (
     build_status,
 )
 from matcha_ml.runners.base_runner import BaseRunner
-
-# from matcha_ml.state import MatchaState
+from matcha_ml.state.matcha_state import MatchaState, MatchaStateService
 
 RESOURCE_NAMES = [
     "experiment_tracker",
@@ -32,7 +31,7 @@ class AzureRunner(BaseRunner):
         """Initialize AzureRunner class."""
         super().__init__()
 
-    def _show_terraform_outputs(self, matcha_state) -> None:
+    def _show_terraform_outputs(self, matcha_state: MatchaState) -> None:
         """Print the formatted Terraform outputs.
 
         Args:
@@ -45,8 +44,6 @@ class AzureRunner(BaseRunner):
 
     def provision(self) -> None:
         """Provision resources required for the deployment."""
-        from matcha_ml.state import MatchaStateService
-
         self._check_terraform_installation()
         self._validate_terraform_config()
         self._validate_kubeconfig(base_path=".kube/config")

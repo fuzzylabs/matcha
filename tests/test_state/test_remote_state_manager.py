@@ -12,7 +12,7 @@ from azure.mgmt.confluent.models._confluent_management_client_enums import (  # 
 )
 
 from matcha_ml.errors import MatchaError
-from matcha_ml.runners import RemoteStateRunner
+from matcha_ml.runners.remote_state_runner import RemoteStateRunner
 from matcha_ml.state import RemoteStateManager
 from matcha_ml.state.remote_state_manager import (
     ALREADY_LOCKED_MESSAGE,
