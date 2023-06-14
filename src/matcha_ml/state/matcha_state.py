@@ -219,19 +219,6 @@ class MatchaStateService:
         with open(MatchaStateService.matcha_state_path, "w") as f:
             json.dump(matcha_state.to_dict(), f, indent=4)
 
-    def update_state_file(self, matcha_state: MatchaState) -> None:
-        # TODO
-        """Read and update the matcha state file with new provisioned resources.
-
-        Args:
-            matcha_state (MatchaState): State dataclass object to be written to the state file.
-        """
-        # with open(self.matcha_state_path, "r") as f:
-        #     existing = json.load(f)
-
-        with open(self.matcha_state_path, "w") as f:
-            json.dump(matcha_state, f, indent=4)
-
     def _read_state(self) -> MatchaState:
         """Read the state from the local file system.
 
