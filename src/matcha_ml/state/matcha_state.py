@@ -216,10 +216,6 @@ class MatchaStateService:
         Args:
             matcha_state (MatchaState): State dataclass object to be written to the state file.
         """
-        os.makedirs(
-            os.path.dirname(MatchaStateService.matcha_state_path), exist_ok=True
-        )
-
         with open(MatchaStateService.matcha_state_path, "w") as f:
             json.dump(matcha_state.to_dict(), f, indent=4)
 
