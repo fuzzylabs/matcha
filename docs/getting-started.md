@@ -7,6 +7,7 @@ There are five things we'll cover:
 * [Pre-requisites](#pre-requisites): everything you need to set up before starting.
 * [The movie recommender](#the-movie-recommender): downloading the example code and setting up your Python environment
 * [Provisioning](#provisioning): Using Matcha to provision your infrastructure
+* [Sharing Resources](#🤝-sharing-resources): Sharing resources with other people
 * [Training and deploying](#training-and-deploying): training a model on your provisioned infrastructure, deploying, and testing it
 * [Destroying](#destroying): tearing down provisioned infrastructure
 
@@ -144,13 +145,18 @@ Experiment tracker
 
 By default, Matcha will hide sensitive resource properties. If you need one of these properties, then you can add the `--show-sensitive` flag to your `get` command.
 
-# &#129309; Sharing Resources
+# &#129309; Sharing resources
 
-You'll notice that a configuration file is create as part of the provisioning process - it's called `matcha.config.json`. This file stores the information necessary for Matcha to link up to your provisioned resources.
+You'll notice that a configuration file is create as part of the provisioning process - it's called `matcha.config.json`. This file stores the information necessary for Matcha to identify the resource group and storage container that holds the details of the provisioned resources.
 
-To share these resources, you need to add this file to your project repository (GitHub or similar).
+When Matcha provision first runs, it creates a storage blob in Azure which holds details of the provisioned environment. For more detail, please see our [Inside Matcha > How does Matcha work](inside-matcha.md) section
 
-> Note: this file does not contain any sensitive information such as passwords or server endpoints.
+In order to access your provisioned resources, other users will need to ensure this configuration file exists locally, in the same directory where the file was originally created. We suggest that the matcha.config.json file be included within the project repository and shared using GitHub or similar repository hosting tools. The user will also have to:
+
+1. Set the active Azure subscription to the one that contains the resource group.
+2. Ensure they have access to both the resource group and the storage bucket.
+
+> Note: the shared file does not contain any sensitive information such as passwords or server endpoints.
 
 The other users that you're sharing the resources with will then need to ensure this configuration file exists locally, in the same directory where the file was originally created.
 
@@ -160,10 +166,6 @@ Matcha uses this file to find and pull the provisioned state information, which 
     <img src="/img/getting-started/shared-state.png" width="400"></img>
 </div>
 
-In order to access the shared state (including secrets) the user needs to do two things:
-
-1. Set the active Azure subscription to the one that contains the resource group.
-2. Ensure they have access to both the resource group and the storage bucket.
 
 # Training and deploying
 
