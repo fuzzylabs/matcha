@@ -123,7 +123,6 @@ def test_cli_provision_command(
         app, ["provision"], input="uksouth\nmatcha\ndefault\ndefault\nY\n"
     )
 
-    print(result.stdout)
     # Exit code 0 means there was no error
     assert result.exit_code == 0
 
