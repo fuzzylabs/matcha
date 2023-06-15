@@ -7,7 +7,7 @@ There are five things we'll cover:
 * [Pre-requisites](#pre-requisites): everything you need to set up before starting.
 * [The movie recommender](#the-movie-recommender): downloading the example code and setting up your Python environment
 * [Provisioning](#provisioning): Using Matcha to provision your infrastructure
-* [Sharing Resources](#🤝-sharing-resources): Sharing resources with other people
+* [Sharing Resources](#sharing-resources): Sharing resources with other people
 * [Training and deploying](#training-and-deploying): training a model on your provisioned infrastructure, deploying, and testing it
 * [Destroying](#destroying): tearing down provisioned infrastructure
 
