@@ -71,7 +71,8 @@ mypy = "^1.1.1"
 mkdocs-glightbox = "^0.3.4"
 pymdown-extensions = "10.0"
 mkdocs-material = "^9.1.12"
-"mkdostrings[python]" = "0.20.0"
+mkdocstrings = "0.22.0"
+mkdocstrings-python = "1.1.2"
 
 [build-system]
 requires = ["poetry-core"]
