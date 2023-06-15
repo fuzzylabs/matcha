@@ -1,3 +1,3 @@
 # API Reference Documentation
 
-::: src.matcha_ml
+::: src.matcha_ml.core.core
