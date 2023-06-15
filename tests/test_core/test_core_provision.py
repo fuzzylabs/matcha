@@ -107,6 +107,15 @@ def test_provision_returns_matcha_state(
             "container_registry_azure_registry_url": {
                 "value": "azure_container_registry",
             },
+            "pipeline_zenml_connection_string": {
+                "value": "zenml_test_connection_string",
+            },
+            "pipeline_zenml_server_password": {
+                "value": "zen_server_password",
+            },
+            "pipeline_zenml_server_url": {
+                "value": "zen_server_url",
+            },
             "experiment_tracker_mlflow_tracking_url": {
                 "value": "mlflow_test_url",
             },

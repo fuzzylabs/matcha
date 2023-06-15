@@ -169,6 +169,12 @@ def mock_state_file(matcha_testing_directory: str, uuid_for_testing: uuid.UUID) 
             "registry-name": "azure_registry_name",
             "registry-url": "azure_container_registry",
         },
+        "pipeline": {
+            "flavor": "zenml",
+            "connection-string": "zenml_test_connection_string",
+            "server-password": "zen_server_password",
+            "server-url": "zen_server_url",
+        },
         "experiment-tracker": {"flavor": "mlflow", "tracking-url": "mlflow_test_url"},
         "id": {"matcha_uuid": str(uuid_for_testing)},
     }
@@ -204,6 +210,17 @@ def state_file_as_object(uuid_for_testing: uuid.UUID) -> MatchaState:
                     MatchaResourceProperty("flavor", "azure"),
                     MatchaResourceProperty("registry-name", "azure_registry_name"),
                     MatchaResourceProperty("registry-url", "azure_container_registry"),
+                ],
+            ),
+            MatchaStateComponent(
+                resource=MatchaResource("pipeline"),
+                properties=[
+                    MatchaResourceProperty("flavor", "zenml"),
+                    MatchaResourceProperty(
+                        "connection-string", "zenml_test_connection_string"
+                    ),
+                    MatchaResourceProperty("server-password", "zen_server_password"),
+                    MatchaResourceProperty("server-url", "zen_server_url"),
                 ],
             ),
             MatchaStateComponent(

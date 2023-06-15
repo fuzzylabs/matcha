@@ -1,7 +1,6 @@
 """Test suite to test the core matcha commands and all its subcommands."""
-import json
 import os
-import uuid
+from pathlib import Path
 from typing import Dict, Iterable, Iterator, Union
 from unittest import mock
 from unittest.mock import MagicMock
@@ -10,7 +9,6 @@ import pytest
 import yaml
 
 from matcha_ml.cli.cli import app
-from matcha_ml.constants import MATCHA_STATE_PATH
 from matcha_ml.core import get, remove_state_lock
 from matcha_ml.errors import MatchaInputError
 from matcha_ml.services.global_parameters_service import GlobalParameters
@@ -23,56 +21,18 @@ INTERNAL_FUNCTION_STUB = "matcha_ml.services.global_parameters_service.GlobalPar
 
 
 @pytest.fixture(autouse=True)
-def mock_state_file(matcha_testing_directory: str, uuid_for_testing: uuid.UUID):
-    """A fixture for mocking a test state file in the test directory.
+def mock_state_file_wrapper(mock_state_file: Path):
+    """Re-use fixture from conftest.py with autouse instead.
+
+    A fixture for mocking a test state file in the test directory.
 
     Args:
-        matcha_testing_directory (str): the test directory
-        uuid_for_testing (uuid.UUID): Fixed valid UUID for testing.
+        mock_state_file (Path): Path to mocked matcha.state file
 
+    Yields:
+        _type_: _description_
     """
-    os.chdir(matcha_testing_directory)
-
-    matcha_infrastructure_dir = os.path.join(".matcha", "infrastructure", "resources")
-    os.makedirs(matcha_infrastructure_dir)
-
-    state_file_resources = {
-        "cloud": {"flavor": "azure", "resource-group-name": "test_resources"},
-        "container-registry": {
-            "flavor": "azure",
-            "registry-name": "azure_registry_name",
-            "registry-url": "azure_container_registry",
-        },
-        "experiment-tracker": {"flavor": "mlflow", "tracking-url": "mlflow_test_url"},
-        "id": {"matcha_uuid": str(uuid_for_testing)},
-    }
-
-    with open(MATCHA_STATE_PATH, "w") as f:
-        json.dump(state_file_resources, f)
-
-
-@pytest.fixture
-def expected_outputs(uuid_for_testing: uuid.UUID) -> dict:
-    """The expected state file initialized.
-
-    Args:
-        uuid_for_testing (uuid.UUID): Fixed valid UUID for testing.
-
-    Returns:
-        dict: expected output
-    """
-    outputs = {
-        "cloud": {"flavor": "azure", "resource-group-name": "test_resources"},
-        "container-registry": {
-            "flavor": "azure",
-            "registry-name": "azure_registry_name",
-            "registry-url": "azure_container_registry",
-        },
-        "experiment-tracker": {"flavor": "mlflow", "tracking-url": "mlflow_test_url"},
-        "id": {"matcha_uuid": str(uuid_for_testing)},
-    }
-
-    return outputs
+    yield mock_state_file
 
 
 @pytest.fixture

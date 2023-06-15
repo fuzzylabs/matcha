@@ -42,6 +42,12 @@ def expected_outputs() -> dict:
             "registry-name": "azure_registry_name",
             "registry-url": "azure_container_registry",
         },
+        "pipeline": {
+            "flavor": "zenml",
+            "connection-string": "zenml_test_connection_string",
+            "server-password": "zen_server_password",
+            "server-url": "zen_server_url",
+        },
         "experiment-tracker": {"flavor": "mlflow", "tracking-url": "mlflow_test_url"},
         "id": {"matcha_uuid": "bdd640fb-0667-4ad1-9c80-317fa3b1799d"},
     }
@@ -231,7 +237,7 @@ def test_get_hash_local_state(
         mock_state_file (Path): a mocked state file in the test directory.
         matcha_state_service (MatchaStateService): The matcha_state_service testing instance.
     """
-    expected_hash = "6ccfbc1dd19dc7692b10f65a9b9bde7c"
+    expected_hash = "ee2e6c83593a10c76611488809ad7d45"
     result_hash = matcha_state_service.get_hash_local_state()
 
     assert result_hash == expected_hash
@@ -426,6 +432,15 @@ def test_matcha_state_build_state_from_terraform_output(
         },
         "container_registry_azure_registry_url": {
             "value": "azure_container_registry",
+        },
+        "pipeline_zenml_connection_string": {
+            "value": "zenml_test_connection_string",
+        },
+        "pipeline_zenml_server_password": {
+            "value": "zen_server_password",
+        },
+        "pipeline_zenml_server_url": {
+            "value": "zen_server_url",
         },
         "experiment_tracker_mlflow_tracking_url": {
             "value": "mlflow_test_url",

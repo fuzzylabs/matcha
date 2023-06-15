@@ -11,10 +11,7 @@ from _pytest.capture import SysCapture
 
 from matcha_ml.runners import AzureRunner
 from matcha_ml.state.matcha_state import (
-    MatchaResource,
-    MatchaResourceProperty,
     MatchaState,
-    MatchaStateComponent,
     MatchaStateService,
 )
 
@@ -130,58 +127,6 @@ def template_runner() -> AzureRunner:
     return AzureRunner()
 
 
-@pytest.fixture
-def matcha_state() -> MatchaState:
-    """A fixture to represent the Matcha state as a MatchaState object.
-
-    Returns:
-        MatchaState: the Matcha state testing fixture.
-    """
-    return MatchaState(
-        components=[
-            MatchaStateComponent(
-                resource=MatchaResource("cloud"),
-                properties=[
-                    MatchaResourceProperty("flavor", "azure"),
-                    MatchaResourceProperty("resource-group-name", "test_resources"),
-                ],
-            ),
-            MatchaStateComponent(
-                resource=MatchaResource("container-registry"),
-                properties=[
-                    MatchaResourceProperty("flavor", "azure"),
-                    MatchaResourceProperty("registry-name", "azure_registry_name"),
-                    MatchaResourceProperty("registry-url", "azure_container_registry"),
-                ],
-            ),
-            MatchaStateComponent(
-                resource=MatchaResource("experiment-tracker"),
-                properties=[
-                    MatchaResourceProperty("flavor", "mlflow"),
-                    MatchaResourceProperty("tracking-url", "mlflow_test_url"),
-                ],
-            ),
-            MatchaStateComponent(
-                resource=MatchaResource("pipeline"),
-                properties=[
-                    MatchaResourceProperty("flavor", "zenml"),
-                    MatchaResourceProperty(
-                        "connection-string", "zenml_test_connection_string"
-                    ),
-                    MatchaResourceProperty("server-password", "zen_server_password"),
-                    MatchaResourceProperty("server-url", "zen_server_url"),
-                ],
-            ),
-            MatchaStateComponent(
-                resource=MatchaResource("id"),
-                properties=[
-                    MatchaResourceProperty("matcha_uuid", "matcha_id_test_value"),
-                ],
-            ),
-        ]
-    )
-
-
 def test_write_outputs_state(
     template_runner: AzureRunner,
     mock_output: Callable[[str, bool], Union[str, Dict[str, str]]],
@@ -217,7 +162,7 @@ def test_show_terraform_outputs(
     template_runner: AzureRunner,
     capsys: SysCapture,
     expected_outputs_hide_sensitive: dict,
-    matcha_state: MatchaState,
+    state_file_as_object: MatchaState,
     matcha_testing_directory: str,
 ):
     """Test service shows the correct terraform output.
@@ -226,12 +171,12 @@ def test_show_terraform_outputs(
         template_runner (AzureRunner): a AzureRunner object instance
         capsys (SysCapture): fixture to capture stdout and stderr
         expected_outputs_hide_sensitive (dict): expected output from terraform
-        matcha_state (MatchaState): mock MatchaState dataclass object
+        state_file_as_object (MatchaState): mock MatchaState dataclass object
         matcha_testing_directory (str): Testing directory
     """
     os.chdir(matcha_testing_directory)
     with does_not_raise():
-        template_runner._show_terraform_outputs(matcha_state)
+        template_runner._show_terraform_outputs(state_file_as_object)
         captured = capsys.readouterr()
 
         for output in expected_outputs_hide_sensitive:
