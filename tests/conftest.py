@@ -119,12 +119,14 @@ def mock_state_file(matcha_testing_directory: str) -> Path:
             "registry-url": "azure_container_registry",
         },
         "experiment-tracker": {"flavor": "mlflow", "tracking-url": "mlflow_test_url"},
+        "id": {"matcha_uuid": "bdd640fb-0667-4ad1-9c80-317fa3b1799d"},
     }
 
     with open(MATCHA_STATE_PATH, "w") as f:
         json.dump(state_file_resources, f)
 
     return Path(MATCHA_STATE_PATH)
+
 
 @pytest.fixture(autouse=True)
 def random_state():

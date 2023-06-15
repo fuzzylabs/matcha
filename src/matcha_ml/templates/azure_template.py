@@ -55,4 +55,4 @@ class AzureTemplate(BaseTemplate):
         _ = config_dict.pop("password", None)
         initial_state_file_dict = {"cloud": config_dict}
         matcha_state = MatchaState.from_dict(initial_state_file_dict)
-        MatchaStateService.create_state_file(matcha_state)
+        MatchaStateService(matcha_state=matcha_state)

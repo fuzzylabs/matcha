@@ -9,7 +9,6 @@ from collections import defaultdict
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Tuple
 
-from matcha_ml.cli.ui.print_messages import print_error
 from matcha_ml.constants import MATCHA_STATE_PATH
 from matcha_ml.errors import MatchaError, MatchaInputError
 
@@ -126,13 +125,27 @@ class MatchaStateService:
 
     matcha_state_path = MATCHA_STATE_PATH
 
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        matcha_state: Optional[MatchaState] = None,
+        terraform_output: Optional[Dict[str, str]] = None,
+    ) -> None:
         """Constructor for the MatchaStateService.
+
+        Args:
+            matcha_state (Optional[MatchaState], optional): MatchaState object to initialise the service with. Defaults to None.
+            terraform_output (Optional[dict], optional): Output from Terraform to be parsed into a MatchaState object on intialisation. Defaults to None.
 
         Raises:
             MatchaError: if the state file does not exist.
         """
-        if self.state_exists():
+        if matcha_state is not None:
+            self._state = matcha_state
+            self._write_state(matcha_state=matcha_state)
+        elif terraform_output is not None:
+            self._state = self.build_state_from_terraform_output(terraform_output)
+            self._write_state(self._state)
+        elif self.state_exists():
             self._state = self._read_state()
         else:
             raise MatchaError(MISSING_STATE_ERROR_MSG)
@@ -146,53 +159,53 @@ class MatchaStateService:
         """
         return bool(os.path.isfile(cls.matcha_state_path))
 
-    @staticmethod
-    def _parse_terraform_output_resource_name(output_name: str) -> Tuple[str, str, str]:
-        """Build resource output for each Terraform output.
-
-        Format for Terraform output names is:
-        <resource>_<flavor>_<property>
-        where <resource> is a name found in RESOURCE_NAMES
-
-        Args:
-            output_name (str): the name of the Terraform output.
-
-        Returns:
-            Tuple[str, str, str]: the resource output for matcha.state.
-        """
-        resource_type: str
-
-        for key in RESOURCE_NAMES:
-            if key in output_name:
-                resource_type = key
-                break
-
-        if resource_type is None:
-            print_error(
-                "A valid resource type for the output '{output_name}' does not exist."
-            )
-            raise MatchaInputError()
-
-        flavour_and_resource_name = output_name[len(resource_type) + 1 :]
-
-        flavor, resource_name = flavour_and_resource_name.split("_", maxsplit=1)
-        resource_name = resource_name.replace("_", "-")
-        resource_type = resource_type.replace("_", "-")
-
-        return resource_type, flavor, resource_name
-
-    @staticmethod
     def build_state_from_terraform_output(
-        terraform_output: Dict[str, str]
+        self, terraform_output: Dict[str, str]
     ) -> MatchaState:
         """Builds a MatchaState class from a terraform output dictionary.
 
         Args:
-            terraform_output (Dict[str, str]): Terraform output variables as a dictionary "
+            terraform_output (Dict[str, str]): Terraform output variables as a dictionary
 
         Returns:
             MatchaState: Terraform output variables in a MatchaState dataclass format.
         """
+
+        def _parse_terraform_output_resource_name(
+            output_name: str,
+        ) -> Tuple[str, str, str]:
+            """Build resource output for each Terraform output.
+
+            Format for Terraform output names is:
+            <resource>_<flavor>_<property>
+            where <resource> is a name found in RESOURCE_NAMES
+
+            Args:
+                output_name (str): the name of the Terraform output.
+
+            Returns:
+                Tuple[str, str, str]: the resource output for matcha.state.
+            """
+            resource_type: Optional[str] = None
+
+            for key in RESOURCE_NAMES:
+                if key in output_name:
+                    resource_type = key
+                    break
+
+            if resource_type is None:
+                raise MatchaInputError(
+                    "A valid resource type for the output '{output_name}' does not exist."
+                )
+
+            flavour_and_resource_name = output_name[len(resource_type) + 1 :]
+
+            flavor, resource_name = flavour_and_resource_name.split("_", maxsplit=1)
+            resource_name = resource_name.replace("_", "-")
+            resource_type = resource_type.replace("_", "-")
+
+            return resource_type, flavor, resource_name
+
         state_outputs: Dict[str, Dict[str, str]] = defaultdict(dict)
 
         for output_name, properties in terraform_output.items():
@@ -200,7 +213,7 @@ class MatchaStateService:
                 resource_type,
                 flavor,
                 resource_name,
-            ) = MatchaStateService._parse_terraform_output_resource_name(output_name)
+            ) = _parse_terraform_output_resource_name(output_name)
             state_outputs[resource_type].setdefault("flavor", flavor)
             state_outputs[resource_type][resource_name] = properties["value"]
 
@@ -209,14 +222,13 @@ class MatchaStateService:
 
         return MatchaState.from_dict(state_outputs)
 
-    @staticmethod
-    def create_state_file(matcha_state: MatchaState) -> None:
-        """Creates a new matcha.state file.
+    def _write_state(self, matcha_state: MatchaState) -> None:
+        """Writes a given MatchaState object to the matcha.state file.
 
         Args:
             matcha_state (MatchaState): State dataclass object to be written to the state file.
         """
-        with open(MatchaStateService.matcha_state_path, "w") as f:
+        with open(self.matcha_state_path, "w") as f:
             json.dump(matcha_state.to_dict(), f, indent=4)
 
     def _read_state(self) -> MatchaState:

@@ -50,9 +50,8 @@ class AzureRunner(BaseRunner):
         self._initialize_terraform(msg="Matcha")
         self._apply_terraform()
         tf_output = self.tfs.terraform_client.output()
-        matcha_state = MatchaStateService.build_state_from_terraform_output(tf_output)
-        MatchaStateService.create_state_file(matcha_state)
-        self._show_terraform_outputs(matcha_state)
+        matcha_state_service = MatchaStateService(terraform_output=tf_output)
+        self._show_terraform_outputs(matcha_state_service._state)
 
     def deprovision(self) -> None:
         """Destroy the provisioned resources."""
