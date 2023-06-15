@@ -34,8 +34,7 @@ def execute_analytics_event(func: Callable, *args, **kwargs) -> Tuple[Optional[M
     Returns:
         The result of the call to func, the error code.
     """
-    error_code = None
-    result = None
+    error_code, result = None, None
     try:
         result = func(*args, **kwargs)
     except Exception as e:
@@ -69,11 +68,8 @@ def track(event_name: AnalyticsEvent) -> Callable[..., Any]:
                 Any: the result of the wrapped function.
             """
             global_params = GlobalParameters()
-            result = None
-            error_code = None
-            te = None
-            ts = None
-            if event_name.value not in [event.value for event in AnalyticsEvent]:
+            result, error_code, te, ts = None, None, None, None
+            if event_name.value not in {event.value for event in AnalyticsEvent}:
                 warn("Event not recognised by analytics service.")
 
             if not global_params.analytics_opt_out:
