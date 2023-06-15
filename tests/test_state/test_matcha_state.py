@@ -479,3 +479,25 @@ def test_matcha_state_build_state_from_terraform_output(
 
     assert isinstance(matcha_state_service._state, MatchaState)
     assert matcha_state_service._state == state_file_as_object
+
+
+def test_matcha_state_service_initialise_with_matcha_state(
+    state_file_as_object: MatchaState, matcha_testing_directory: str
+):
+    """Test that a matcha.state file is created correctly when initialising MatchaStateService with a MatchaState object.
+
+    Args:
+        state_file_as_object (MatchaState): the state as a MatchaState object.
+        matcha_testing_directory (str): Mock testing directory.
+    """
+    os.chdir(matcha_testing_directory)
+    os.makedirs(".matcha/infrastructure", exist_ok=True)
+
+    assert not os.path.exists(".matcha/infrastructure/matcha.state")
+
+    matcha_state_service = MatchaStateService(matcha_state=state_file_as_object)
+
+    assert isinstance(matcha_state_service._state, MatchaState)
+    assert matcha_state_service._state == state_file_as_object
+
+    assert os.path.exists(".matcha/infrastructure/matcha.state")
