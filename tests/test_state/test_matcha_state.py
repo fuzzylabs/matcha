@@ -1,4 +1,5 @@
 """Tests for Matcha State Service."""
+import json
 import os
 from pathlib import Path
 from typing import Any
@@ -456,3 +457,28 @@ def test_matcha_state_service_initialise_with_matcha_state(
     assert matcha_state_service._state == state_file_as_object
 
     assert os.path.exists(".matcha/infrastructure/matcha.state")
+
+
+def test_write_state(
+    state_file_as_object: MatchaState,
+    mock_state_file: Path,
+):
+    """Test calling write state updates the state file.
+
+    Args:
+        state_file_as_object (MatchaState): the state as a MatchaState object.
+        mock_state_file (Path): a mocked state file in the test directory
+    """
+    matcha_state_service = MatchaStateService()
+    new_state_component = MatchaStateComponent(
+        MatchaResource("new-resource"),
+        [MatchaResourceProperty("new-property", "new-property-value")],
+    )
+    state_file_as_object.components.append(new_state_component)
+    matcha_state_service._write_state(state_file_as_object)
+
+    with open(mock_state_file) as f:
+        state_file_dict = json.load(f)
+
+    assert "new-resource" in state_file_dict
+    assert state_file_dict.get("new-resource") == {"new-property": "new-property-value"}

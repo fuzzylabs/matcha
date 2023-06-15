@@ -15,10 +15,7 @@ from matcha_ml.core._validation import LONGEST_RESOURCE_NAME, MAXIMUM_RESOURCE_N
 from matcha_ml.errors import MatchaError, MatchaInputError
 from matcha_ml.services.global_parameters_service import GlobalParameters
 from matcha_ml.state.matcha_state import (
-    MatchaResource,
-    MatchaResourceProperty,
     MatchaState,
-    MatchaStateComponent,
 )
 from matcha_ml.templates.azure_template import SUBMODULE_NAMES
 
@@ -33,37 +30,6 @@ RUN_TWICE = 2
 REMOTE_STATE_MANAGER_PREFIX = "matcha_ml.state.remote_state_manager.RemoteStateManager"
 
 INTERNAL_FUNCTION_STUB = "matcha_ml.services.global_parameters_service.GlobalParameters"
-
-
-@pytest.fixture
-def matcha_state(uuid_for_testing: uuid.UUID) -> MatchaState:
-    """A fixture to represent the Matcha state as a MatchaState object.
-
-    Args:
-        uuid_for_testing (uuid.UUID): Fixed UUID4 value.
-
-    Returns:
-        MatchaState: the Matcha state testing fixture.
-    """
-    return MatchaState(
-        components=[
-            MatchaStateComponent(
-                resource=MatchaResource("cloud"),
-                properties=[
-                    MatchaResourceProperty("flavor", "azure"),
-                    MatchaResourceProperty("resource-group-name", "test-resources"),
-                    MatchaResourceProperty("prefix", "test"),
-                    MatchaResourceProperty("location", "ukwest"),
-                ],
-            ),
-            MatchaStateComponent(
-                resource=MatchaResource("id"),
-                properties=[
-                    MatchaResourceProperty("matcha_uuid", str(uuid_for_testing)),
-                ],
-            ),
-        ]
-    )
 
 
 @pytest.fixture(autouse=True)
@@ -115,14 +81,14 @@ def mock_use_remote_state():
 
 def test_provision_returns_matcha_state(
     matcha_testing_directory: str,
-    matcha_state: MatchaState,
+    state_file_as_object: MatchaState,
     uuid_for_testing: uuid.UUID,
 ):
     """Test that provision returns a MatchaState object.
 
     Args:
         matcha_testing_directory (str): temporary working directory.
-        matcha_state (MatchaState): the Matcha state testing fixture.
+        state_file_as_object (MatchaState): the Matcha state testing fixture.
         uuid_for_testing (uuid.UUID): Fixed UUID4 value.
     """
     os.chdir(matcha_testing_directory)
@@ -133,13 +99,16 @@ def test_provision_returns_matcha_state(
     ) as uuid_mock:
         terraform_client_output.return_value = {
             "cloud_azure_resource_group_name": {
-                "value": "test-resources",
+                "value": "test_resources",
             },
-            "cloud_azure_prefix": {
-                "value": "test",
+            "container_registry_azure_registry_name": {
+                "value": "azure_registry_name",
             },
-            "cloud_azure_location": {
-                "value": "ukwest",
+            "container_registry_azure_registry_url": {
+                "value": "azure_container_registry",
+            },
+            "experiment_tracker_mlflow_tracking_url": {
+                "value": "mlflow_test_url",
             },
         }
         uuid_mock.return_value = uuid_for_testing
@@ -147,8 +116,8 @@ def test_provision_returns_matcha_state(
             location="ukwest", prefix="test", password="default"
         )
 
-    assert isinstance(matcha_state, MatchaState)
-    assert provision_result == matcha_state
+    assert isinstance(state_file_as_object, MatchaState)
+    assert provision_result == state_file_as_object
 
 
 def assert_infrastructure(
