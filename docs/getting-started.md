@@ -149,7 +149,7 @@ By default, Matcha will hide sensitive resource properties. If you need one of t
 
 You'll notice that a configuration file is create as part of the provisioning process - it's called `matcha.config.json`. This file stores the information necessary for Matcha to identify the resource group and storage container that holds the details of the provisioned resources.
 
-When Matcha provision first runs, it creates a storage blob in Azure which holds details of the provisioned environment. For more detail, please see our [Inside Matcha > How does Matcha work](inside-matcha.md) section
+When Matcha provision first runs, it creates a storage blob in Azure which holds details of the provisioned environment. For more detail, please see our [Inside Matcha > How does Matcha work](inside-matcha.md) section.
 
 In order to access your provisioned resources, other users will need to ensure this configuration file exists locally, in the same directory where the file was originally created. We suggest that the matcha.config.json file be included within the project repository and shared using GitHub or similar repository hosting tools. The user will also have to:
 
@@ -157,8 +157,6 @@ In order to access your provisioned resources, other users will need to ensure t
 2. Ensure they have access to both the resource group and the storage bucket.
 
 > Note: the shared file does not contain any sensitive information such as passwords or server endpoints.
-
-The other users that you're sharing the resources with will then need to ensure this configuration file exists locally, in the same directory where the file was originally created.
 
 Matcha uses this file to find and pull the provisioned state information, which will allow multiple users to use the same provisioned resources.
 
