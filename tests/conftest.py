@@ -99,35 +99,6 @@ def mocked_segment_track_decorator():
         yield track_analytics
 
 
-@pytest.fixture()
-def mock_state_file(matcha_testing_directory: str) -> Path:
-    """A fixture for mocking a test state file in the test directory.
-
-    Args:
-        matcha_testing_directory (str): the test directory
-    """
-    os.chdir(matcha_testing_directory)
-
-    matcha_infrastructure_dir = os.path.join(".matcha", "infrastructure", "resources")
-    os.makedirs(matcha_infrastructure_dir)
-
-    state_file_resources = {
-        "cloud": {"flavor": "azure", "resource-group-name": "test_resources"},
-        "container-registry": {
-            "flavor": "azure",
-            "registry-name": "azure_registry_name",
-            "registry-url": "azure_container_registry",
-        },
-        "experiment-tracker": {"flavor": "mlflow", "tracking-url": "mlflow_test_url"},
-        "id": {"matcha_uuid": "bdd640fb-0667-4ad1-9c80-317fa3b1799d"},
-    }
-
-    with open(MATCHA_STATE_PATH, "w") as f:
-        json.dump(state_file_resources, f)
-
-    return Path(MATCHA_STATE_PATH)
-
-
 @pytest.fixture(autouse=True)
 def random_state():
     """A fixture to ensure the random state is fixed for the tests."""
@@ -170,3 +141,33 @@ def mocked_terraform_config(matcha_testing_directory) -> TerraformConfig:
         working_dir.return_value = str(matcha_testing_directory)
 
         yield TerraformConfig()
+
+
+@pytest.fixture()
+def mock_state_file(matcha_testing_directory: str, uuid_for_testing: uuid.UUID) -> Path:
+    """A fixture for mocking a test state file in the test directory.
+
+    Args:
+        matcha_testing_directory (str): the test directory
+        uuid_for_testing (uuid.UUID): a UUID4 which remains the same across tests.
+    """
+    os.chdir(matcha_testing_directory)
+
+    matcha_infrastructure_dir = os.path.join(".matcha", "infrastructure", "resources")
+    os.makedirs(matcha_infrastructure_dir)
+
+    state_file_resources = {
+        "cloud": {"flavor": "azure", "resource-group-name": "test_resources"},
+        "container-registry": {
+            "flavor": "azure",
+            "registry-name": "azure_registry_name",
+            "registry-url": "azure_container_registry",
+        },
+        "experiment-tracker": {"flavor": "mlflow", "tracking-url": "mlflow_test_url"},
+        "id": {"matcha_uuid": str(uuid_for_testing)},
+    }
+
+    with open(MATCHA_STATE_PATH, "w") as f:
+        json.dump(state_file_resources, f)
+
+    return Path(MATCHA_STATE_PATH)

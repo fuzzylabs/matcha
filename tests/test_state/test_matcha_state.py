@@ -451,13 +451,15 @@ def test_state_component_find_property_not_found(
 
 
 def test_matcha_state_build_state_from_terraform_output(
-    state_file_as_object: MatchaState,
+    state_file_as_object: MatchaState, matcha_testing_directory: str
 ):
     """Test that a MatchaState object with the correct format is returned from the build_state_from_terraform_output function.
 
     Args:
         state_file_as_object (MatchaState): the state as a MatchaState object.
+        matcha_testing_directory (str): Mock testing directory.
     """
+    os.chdir(matcha_testing_directory)
     os.makedirs(".matcha/infrastructure", exist_ok=True)
     terraform_client_output = {
         "cloud_azure_resource_group_name": {
