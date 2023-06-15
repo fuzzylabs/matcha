@@ -1,6 +1,5 @@
 """Tests for Matcha State Service."""
 import os
-import uuid
 from pathlib import Path
 from typing import Any
 
@@ -47,50 +46,6 @@ def expected_outputs() -> dict:
     }
 
     return outputs
-
-
-@pytest.fixture
-def state_file_as_object(uuid_for_testing: uuid.UUID) -> MatchaState:
-    """A fixture to represent the Matcha state as a MatchaState object.
-
-    Args:
-        uuid_for_testing (uuid.UUID): Fixted valid UUID for testing.
-
-    Returns:
-        MatchaState: the Matcha state testing fixture.
-    """
-    return MatchaState(
-        components=[
-            MatchaStateComponent(
-                resource=MatchaResource("cloud"),
-                properties=[
-                    MatchaResourceProperty("flavor", "azure"),
-                    MatchaResourceProperty("resource-group-name", "test_resources"),
-                ],
-            ),
-            MatchaStateComponent(
-                resource=MatchaResource("container-registry"),
-                properties=[
-                    MatchaResourceProperty("flavor", "azure"),
-                    MatchaResourceProperty("registry-name", "azure_registry_name"),
-                    MatchaResourceProperty("registry-url", "azure_container_registry"),
-                ],
-            ),
-            MatchaStateComponent(
-                resource=MatchaResource("experiment-tracker"),
-                properties=[
-                    MatchaResourceProperty("flavor", "mlflow"),
-                    MatchaResourceProperty("tracking-url", "mlflow_test_url"),
-                ],
-            ),
-            MatchaStateComponent(
-                resource=MatchaResource("id"),
-                properties=[
-                    MatchaResourceProperty("matcha_uuid", str(uuid_for_testing)),
-                ],
-            ),
-        ]
-    )
 
 
 @pytest.fixture

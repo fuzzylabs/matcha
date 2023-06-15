@@ -1,6 +1,7 @@
 """Test suite to test the core matcha commands and all its subcommands."""
 import json
 import os
+import uuid
 from typing import Dict, Iterable, Iterator, Union
 from unittest import mock
 from unittest.mock import MagicMock
@@ -14,8 +15,6 @@ from matcha_ml.core import get, remove_state_lock
 from matcha_ml.errors import MatchaInputError
 from matcha_ml.services.global_parameters_service import GlobalParameters
 from matcha_ml.state.matcha_state import (
-    MatchaResource,
-    MatchaResourceProperty,
     MatchaState,
     MatchaStateComponent,
 )
@@ -24,11 +23,13 @@ INTERNAL_FUNCTION_STUB = "matcha_ml.services.global_parameters_service.GlobalPar
 
 
 @pytest.fixture(autouse=True)
-def mock_state_file(matcha_testing_directory: str):
+def mock_state_file(matcha_testing_directory: str, uuid_for_testing: uuid.UUID):
     """A fixture for mocking a test state file in the test directory.
 
     Args:
         matcha_testing_directory (str): the test directory
+        uuid_for_testing (uuid.UUID): Fixed valid UUID for testing.
+
     """
     os.chdir(matcha_testing_directory)
 
@@ -43,6 +44,7 @@ def mock_state_file(matcha_testing_directory: str):
             "registry-url": "azure_container_registry",
         },
         "experiment-tracker": {"flavor": "mlflow", "tracking-url": "mlflow_test_url"},
+        "id": {"matcha_uuid": str(uuid_for_testing)},
     }
 
     with open(MATCHA_STATE_PATH, "w") as f:
@@ -50,8 +52,11 @@ def mock_state_file(matcha_testing_directory: str):
 
 
 @pytest.fixture
-def expected_outputs() -> dict:
+def expected_outputs(uuid_for_testing: uuid.UUID) -> dict:
     """The expected state file initialized.
+
+    Args:
+        uuid_for_testing (uuid.UUID): Fixed valid UUID for testing.
 
     Returns:
         dict: expected output
@@ -64,56 +69,22 @@ def expected_outputs() -> dict:
             "registry-url": "azure_container_registry",
         },
         "experiment-tracker": {"flavor": "mlflow", "tracking-url": "mlflow_test_url"},
+        "id": {"matcha_uuid": str(uuid_for_testing)},
     }
 
     return outputs
 
 
 @pytest.fixture
-def matcha_state() -> MatchaState:
-    """A fixture to represent the Matcha state as a MatchaState object.
-
-    Returns:
-        MatchaState: the Matcha state testing fixture.
-    """
-    return MatchaState(
-        components=[
-            MatchaStateComponent(
-                resource=MatchaResource("cloud"),
-                properties=[
-                    MatchaResourceProperty("flavor", "azure"),
-                    MatchaResourceProperty("resource-group-name", "test_resources"),
-                ],
-            ),
-            MatchaStateComponent(
-                resource=MatchaResource("container-registry"),
-                properties=[
-                    MatchaResourceProperty("flavor", "azure"),
-                    MatchaResourceProperty("registry-name", "azure_registry_name"),
-                    MatchaResourceProperty("registry-url", "azure_container_registry"),
-                ],
-            ),
-            MatchaStateComponent(
-                resource=MatchaResource("experiment-tracker"),
-                properties=[
-                    MatchaResourceProperty("flavor", "mlflow"),
-                    MatchaResourceProperty("tracking-url", "mlflow_test_url"),
-                ],
-            ),
-        ]
-    )
-
-
-@pytest.fixture
 def experiment_tracker_state_component(
-    matcha_state: MatchaState,
+    state_file_as_object: MatchaState,
 ) -> MatchaStateComponent:
     """A single state component as a fixture, specifically, the experiment-tracker.
 
     Returns:
         MatchaStateComponent: the experiment tracker state component.
     """
-    return matcha_state.components[-1]
+    return state_file_as_object.components[-2]
 
 
 @pytest.fixture(autouse=True)
@@ -164,26 +135,26 @@ def expected_configuration() -> Dict[str, Union[str, bool]]:
 
 
 def test_get_resources(
-    mock_provisioned_remote_state: MagicMock, matcha_state: MatchaState
+    mock_provisioned_remote_state: MagicMock, state_file_as_object: MatchaState
 ):
     """Test get resources function with no resource specified.
 
     Args:
         mock_provisioned_remote_state (MagicMock): mock of a RemoteStateManager instance
-        matcha_state (MatchaState): the expected MatchaState fixture.
+        state_file_as_object (MatchaState): the expected MatchaState fixture.
     """
-    assert matcha_state == get(None, None)
+    assert state_file_as_object == get(None, None)
 
 
 def test_get_resources_resource_name_with_capitals(
-        mock_provisioned_remote_state: MagicMock,
-        experiment_tracker_state_component: MatchaStateComponent,
+    mock_provisioned_remote_state: MagicMock,
+    experiment_tracker_state_component: MatchaStateComponent,
 ):
     """Test get resources with a resource name containing errant capital letter(s).
 
     Args:
         mock_provisioned_remote_state (MagicMock): mock of a RemoteStateManager instance.
-        experimental_tracker_state_component(MatchaStateComponent): the experiment tracker state components.
+        experiment_tracker_state_component (MatchaStateComponent): the experiment tracker state components.
     """
     get_result = get(resource_name="Experiment-Tracker", property_name=None)
 
@@ -242,23 +213,22 @@ def test_get_resources_with_invalid_resource_name(
 
 
 def test_get_resources_with_resource_and_property_names_with_capitals(
-        mock_provisioned_remote_state: MagicMock,
-        experiment_tracker_state_component: MatchaStateComponent,
+    mock_provisioned_remote_state: MagicMock,
+    experiment_tracker_state_component: MatchaStateComponent,
 ):
-    """Test get resources function with resource name and resource property specified with arguments containing errant
-    capital letter(s).
+    """Test get resources function with resource name and resource property specified with arguments containing errant capital letter(s).
 
-        Args:
-            mock_provisioned_remote_state (MagicMock): mock of a RemoteStateManager instance.
-            experiment_tracker_state_component (MatchaStateComponent): the experiment tracker state component.
-        """
+    Args:
+        mock_provisioned_remote_state (MagicMock): mock of a RemoteStateManager instance.
+        experiment_tracker_state_component (MatchaStateComponent): the experiment tracker state component.
+    """
     get_result = get(resource_name="Experiment-Tracker", property_name="Flavor")
 
     assert get_result and len(get_result.components) == 1
 
     assert (
-            get_result.components[0].properties[0]
-            == experiment_tracker_state_component.properties[0]
+        get_result.components[0].properties[0]
+        == experiment_tracker_state_component.properties[0]
     )
 
 

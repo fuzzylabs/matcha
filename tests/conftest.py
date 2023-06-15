@@ -17,7 +17,13 @@ from typer.testing import CliRunner
 from matcha_ml.services import AzureClient
 from matcha_ml.services.azure_service import ROLE_ID_MAPPING
 from matcha_ml.services.terraform_service import TerraformConfig
-from matcha_ml.state.matcha_state import MATCHA_STATE_PATH
+from matcha_ml.state.matcha_state import (
+    MATCHA_STATE_PATH,
+    MatchaResource,
+    MatchaResourceProperty,
+    MatchaState,
+    MatchaStateComponent,
+)
 
 UUID_VERSION = 4
 INTERNAL_FUNCTION_STUB = "matcha_ml.services.AzureClient"
@@ -171,3 +177,47 @@ def mock_state_file(matcha_testing_directory: str, uuid_for_testing: uuid.UUID) 
         json.dump(state_file_resources, f)
 
     return Path(MATCHA_STATE_PATH)
+
+
+@pytest.fixture
+def state_file_as_object(uuid_for_testing: uuid.UUID) -> MatchaState:
+    """A fixture to represent the Matcha state as a MatchaState object.
+
+    Args:
+        uuid_for_testing (uuid.UUID): Fixed valid UUID for testing.
+
+    Returns:
+        MatchaState: the Matcha state testing fixture.
+    """
+    return MatchaState(
+        components=[
+            MatchaStateComponent(
+                resource=MatchaResource("cloud"),
+                properties=[
+                    MatchaResourceProperty("flavor", "azure"),
+                    MatchaResourceProperty("resource-group-name", "test_resources"),
+                ],
+            ),
+            MatchaStateComponent(
+                resource=MatchaResource("container-registry"),
+                properties=[
+                    MatchaResourceProperty("flavor", "azure"),
+                    MatchaResourceProperty("registry-name", "azure_registry_name"),
+                    MatchaResourceProperty("registry-url", "azure_container_registry"),
+                ],
+            ),
+            MatchaStateComponent(
+                resource=MatchaResource("experiment-tracker"),
+                properties=[
+                    MatchaResourceProperty("flavor", "mlflow"),
+                    MatchaResourceProperty("tracking-url", "mlflow_test_url"),
+                ],
+            ),
+            MatchaStateComponent(
+                resource=MatchaResource("id"),
+                properties=[
+                    MatchaResourceProperty("matcha_uuid", str(uuid_for_testing)),
+                ],
+            ),
+        ]
+    )
