@@ -156,6 +156,9 @@ def mock_state_file(matcha_testing_directory: str, uuid_for_testing: uuid.UUID) 
     Args:
         matcha_testing_directory (str): the test directory
         uuid_for_testing (uuid.UUID): a UUID4 which remains the same across tests.
+
+    Returns:
+        Path: Path object to matcha.state file
     """
     os.chdir(matcha_testing_directory)
 

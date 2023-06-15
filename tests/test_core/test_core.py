@@ -21,7 +21,7 @@ INTERNAL_FUNCTION_STUB = "matcha_ml.services.global_parameters_service.GlobalPar
 
 
 @pytest.fixture(autouse=True)
-def mock_state_file_wrapper(mock_state_file: Path):
+def mock_state_file_wrapper(mock_state_file: Path) -> Path:
     """Re-use fixture from conftest.py with autouse instead.
 
     A fixture for mocking a test state file in the test directory.
@@ -30,7 +30,7 @@ def mock_state_file_wrapper(mock_state_file: Path):
         mock_state_file (Path): Path to mocked matcha.state file
 
     Yields:
-        _type_: _description_
+        Path: Path object to matcha.state file
     """
     yield mock_state_file
 
