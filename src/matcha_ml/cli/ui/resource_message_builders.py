@@ -7,7 +7,12 @@ from rich.console import Console
 
 err_console = Console(stderr=True)
 
-SENSITIVE_OUTPUT = ["connection-string", "server-username", "server-password"]
+SENSITIVE_OUTPUT = [
+    "connection-string",
+    "server-username",
+    "server-password",
+    "azure-connection-string",
+]
 HIDDEN_STR = "********"
 
 

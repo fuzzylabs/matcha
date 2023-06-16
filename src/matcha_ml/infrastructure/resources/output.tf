@@ -3,6 +3,12 @@ output "experiment_tracker_mlflow_tracking_url" {
   value       = module.mlflow.mlflow_tracking_url
 }
 
+output "experiment_tracker_mlflow_azure_connection_string"{
+  description = "The Azure connection string for the MLflow storage on Azure"
+  value       = module.storage.primary_connection_string
+  sensitive   = true
+}
+
 output "pipeline_zenml_storage_path" {
   description = "The Azure Blob Storage Container path for storing ZenML artifacts"
   value       = module.zenml_storage.zenml_blobstorage_container_path
