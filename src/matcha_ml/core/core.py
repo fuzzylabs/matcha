@@ -149,6 +149,7 @@ def provision(
         MatchaError: If region is not valid.
     """
     remote_state_manager = RemoteStateManager()
+    template_runner = AzureRunner()
 
     if remote_state_manager.is_state_stale():
         if verbose:
@@ -158,6 +159,9 @@ def provision(
                 )
             )
         remote_state_manager.remove_matcha_config()
+        # add module.remove.matcha_dir
+        template_runner.remove_matcha_dir()
+        # add test for matcha_dir == matcha.config.json
 
     if remote_state_manager.is_state_provisioned():
         raise MatchaError(
@@ -177,7 +181,6 @@ def provision(
 
     with remote_state_manager.use_lock(), remote_state_manager.use_remote_state():
         # create a runner for provisioning resource with Terraform service.
-        template_runner = AzureRunner()
 
         project_directory = os.getcwd()
         destination = os.path.join(

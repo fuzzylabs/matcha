@@ -213,6 +213,21 @@ def test_show_terraform_outputs(
             assert output in captured.out
 
 
+def test_remove_matcha_dir(matcha_testing_directory: str, template_runner: AzureRunner):
+    """Tests service can remove the .matcha directory when required.
+
+    Args:
+        matcha_testing_directory (str): Testing directory
+        template_runner (AzureRunner): a AzureTemplateRunner object instance
+    """
+    matcha_dir = os.path.join(matcha_testing_directory, ".matcha")
+    os.mkdir(matcha_dir)
+    os.chdir(matcha_testing_directory)
+    template_runner.remove_matcha_dir()
+
+    assert not os.path.exists(matcha_dir)
+
+
 def test_provision(template_runner: AzureRunner):
     """Test service can provision resources using terraform.
 

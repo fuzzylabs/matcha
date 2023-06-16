@@ -1,5 +1,7 @@
 """Run terraform templates to provision and deprovision resources."""
 import json
+import os
+import shutil
 import uuid
 from collections import defaultdict
 from typing import Dict, Tuple
@@ -113,6 +115,12 @@ class AzureRunner(BaseRunner):
                 updated_state_file_data[key] = value
 
         self._update_state_file(updated_state_file_data)
+
+    def remove_matcha_dir(self) -> None:
+        """Removes the project's .matcha directory"."""
+        project_directory = os.getcwd()
+        target = os.path.join(project_directory, ".matcha")
+        shutil.rmtree(target)
 
     def provision(self) -> None:
         """Provision resources required for the deployment."""
