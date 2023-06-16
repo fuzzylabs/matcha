@@ -497,3 +497,31 @@ def test_write_state(
 
     assert "new-resource" in state_file_dict
     assert state_file_dict.get("new-resource") == {"new-property": "new-property-value"}
+
+
+def test_matcha_state_service_raises_error_when_initialised_with_both_arguments(
+    matcha_testing_directory: str,
+):
+    """Test MatchaStateService raises a MatchaError when initialised with both matcha_state and terraform_output.
+
+    Args:
+        matcha_testing_directory (str): Mock testing directory.
+    """
+    os.chdir(matcha_testing_directory)
+    matcha_state_object = MatchaState(
+        [
+            MatchaStateComponent(
+                MatchaResource("new-resource"),
+                [MatchaResourceProperty("new-property", "new-property-value")],
+            )
+        ]
+    )
+    terraform_client_output = {
+        "new-resource_flavor_new-property": {
+            "value": "new-property-value",
+        }
+    }
+    with pytest.raises(MatchaError):
+        _ = MatchaStateService(
+            matcha_state=matcha_state_object, terraform_output=terraform_client_output
+        )
