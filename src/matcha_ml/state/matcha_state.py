@@ -49,7 +49,7 @@ class MatchaStateComponent:
     def find_property(self, property_name: str) -> MatchaResourceProperty:
         """Given a property name, find the property that matches it.
 
-        Note: this is works under the assumption of none-duplicated properties.
+        Note: this only works under the assumption of none-duplicated properties.
 
         Args:
             property_name (str): the name of the property.
