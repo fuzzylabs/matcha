@@ -105,7 +105,8 @@ def destroy() -> None:
     """Destroy the provisioned cloud resources.
 
     Decommission the cloud infrastructure built by matcha when provision has been called either historically or during
-    this session.
+    this session. After calling destroy, the resources provisioned by matcha should no longer be active on your
+    chosen provider's UI.
 
     Raises:
         Matcha Error: where no state has been provisioned.
