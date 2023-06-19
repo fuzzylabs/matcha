@@ -213,6 +213,11 @@ def test_show_terraform_outputs(
             assert output in captured.out
 
 
+def test_is_local_state_stale():
+    """TBC."""
+    pass
+
+
 def test_remove_matcha_dir(matcha_testing_directory: str, template_runner: AzureRunner):
     """Tests service can remove the .matcha directory when required.
 

@@ -116,6 +116,28 @@ class AzureRunner(BaseRunner):
 
         self._update_state_file(updated_state_file_data)
 
+    def is_local_state_stale(self) -> bool:
+        """Checks for congruence between the local config file and the local tfvars file."""
+        local_tfvars_file = os.path.join(
+            os.getcwd(),
+            ".matcha",
+            "infrastructure",
+            "remote_state_storage",
+            "terraform.tfvars.json",
+        )
+        local_config_file = os.path.join(os.getcwd(), "matcha.config.json")
+        with open(local_tfvars_file) as tf:
+            local_tfvars = json.load(tf)
+
+        with open(local_config_file) as config:
+            local_config = json.load(config)
+            index = local_config["remote_state_bucket"]["resource_group_name"].find("-")
+            local_config["prefix"] = local_config["remote_state_bucket"][
+                "resource_group_name"
+            ][:index]
+
+        return bool(local_config["prefix"] != local_tfvars["prefix"])
+
     def remove_matcha_dir(self) -> None:
         """Removes the project's .matcha directory"."""
         project_directory = os.getcwd()

@@ -159,7 +159,6 @@ def provision(
                 )
             )
         remote_state_manager.remove_matcha_config()
-        # add module.remove.matcha_dir
         template_runner.remove_matcha_dir()
         # add test for matcha_dir == matcha.config.json
 
