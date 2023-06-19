@@ -151,6 +151,9 @@ def provision(
     remote_state_manager = RemoteStateManager()
     template_runner = AzureRunner()
 
+    if template_runner.is_local_state_stale():
+        template_runner.remove_matcha_dir()
+
     if remote_state_manager.is_state_stale():
         if verbose:
             print_status(

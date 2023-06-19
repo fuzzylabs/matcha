@@ -126,23 +126,27 @@ class AzureRunner(BaseRunner):
             "terraform.tfvars.json",
         )
         local_config_file = os.path.join(os.getcwd(), "matcha.config.json")
-        with open(local_tfvars_file) as tf:
-            local_tfvars = json.load(tf)
-
-        with open(local_config_file) as config:
-            local_config = json.load(config)
-            index = local_config["remote_state_bucket"]["resource_group_name"].find("-")
-            local_config["prefix"] = local_config["remote_state_bucket"][
-                "resource_group_name"
-            ][:index]
-
-        return bool(local_config["prefix"] != local_tfvars["prefix"])
+        if os.path.exists(local_tfvars_file) and os.path.exists(local_config_file):
+            with open(local_tfvars_file) as tf:
+                local_tfvars = json.load(tf)
+            with open(local_config_file) as config:
+                local_config = json.load(config)
+                index = local_config["remote_state_bucket"]["resource_group_name"].find(
+                    "-"
+                )
+                local_config["prefix"] = local_config["remote_state_bucket"][
+                    "resource_group_name"
+                ][:index]
+            return bool(local_config["prefix"] != local_tfvars["prefix"])
+        else:
+            return False
 
     def remove_matcha_dir(self) -> None:
         """Removes the project's .matcha directory"."""
         project_directory = os.getcwd()
         target = os.path.join(project_directory, ".matcha")
-        shutil.rmtree(target)
+        if os.path.exists(target):
+            shutil.rmtree(target)
 
     def provision(self) -> None:
         """Provision resources required for the deployment."""

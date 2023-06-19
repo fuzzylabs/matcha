@@ -122,8 +122,8 @@ class MatchaStateService:
         """
         if self.state_exists():
             self._state = self._read_state()
-        # else:
-        #     raise MatchaError(MISSING_STATE_ERROR_MSG)
+        else:
+            raise MatchaError(MISSING_STATE_ERROR_MSG)
 
     @classmethod
     def state_exists(cls) -> bool:
