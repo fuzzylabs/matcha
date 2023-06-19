@@ -1,10 +1,12 @@
 """Reusable fixtures."""
 import json
 import os
+import random
 import tempfile
+import uuid
 from pathlib import Path
 from typing import Iterator
-from unittest.mock import patch
+from unittest.mock import PropertyMock, patch
 
 import pytest
 from azure.mgmt.confluent.models._confluent_management_client_enums import (
@@ -14,8 +16,16 @@ from typer.testing import CliRunner
 
 from matcha_ml.services import AzureClient
 from matcha_ml.services.azure_service import ROLE_ID_MAPPING
-from matcha_ml.state.matcha_state import MATCHA_STATE_PATH
+from matcha_ml.services.terraform_service import TerraformConfig
+from matcha_ml.state.matcha_state import (
+    MATCHA_STATE_PATH,
+    MatchaResource,
+    MatchaResourceProperty,
+    MatchaState,
+    MatchaStateComponent,
+)
 
+UUID_VERSION = 4
 INTERNAL_FUNCTION_STUB = "matcha_ml.services.AzureClient"
 
 
@@ -95,12 +105,60 @@ def mocked_segment_track_decorator():
         yield track_analytics
 
 
+@pytest.fixture(autouse=True)
+def random_state():
+    """A fixture to ensure the random state is fixed for the tests."""
+    random.seed(42)
+
+
+@pytest.fixture
+def uuid_for_testing() -> uuid.UUID:
+    """A random UUID4 that can be used as a fixture in the tests.
+
+    Returns:
+        uuid.UUID: a UUID4 which remains the same across tests.
+    """
+    return uuid.UUID(int=random.getrandbits(128), version=UUID_VERSION)
+
+
+@pytest.fixture(autouse=True)
+def mock_uuid(uuid_for_testing) -> None:
+    """Mock the return value for UUID4 function.
+
+    Args:
+        uuid_for_testing (uuid.UUID): a fixed valid UUID4 value.
+    """
+    with patch("matcha_ml.state.matcha_state.uuid.uuid4") as uuid_mock:
+        uuid_mock.return_value = uuid_for_testing
+        yield
+
+
+@pytest.fixture(autouse=True)
+def mocked_terraform_config(matcha_testing_directory) -> TerraformConfig:
+    """Mock for the TerraformConfig working directory.
+
+    Returns:
+        TerraformConfig: the mocked TerraformConfig.
+    """
+    with patch(
+        "matcha_ml.services.terraform_service.TerraformConfig.working_dir",
+        new_callable=PropertyMock,
+    ) as working_dir:
+        working_dir.return_value = str(matcha_testing_directory)
+
+        yield TerraformConfig()
+
+
 @pytest.fixture()
-def mock_state_file(matcha_testing_directory: str) -> Path:
+def mock_state_file(matcha_testing_directory: str, uuid_for_testing: uuid.UUID) -> Path:
     """A fixture for mocking a test state file in the test directory.
 
     Args:
         matcha_testing_directory (str): the test directory
+        uuid_for_testing (uuid.UUID): a UUID4 which remains the same across tests.
+
+    Returns:
+        Path: Path object to matcha.state file
     """
     os.chdir(matcha_testing_directory)
 
@@ -114,10 +172,72 @@ def mock_state_file(matcha_testing_directory: str) -> Path:
             "registry-name": "azure_registry_name",
             "registry-url": "azure_container_registry",
         },
+        "pipeline": {
+            "flavor": "zenml",
+            "connection-string": "zenml_test_connection_string",
+            "server-password": "zen_server_password",
+            "server-url": "zen_server_url",
+        },
         "experiment-tracker": {"flavor": "mlflow", "tracking-url": "mlflow_test_url"},
+        "id": {"matcha_uuid": str(uuid_for_testing)},
     }
 
     with open(MATCHA_STATE_PATH, "w") as f:
         json.dump(state_file_resources, f)
 
     return Path(MATCHA_STATE_PATH)
+
+
+@pytest.fixture
+def state_file_as_object(uuid_for_testing: uuid.UUID) -> MatchaState:
+    """A fixture to represent the Matcha state as a MatchaState object.
+
+    Args:
+        uuid_for_testing (uuid.UUID): Fixed valid UUID for testing.
+
+    Returns:
+        MatchaState: the Matcha state testing fixture.
+    """
+    return MatchaState(
+        components=[
+            MatchaStateComponent(
+                resource=MatchaResource("cloud"),
+                properties=[
+                    MatchaResourceProperty("flavor", "azure"),
+                    MatchaResourceProperty("resource-group-name", "test_resources"),
+                ],
+            ),
+            MatchaStateComponent(
+                resource=MatchaResource("container-registry"),
+                properties=[
+                    MatchaResourceProperty("flavor", "azure"),
+                    MatchaResourceProperty("registry-name", "azure_registry_name"),
+                    MatchaResourceProperty("registry-url", "azure_container_registry"),
+                ],
+            ),
+            MatchaStateComponent(
+                resource=MatchaResource("pipeline"),
+                properties=[
+                    MatchaResourceProperty("flavor", "zenml"),
+                    MatchaResourceProperty(
+                        "connection-string", "zenml_test_connection_string"
+                    ),
+                    MatchaResourceProperty("server-password", "zen_server_password"),
+                    MatchaResourceProperty("server-url", "zen_server_url"),
+                ],
+            ),
+            MatchaStateComponent(
+                resource=MatchaResource("experiment-tracker"),
+                properties=[
+                    MatchaResourceProperty("flavor", "mlflow"),
+                    MatchaResourceProperty("tracking-url", "mlflow_test_url"),
+                ],
+            ),
+            MatchaStateComponent(
+                resource=MatchaResource("id"),
+                properties=[
+                    MatchaResourceProperty("matcha_uuid", str(uuid_for_testing)),
+                ],
+            ),
+        ]
+    )

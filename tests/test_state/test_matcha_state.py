@@ -1,4 +1,5 @@
 """Tests for Matcha State Service."""
+import json
 import os
 from pathlib import Path
 from typing import Any
@@ -41,45 +42,17 @@ def expected_outputs() -> dict:
             "registry-name": "azure_registry_name",
             "registry-url": "azure_container_registry",
         },
+        "pipeline": {
+            "flavor": "zenml",
+            "connection-string": "zenml_test_connection_string",
+            "server-password": "zen_server_password",
+            "server-url": "zen_server_url",
+        },
         "experiment-tracker": {"flavor": "mlflow", "tracking-url": "mlflow_test_url"},
+        "id": {"matcha_uuid": "bdd640fb-0667-4ad1-9c80-317fa3b1799d"},
     }
 
     return outputs
-
-
-@pytest.fixture
-def state_file_as_object() -> MatchaState:
-    """A fixture to represent the Matcha state as a MatchaState object.
-
-    Returns:
-        MatchaState: the Matcha state testing fixture.
-    """
-    return MatchaState(
-        components=[
-            MatchaStateComponent(
-                resource=MatchaResource("cloud"),
-                properties=[
-                    MatchaResourceProperty("flavor", "azure"),
-                    MatchaResourceProperty("resource-group-name", "test_resources"),
-                ],
-            ),
-            MatchaStateComponent(
-                resource=MatchaResource("container-registry"),
-                properties=[
-                    MatchaResourceProperty("flavor", "azure"),
-                    MatchaResourceProperty("registry-name", "azure_registry_name"),
-                    MatchaResourceProperty("registry-url", "azure_container_registry"),
-                ],
-            ),
-            MatchaStateComponent(
-                resource=MatchaResource("experiment-tracker"),
-                properties=[
-                    MatchaResourceProperty("flavor", "mlflow"),
-                    MatchaResourceProperty("tracking-url", "mlflow_test_url"),
-                ],
-            ),
-        ]
-    )
 
 
 @pytest.fixture
@@ -264,7 +237,7 @@ def test_get_hash_local_state(
         mock_state_file (Path): a mocked state file in the test directory.
         matcha_state_service (MatchaStateService): The matcha_state_service testing instance.
     """
-    expected_hash = "031318ef84db0275c7d26230a51eb459"
+    expected_hash = "ee2e6c83593a10c76611488809ad7d45"
     result_hash = matcha_state_service.get_hash_local_state()
 
     assert result_hash == expected_hash
@@ -437,3 +410,118 @@ def test_state_component_find_property_not_found(
         str(err.value)
         == f"The property with the name '{invalid_property_name}' could not be found."
     )
+
+
+def test_matcha_state_build_state_from_terraform_output(
+    state_file_as_object: MatchaState, matcha_testing_directory: str
+):
+    """Test that a MatchaState object with the correct format is returned from the build_state_from_terraform_output function.
+
+    Args:
+        state_file_as_object (MatchaState): the state as a MatchaState object.
+        matcha_testing_directory (str): Mock testing directory.
+    """
+    os.chdir(matcha_testing_directory)
+    os.makedirs(".matcha/infrastructure", exist_ok=True)
+    terraform_client_output = {
+        "cloud_azure_resource_group_name": {
+            "value": "test_resources",
+        },
+        "container_registry_azure_registry_name": {
+            "value": "azure_registry_name",
+        },
+        "container_registry_azure_registry_url": {
+            "value": "azure_container_registry",
+        },
+        "pipeline_zenml_connection_string": {
+            "value": "zenml_test_connection_string",
+        },
+        "pipeline_zenml_server_password": {
+            "value": "zen_server_password",
+        },
+        "pipeline_zenml_server_url": {
+            "value": "zen_server_url",
+        },
+        "experiment_tracker_mlflow_tracking_url": {
+            "value": "mlflow_test_url",
+        },
+    }
+    matcha_state_service = MatchaStateService(terraform_output=terraform_client_output)
+
+    assert isinstance(matcha_state_service._state, MatchaState)
+    assert matcha_state_service._state == state_file_as_object
+
+
+def test_matcha_state_service_initialise_with_matcha_state(
+    state_file_as_object: MatchaState, matcha_testing_directory: str
+):
+    """Test that a matcha.state file is created correctly when initialising MatchaStateService with a MatchaState object.
+
+    Args:
+        state_file_as_object (MatchaState): the state as a MatchaState object.
+        matcha_testing_directory (str): Mock testing directory.
+    """
+    os.chdir(matcha_testing_directory)
+    os.makedirs(".matcha/infrastructure", exist_ok=True)
+
+    assert not os.path.exists(".matcha/infrastructure/matcha.state")
+
+    matcha_state_service = MatchaStateService(matcha_state=state_file_as_object)
+
+    assert isinstance(matcha_state_service._state, MatchaState)
+    assert matcha_state_service._state == state_file_as_object
+
+    assert os.path.exists(".matcha/infrastructure/matcha.state")
+
+
+def test_write_state(
+    state_file_as_object: MatchaState,
+    mock_state_file: Path,
+):
+    """Test calling write state updates the state file.
+
+    Args:
+        state_file_as_object (MatchaState): the state as a MatchaState object.
+        mock_state_file (Path): a mocked state file in the test directory
+    """
+    matcha_state_service = MatchaStateService()
+    new_state_component = MatchaStateComponent(
+        MatchaResource("new-resource"),
+        [MatchaResourceProperty("new-property", "new-property-value")],
+    )
+    state_file_as_object.components.append(new_state_component)
+    matcha_state_service._write_state(state_file_as_object)
+
+    with open(mock_state_file) as f:
+        state_file_dict = json.load(f)
+
+    assert "new-resource" in state_file_dict
+    assert state_file_dict.get("new-resource") == {"new-property": "new-property-value"}
+
+
+def test_matcha_state_service_raises_error_when_initialised_with_both_arguments(
+    matcha_testing_directory: str,
+):
+    """Test MatchaStateService raises a MatchaError when initialised with both matcha_state and terraform_output.
+
+    Args:
+        matcha_testing_directory (str): Mock testing directory.
+    """
+    os.chdir(matcha_testing_directory)
+    matcha_state_object = MatchaState(
+        [
+            MatchaStateComponent(
+                MatchaResource("new-resource"),
+                [MatchaResourceProperty("new-property", "new-property-value")],
+            )
+        ]
+    )
+    terraform_client_output = {
+        "new-resource_flavor_new-property": {
+            "value": "new-property-value",
+        }
+    }
+    with pytest.raises(MatchaError):
+        _ = MatchaStateService(
+            matcha_state=matcha_state_object, terraform_output=terraform_client_output
+        )

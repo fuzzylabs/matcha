@@ -14,7 +14,7 @@ from matcha_ml.cli.ui.status_message_builders import (
 )
 from matcha_ml.constants import LOCK_FILE_NAME
 from matcha_ml.errors import MatchaError
-from matcha_ml.runners import RemoteStateRunner
+from matcha_ml.runners.remote_state_runner import RemoteStateRunner
 from matcha_ml.storage import AzureStorage
 from matcha_ml.templates import RemoteStateTemplate
 
