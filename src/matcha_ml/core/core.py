@@ -104,6 +104,9 @@ def get(
 def destroy() -> None:
     """Destroy the provisioned cloud resources.
 
+    Decommission the cloud infrastructure built by matcha when provision has been called either historically or during
+    this session.
+
     Raises:
         Matcha Error: where no state has been provisioned.
     """
