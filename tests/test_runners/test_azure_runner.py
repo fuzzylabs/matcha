@@ -183,10 +183,11 @@ def test_show_terraform_outputs(
             assert output in captured.out
 
 
-def test_provision(template_runner: AzureRunner):
+def test_provision(matcha_testing_directory: str, template_runner: AzureRunner):
     """Test service can provision resources using terraform.
 
     Args:
+        matcha_testing_directory (str): Testing directory
         template_runner (AzureRunner): a AzureRunner object instance
     """
     template_runner._check_terraform_installation = MagicMock()
@@ -200,7 +201,10 @@ def test_provision(template_runner: AzureRunner):
         template_runner._initialize_terraform.assert_not_called()
         template_runner._apply_terraform.assert_not_called()
 
-    with mock.patch("typer.confirm") as mock_confirm:
+    with mock.patch("typer.confirm") as mock_confirm, mock.patch(
+        "matcha_ml.state.matcha_state.MATCHA_STATE_PATH"
+    ) as state_path:
+        state_path.return_value = matcha_testing_directory
         mock_confirm.return_value = True
         template_runner.provision()
         template_runner._initialize_terraform.assert_called()
