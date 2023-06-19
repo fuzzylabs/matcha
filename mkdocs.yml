@@ -15,6 +15,7 @@ nav:
   - Inside Matcha:
     - How does Matcha work: 'inside-matcha.md'
     - Why we collect usage data: 'privacy.md'
+  - API Reference: 'references.md'
 
 
 theme:
@@ -36,6 +37,12 @@ markdown_extensions:
 plugins:
   - glightbox:
       zoomable: true
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            show_submodules: true
+            separate_signature: true
 
 extra:
   social:

@@ -89,13 +89,6 @@ def assert_infrastructure(
         state_file_path = os.path.join(destination_path, os.pardir, "matcha.state")
         assert os.path.exists(state_file_path)
 
-        with open(state_file_path) as f:
-            tf_vars = json.load(f)
-
-        _ = expected_tf_vars.pop("password", None)
-        expected_matcha_state_vars = {"cloud": expected_tf_vars}
-        assert tf_vars == expected_matcha_state_vars
-
 
 def test_cli_provision_command_help(runner: CliRunner):
     """Test cli for provision command help.

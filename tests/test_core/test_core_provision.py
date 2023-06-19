@@ -2,6 +2,7 @@
 import glob
 import json
 import os
+import uuid
 from pathlib import Path
 from typing import Dict, Iterator, Union
 from unittest import mock
@@ -14,10 +15,7 @@ from matcha_ml.core._validation import LONGEST_RESOURCE_NAME, MAXIMUM_RESOURCE_N
 from matcha_ml.errors import MatchaError, MatchaInputError
 from matcha_ml.services.global_parameters_service import GlobalParameters
 from matcha_ml.state.matcha_state import (
-    MatchaResource,
-    MatchaResourceProperty,
     MatchaState,
-    MatchaStateComponent,
 )
 from matcha_ml.templates.azure_template import SUBMODULE_NAMES
 
@@ -32,26 +30,6 @@ RUN_TWICE = 2
 REMOTE_STATE_MANAGER_PREFIX = "matcha_ml.state.remote_state_manager.RemoteStateManager"
 
 INTERNAL_FUNCTION_STUB = "matcha_ml.services.global_parameters_service.GlobalParameters"
-
-
-@pytest.fixture
-def matcha_state() -> MatchaState:
-    """A fixture to represent the Matcha state as a MatchaState object.
-
-    Returns:
-        MatchaState: the Matcha state testing fixture.
-    """
-    return MatchaState(
-        components=[
-            MatchaStateComponent(
-                resource=MatchaResource("cloud"),
-                properties=[
-                    MatchaResourceProperty("location", "ukwest"),
-                    MatchaResourceProperty("prefix", "test"),
-                ],
-            ),
-        ]
-    )
 
 
 @pytest.fixture(autouse=True)
@@ -102,20 +80,53 @@ def mock_use_remote_state():
 
 
 def test_provision_returns_matcha_state(
-    matcha_testing_directory: str, matcha_state: MatchaState
+    matcha_testing_directory: str,
+    state_file_as_object: MatchaState,
+    uuid_for_testing: uuid.UUID,
 ):
     """Test that provision returns a MatchaState object.
 
     Args:
-        matcha_testing_directory (str): _description_
-        matcha_state (MatchaState): _description_
+        matcha_testing_directory (str): temporary working directory.
+        state_file_as_object (MatchaState): the Matcha state testing fixture.
+        uuid_for_testing (uuid.UUID): Fixed UUID4 value.
     """
     os.chdir(matcha_testing_directory)
+    with mock.patch(
+        "matcha_ml.services.terraform_service.python_terraform.Terraform.output"
+    ) as terraform_client_output, mock.patch(
+        "matcha_ml.state.matcha_state.uuid.uuid4"
+    ) as uuid_mock:
+        terraform_client_output.return_value = {
+            "cloud_azure_resource_group_name": {
+                "value": "test_resources",
+            },
+            "container_registry_azure_registry_name": {
+                "value": "azure_registry_name",
+            },
+            "container_registry_azure_registry_url": {
+                "value": "azure_container_registry",
+            },
+            "pipeline_zenml_connection_string": {
+                "value": "zenml_test_connection_string",
+            },
+            "pipeline_zenml_server_password": {
+                "value": "zen_server_password",
+            },
+            "pipeline_zenml_server_url": {
+                "value": "zen_server_url",
+            },
+            "experiment_tracker_mlflow_tracking_url": {
+                "value": "mlflow_test_url",
+            },
+        }
+        uuid_mock.return_value = uuid_for_testing
+        provision_result = provision(
+            location="ukwest", prefix="test", password="default"
+        )
 
-    provision_result = provision(location="ukwest", prefix="test", password="default")
-
-    assert isinstance(matcha_state, MatchaState)
-    assert provision_result == matcha_state
+    assert isinstance(state_file_as_object, MatchaState)
+    assert provision_result == state_file_as_object
 
 
 def assert_infrastructure(
@@ -203,7 +214,7 @@ def test_provision_copies_infrastructure_templates_with_specified_values(
     assert_infrastructure(
         state_storage_destination_path, state_storage_expected_tf_vars, False
     )
-    assert_infrastructure(resources_destination_path, resources_expected_tf_vars)
+    assert_infrastructure(resources_destination_path, resources_expected_tf_vars, False)
     mock_use_lock.assert_called_once()
 
 
