@@ -20,9 +20,20 @@ def get(
     resource_name: Optional[str],
     property_name: Optional[str],
 ) -> MatchaState:
-    """Return the information of the provisioned resource based on the resource name specified.
+    """Return information regarding a previously provisioned resource based on the resource and property names provided.
 
-    Return all resources if no resource name is specified.
+    The information is returned in the form of a `MatchaState` object containing various `MatchaStateComponent` objects.
+    The `MatchaStateComponent` objects in turn hold `MatchaResource` and `MatchaResourceProperty` components.
+    If no resource name is provided, all resources are returned.
+
+    Examples:
+        >>> get("cloud", "resource-group-name")
+        MatchaState(components=[MatchaStateComponent(resource=MatchaResource(name='cloud'),
+        properties=[MatchaResourceProperty(name='resource-group-name', value='test_resources')])])
+
+        >>> get("experiment-tracker", "flavor")
+        MatchaState(components=[MatchaStateComponent(resource=MatchaResource(name='experiment-tracker'),
+        properties=[MatchaResourceProperty(name='flavor', value='mlflow')])])
 
     Args:
         resource_name (Optional[str]): name of the resource to get information for.
@@ -91,7 +102,7 @@ def get(
 
 @track(event_name=AnalyticsEvent.DESTROY)
 def destroy() -> None:
-    """Destroys provisioned resources in the cloud.
+    """Destroy the provisioned cloud resources.
 
     Raises:
         Matcha Error: where no state has been provisioned.
@@ -120,7 +131,7 @@ def analytics_opt_in() -> None:
 
 
 def remove_state_lock() -> None:
-    """Unlock remote state."""
+    """Unlock the remote state."""
     remote_state = RemoteStateManager()
     remote_state.unlock()
 
@@ -132,7 +143,17 @@ def provision(
     password: str,
     verbose: Optional[bool] = False,
 ) -> MatchaState:
-    """Provision cloud resources using templates.
+    """Provision cloud resources using existing matcha templates.
+
+    Provision cloud resources in the location provided. Provide a prefix to differentiate the provisioned resources from
+    other, existing resources, and provide a password. To show more output than the default, set verbose to True.
+
+    Examples:
+        >>> provision(location="ukwest", prefix="myexample", password="example_password", verbose=False)
+        MatchaState(components=[MatchaStateComponent(resource=MatchaResource(name='cloud'),
+            properties=[MatchaResourceProperty(name='location', value='ukwest'),
+            MatchaResourceProperty(name='prefix', value='test')])])
+
 
     Args:
         location (str): Azure location in which all resources will be provisioned.
