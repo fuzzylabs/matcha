@@ -1,5 +1,7 @@
 """Test suite to test the core matcha commands and all its subcommands."""
+import json
 import os
+import uuid
 from pathlib import Path
 from typing import Dict, Iterable, Iterator, Union
 from unittest import mock
@@ -41,6 +43,9 @@ def experiment_tracker_state_component(
 ) -> MatchaStateComponent:
     """A single state component as a fixture, specifically, the experiment-tracker.
 
+    Args:
+        state_file_as_object (MatchaState): the expected MatchaState fixture.
+
     Returns:
         MatchaStateComponent: the experiment tracker state component.
     """
@@ -54,7 +59,7 @@ def teardown_singleton():
 
 
 @pytest.fixture(autouse=True)
-def mock_provisioned_remote_state() -> Iterable[MagicMock]:
+def mock_provisioned_remote_state(uuid_for_testing: uuid.UUID) -> Iterable[MagicMock]:
     """Mock remote state manager to have state provisioned.
 
     Returns:
@@ -68,6 +73,31 @@ def mock_provisioned_remote_state() -> Iterable[MagicMock]:
         mock_state_manager.get_hash_remote_state.return_value = (
             "470544910b3fe623e00d63e6314588a3"
         )
+
+        def download(path):
+            state_file_resources = {
+                "cloud": {"flavor": "azure", "resource-group-name": "test_resources"},
+                "container-registry": {
+                    "flavor": "azure",
+                    "registry-name": "azure_registry_name",
+                    "registry-url": "azure_container_registry",
+                },
+                "pipeline": {
+                    "flavor": "zenml",
+                    "connection-string": "zenml_test_connection_string",
+                    "server-password": "zen_server_password",
+                    "server-url": "zen_server_url",
+                },
+                "experiment-tracker": {
+                    "flavor": "mlflow",
+                    "tracking-url": "mlflow_test_url",
+                },
+                "id": {"matcha_uuid": str(uuid_for_testing)},
+            }
+            with open(".matcha/infrastructure/matcha.state", "w") as f:
+                json.dump(state_file_resources, f)
+
+        mock_state_manager.download = download
         yield mock_state_manager
 
 
@@ -307,3 +337,22 @@ def test_remove_state_lock_function_warning(
 
     # Check if unlock function from RemoteStateManager class is called only once
     mock_provisioned_remote_state.unlock.assert_called_once()
+
+
+def test_get_downloads_matcha_state_directory(mock_state_file, state_file_as_object):
+    """Test that get downloads the matcha state directory when it does not exist locally for a user and does exist remotely.
+
+    Args:
+        mock_state_file (Path): Path to mocked matcha.state file
+        state_file_as_object (MatchaState): the expected MatchaState fixture.
+    """
+    state_file_location = os.path.join(os.getcwd(), mock_state_file)
+    # Remove matcha.state file
+    os.remove(state_file_location)
+    assert not os.path.exists(state_file_location)
+
+    # Run get and expect the matcha.state file to have been redownloaded
+    get_result = get(None, None)
+
+    assert os.path.exists(state_file_location)
+    assert state_file_as_object == get_result
