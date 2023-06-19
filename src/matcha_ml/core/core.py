@@ -154,7 +154,7 @@ def provision(
 ) -> MatchaState:
     """Provision cloud resources using existing Matcha Terraform templates.
 
-    Provision cloud resources in the location provided. Provide a prefix for the Azure group's  name and a password for
+    Provision cloud resources in the location provided. Provide a prefix for the Azure group's name and a password for
     the provisioned server. To show more output than the default, set verbose to True.
 
     Examples:
@@ -167,7 +167,7 @@ def provision(
     Args:
         location (str): Azure location in which all resources will be provisioned.
         prefix (str): Prefix used for all resources.
-        password (str): Password for ZenServer.
+        password (str): Password for the deployment server.
         verbose (bool optional): additional output is show when True. Defaults to False.
 
     Returns:
