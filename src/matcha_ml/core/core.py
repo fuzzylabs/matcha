@@ -125,12 +125,19 @@ def destroy() -> None:
 
 
 def analytics_opt_out() -> None:
-    """Disable the collection of anonymous usage data."""
+    """Disable the collection of anonymous usage data.
+
+    More information regarding why we collect usage data, and how it is used, can be found
+    [here](https://mymatcha.ai/privacy/).
+    """
     GlobalParameters().analytics_opt_out = True
 
 
 def analytics_opt_in() -> None:
-    """Enable the collection of anonymous usage data (enabled by default)."""
+    """Enable the collection of anonymous usage data (enabled by default).
+
+    More information regarding why we collect usage data, and how it is used, can be found
+    [here](https://mymatcha.ai/privacy/)."""
     GlobalParameters().analytics_opt_out = False
 
 
