@@ -1,4 +1,4 @@
-"""The core functions for matcha."""
+"""The core functionality for Matcha API."""
 import os
 from typing import Optional
 
@@ -104,7 +104,7 @@ def get(
 def destroy() -> None:
     """Destroy the provisioned cloud resources.
 
-    Decommission the cloud infrastructure built by matcha when provision has been called either historically or during
+    Decommission the cloud infrastructure built by Matcha when provision has been called either historically or during
     this session. After calling destroy, the resources provisioned by matcha should no longer be active on your
     chosen provider's UI.
 
@@ -135,7 +135,12 @@ def analytics_opt_in() -> None:
 
 
 def remove_state_lock() -> None:
-    """Unlock the remote state."""
+    """Unlock the remote state.
+
+    Note:
+        The remote state is synced to a state file kept locally. The state will be locked when in use, and removing the
+        state lock and making changes could result in a state file not consistent with what Matcha expects.
+    """
     remote_state = RemoteStateManager()
     remote_state.unlock()
 
@@ -147,10 +152,10 @@ def provision(
     password: str,
     verbose: Optional[bool] = False,
 ) -> MatchaState:
-    """Provision cloud resources using existing matcha templates.
+    """Provision cloud resources using existing Matcha Terraform templates.
 
-    Provision cloud resources in the location provided. Provide a prefix to differentiate the provisioned resources from
-    other, existing resources, and provide a password. To show more output than the default, set verbose to True.
+    Provision cloud resources in the location provided. Provide a prefix for the Azure group's  name and a password for
+    the provisioned server. To show more output than the default, set verbose to True.
 
     Examples:
         >>> provision(location="ukwest", prefix="myexample", password="example_password", verbose=False)
