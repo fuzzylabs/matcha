@@ -42,7 +42,6 @@ def get(
     if property_name:
         property_name = property_name.lower()
 
-    matcha_state_service = MatchaStateService()
     remote_state = RemoteStateManager()
 
     if not remote_state.is_state_provisioned():
@@ -50,12 +49,11 @@ def get(
             "Error - matcha state has not been initialized, nothing to get."
         )
 
-    if not matcha_state_service.state_exists():
+    if not MatchaStateService.state_exists():
         # if the state file doesn't exist, then download it from the remote
         remote_state.download(os.getcwd())
 
-        # reinitialise to create the necessary variables
-        matcha_state_service = MatchaStateService()
+    matcha_state_service = MatchaStateService()
 
     with remote_state.use_lock():
         local_hash = matcha_state_service.get_hash_local_state()
