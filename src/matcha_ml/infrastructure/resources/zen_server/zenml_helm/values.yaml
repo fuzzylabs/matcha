@@ -82,7 +82,7 @@ zenml:
     # sslKey: /path/to/client-key.pem
     # sslVerifyServerCert: True
 
-  # Secrets store settings. This is used to store centralized secrets.
+  # Secrets store settings. This is used to store centralised secrets.
   secretsStore:
     # Set to false to disable the secrets store.
     enabled: true

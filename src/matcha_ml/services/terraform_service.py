@@ -47,7 +47,7 @@ class TerraformService:
 
     @property
     def terraform_client(self) -> python_terraform.Terraform:
-        """Initialize and/or return the terraform client.
+        """Initialise and/or return the terraform client.
 
         Returns:
             python_terraform.Terraform: The terraform client.

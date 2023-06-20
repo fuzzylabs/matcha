@@ -16,7 +16,7 @@ class RemoteStateRunner(BaseRunner):
             os.getcwd(), ".matcha", "infrastructure", "remote_state_storage"
         ),
     ) -> None:
-        """Initialize a RemoteStateRunner.
+        """Initialise a RemoteStateRunner.
 
         Args:
             working_dir (str): Working directory for terraform.

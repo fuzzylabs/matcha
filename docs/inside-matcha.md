@@ -21,14 +21,14 @@ When `provision` is run by the user, we take their input (the `region` and `pref
 
 After completing the provisioning process on Azure, the output information of the remote state manager is stored in a `matcha.config.json` file in the project root directory. Additionally, information about the provisioned resources, along with the populated Terraform files, is stored in a `matcha.state` file within a `.matcha/infrastructure` directory.
 
-At this point, users have access to the provisioned resources and can utilize them as needed.
+At this point, users have access to the provisioned resources and can utilise them as needed.
 
 To enable multiple users to use the same set of provisioned resources, the user will need to upload the `matcha.config.json` file to the project's GitHub repository. This ensures that everyone has access to the up-to-date information regarding Matcha's current state.
 
 ## `get`
 
 Through `get`, the user can fetch information about their provisioned resources. Matcha `get` interacts with the `matcha.state` file, which is stored locally and in the cloud. The local `matcha.state` file will be synchronised with the cloud file to ensure that changes to the provisioned state are reflected in each user's environment.
-The user can use `get` to request information on specific resourcs or properties by using the built-in arguments, and specify the format in which that information is returned by using the `--output` option. For more details, run `matcha get --help`. This enables the user to configure their workflow, for example, by getting the endpoint for their MLFlow experiment tracker.
+The user can use `get` to request information on specific resources or properties by using the built-in arguments, and specify the format in which that information is returned by using the `--output` option. For more details, run `matcha get --help`. This enables the user to configure their workflow, for example, by getting the endpoint for their MLFlow experiment tracker.
 
 ## `destroy`
 

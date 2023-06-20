@@ -87,7 +87,7 @@ class GlobalParameters:
         """User ID getter.
 
         Returns:
-            str: Unqiue user ID string
+            str: Unique user ID string
         """
         if self._user_id is None:
             self._user_id = str(uuid4())

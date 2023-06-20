@@ -44,7 +44,7 @@ def test_cli_invalid_argument(runner):
     # Invoke invalid option dummy
     result = runner.invoke(app, ["--dummy"])
 
-    # Exit code other than 0 means there was an error in exectuion of program
+    # Exit code other than 0 means there was an error in execution of program
     assert result.exit_code != 0
 
     # Check if error message is present in output

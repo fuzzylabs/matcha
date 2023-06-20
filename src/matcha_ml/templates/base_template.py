@@ -37,7 +37,7 @@ class BaseTemplate:
     allowed_extensions: List[str] = ["tf", "yaml", "tpl"]
 
     def __init__(self, submodule_names: List[str]):
-        """Initialize the class.
+        """Initialise the class.
 
         Args:
             submodule_names (List[str]): A list of submodule names.

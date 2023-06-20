@@ -24,7 +24,7 @@ def get(
         Dict[str, Dict[str, str]]: the information of the provisioned resource.
 
     Raises:
-        MatchaError: Raised when the matcha state has not been initialized
+        MatchaError: Raised when the matcha state has not been initialised
         MatchaError: Raised when the matcha.state file does not exist
         MatchaInputError: Raised when the resource or property name does not exist in the matcha.state file
     """
@@ -33,7 +33,7 @@ def get(
 
     if not remote_state.is_state_provisioned():
         raise MatchaError(
-            "Error - matcha state has not been initialized, nothing to get."
+            "Error - matcha state has not been initialised, nothing to get."
         )
 
     if not matcha_state_service.state_file_exists:

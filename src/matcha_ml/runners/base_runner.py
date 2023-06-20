@@ -21,7 +21,7 @@ class BaseRunner:
     """A BaseRunner class provides methods that interface with the Terraform service to facilitate the provisioning and deprovisioning of resources."""
 
     def __init__(self, working_dir: Optional[str] = None) -> None:
-        """Initialize BaseRunner class.
+        """Initialise BaseRunner class.
 
         Args:
             working_dir (Optional[str]): Working directory for terraform. Defaults to None.

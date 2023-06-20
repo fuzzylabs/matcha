@@ -12,7 +12,7 @@ class RemoteStateTemplate(BaseTemplate):
     """
 
     def __init__(self) -> None:
-        """Initialize the StateStorageTemplate with the submodule names.
+        """Initialise the StateStorageTemplate with the submodule names.
 
         Args:
             submodule_names (List[str]): A list of submodule names.

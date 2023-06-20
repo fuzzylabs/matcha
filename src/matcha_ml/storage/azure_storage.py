@@ -20,7 +20,7 @@ class AzureStorage:
     blob_service_client: BlobServiceClient
 
     def __init__(self, account_name: str, resource_group_name: str) -> None:
-        """Initialize Azure Storage.
+        """Initialise Azure Storage.
 
         Args:
             account_name (str): Azure storage account name

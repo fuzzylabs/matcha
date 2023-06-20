@@ -81,7 +81,7 @@ Next, let's provision:
 matcha provision
 ```
 
-Initially, Matcha will ask you a few questions about how you'd like your infrastructure to be set up. Specifically, it will ask for a _name_ for your infrastructure, a _region_ to deploy it to. Once these details are provided, Matcha will proceed to initialize a remote state manager and ask for a password. After that, it will go ahead of provision infrastructure.
+Initially, Matcha will ask you a few questions about how you'd like your infrastructure to be set up. Specifically, it will ask for a _name_ for your infrastructure, a _region_ to deploy it to. Once these details are provided, Matcha will proceed to initialise a remote state manager and ask for a password. After that, it will go ahead of provision infrastructure.
 
 > Note: provisioning can take up to 20 minutes.
 

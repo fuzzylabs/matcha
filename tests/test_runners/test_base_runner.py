@@ -83,7 +83,7 @@ def test_check_matcha_directory_exists(
 
 
 def test_initialize_terraform(capsys: SysCapture):
-    """Test if service behaves as expected when initializing Terraform.
+    """Test if service behaves as expected when initialising Terraform.
 
     Args:
         capsys (SysCapture): fixture to capture stdout and stderr
