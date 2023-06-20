@@ -97,4 +97,6 @@ It's important to do the following, and the PR template that you'll see will ask
 
 * Make sure your code passes the tests. At the moment, running the whole test suite doesn't take a long time so we advice doing that with `pytest` (see the [DEVELOPMENT](https://github.com/fuzzylabs/matcha/blob/main/DEVELOPMENT.md) guide).
 
+* Your PR will also be checked for spelling errors in the CI by the [`typos`](https://github.com/crate-ci/typos) crate. If a false positive is raised by the checker, consider adding it to the `.typos.toml` file in the root of the project.
+
 * Ensure that your code is documented and commented, and that the documentation renders properly.
