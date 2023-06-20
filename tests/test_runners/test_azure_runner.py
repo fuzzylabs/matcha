@@ -190,6 +190,7 @@ def test_provision(matcha_testing_directory: str, template_runner: AzureRunner):
         matcha_testing_directory (str): Testing directory
         template_runner (AzureRunner): a AzureRunner object instance
     """
+    os.makedirs(matcha_testing_directory, ".matcha", "infrastructure")
     template_runner._check_terraform_installation = MagicMock()
     template_runner._validate_terraform_config = MagicMock()
     template_runner._initialize_terraform = MagicMock()
@@ -201,10 +202,7 @@ def test_provision(matcha_testing_directory: str, template_runner: AzureRunner):
         template_runner._initialize_terraform.assert_not_called()
         template_runner._apply_terraform.assert_not_called()
 
-    with mock.patch("typer.confirm") as mock_confirm, mock.patch(
-        "matcha_ml.state.matcha_state.MATCHA_STATE_PATH"
-    ) as state_path:
-        state_path.return_value = matcha_testing_directory
+    with mock.patch("typer.confirm") as mock_confirm:
         mock_confirm.return_value = True
         template_runner.provision()
         template_runner._initialize_terraform.assert_called()
