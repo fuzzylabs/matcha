@@ -1,4 +1,4 @@
-"""The core functions for matcha."""
+"""The core functionality for Matcha API."""
 import os
 from typing import Optional
 
@@ -20,9 +20,20 @@ def get(
     resource_name: Optional[str],
     property_name: Optional[str],
 ) -> MatchaState:
-    """Return the information of the provisioned resource based on the resource name specified.
+    """Return information regarding a previously provisioned resource based on the resource and property names provided.
 
-    Return all resources if no resource name is specified.
+    The information is returned in the form of a `MatchaState` object containing various `MatchaStateComponent` objects.
+    The `MatchaStateComponent` objects in turn hold `MatchaResource` and `MatchaResourceProperty` components.
+    If no resource name is provided, all resources are returned.
+
+    Examples:
+        >>> get("cloud", "resource-group-name")
+        MatchaState(components=[MatchaStateComponent(resource=MatchaResource(name='cloud'),
+        properties=[MatchaResourceProperty(name='resource-group-name', value='test_resources')])])
+
+        >>> get("experiment-tracker", "flavor")
+        MatchaState(components=[MatchaStateComponent(resource=MatchaResource(name='experiment-tracker'),
+        properties=[MatchaResourceProperty(name='flavor', value='mlflow')])])
 
     Args:
         resource_name (Optional[str]): name of the resource to get information for.
@@ -89,7 +100,11 @@ def get(
 
 @track(event_name=AnalyticsEvent.DESTROY)
 def destroy() -> None:
-    """Destroys provisioned resources in the cloud.
+    """Destroy the provisioned cloud resources.
+
+    Decommission the cloud infrastructure built by Matcha when provision has been called either historically or during
+    this session. After calling destroy, the resources provisioned by matcha should no longer be active on your
+    chosen provider's UI.
 
     Raises:
         Matcha Error: where no state has been provisioned.
@@ -108,17 +123,29 @@ def destroy() -> None:
 
 
 def analytics_opt_out() -> None:
-    """Disable the collection of anonymous usage data."""
+    """Disable the collection of anonymous usage data.
+
+    More information regarding why we collect usage data, and how it is used, can be found
+    [here](https://mymatcha.ai/privacy/).
+    """
     GlobalParameters().analytics_opt_out = True
 
 
 def analytics_opt_in() -> None:
-    """Enable the collection of anonymous usage data (enabled by default)."""
+    """Enable the collection of anonymous usage data (enabled by default).
+
+    More information regarding why we collect usage data, and how it is used, can be found
+    [here](https://mymatcha.ai/privacy/)."""
     GlobalParameters().analytics_opt_out = False
 
 
 def remove_state_lock() -> None:
-    """Unlock remote state."""
+    """Unlock the remote state.
+
+    Note:
+        The remote state is synced to a state file kept locally. The state will be locked when in use, and removing the
+        state lock and making changes could result in a state file not consistent with what Matcha expects.
+    """
     remote_state = RemoteStateManager()
     remote_state.unlock()
 
@@ -130,12 +157,22 @@ def provision(
     password: str,
     verbose: Optional[bool] = False,
 ) -> MatchaState:
-    """Provision cloud resources using templates.
+    """Provision cloud resources using existing Matcha Terraform templates.
+
+    Provision cloud resources in the location provided. Provide a prefix for the Azure group's name and a password for
+    the provisioned server. To show more output than the default, set verbose to True.
+
+    Examples:
+        >>> provision(location="ukwest", prefix="myexample", password="example_password", verbose=False)
+        MatchaState(components=[MatchaStateComponent(resource=MatchaResource(name='cloud'),
+            properties=[MatchaResourceProperty(name='location', value='ukwest'),
+            MatchaResourceProperty(name='prefix', value='test')])])
+
 
     Args:
         location (str): Azure location in which all resources will be provisioned.
         prefix (str): Prefix used for all resources.
-        password (str): Password for ZenServer.
+        password (str): Password for the deployment server.
         verbose (bool optional): additional output is show when True. Defaults to False.
 
     Returns:
