@@ -183,6 +183,70 @@ def test_show_terraform_outputs(
             assert output in captured.out
 
 
+def test_remove_matcha_dir(matcha_testing_directory: str, template_runner: AzureRunner):
+    """Tests service can remove the .matcha directory when required.
+
+    Args:
+        matcha_testing_directory (str): Testing directory
+        template_runner (AzureRunner): a AzureTemplateRunner object instance.
+    """
+    os.chdir(matcha_testing_directory)
+    matcha_dir = os.path.join(matcha_testing_directory, ".matcha")
+    os.mkdir(matcha_dir)
+    os.chdir(matcha_testing_directory)
+    assert os.path.exists(matcha_dir)
+    template_runner.remove_matcha_dir()
+
+    assert not os.path.exists(matcha_dir)
+
+
+def test_is_local_state_stale(
+    matcha_testing_directory: str, template_runner: AzureRunner
+):
+    """Tests service can identify stale local state.
+
+    Args:
+        matcha_testing_directory (str): Testing directory
+        template_runner (AzureRunner): a AzureTemplateRunner object instance.
+    """
+    os.chdir(matcha_testing_directory)
+    local_tfvars_dir = os.path.join(
+        matcha_testing_directory, ".matcha", "infrastructure", "remote_state_storage"
+    )
+    local_tfvars_file = os.path.join(local_tfvars_dir, "terraform.tfvars.json")
+    local_tfvars_data = {"location": "test", "prefix": "test123"}
+
+    local_config_file = os.path.join(matcha_testing_directory, "matcha.config.json")
+    local_config_data = {
+        "remote_state_bucket": {
+            "account_name": "test123statestacc",
+            "container_name": "test123statestore",
+            "resource_group_name": "test123-resources",
+        }
+    }
+    # assert that the local state is not stale while neither file exists
+    assert not template_runner.is_local_state_stale()
+
+    # assert that the local state is not stale while either one of the files exist
+    os.makedirs(local_tfvars_dir)
+    with open(local_tfvars_file, "w") as file:
+        json.dump(local_tfvars_data, file)
+    assert not template_runner.is_local_state_stale()
+
+    # write both files with matching state information and assert local state is not stale
+    with open(local_config_file, "w") as file:
+        json.dump(local_config_data, file)
+
+    assert not template_runner.is_local_state_stale()
+
+    # overwrite local_tfvars_file with mismatching state information and assert local state is stale.
+    local_tfvars_data = {"location": "test", "prefix": "test12"}
+    with open(local_tfvars_file, "w") as file:
+        json.dump(local_tfvars_data, file)
+
+    assert template_runner.is_local_state_stale()
+
+
 def test_provision(matcha_testing_directory: str, template_runner: AzureRunner):
     """Test service can provision resources using terraform.
 
@@ -197,18 +261,14 @@ def test_provision(matcha_testing_directory: str, template_runner: AzureRunner):
     template_runner._apply_terraform = MagicMock()
     template_runner._show_terraform_outputs = MagicMock()
 
-    # Create mock matcha.state file with the required contents
     os.makedirs(os.path.join(matcha_testing_directory, ".matcha", "infrastructure"))
-    with mock.patch("typer.confirm") as mock_confirm:
-        mock_confirm.return_value = False
-        template_runner._initialize_terraform.assert_not_called()
-        template_runner._apply_terraform.assert_not_called()
 
-    with mock.patch("typer.confirm") as mock_confirm:
-        mock_confirm.return_value = True
-        template_runner.provision()
-        template_runner._initialize_terraform.assert_called()
-        template_runner._apply_terraform.assert_called()
+    template_runner._initialize_terraform.assert_not_called()
+    template_runner._apply_terraform.assert_not_called()
+
+    template_runner.provision()
+    template_runner._initialize_terraform.assert_called()
+    template_runner._apply_terraform.assert_called()
 
 
 def test_deprovision(
@@ -230,18 +290,11 @@ def test_deprovision(
     template_runner._destroy_terraform = MagicMock()
     matcha_state_file_dir = MatchaStateService.matcha_state_path
 
-    # Create mock matcha.state file with the required contents
     os.makedirs(os.path.join(matcha_testing_directory, ".matcha", "infrastructure"))
+
     with open(matcha_state_file_dir, "w") as f:
         json.dump(expected_outputs_show_sensitive, f, indent=4)
 
-    with mock.patch("typer.confirm") as mock_confirm:
-        template_runner.state_file = matcha_state_file_dir
-        mock_confirm.return_value = False
-        template_runner._destroy_terraform.assert_not_called()
-
-    with mock.patch("typer.confirm") as mock_confirm:
-        template_runner.state_file = matcha_state_file_dir
-        mock_confirm.return_value = True
-        template_runner.deprovision()
-        template_runner._destroy_terraform.assert_called()
+    template_runner._destroy_terraform.assert_not_called()
+    template_runner.deprovision()
+    template_runner._destroy_terraform.assert_called()

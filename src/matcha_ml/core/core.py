@@ -163,7 +163,6 @@ def provision(
             )
         remote_state_manager.remove_matcha_config()
         template_runner.remove_matcha_dir()
-        # add test for matcha_dir == matcha.config.json
 
     if remote_state_manager.is_state_provisioned():
         raise MatchaError(
@@ -182,8 +181,6 @@ def provision(
     remote_state_manager.provision_remote_state(location, prefix)
 
     with remote_state_manager.use_lock(), remote_state_manager.use_remote_state():
-        # create a runner for provisioning resource with Terraform service.
-
         project_directory = os.getcwd()
         destination = os.path.join(
             project_directory, ".matcha", "infrastructure", "resources"
