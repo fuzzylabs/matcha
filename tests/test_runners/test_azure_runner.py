@@ -190,7 +190,8 @@ def test_provision(matcha_testing_directory: str, template_runner: AzureRunner):
         matcha_testing_directory (str): Testing directory
         template_runner (AzureRunner): a AzureRunner object instance
     """
-    os.makedirs(matcha_testing_directory, ".matcha", "infrastructure")
+    # Create mock matcha.state file with the required contents
+    os.makedirs(os.path.join(matcha_testing_directory, ".matcha", "infrastructure"))
     template_runner._check_terraform_installation = MagicMock()
     template_runner._validate_terraform_config = MagicMock()
     template_runner._initialize_terraform = MagicMock()
