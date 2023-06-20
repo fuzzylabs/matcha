@@ -190,11 +190,10 @@ def test_remove_matcha_dir(matcha_testing_directory: str, template_runner: Azure
         matcha_testing_directory (str): Testing directory
         template_runner (AzureRunner): a AzureTemplateRunner object instance.
     """
-    os.chdir(matcha_testing_directory)
     matcha_dir = os.path.join(matcha_testing_directory, ".matcha")
     os.mkdir(matcha_dir)
-    os.chdir(matcha_testing_directory)
     assert os.path.exists(matcha_dir)
+    os.chdir(matcha_testing_directory)
     template_runner.remove_matcha_dir()
 
     assert not os.path.exists(matcha_dir)
