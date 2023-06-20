@@ -1,0 +1,13 @@
+[files]
+# extend-exclude = ["*.json", "*.js", "*.ipynb",]
+# extend-ignore = ["*.json", "*.js", "*.ipynb",]
+
+[default.extend-identifiers]
+
+
+
+[default.extend-words]
+aks = "aks"
+
+[default]
+locale = "en-uk"
