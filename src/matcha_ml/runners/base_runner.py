@@ -95,7 +95,7 @@ class BaseRunner:
                 )
             )
 
-            with Spinner("Initializing"):
+            with Spinner("Initialising"):
                 ret_code, _, err = self.tfs.init()
 
                 if ret_code != 0:

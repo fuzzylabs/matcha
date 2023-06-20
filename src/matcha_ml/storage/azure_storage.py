@@ -215,7 +215,7 @@ class AzureStorage:
         return remote_hash
 
     def _sync_remote(self, container_name: str, blob_set: Set[str]) -> None:
-        """Synchronizes the remote storage with the local files.
+        """Synchronises the remote storage with the local files.
 
         It ignores uploading files in `.matcha` folder that are ignored in `IGNORED_FOLDERS`.
 
@@ -233,7 +233,7 @@ class AzureStorage:
             container_client.delete_blob(blob)
 
     def _sync_local(self, dest_folder_path: str) -> None:
-        """Synchronizes the local .matcha folder with the remote storage files.
+        """Synchronises the local .matcha folder with the remote storage files.
 
         It ignores deleting files in `.matcha` folder that are not present in remote storage.
 
