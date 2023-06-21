@@ -54,7 +54,6 @@ def get(
         property_name = property_name.lower()
 
     remote_state = RemoteStateManager()
-    matcha_state_service = MatchaStateService()
 
     if not remote_state.is_state_provisioned():
         raise MatchaError(
@@ -62,6 +61,7 @@ def get(
         )
 
     if not MatchaStateService.state_exists():
+        print("here")
         # if the state file doesn't exist, then download it from the remote
         remote_state.download(os.getcwd())
 
@@ -136,7 +136,8 @@ def analytics_opt_in() -> None:
     """Enable the collection of anonymous usage data (enabled by default).
 
     More information regarding why we collect usage data, and how it is used, can be found
-    [here](https://mymatcha.ai/privacy/)."""
+    [here](https://mymatcha.ai/privacy/).
+    """
     GlobalParameters().analytics_opt_out = False
 
 
