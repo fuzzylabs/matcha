@@ -61,7 +61,6 @@ def get(
         )
 
     if not MatchaStateService.state_exists():
-        print("here")
         # if the state file doesn't exist, then download it from the remote
         remote_state.download(os.getcwd())
 
