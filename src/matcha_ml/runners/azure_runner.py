@@ -1,4 +1,6 @@
 """Run terraform templates to provision and deprovision resources."""
+import os
+import shutil
 
 from matcha_ml.cli.ui.print_messages import (
     print_json,
@@ -41,6 +43,13 @@ class AzureRunner(BaseRunner):
         resources_dict = hide_sensitive_in_output(matcha_state.to_dict())
         resources_json = dict_to_json(resources_dict)
         print_json(resources_json)
+
+    def remove_matcha_dir(self) -> None:
+        """Removes the project's .matcha directory"."""
+        project_directory = os.getcwd()
+        target = os.path.join(project_directory, ".matcha")
+        if os.path.exists(target):
+            shutil.rmtree(target)
 
     def provision(self) -> None:
         """Provision resources required for the deployment."""

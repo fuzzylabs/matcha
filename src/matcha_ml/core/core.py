@@ -135,7 +135,8 @@ def analytics_opt_in() -> None:
     """Enable the collection of anonymous usage data (enabled by default).
 
     More information regarding why we collect usage data, and how it is used, can be found
-    [here](https://mymatcha.ai/privacy/)."""
+    [here](https://mymatcha.ai/privacy/).
+    """
     GlobalParameters().analytics_opt_out = False
 
 
@@ -184,6 +185,12 @@ def provision(
         MatchaError: If region is not valid.
     """
     remote_state_manager = RemoteStateManager()
+    template_runner = AzureRunner()
+
+    if MatchaStateService.state_exists():
+        matcha_state_service = MatchaStateService()
+        if matcha_state_service.is_local_state_stale():
+            template_runner.remove_matcha_dir()
 
     if remote_state_manager.is_state_stale():
         if verbose:
@@ -193,6 +200,7 @@ def provision(
                 )
             )
         remote_state_manager.remove_matcha_config()
+        template_runner.remove_matcha_dir()
 
     if remote_state_manager.is_state_provisioned():
         raise MatchaError(
@@ -211,9 +219,6 @@ def provision(
     remote_state_manager.provision_remote_state(location, prefix)
 
     with remote_state_manager.use_lock(), remote_state_manager.use_remote_state():
-        # create a runner for provisioning resource with Terraform service.
-        template_runner = AzureRunner()
-
         project_directory = os.getcwd()
         destination = os.path.join(
             project_directory, ".matcha", "infrastructure", "resources"

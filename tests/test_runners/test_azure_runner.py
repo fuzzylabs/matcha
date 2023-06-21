@@ -183,6 +183,46 @@ def test_show_terraform_outputs(
             assert output in captured.out
 
 
+def test_remove_matcha_dir(matcha_testing_directory: str, template_runner: AzureRunner):
+    """Tests service can remove the .matcha directory when required.
+
+    Args:
+        matcha_testing_directory (str): Testing directory
+        template_runner (AzureRunner): a AzureTemplateRunner object instance.
+    """
+    matcha_dir = os.path.join(matcha_testing_directory, ".matcha")
+    os.mkdir(matcha_dir)
+    assert os.path.exists(matcha_dir)
+    os.chdir(matcha_testing_directory)
+    template_runner.remove_matcha_dir()
+
+    assert not os.path.exists(matcha_dir)
+
+
+def test_provision(matcha_testing_directory: str, template_runner: AzureRunner):
+    """Test service can provision resources using terraform.
+
+    Args:
+        matcha_testing_directory (str): Testing directory
+        template_runner (AzureRunner): a AzureRunner object instance
+    """
+    os.chdir(matcha_testing_directory)
+    template_runner._check_terraform_installation = MagicMock()
+    template_runner._validate_terraform_config = MagicMock()
+    template_runner._initialize_terraform = MagicMock()
+    template_runner._apply_terraform = MagicMock()
+    template_runner._show_terraform_outputs = MagicMock()
+
+    os.makedirs(os.path.join(matcha_testing_directory, ".matcha", "infrastructure"))
+
+    template_runner._initialize_terraform.assert_not_called()
+    template_runner._apply_terraform.assert_not_called()
+
+    template_runner.provision()
+    template_runner._initialize_terraform.assert_called()
+    template_runner._apply_terraform.assert_called()
+
+
 def test_deprovision(
     template_runner: AzureRunner,
     matcha_testing_directory: str,
@@ -202,18 +242,11 @@ def test_deprovision(
     template_runner._destroy_terraform = MagicMock()
     matcha_state_file_dir = MatchaStateService.matcha_state_path
 
-    # Create mock matcha.state file with the required contents
     os.makedirs(os.path.join(matcha_testing_directory, ".matcha", "infrastructure"))
+
     with open(matcha_state_file_dir, "w") as f:
         json.dump(expected_outputs_show_sensitive, f, indent=4)
 
-    with mock.patch("typer.confirm") as mock_confirm:
-        template_runner.state_file = matcha_state_file_dir
-        mock_confirm.return_value = False
-        template_runner._destroy_terraform.assert_not_called()
-
-    with mock.patch("typer.confirm") as mock_confirm:
-        template_runner.state_file = matcha_state_file_dir
-        mock_confirm.return_value = True
-        template_runner.deprovision()
-        template_runner._destroy_terraform.assert_called()
+    template_runner._destroy_terraform.assert_not_called()
+    template_runner.deprovision()
+    template_runner._destroy_terraform.assert_called()
