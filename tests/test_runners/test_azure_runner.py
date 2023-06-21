@@ -199,53 +199,6 @@ def test_remove_matcha_dir(matcha_testing_directory: str, template_runner: Azure
     assert not os.path.exists(matcha_dir)
 
 
-def test_is_local_state_stale(
-    matcha_testing_directory: str, template_runner: AzureRunner
-):
-    """Tests service can identify stale local state.
-
-    Args:
-        matcha_testing_directory (str): Testing directory
-        template_runner (AzureRunner): a AzureTemplateRunner object instance.
-    """
-    os.chdir(matcha_testing_directory)
-    local_tfvars_dir = os.path.join(
-        matcha_testing_directory, ".matcha", "infrastructure", "remote_state_storage"
-    )
-    local_tfvars_file = os.path.join(local_tfvars_dir, "terraform.tfvars.json")
-    local_tfvars_data = {"location": "test", "prefix": "test123"}
-
-    local_config_file = os.path.join(matcha_testing_directory, "matcha.config.json")
-    local_config_data = {
-        "remote_state_bucket": {
-            "account_name": "test123statestacc",
-            "container_name": "test123statestore",
-            "resource_group_name": "test123-resources",
-        }
-    }
-    # assert that the local state is not stale while neither file exists
-    assert not template_runner.is_local_state_stale()
-
-    # assert that the local state is not stale while either one of the files exist
-    os.makedirs(local_tfvars_dir)
-    with open(local_tfvars_file, "w") as file:
-        json.dump(local_tfvars_data, file)
-    assert not template_runner.is_local_state_stale()
-
-    # write both files with matching state information and assert local state is not stale
-    with open(local_config_file, "w") as file:
-        json.dump(local_config_data, file)
-
-    assert not template_runner.is_local_state_stale()
-
-    # overwrite local_tfvars_file with mismatching state information and assert local state is stale.
-    local_tfvars_data = {"location": "test", "prefix": "test12"}
-    with open(local_tfvars_file, "w") as file:
-        json.dump(local_tfvars_data, file)
-
-    assert template_runner.is_local_state_stale()
-
-
 def test_provision(matcha_testing_directory: str, template_runner: AzureRunner):
     """Test service can provision resources using terraform.
 

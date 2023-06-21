@@ -3,6 +3,7 @@ import json
 import os
 from pathlib import Path
 from typing import Any
+from unittest import mock
 
 import pytest
 
@@ -525,3 +526,68 @@ def test_matcha_state_service_raises_error_when_initialised_with_both_arguments(
         _ = MatchaStateService(
             matcha_state=matcha_state_object, terraform_output=terraform_client_output
         )
+
+
+def test_is_local_state_stale(matcha_testing_directory: str):
+    """Tests service can identify stale local state.
+
+    Args:
+        matcha_testing_directory (str): Testing directory
+    """
+    os.chdir(matcha_testing_directory)
+
+    # create the local state dir, filepath and file
+    local_state_dir = os.path.join(
+        matcha_testing_directory, ".matcha", "infrastructure"
+    )
+    local_state_file = os.path.join(local_state_dir, "matcha.state")
+    local_state_data = {
+        "cloud": {
+            "flavor": "azure",
+            "location": "uksouth",
+            "prefix": "test123",
+            "resource-group-name": "test123-resources",
+        }
+    }
+
+    os.makedirs(local_state_dir)
+    with open(local_state_file, "w") as file:
+        json.dump(local_state_data, file)
+
+    # mock the MatchaStateService
+    with mock.patch(
+        "matcha_ml.state.matcha_state.MATCHA_STATE_PATH"
+    ) as matcha_state_path:
+        matcha_state_path.return_value = local_state_file
+        matcha_state_service = MatchaStateService()
+
+    # assert that the local state is not stale while only the local state file exists
+    assert not matcha_state_service.is_local_state_stale()
+
+    # create the local config filepath and file
+    local_config_file = os.path.join(matcha_testing_directory, "matcha.config.json")
+    local_config_data = {
+        "remote_state_bucket": {
+            "account_name": "test123statestacc",
+            "container_name": "test123statestore",
+            "resource_group_name": "test123-resources",
+        }
+    }
+    with open(local_config_file, "w") as file:
+        json.dump(local_config_data, file)
+
+    # assert that the local state is not stale when both files exist and are congruous
+    assert not matcha_state_service.is_local_state_stale()
+
+    # overwrite local_config_file with mismatching state information and assert local state is stale.
+    local_config_data = {
+        "remote_state_bucket": {
+            "account_name": "test12statestacc",
+            "container_name": "test12statestore",
+            "resource_group_name": "test12-resources",
+        }
+    }
+    with open(local_config_file, "w") as file:
+        json.dump(local_config_data, file)
+
+    assert matcha_state_service.is_local_state_stale()

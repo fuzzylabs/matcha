@@ -223,7 +223,7 @@ class MatchaStateService:
                 resource_name,
             ) = _parse_terraform_output_resource_name(output_name)
             state_outputs[resource_type].setdefault("flavor", flavor)
-            state_outputs[resource_type][resource_name] = properties["value"]
+            state_outputs[resource_type][resource_name] = properties["value"]  # type: ignore
 
         # Create a unique matcha state identifier
         state_outputs["id"] = {"matcha_uuid": str(uuid.uuid4())}
@@ -254,6 +254,26 @@ class MatchaStateService:
         with open(self.matcha_state_path) as in_file:
             self._state = MatchaState.from_dict(json.load(in_file))
         return self._state
+
+    def is_local_state_stale(self) -> bool:
+        """Checks for congruence between the local config file and the local state file."""
+        local_config_file = os.path.join(os.getcwd(), "matcha.config.json")
+
+        # the resource group name from the state object
+        matcha_state_resource_group = (
+            self.get_component("cloud").find_property("resource-group-name").value
+        )
+
+        if self.state_exists() and os.path.exists(local_config_file):
+            with open(local_config_file) as config:
+                local_config = json.load(config)
+
+            return bool(
+                matcha_state_resource_group
+                != local_config["remote_state_bucket"]["resource_group_name"]
+            )
+        else:
+            return False
 
     def fetch_resources_from_state_file(
         self,

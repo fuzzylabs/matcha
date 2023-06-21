@@ -42,8 +42,8 @@ def get(
     if property_name:
         property_name = property_name.lower()
 
-    matcha_state_service = MatchaStateService()
     remote_state = RemoteStateManager()
+    matcha_state_service = MatchaStateService()
 
     if not remote_state.is_state_provisioned():
         raise MatchaError(
@@ -151,8 +151,10 @@ def provision(
     remote_state_manager = RemoteStateManager()
     template_runner = AzureRunner()
 
-    if template_runner.is_local_state_stale():
-        template_runner.remove_matcha_dir()
+    if MatchaStateService.state_exists():
+        matcha_state_service = MatchaStateService()
+        if matcha_state_service.is_local_state_stale():
+            template_runner.remove_matcha_dir()
 
     if remote_state_manager.is_state_stale():
         if verbose:
