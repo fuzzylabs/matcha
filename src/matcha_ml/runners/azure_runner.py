@@ -81,9 +81,9 @@ class AzureRunner(BaseRunner):
             )
             raise MatchaInputError()
 
-        flavour_and_resource_name = output_name[len(resource_type) + 1 :]
+        flavor_and_resource_name = output_name[len(resource_type) + 1 :]
 
-        flavor, resource_name = flavour_and_resource_name.split("_", maxsplit=1)
+        flavor, resource_name = flavor_and_resource_name.split("_", maxsplit=1)
         resource_name = resource_name.replace("_", "-")
         resource_type = resource_type.replace("_", "-")
 
@@ -106,7 +106,9 @@ class AzureRunner(BaseRunner):
 
         self._update_state_file(state_outputs)
 
-    def _update_state_file(self, state_outputs: Dict[str, Dict[str, str]]) -> None:
+    def _update_state_file(
+        self, state_outputs: Dict[str, Dict[str, str]]
+    ) -> None:
         """Read and update the matcha state file with new provisioned resources.
 
         Args:
@@ -118,7 +120,9 @@ class AzureRunner(BaseRunner):
     def _show_terraform_outputs(self) -> None:
         """Print the terraform outputs from state file."""
         self._write_outputs_state()
-        print_status(build_status("Here are the endpoints for what's been provisioned"))
+        print_status(
+            build_status("Here are the endpoints for what's been provisioned")
+        )
         # print terraform output from state file
         with open(self.state_file) as fp:
             resources_dict = hide_sensitive_in_output(json.loads(fp.read()))

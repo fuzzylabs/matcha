@@ -439,9 +439,9 @@ def test_use_remote_state():
     remote_state_manager = RemoteStateManager()
     with patch.object(remote_state_manager, "upload") as mocked_upload, patch.object(
         remote_state_manager, "download"
-    ) as mocked_downlaod:
+    ) as mocked_download:
         with remote_state_manager.use_remote_state():
-            mocked_downlaod.assert_called_once_with(os.getcwd())
+            mocked_download.assert_called_once_with(os.getcwd())
         mocked_upload.assert_called_once_with(os.path.join(".matcha", "infrastructure"))
 
 

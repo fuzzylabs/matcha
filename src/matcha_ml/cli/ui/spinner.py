@@ -17,7 +17,7 @@ class Spinner:
     progress: Progress
 
     def __init__(self, status: str):
-        """Initialise a spinner using Progress.
+        """Initialize a spinner using Progress.
 
         Args:
             status (str): task description

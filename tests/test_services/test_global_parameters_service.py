@@ -106,7 +106,7 @@ def test_opt_out(config_path):
     """Tests that the opt out function changes the class variables and the global config file.
 
     Args:
-        config_path (str): Mock testing directory location for the Global Parameteres file to be located
+        config_path (str): Mock testing directory location for the Global Parameters file to be located
     """
     with mock.patch(
         f"{INTERNAL_FUNCTION_STUB}.default_config_file_path",

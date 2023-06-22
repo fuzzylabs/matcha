@@ -57,7 +57,7 @@ class RemoteStateManager:
     config_path: str
 
     def __init__(self, config_path: Optional[str] = None) -> None:
-        """Initialise Remote State Manager.
+        """Initialize Remote State Manager.
 
         Args:
             config_path (Optional[str]): optional configuration file path
