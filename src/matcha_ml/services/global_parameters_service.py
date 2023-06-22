@@ -23,7 +23,7 @@ class GlobalParameters:
         """Creates a singleton instance of the GlobalParameters class.
 
         Returns:
-            GlobalParameters: Already existing initialised object, otherwise a new singleton object
+            GlobalParameters: Already existing initialized object, otherwise a new singleton object
         """
         if cls._instance is None:
             cls._instance = super().__new__(cls)

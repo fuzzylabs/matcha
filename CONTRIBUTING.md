@@ -93,7 +93,7 @@ Before a PR can be merged, two core developers need to approve it. It may be the
 
 It's important to do the following, and the PR template that you'll see will ask you explicitly:
 
-* Give your pull request a helpful title which summarises what your contribution does.
+* Give your pull request a helpful title which summarizes what your contribution does.
 
 * Make sure your code passes the tests. At the moment, running the whole test suite doesn't take a long time so we advice doing that with `pytest` (see the [DEVELOPMENT](https://github.com/fuzzylabs/matcha/blob/main/DEVELOPMENT.md) guide).
 

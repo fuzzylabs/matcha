@@ -37,7 +37,7 @@ class AzureRunner(BaseRunner):
     """A Runner class provides methods that interface with the Terraform service to facilitate the provisioning and deprovisioning of resources."""
 
     def __init__(self) -> None:
-        """Initialise AzureRunner class."""
+        """Initialize AzureRunner class."""
         super().__init__()
 
     def is_approved(self, verb: str, resources: List[Tuple[str, str]]) -> bool:
@@ -81,11 +81,9 @@ class AzureRunner(BaseRunner):
             )
             raise MatchaInputError()
 
-        flavour_and_resource_name = output_name[len(resource_type) + 1 :]
+        flavor_and_resource_name = output_name[len(resource_type) + 1 :]
 
-        flavor, resource_name = flavour_and_resource_name.split(
-            "_", maxsplit=1
-        )
+        flavor, resource_name = flavor_and_resource_name.split("_", maxsplit=1)
         resource_name = resource_name.replace("_", "-")
         resource_type = resource_type.replace("_", "-")
 

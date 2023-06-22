@@ -100,7 +100,7 @@ The module is not intended to be run on its own, but by the matcha CLI tool. How
 
 Pre-requisite: [Terraform](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli#install-terraform)
 
-Initialise terraform module:
+Initialize terraform module:
 
 ```bash
 cd src/matcha_ml/infrastructure

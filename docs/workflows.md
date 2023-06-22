@@ -9,4 +9,4 @@ Before you dive into the example workflows, you'll need to ensure that you have 
 The repository currently contains the following examples:
 
 1. [Movie Recommendation](https://github.com/fuzzylabs/matcha-examples/tree/main/recommendation).
-2. [Legal text summarisation using LLMs](https://github.com/fuzzylabs/matcha-examples/tree/main/llm).
+2. [Legal text summarization using LLMs](https://github.com/fuzzylabs/matcha-examples/tree/main/llm).

@@ -16,7 +16,7 @@ class RemoteStateRunner(BaseRunner):
             os.getcwd(), ".matcha", "infrastructure", "remote_state_storage"
         ),
     ) -> None:
-        """Initialise a RemoteStateRunner.
+        """Initialize a RemoteStateRunner.
 
         Args:
             working_dir (str): Working directory for terraform.
@@ -38,7 +38,9 @@ class RemoteStateRunner(BaseRunner):
 
         prefix = "remote_state_storage"
         account_name = tf_outputs[f"{prefix}_account_name"]["value"]
-        resource_group_name = tf_outputs[f"{prefix}_resource_group_name"]["value"]
+        resource_group_name = tf_outputs[f"{prefix}_resource_group_name"][
+            "value"
+        ]
         container_name = tf_outputs[f"{prefix}_container_name"]["value"]
 
         return account_name, container_name, resource_group_name

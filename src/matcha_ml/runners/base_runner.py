@@ -21,7 +21,7 @@ class BaseRunner:
     """A BaseRunner class provides methods that interface with the Terraform service to facilitate the provisioning and deprovisioning of resources."""
 
     def __init__(self, working_dir: Optional[str] = None) -> None:
-        """Initialise BaseRunner class.
+        """Initialize BaseRunner class.
 
         Args:
             working_dir (Optional[str]): Working directory for terraform. Defaults to None.
@@ -95,7 +95,7 @@ class BaseRunner:
                 )
             )
 
-            with Spinner("Initialising"):
+            with Spinner("Initializing"):
                 ret_code, _, err = self.tfs.init()
 
                 if ret_code != 0:
