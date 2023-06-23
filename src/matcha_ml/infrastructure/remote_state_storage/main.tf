@@ -12,7 +12,7 @@ module "resource_group" {
 module "state_storage" {
   source = "./state_storage"
 
-  # otehrwise the module will be created before resource group is ready
+  # otherwise the module will be created before resource group is ready
   depends_on = [module.resource_group]
 
   resource_group_name = module.resource_group.name

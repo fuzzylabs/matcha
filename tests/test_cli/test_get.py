@@ -468,5 +468,5 @@ def test_get_cli_hash_mismatch(
 
     assert result.exit_code == 0
 
-    # Check if remote state mananger trigger download function once upon hash mismatch
+    # Check if remote state manager trigger download function once upon hash mismatch
     mock_provisioned_remote_state.download.assert_called_once()

@@ -32,7 +32,7 @@ def build_resource_confirmation(
 def build_status(status: str) -> str:
     """Build information status message.
 
-    Use white colour for formatting
+    Use white color for formatting
 
     Args:
         status: status message
@@ -46,7 +46,7 @@ def build_status(status: str) -> str:
 def build_step_success_status(status: str) -> str:
     """Build step success status message.
 
-    Use green colour and bold font for formatting
+    Use green color and bold font for formatting
 
     Args:
         status: status message
@@ -60,7 +60,7 @@ def build_step_success_status(status: str) -> str:
 def build_substep_success_status(status: str) -> str:
     """Build sub-step success status message.
 
-    Use green colour for formatting
+    Use green color for formatting
 
     Args:
         status: status message
@@ -74,7 +74,7 @@ def build_substep_success_status(status: str) -> str:
 def build_warning_status(status: str) -> str:
     """Build warning status message.
 
-    Use yellow colour for formatting
+    Use yellow color for formatting
 
     Args:
         status: status message

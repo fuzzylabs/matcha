@@ -48,7 +48,8 @@ class TerraformService:
         """
         if self._terraform_client is None:
             self._terraform_client = python_terraform.Terraform(
-                working_dir=self.config.working_dir, var_file=self.config.var_file
+                working_dir=self.config.working_dir,
+                var_file=self.config.var_file,
             )
         return self._terraform_client
 
@@ -65,7 +66,9 @@ class TerraformService:
 
         return True
 
-    def verify_kubectl_config_file(self, config_path: str = ".kube/config") -> None:
+    def verify_kubectl_config_file(
+        self, config_path: str = ".kube/config"
+    ) -> None:
         """Checks if kubeconfig is present at location ~/.kube/config.
 
         Args:
@@ -120,7 +123,7 @@ class TerraformService:
         return Path(os.path.join(self.config.working_dir, ".terraform"))
 
     def init(self) -> Tuple[int, str, str]:
-        """Run `terraform init` with the initialised Terraform client from the python_terraform module.
+        """Run `terraform init` with the initialized Terraform client from the python_terraform module.
 
         Returns:
             Tuple[int, str, str]: return code of Terraform, standard output and standard error.
@@ -133,7 +136,7 @@ class TerraformService:
         return ret_code, out, err
 
     def apply(self) -> Tuple[int, str, str]:
-        """Run `terraform apply` with the initialised Terraform client from the python_terraform module.
+        """Run `terraform apply` with the initialized Terraform client from the python_terraform module.
 
         Returns:
             Tuple[int, str, str]: return code of Terraform, standard output and standard error.
@@ -150,7 +153,7 @@ class TerraformService:
         return ret_code, out, err
 
     def destroy(self) -> Tuple[int, str, str]:
-        """Destroy the provisioned resources with the initialised Terraform client from the python_terraform module..
+        """Destroy the provisioned resources with the initialized Terraform client from the python_terraform module..
 
         Returns:
             Tuple[int, str, str]: return code of terraform, standard output and standard error.

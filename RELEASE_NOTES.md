@@ -22,7 +22,7 @@ How this works under the hood has been described in detail [here](https://mymatc
 
 We want to make a tool that is both useful and usable. To achieve this, it's important that we understand how the tool is being used by the community.
 
-By collecting fully anonymised usage data, i.e., logging a command being run, it'll enable us to accelerate development and demonstrate value both for us and potential partners.
+By collecting fully anonymized usage data, i.e., logging a command being run, it'll enable us to accelerate development and demonstrate value both for us and potential partners.
 
 This version implements that functionality.
 

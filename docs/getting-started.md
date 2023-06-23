@@ -7,6 +7,7 @@ There are five things we'll cover:
 * [Pre-requisites](#pre-requisites): everything you need to set up before starting.
 * [The movie recommender](#the-movie-recommender): downloading the example code and setting up your Python environment
 * [Provisioning](#provisioning): Using Matcha to provision your infrastructure
+* [Sharing Resources](#sharing-resources): Sharing resources with other people
 * [Training and deploying](#training-and-deploying): training a model on your provisioned infrastructure, deploying, and testing it
 * [Destroying](#destroying): tearing down provisioned infrastructure
 
@@ -144,6 +145,26 @@ Experiment tracker
 
 By default, Matcha will hide sensitive resource properties. If you need one of these properties, then you can add the `--show-sensitive` flag to your `get` command.
 
+# &#129309; Sharing resources
+
+You'll notice that a configuration file is create as part of the provisioning process - it's called `matcha.config.json`. This file stores the information necessary for Matcha to identify the resource group and storage container that holds the details of the provisioned resources.
+
+When Matcha provision first runs, it creates a storage blob in Azure which holds details of the provisioned environment. For more detail, please see our [Inside Matcha > How does Matcha work](inside-matcha.md) section.
+
+In order to access your provisioned resources, other users will need to ensure this configuration file exists locally, in the same directory where the file was originally created. We suggest that the matcha.config.json file be included within the project repository and shared using GitHub or similar repository hosting tools. The user will also have to:
+
+1. Set the active Azure subscription to the one that contains the resource group.
+2. Ensure they have access to both the resource group and the storage bucket.
+
+> Note: the shared file does not contain any sensitive information such as passwords or server endpoints.
+
+Matcha uses this file to find and pull the provisioned state information, which will allow multiple users to use the same provisioned resources.
+
+<div align="center">
+    <img src="/img/getting-started/shared-state.png" width="400"></img>
+</div>
+
+
 # Training and deploying
 
 Now that you've reached this point, you'll have provisioned the following infrastructure into Azure:
@@ -203,18 +224,12 @@ python inference.py --user 100 --movie 100
 
 This will result in a score, which represents how strongly we recommend movie ID `100` to user ID `100`.
 
-# Destroying
+## Destroying
 
 The final thing you'll want to do is decommission the infrastructure that Matcha has set up during this guide. Matcha includes a `destroy` command which will remove everything that has been provisioned, which avoids running up an Azure bill!
-
-To destroy the provisioned resources only, run:
 
 ```bash
 matcha destroy
 ```
 
-To destroy both the provisioned resources and remote state management, run:
-
-```bash
-matcha destroy full
-```
+> Note that this command is irreversible will remove all the resources deployed by `matcha provision` including the resource group, so make sure you save any data you wish to keep before running this command.

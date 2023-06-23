@@ -6,7 +6,7 @@ class MatchaError(Exception):
     """Matcha generic Error."""
 
     def __init__(self, message: str, *args: Any, **kwargs: Any):
-        """Initialise Matcha Error.
+        """Initialize Matcha Error.
 
         Args:
             message: the error message to propagate to the user
@@ -23,7 +23,7 @@ class MatchaPermissionError(MatchaError):
     """
 
     def __init__(self, message: str, *args: Any, **kwargs: Any):
-        """Initialise Matcha Permission Error.
+        """Initialize Matcha Permission Error.
 
         Args:
             message: the error message to propagate to the user
@@ -40,7 +40,7 @@ class MatchaAuthenticationError(MatchaError):
     """
 
     def __init__(self, auth_error: str, *args: Any, **kwargs: Any):
-        """The initialiser for the Authentication error.
+        """The initializer for the Authentication error.
 
         Args:
             auth_error (str): the error to propagate to the user.
@@ -58,7 +58,7 @@ class MatchaInputError(MatchaError):
     """
 
     def __init__(self, *args: Any, **kwargs: Any):
-        """The initialiser for Input error.
+        """The initializer for Input error.
 
         Args:
             *args: additional arguments to pass to the Exception base class.
@@ -74,12 +74,14 @@ class MatchaTerraformError(MatchaError):
     """
 
     def __init__(self, tf_error: str, *args: Any, **kwargs: Any):
-        """Initialise Matcha Terraform Error.
+        """Initialize Matcha Terraform Error.
 
         Args:
             tf_error: terraform error
             *args: args
             **kwargs: kwargs
         """
-        message = f"Terraform failed because of the following error: '{tf_error}'."
+        message = (
+            f"Terraform failed because of the following error: '{tf_error}'."
+        )
         super().__init__(message, *args, **kwargs)

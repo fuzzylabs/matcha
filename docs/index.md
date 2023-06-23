@@ -6,7 +6,7 @@ If you train machine learning models, then you know the challenge of going from 
 
 ![Animation of Matcha provision](img/matcha-provision.gif)
 
-Under the hood, Matcha leverages a number of other open souce tools: we use MLFlow to track experiments, Seldon to serve models, ZenML for orchestration, and Kubernetes for model training workloads, as well as for hosting everything else. Matcha's job is to bring together the best MLOps tooling, and set them up for you, so you can focus on training models.
+Under the hood, Matcha leverages a number of other open source tools: we use MLFlow to track experiments, Seldon to serve models, ZenML for orchestration, and Kubernetes for model training workloads, as well as for hosting everything else. Matcha's job is to bring together the best MLOps tooling, and set them up for you, so you can focus on training models.
 
 Along with setting up your infrastructure, Matcha comes with a set of well-engineered examples, covering common machine learning use-cases. These examples will help you make the most out of Matcha.
 
@@ -28,7 +28,7 @@ These days there are lots of MLOps platforms and tools to choose from, and you m
 
 To begin with, it's important to say that Matcha isn't a _platform_, so it's not directly comparable to something like the Azure Machine Learning Platform, or Amazon Sagemaker. Platforms try to offer an all-in-one solution, but we see two problems with platforms: firstly, you're locked in to a particular vendor, and secondly they suffer from being a _jack of all trades, master of none_.
 
-Open source is the solution. In designing Matcha, we've hand-picked existing tools that each do _one thing well_. Matcha's job is to deploy and manage those tools on your behalf, but there's nothing proprietory in how we do that, so you'll never be locked in.
+Open source is the solution. In designing Matcha, we've hand-picked existing tools that each do _one thing well_. Matcha's job is to deploy and manage those tools on your behalf, but there's nothing proprietary in how we do that, so you'll never be locked in.
 
 # The Matcha roadmap
 

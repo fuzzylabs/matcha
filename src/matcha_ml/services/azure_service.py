@@ -50,7 +50,7 @@ class AzureClient:
 
         Raises:
             MatchaAuthenticationError: when the Azure CLI is unable to be invoked.
-            MatchaAuthenticationError: when no access token is recieved.
+            MatchaAuthenticationError: when no access token is received.
 
         Returns:
             bool: True if the checks pass, an error is raised otherwise.
