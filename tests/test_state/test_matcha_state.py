@@ -99,7 +99,7 @@ def test_state_service_initialization(
 
 
 def test_state_service_initialization_no_state_file(mock_state_file: Path):
-    """Test that object initalisation raises an error when the state file does not exist.
+    """Test that object initialization raises an error when the state file does not exist.
 
     Args:
         mock_state_file (Path): a mocked state file in the test directory
