@@ -136,7 +136,7 @@ class MatchaStateService:
 
         Args:
             matcha_state (Optional[MatchaState]): MatchaState object to initialize the service with. Defaults to None.
-            terraform_output (Optional[dict]): Output from Terraform to be parsed into a MatchaState object on intialization. Defaults to None.
+            terraform_output (Optional[dict]): Output from Terraform to be parsed into a MatchaState object on initialization. Defaults to None.
 
         Raises:
             MatchaError: if the state file does not exist.
