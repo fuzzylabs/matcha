@@ -83,10 +83,10 @@ def assert_object(obj: Any, expected_type: Any) -> None:
     assert isinstance(obj, expected_type)
 
 
-def test_state_service_initialisation(
+def test_state_service_initialization(
     mock_state_file: Path, state_file_as_object: MatchaState
 ):
-    """Test that object initialisation works as expected when a state file exists.
+    """Test that object initialization works as expected when a state file exists.
 
     Args:
         mock_state_file (Path): a mocked state file in the test directory
@@ -98,7 +98,7 @@ def test_state_service_initialisation(
     assert service._state == state_file_as_object
 
 
-def test_state_service_initialisation_no_state_file(mock_state_file: Path):
+def test_state_service_initialization_no_state_file(mock_state_file: Path):
     """Test that object initalisation raises an error when the state file does not exist.
 
     Args:
@@ -453,10 +453,10 @@ def test_matcha_state_build_state_from_terraform_output(
     assert matcha_state_service._state == state_file_as_object
 
 
-def test_matcha_state_service_initialise_with_matcha_state(
+def test_matcha_state_service_initialize_with_matcha_state(
     state_file_as_object: MatchaState, matcha_testing_directory: str
 ):
-    """Test that a matcha.state file is created correctly when initialising MatchaStateService with a MatchaState object.
+    """Test that a matcha.state file is created correctly when initializing MatchaStateService with a MatchaState object.
 
     Args:
         state_file_as_object (MatchaState): the state as a MatchaState object.
@@ -500,10 +500,10 @@ def test_write_state(
     assert state_file_dict.get("new-resource") == {"new-property": "new-property-value"}
 
 
-def test_matcha_state_service_raises_error_when_initialised_with_both_arguments(
+def test_matcha_state_service_raises_error_when_initialized_with_both_arguments(
     matcha_testing_directory: str,
 ):
-    """Test MatchaStateService raises a MatchaError when initialised with both matcha_state and terraform_output.
+    """Test MatchaStateService raises a MatchaError when initialize with both matcha_state and terraform_output.
 
     Args:
         matcha_testing_directory (str): Mock testing directory.

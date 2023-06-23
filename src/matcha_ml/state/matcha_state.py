@@ -132,15 +132,15 @@ class MatchaStateService:
     ) -> None:
         """Constructor for the MatchaStateService.
 
-        Note: this object should not be initialised with both 'matcha_state' and 'terraform_output' arguments.
+        Note: this object should not be initialized with both 'matcha_state' and 'terraform_output' arguments.
 
         Args:
-            matcha_state (Optional[MatchaState]): MatchaState object to initialise the service with. Defaults to None.
+            matcha_state (Optional[MatchaState]): MatchaState object to initialize the service with. Defaults to None.
             terraform_output (Optional[dict]): Output from Terraform to be parsed into a MatchaState object on intialisation. Defaults to None.
 
         Raises:
             MatchaError: if the state file does not exist.
-            MatchaError: if MatchaStateService is initialised with both 'matcha_state' and 'terraform_output' arguments.
+            MatchaError: if MatchaStateService is initialize with both 'matcha_state' and 'terraform_output' arguments.
         """
         if matcha_state is not None and terraform_output is not None:
             raise MatchaError(
