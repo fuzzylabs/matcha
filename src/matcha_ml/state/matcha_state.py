@@ -206,9 +206,9 @@ class MatchaStateService:
                     "A valid resource type for the output '{output_name}' does not exist."
                 )
 
-            flavour_and_resource_name = output_name[len(resource_type) + 1 :]
+            flavor_and_resource_name = output_name[len(resource_type) + 1 :]
 
-            flavor, resource_name = flavour_and_resource_name.split("_", maxsplit=1)
+            flavor, resource_name = flavor_and_resource_name.split("_", maxsplit=1)
             resource_name = resource_name.replace("_", "-")
             resource_type = resource_type.replace("_", "-")
 

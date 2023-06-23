@@ -39,7 +39,7 @@ def mocked_global_parameters_service(matcha_testing_directory, uuid_for_testing)
         yield GlobalParameters()
 
 
-def test_segment_track_recieves_the_correct_arguments(
+def test_segment_track_receives_the_correct_arguments(
     runner,
     matcha_testing_directory,
     mocked_segment_track_decorator,

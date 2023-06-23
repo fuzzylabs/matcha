@@ -13,7 +13,7 @@ from segment import analytics
 from matcha_ml.errors import MatchaError
 from matcha_ml.services._validation import _check_uuid
 from matcha_ml.services.global_parameters_service import GlobalParameters
-from matcha_ml.state import MatchaStateService, MatchaState
+from matcha_ml.state import MatchaState, MatchaStateService
 
 analytics.write_key = "qwBKAvY6MEUvv5XIs4rE07ohf5neT3sx"
 
@@ -26,11 +26,14 @@ class AnalyticsEvent(str, Enum):
     GET = "get"
 
 
-def execute_analytics_event(func: Callable, *args, **kwargs) -> Tuple[Optional[MatchaState], Any]:
+def execute_analytics_event(
+    func: Callable, *args, **kwargs
+) -> Tuple[Optional[MatchaState], Any]:
     """Exists to Temporarily fix misleading error messages coming from track decorator.
 
     Args:
         func (Callable): The function decorated by track.
+
     Returns:
         The result of the call to func, the error code.
     """
@@ -70,7 +73,7 @@ def track(event_name: AnalyticsEvent) -> Callable[..., Any]:
             global_params = GlobalParameters()
             result, error_code, te, ts = None, None, None, None
             if event_name.value not in {event.value for event in AnalyticsEvent}:
-                warn("Event not recognised by analytics service.")
+                warn("Event not recognized by analytics service.")
 
             if not global_params.analytics_opt_out:
                 if event_name.value in [event_name.PROVISION, event_name.GET]:
