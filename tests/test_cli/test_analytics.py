@@ -5,7 +5,7 @@ from typer.testing import CliRunner
 
 from matcha_ml.cli.cli import app
 
-INTERNAL_FUNCTION_STUB = "matcha_ml.core.core"
+INTERNAL_FUNCTION_STUB = "matcha_ml.core"
 
 
 def test_cli_analytics_command_help_option(runner: CliRunner) -> None:

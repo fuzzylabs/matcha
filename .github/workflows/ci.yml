@@ -6,10 +6,12 @@ on:
     branches:
       - main
       - develop
+      - '**feature**'
   push:
     branches:
       - main
       - develop
+      - '**feature**'
 
 jobs:
   ci-tests:

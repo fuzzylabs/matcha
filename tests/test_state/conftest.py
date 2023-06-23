@@ -3,7 +3,7 @@ from unittest.mock import patch
 
 import pytest
 
-from matcha_ml.runners import RemoteStateRunner
+from matcha_ml.runners.remote_state_runner import RemoteStateRunner
 
 INTERNAL_FUNCTION_STUB = "matcha_ml.state.remote_state_manager.RemoteStateRunner"
 

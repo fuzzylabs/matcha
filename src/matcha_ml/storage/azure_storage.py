@@ -3,7 +3,7 @@ import glob
 import hashlib
 import os
 import tempfile
-from typing import Set
+from typing import Optional, Set
 
 from azure.storage.blob import BlobClient, BlobServiceClient, ContainerClient
 
@@ -18,6 +18,8 @@ class AzureStorage:
 
     az_client: AzureClient
     blob_service_client: BlobServiceClient
+    account_name: Optional[str] = None
+    resource_group_name: Optional[str] = None
 
     def __init__(self, account_name: str, resource_group_name: str) -> None:
         """Initialize Azure Storage.
@@ -26,6 +28,8 @@ class AzureStorage:
             account_name (str): Azure storage account name
             resource_group_name (str): Name of resource group containing given account name
         """
+        self.account_name = account_name
+        self.resource_group_name = resource_group_name
         self.az_client = AzureClient()
         self.resource_group_exists = self.az_client.resource_group_exists(
             resource_group_name
