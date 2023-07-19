@@ -71,6 +71,8 @@ mypy = "^1.1.1"
 mkdocs-glightbox = "^0.3.4"
 pymdown-extensions = "10.0"
 mkdocs-material = "^9.1.12"
+mkdocstrings = "0.22.0"
+mkdocstrings-python = "1.1.2"
 
 [build-system]
 requires = ["poetry-core"]
@@ -151,3 +153,7 @@ module = [
     "segment.*"
 ]
 ignore_missing_imports = true
+
+[tool.ruff.pylint]
+max-branches = 13
+max-args = 6
