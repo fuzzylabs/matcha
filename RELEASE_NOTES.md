@@ -4,7 +4,7 @@
 
 We've been quietly working away on Matcha and we've re-engineered the core of Matcha to support programmatically deploying infrastructure to Azure.
 
-While you'll still be able to use your favourite commands on the CLI (`matcha get experiment-tracker`), you can now incorporate Matcha into your Python workflows:
+While you'll still be able to use your favorite commands on the CLI (`matcha get experiment-tracker`), you can now incorporate Matcha into your Python workflows:
 
 ```python
 experiment_tracker = matcha.get('experiment-tracker')
