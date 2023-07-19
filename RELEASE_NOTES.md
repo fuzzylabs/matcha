@@ -1,3 +1,26 @@
+# v0.2.6
+
+# 🔌 Matcha as an API!
+
+We've been quietly working away on Matcha and we've re-engineered the core of Matcha to support programmatically deploying infrastructure to Azure.
+
+While you'll still be able to use your favourite commands on the CLI (`matcha get experiment-tracker`), you can now incorporate Matcha into your Python workflows:
+
+```python
+experiment_tracker = matcha.get('experiment-tracker')
+```
+
+This means that you can stand-up, link tools to their infrastructure, and tear-down resources in a couple of lines of Python code.
+
+See our [new reference documentation](https://mymatcha.ai//references/) to get started!
+
+We're also pleased that as part of this release, we had our first external PR from [Alex](https://github.com/strickvl), a friend of ours over at [ZenML](zenml.io) https://github.com/fuzzylabs/matcha/pull/161.
+
+Date: 19th July 2023
+
+See all changes here: https://github.com/fuzzylabs/matcha/compare/v0.2.5...v0.2.6
+
+---
 # v0.2.5
 
 # &#129309; Matcha goes multi-user!
@@ -30,18 +53,21 @@ We've explained what we're collecting and why in our documentation - see [here](
 
 See all changes here: https://github.com/fuzzylabs/matcha/compare/v0.2.4...v0.2.5
 
+---
 # 0.2.4
 
 &#128293; This version contains a hot fix for matcha get command, so it does not throw an error when run without arguments.
 
 See all changes here: [v0.2.3...v0.2.4](https://github.com/fuzzylabs/matcha/compare/v0.2.3...v0.2.4)
 
+---
 # 0.2.3
 
 &#128293; This version contains a quick fix for an import error caused by an old version of `urllib3`
 
 See all changes here: [v0.2.2...v0.2.3](https://github.com/fuzzylabs/matcha/compare/v0.2.2...v0.2.3)
 
+---
 # 0.2.2
 
 This release includes documentation changes and bug fixes (detailed below) prior to the public announcement.
@@ -66,6 +92,7 @@ Date: 16th May 2023
 
 See all changes here: [v0.2.1...v0.2.2](https://github.com/fuzzylabs/matcha/compare/v0.2.1...v0.2.2)
 
+---
 # 0.2.1
 
 In this release, we introduce `matcha` to the world - an open source tool for provisioning MLOps environments to the cloud.
