@@ -10,9 +10,9 @@ As a provisioning tool, Matcha interacts with Azure on your behalf, hiding away 
 
 ## What permissions does Matcha require?
 
-In its current form, **either** the following Azure permissions are required:
+Your account is required to have **either**:
 
-1. Owner
+1. Owner; _OR_ 
 2. A combination of: Contributor + User Access Administrator
 
 > Note: These are high level roles with a lot of privileges and we're actively working on introducing more granular permissions.
