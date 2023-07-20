@@ -117,7 +117,9 @@ def destroy() -> None:
         )
 
     template_runner = AzureRunner()
-    with remote_state_manager.use_lock(), remote_state_manager.use_remote_state():
+    with remote_state_manager.use_lock(
+        destroy=True
+    ), remote_state_manager.use_remote_state(destroy=True):
         template_runner.deprovision()
         remote_state_manager.deprovision_remote_state()
 
