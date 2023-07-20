@@ -424,6 +424,37 @@ def test_use_lock(
     assert mock_azure_storage_instance.delete_blob.call_count == 1
 
 
+def test_use_lock_on_destroy_command(
+    valid_config_testing_directory: str, mock_azure_storage_instance: MagicMock
+):
+    """Test use_lock context manager when destroy is True.
+
+    Args:
+        valid_config_testing_directory (str): temporary working directory path, with valid config file
+        mock_azure_storage_instance (MagicMock): mock of AzureStorage instance
+    """
+    os.chdir(valid_config_testing_directory)
+
+    mock_azure_storage_instance.blob_exists.return_value = False
+
+    remote_state = RemoteStateManager()
+    with remote_state.use_lock(destroy=True):
+        # Test that the state was locked
+        mock_azure_storage_instance.create_empty.assert_called_with(
+            container_name="test-container", blob_name=LOCK_FILE_NAME
+        )
+        assert mock_azure_storage_instance.create_empty.call_count == 1
+        mock_azure_storage_instance.blob_exists.assert_not_called()
+        mock_azure_storage_instance.delete_blob.assert_not_called()
+
+        # Set azure storage mock into a locked state
+        mock_azure_storage_instance.blob_exists.return_value = True
+
+    # Test that the state was not unlocked
+    mock_azure_storage_instance.blob_exists.assert_not_called()
+    mock_azure_storage_instance.delete_blob.assert_not_called()
+
+
 def test_use_remote_state():
     """Test use_remote_state context manager."""
     remote_state_manager = RemoteStateManager()
@@ -433,6 +464,17 @@ def test_use_remote_state():
         with remote_state_manager.use_remote_state():
             mocked_download.assert_called_once_with(os.getcwd())
         mocked_upload.assert_called_once_with(os.path.join(".matcha", "infrastructure"))
+
+
+def test_use_remote_state_on_destroy():
+    """Test use_remote_state context manager and assert upload is not called when destroy is True."""
+    remote_state_manager = RemoteStateManager()
+    with patch.object(remote_state_manager, "upload") as mocked_upload, patch.object(
+        remote_state_manager, "download"
+    ) as mocked_download:
+        with remote_state_manager.use_remote_state(destroy=True):
+            mocked_download.assert_called_once_with(os.getcwd())
+        mocked_upload.assert_not_called()
 
 
 def test_is_state_provisioned_returns_false_when_resource_group_does_not_exist(
