@@ -297,6 +297,9 @@ class RemoteStateManager:
 
         Downloads the state before executing the code.
         Upload the state when context is finished.
+
+        Args:
+            destroy (bool): Flag for whether the command being run is 'destroy' or not.
         """
         self.download(os.getcwd())
 
@@ -337,7 +340,11 @@ class RemoteStateManager:
 
     @contextlib.contextmanager
     def use_lock(self, destroy: bool = False) -> Iterator[None]:
-        """Context manager to lock state."""
+        """Context manager to lock state.
+
+        Args:
+            destroy (bool): Flag for whether the command being run is 'destroy' or not.
+        """
         self.lock()
         try:
             yield
