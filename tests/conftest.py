@@ -98,7 +98,7 @@ def mocked_segment_track_decorator():
         MagicMock: Mocked segment track function.
     """
     with patch(
-        "matcha_ml.services.analytics_service.analytics.track"
+        "matcha_ml.services.analytics_service.analytics.Client.track"
     ) as track_analytics:
         track_analytics.return_value = None
 

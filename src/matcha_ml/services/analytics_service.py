@@ -3,6 +3,7 @@
 This approach to collecting usage data was inspired by ZenML; source: https://github.com/zenml-io/zenml/blob/main/src/zenml/utils/analytics_utils.py
 """
 import functools
+import logging
 from enum import Enum
 from time import perf_counter
 from typing import Any, Callable, Optional, Tuple
@@ -15,7 +16,10 @@ from matcha_ml.services._validation import _check_uuid
 from matcha_ml.services.global_parameters_service import GlobalParameters
 from matcha_ml.state import MatchaState, MatchaStateService
 
-analytics.write_key = "qwBKAvY6MEUvv5XIs4rE07ohf5neT3sx"
+WRITE_KEY = "qwBKAvY6MEUvv5XIs4rE07ohf5neT3sx"
+
+# Suppress Segment warnings
+logging.getLogger("segment").setLevel(logging.FATAL)
 
 
 class AnalyticsEvent(str, Enum):
@@ -57,6 +61,9 @@ def track(event_name: AnalyticsEvent) -> Callable[..., Any]:
 
         Args:
             func (Callable[..., Any]): The function that is being decorated
+
+        Returns:
+            Callable[..., Any]: The function that is being decorated
         """
 
         @functools.wraps(func)
@@ -110,7 +117,9 @@ def track(event_name: AnalyticsEvent) -> Callable[..., Any]:
                     result, error_code = execute_analytics_event(func, *args, **kwargs)
                     te = perf_counter()
 
-                analytics.track(
+                client = analytics.Client(WRITE_KEY, max_retries=1, debug=False)
+
+                client.track(
                     global_params.user_id,
                     event_name.value,
                     {
