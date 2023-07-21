@@ -22,3 +22,8 @@ output "cloud_azure_location"{
   description = "The Azure location in which the resources are provisioned" 
   value = var.location
 }
+
+output "cloud_azure_resource_group_name" {
+  description = "Name of the Azure resource group"
+  value = module.resource_group.name
+}
