@@ -1,4 +1,5 @@
 """Run terraform templates to provision and deprovision resources."""
+import multiprocessing
 import os
 from typing import Optional, Tuple
 
@@ -10,9 +11,12 @@ from matcha_ml.cli.ui.spinner import Spinner
 from matcha_ml.cli.ui.status_message_builders import (
     build_status,
     build_substep_success_status,
+    terraform_status_update
 )
 from matcha_ml.errors import MatchaTerraformError
-from matcha_ml.services.terraform_service import TerraformConfig, TerraformService
+from matcha_ml.services.terraform_service import TerraformConfig, TerraformService, TerraformResult
+
+from multiprocessing.pool import ThreadPool, ApplyResult
 
 SPINNER = "dots"
 
@@ -95,11 +99,11 @@ class BaseRunner:
             )
 
             with Spinner("Initializing"):
-                ret_code, _, err = self.tfs.init()
+                tf_result = self.tfs.init()
 
-                if ret_code != 0:
+                if tf_result.return_code != 0:
                     print_error("The command 'terraform init' failed.")
-                    raise MatchaTerraformError(tf_error=err)
+                    raise MatchaTerraformError(tf_error=tf_result.std_err)
 
             print_status(
                 build_substep_success_status(
@@ -132,11 +136,16 @@ class BaseRunner:
         Raises:
             MatchaTerraformError: if 'terraform apply' failed.
         """
-        with Spinner("Applying"):
-            ret_code, _, err = self.tfs.apply()
+        with Spinner("Applying") as spinner:
+            pool = ThreadPool(processes=1)
+            _ = pool.apply_async(terraform_status_update, (spinner,))
 
-            if ret_code != 0:
-                raise MatchaTerraformError(tf_error=err)
+            tf_result = self.tfs.apply()
+
+            pool.terminate()
+
+            if tf_result.return_code != 0:
+                raise MatchaTerraformError(tf_error=tf_result.std_err)
         print_status(
             build_substep_success_status(
                 f"{Emojis.CHECKMARK.value} Matcha resources have been provisioned!\n"
@@ -156,10 +165,10 @@ class BaseRunner:
         )
         print()
         with Spinner("Destroying"):
-            ret_code, _, err = self.tfs.destroy()
+            tf_result = self.tfs.destroy()
 
-            if ret_code != 0:
-                raise MatchaTerraformError(tf_error=err)
+            if tf_result.return_code != 0:
+                raise MatchaTerraformError(tf_error=tf_result.std_err)
 
     def provision(self) -> Optional[Tuple[str, str, str]]:
         """Provision resources required for the deployment."""

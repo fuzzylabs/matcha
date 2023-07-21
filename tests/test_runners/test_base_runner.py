@@ -9,6 +9,7 @@ from _pytest.capture import SysCapture
 
 from matcha_ml.errors import MatchaTerraformError
 from matcha_ml.runners.base_runner import BaseRunner
+from matcha_ml.services.terraform_service import TerraformResult
 
 CLASS_STUB = "matcha_ml.runners.base_runner.BaseRunner"
 
@@ -101,7 +102,7 @@ def test_initialize_terraform(capsys: SysCapture):
         assert expected in captured.out
 
     with mock.patch.object(template_runner.tf_state_dir, "exists", return_value=False):
-        template_runner.tfs.init = MagicMock(return_value=(0, "", ""))
+        template_runner.tfs.init = MagicMock(return_value=TerraformResult(0, "", ""))
         expected = " initialized!"
         template_runner._initialize_terraform()
 
@@ -117,7 +118,7 @@ def test_apply_terraform(capsys: SysCapture):
         capsys (SysCapture): fixture to capture stdout and stderr
     """
     template_runner = BaseRunner()
-    template_runner.tfs.apply = MagicMock(return_value=(0, "", ""))
+    template_runner.tfs.apply = MagicMock(return_value=TerraformResult(0, "", ""))
     expected = "Matcha resources have been provisioned!"
 
     template_runner._apply_terraform()
@@ -125,7 +126,7 @@ def test_apply_terraform(capsys: SysCapture):
 
     assert expected in captured.out
 
-    template_runner.tfs.apply = MagicMock(return_value=(1, "", "Apply failed"))
+    template_runner.tfs.apply = MagicMock(return_value=TerraformResult(1, "", "Apply failed"))
 
     with pytest.raises(MatchaTerraformError) as exc_info:
         template_runner._apply_terraform()
@@ -143,7 +144,7 @@ def test_destroy_terraform(capsys: SysCapture):
         template_runner (AzureTemplateRunner): a AzureTemplateRunner object instance
     """
     template_runner = BaseRunner()
-    template_runner.tfs.destroy = MagicMock(return_value=(0, "", ""))
+    template_runner.tfs.destroy = MagicMock(return_value=TerraformResult(0, "", ""))
 
     expected = "Destroying your resources"
 
@@ -155,7 +156,7 @@ def test_destroy_terraform(capsys: SysCapture):
 
     assert expected in captured.out
 
-    template_runner.tfs.destroy = MagicMock(return_value=(1, "", "Init failed"))
+    template_runner.tfs.destroy = MagicMock(return_value=TerraformResult(1, "", "Init failed"))
 
     with pytest.raises(MatchaTerraformError) as exc_info:
         template_runner._destroy_terraform()

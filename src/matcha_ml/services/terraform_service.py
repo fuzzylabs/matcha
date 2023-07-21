@@ -2,11 +2,18 @@
 import dataclasses
 import glob
 import os
+import time
 from pathlib import Path
 from typing import Optional, Tuple
 
+
 import python_terraform
 
+@dataclasses.dataclass
+class TerraformResult:
+    return_code: int
+    std_out: str
+    std_err: str
 
 @dataclasses.dataclass
 class TerraformConfig:
@@ -122,7 +129,7 @@ class TerraformService:
         """
         return Path(os.path.join(self.config.working_dir, ".terraform"))
 
-    def init(self) -> Tuple[int, str, str]:
+    def init(self) -> TerraformResult:
         """Run `terraform init` with the initialized Terraform client from the python_terraform module.
 
         Returns:
@@ -133,9 +140,9 @@ class TerraformService:
             raise_on_error=False,
         )
 
-        return ret_code, out, err
+        return TerraformResult(ret_code, out, err)
 
-    def apply(self) -> Tuple[int, str, str]:
+    def apply(self) -> TerraformResult:
         """Run `terraform apply` with the initialized Terraform client from the python_terraform module.
 
         Returns:
@@ -150,9 +157,9 @@ class TerraformService:
             auto_approve=True,
         )
 
-        return ret_code, out, err
+        return TerraformResult(ret_code, out, err)
 
-    def destroy(self) -> Tuple[int, str, str]:
+    def destroy(self) -> TerraformResult:
         """Destroy the provisioned resources with the initialized Terraform client from the python_terraform module..
 
         Returns:
@@ -166,4 +173,4 @@ class TerraformService:
             auto_approve=True,
         )
 
-        return ret_code, out, err
+        return TerraformResult(ret_code, out, err)

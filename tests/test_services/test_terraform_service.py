@@ -6,7 +6,7 @@ from unittest.mock import MagicMock
 import pytest
 from python_terraform import TerraformCommandError
 
-from matcha_ml.services.terraform_service import TerraformConfig, TerraformService
+from matcha_ml.services.terraform_service import TerraformConfig, TerraformService, TerraformResult
 
 
 @pytest.fixture
@@ -218,7 +218,7 @@ def test_init(terraform_test_config: TerraformConfig):
 
     tfs.terraform_client.init = MagicMock(return_value=(0, "", ""))
 
-    _, _, _ = tfs.init()
+    _ = tfs.init()
 
     tfs.terraform_client.init.assert_called()
 
@@ -233,7 +233,7 @@ def test_apply(terraform_test_config: TerraformConfig):
 
     tfs.terraform_client.apply = MagicMock(return_value=(0, "", ""))
 
-    _, _, _ = tfs.apply()
+    _ = tfs.apply()
 
     tfs.terraform_client.apply.assert_called()
 
@@ -248,6 +248,6 @@ def test_destroy(terraform_test_config: TerraformConfig):
 
     tfs.terraform_client.destroy = MagicMock(return_value=(0, "", ""))
 
-    _, _, _ = tfs.destroy()
+    _ = tfs.destroy()
 
     tfs.terraform_client.destroy.assert_called()

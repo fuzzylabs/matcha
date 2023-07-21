@@ -1,10 +1,13 @@
 """UI status message builders."""
+import time
 from typing import List, Optional, Tuple
 
 from rich.console import Console
+from matcha_ml.cli.ui.spinner import Spinner
+from matcha_ml.cli.constants import INFRA_FACTS
+from random import shuffle
 
 err_console = Console(stderr=True)
-
 
 def build_resource_confirmation(
     header: str, resources: List[Tuple[str, str]], footer: Optional[str] = None
@@ -83,3 +86,20 @@ def build_warning_status(status: str) -> str:
         str: formatted message
     """
     return f"[yellow]{status}[/yellow]"
+
+
+def terraform_status_update(spinner: Spinner) -> None:
+    """Outputs some facts about the deployment and matcha tea while the terraform functions are running.
+
+    Args:
+        spinner: The rich spinner that the messages are printed above.
+    """
+    infra_facts_shuffled = list(range(len(INFRA_FACTS)))
+    shuffle(infra_facts_shuffled)
+
+    time.sleep(10)  # there should be a delay prior to spitting facts.
+
+    while True:
+        fact = INFRA_FACTS[infra_facts_shuffled.pop()]
+        spinner.progress.console.print(build_status(fact))
+        time.sleep(60)
