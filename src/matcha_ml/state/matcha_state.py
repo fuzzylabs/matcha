@@ -140,7 +140,7 @@ class MatchaStateService:
 
         Raises:
             MatchaError: if the state file does not exist.
-            MatchaError: if MatchaStateService is initialize with both 'matcha_state' and 'terraform_output' arguments.
+            MatchaError: if MatchaStateService is initialized with both 'matcha_state' and 'terraform_output' arguments.
         """
         if matcha_state is not None and terraform_output is not None:
             raise MatchaError(

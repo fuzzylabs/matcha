@@ -53,6 +53,7 @@ class AzureTemplate(BaseTemplate):
         # Add matcha.state file one directory above the template
         config_dict = vars(config)
         _ = config_dict.pop("password", None)
+        config_dict["resource-group-name"] = f"{config_dict['prefix']}-resources"
         initial_state_file_dict = {"cloud": config_dict}
         matcha_state = MatchaState.from_dict(initial_state_file_dict)
         MatchaStateService(matcha_state=matcha_state)
