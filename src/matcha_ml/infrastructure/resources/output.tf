@@ -14,10 +14,6 @@ output "pipeline_zenml_storage_path" {
   value       = module.zenml_storage.zenml_blobstorage_container_path
 }
 
-output "data_version_control_storage_path" {
-  description = "The Azure Blob Storage Container path for data version control"
-  value = module.data_version_control_storage.blobstorage_container_path
-}
 
 output "pipeline_zenml_connection_string" {
   description = "The primary connection string for the ZenML Azure Storage Account"
