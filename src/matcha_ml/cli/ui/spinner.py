@@ -30,8 +30,12 @@ class Spinner:
         )
         self.progress.add_task(description=status, total=None)
 
-    def __enter__(self):
-        """Call when a spinner object is created using a `with` statement."""
+    def __enter__(self):  # type: ignore
+        """Call when a spinner object is created using a `with` statement.
+
+        Returns:
+            Spinner: the instance for a context manager.
+        """
         self.progress.start()
         return self
 

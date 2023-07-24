@@ -29,5 +29,5 @@ INFRA_FACTS = [
     "Seldon Core is used for model deployment",
     "MLflow is used as an experiment tracker",
     "Matcha is maintained by Fuzzy Labs",
-    "Everything being provisioned is fully open source"
+    "Everything being provisioned is fully open source",
 ]

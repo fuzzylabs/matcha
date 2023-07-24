@@ -126,7 +126,9 @@ def test_apply_terraform(capsys: SysCapture):
 
     assert expected in captured.out
 
-    template_runner.tfs.apply = MagicMock(return_value=TerraformResult(1, "", "Apply failed"))
+    template_runner.tfs.apply = MagicMock(
+        return_value=TerraformResult(1, "", "Apply failed")
+    )
 
     with pytest.raises(MatchaTerraformError) as exc_info:
         template_runner._apply_terraform()
@@ -156,7 +158,9 @@ def test_destroy_terraform(capsys: SysCapture):
 
     assert expected in captured.out
 
-    template_runner.tfs.destroy = MagicMock(return_value=TerraformResult(1, "", "Init failed"))
+    template_runner.tfs.destroy = MagicMock(
+        return_value=TerraformResult(1, "", "Init failed")
+    )
 
     with pytest.raises(MatchaTerraformError) as exc_info:
         template_runner._destroy_terraform()

@@ -1,6 +1,6 @@
 """Run terraform templates to provision and deprovision resources."""
-import multiprocessing
 import os
+from multiprocessing.pool import ThreadPool
 from typing import Optional, Tuple
 
 import typer
@@ -11,12 +11,13 @@ from matcha_ml.cli.ui.spinner import Spinner
 from matcha_ml.cli.ui.status_message_builders import (
     build_status,
     build_substep_success_status,
-    terraform_status_update
+    terraform_status_update,
 )
 from matcha_ml.errors import MatchaTerraformError
-from matcha_ml.services.terraform_service import TerraformConfig, TerraformService, TerraformResult
-
-from multiprocessing.pool import ThreadPool, ApplyResult
+from matcha_ml.services.terraform_service import (
+    TerraformConfig,
+    TerraformService,
+)
 
 SPINNER = "dots"
 

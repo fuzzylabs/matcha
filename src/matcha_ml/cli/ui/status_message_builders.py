@@ -1,13 +1,15 @@
 """UI status message builders."""
 import time
+from random import shuffle
 from typing import List, Optional, Tuple
 
 from rich.console import Console
-from matcha_ml.cli.ui.spinner import Spinner
+
 from matcha_ml.cli.constants import INFRA_FACTS
-from random import shuffle
+from matcha_ml.cli.ui.spinner import Spinner
 
 err_console = Console(stderr=True)
+
 
 def build_resource_confirmation(
     header: str, resources: List[Tuple[str, str]], footer: Optional[str] = None

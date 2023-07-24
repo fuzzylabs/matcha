@@ -6,7 +6,10 @@ from unittest.mock import MagicMock
 import pytest
 from python_terraform import TerraformCommandError
 
-from matcha_ml.services.terraform_service import TerraformConfig, TerraformService, TerraformResult
+from matcha_ml.services.terraform_service import (
+    TerraformConfig,
+    TerraformService,
+)
 
 
 @pytest.fixture

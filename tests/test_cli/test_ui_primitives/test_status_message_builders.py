@@ -7,7 +7,7 @@ from matcha_ml.cli.ui.status_message_builders import (
     build_resource_confirmation,
     build_status,
     build_step_success_status,
-    build_substep_success_status
+    build_substep_success_status,
 )
 
 

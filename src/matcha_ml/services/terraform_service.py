@@ -2,18 +2,20 @@
 import dataclasses
 import glob
 import os
-import time
 from pathlib import Path
-from typing import Optional, Tuple
-
+from typing import Optional
 
 import python_terraform
 
+
 @dataclasses.dataclass
 class TerraformResult:
+    """A class to hold the result of the terraform commands."""
+
     return_code: int
     std_out: str
     std_err: str
+
 
 @dataclasses.dataclass
 class TerraformConfig:
@@ -73,9 +75,7 @@ class TerraformService:
 
         return True
 
-    def verify_kubectl_config_file(
-        self, config_path: str = ".kube/config"
-    ) -> None:
+    def verify_kubectl_config_file(self, config_path: str = ".kube/config") -> None:
         """Checks if kubeconfig is present at location ~/.kube/config.
 
         Args:
