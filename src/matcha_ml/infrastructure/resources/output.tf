@@ -14,6 +14,7 @@ output "pipeline_zenml_storage_path" {
   value       = module.zenml_storage.zenml_blobstorage_container_path
 }
 
+
 output "pipeline_zenml_connection_string" {
   description = "The primary connection string for the ZenML Azure Storage Account"
   value       = module.zenml_storage.zenml_primary_connection_string
