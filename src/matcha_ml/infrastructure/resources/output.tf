@@ -80,6 +80,7 @@ output "cloud_azure_location"{
 output "data_version_control_primary_connection_string"{
   description = "The primary connection string for the ZenML Azure Storage Account"
   value = module.data_version_control_storage.primary_connection_string
+  sensitive = true
 }
 
 output "data_version_control_storage_container_name"{
