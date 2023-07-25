@@ -23,7 +23,7 @@ STATE_RESOURCE_MSG = [
 
 INFRA_FACTS = [
     "Did you know that Matcha tea was created by accident?",
-    "The brewing temperature of the affects the taste of Matcha",
+    "The brewing temperature of the water affects the taste of Matcha",
     "Samurai's drank Matcha before battles",
     "Matcha is provisioning Kubernetes which orchestrates tools",
     "Seldon Core is used for model deployment",

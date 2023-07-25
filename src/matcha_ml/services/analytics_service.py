@@ -27,14 +27,14 @@ class AnalyticsEvent(str, Enum):
 
 
 def execute_analytics_event(
-    func: Callable, *args: dict, **kwargs: dict  # type: ignore
+    func: Callable[..., Any], *args: Any, **kwargs: Any
 ) -> Tuple[Optional[MatchaState], Any]:
     """Exists to Temporarily fix misleading error messages coming from track decorator.
 
     Args:
         func (Callable): The function decorated by track.
-        *args (dict): arguments passed to the function.
-        **kwargs (dict): additional key word arguments passed to the function.
+        *args (Any): arguments passed to the function.
+        **kwargs (Any): additional key word arguments passed to the function.
 
     Returns:
         The result of the call to func, the error code.

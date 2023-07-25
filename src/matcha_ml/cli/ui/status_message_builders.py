@@ -104,4 +104,4 @@ def terraform_status_update(spinner: Spinner) -> None:
     while True:
         fact = INFRA_FACTS[infra_facts_shuffled.pop()]
         spinner.progress.console.print(build_status(fact))
-        time.sleep(60)
+        time.sleep(10)
