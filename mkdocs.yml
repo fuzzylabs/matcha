@@ -10,6 +10,7 @@ nav:
     - Deploying your first model: 'getting-started.md'
   - Concepts:
     - Workflows: 'workflows.md'
+    - Data Version Control: 'data_version_control.md'
     - Azure Permissions: 'azure-permissions.md'
     - Azure Costs: 'costings.md'
   - Inside Matcha:
