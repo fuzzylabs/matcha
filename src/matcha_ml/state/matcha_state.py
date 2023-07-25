@@ -21,6 +21,7 @@ RESOURCE_NAMES = [
     "cloud",
     "container_registry",
     "model_deployer",
+    "data_version_control",
 ]
 
 
@@ -203,7 +204,7 @@ class MatchaStateService:
 
             if resource_type is None:
                 raise MatchaInputError(
-                    "A valid resource type for the output '{output_name}' does not exist."
+                    f"A valid resource type for the output '{output_name}' does not exist."
                 )
 
             flavor_and_resource_name = output_name[len(resource_type) + 1 :]
