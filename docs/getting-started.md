@@ -123,6 +123,12 @@ Pipeline
    - server-url: <url>
    - server-username: ********
    - storage-path: az://<path>
+  
+Data version control
+    - flavor: FLAVOR
+    - connection-string: ********
+    - account-name: <account_name>
+    - container-name: <container_name>
 ```
 
 You can also use `get` to inspect specific resources, for example:
@@ -173,6 +179,7 @@ Now that you've reached this point, you'll have provisioned the following infras
 * Seldon for model deployment and serving.
 * A ZenML server. This example uses ZenML for defining and orchestrating the training and deployment pipelines.
 * Kubernetes. This has two roles: firstly, it's where the training workload actually runs, and secondly it's the deployment environment for all of the above components.
+* A storage container for versioning and storing data. For details on how to set this up, see [here](data-version-control.md).
 
 ## Setup
 
