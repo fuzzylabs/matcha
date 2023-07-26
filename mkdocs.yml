@@ -15,6 +15,8 @@ nav:
   - Inside Matcha:
     - How does Matcha work: 'inside-matcha.md'
     - Why we collect usage data: 'privacy.md'
+  - Tools:
+    - Data Version Control: 'data-version-control.md'
   - API Reference: 'references.md'
 
 
