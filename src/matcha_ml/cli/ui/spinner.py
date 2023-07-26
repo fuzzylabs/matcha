@@ -30,7 +30,7 @@ class Spinner:
         )
         self.progress.add_task(description=status, total=None)
 
-    def __enter__(self):  # type: ignore
+    def __enter__(self) -> "Spinner":
         """Call when a spinner object is created using a `with` statement.
 
         Returns:
