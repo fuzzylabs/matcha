@@ -17,8 +17,6 @@ from matcha_ml.runners.base_runner import BaseRunner
 from matcha_ml.state.matcha_state import MatchaState, MatchaStateService
 
 
-
-
 class AzureRunner(BaseRunner):
     """A Runner class provides methods that interface with the Terraform service to facilitate the provisioning and deprovisioning of resources."""
 
