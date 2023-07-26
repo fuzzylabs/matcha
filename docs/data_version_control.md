@@ -30,7 +30,7 @@ This will print something like the following to your terminal:
         - container-name: CONTAINER_NAME
 
 Now that we have our connection string (you should keep this a secret), assuming you have followed the steps from the 
-dvc docks for initialising and adding files for `dvc` to track, we can tell the `dvc` package where to look for historic 
+dvc docs for initialising and adding files for `dvc` to track, we can tell the `dvc` package where to look for historic 
 data, and where to push new, versionable data. This is done as below:
 
     $ dvc remote modify --local my_dvc connection_string CONNECTION_STRING
