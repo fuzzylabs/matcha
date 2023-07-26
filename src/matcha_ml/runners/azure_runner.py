@@ -16,14 +16,7 @@ from matcha_ml.cli.ui.status_message_builders import (
 from matcha_ml.runners.base_runner import BaseRunner
 from matcha_ml.state.matcha_state import MatchaState, MatchaStateService
 
-RESOURCE_NAMES = [
-    "experiment_tracker",
-    "pipeline",
-    "orchestrator",
-    "cloud",
-    "container_registry",
-    "model_deployer",
-]
+
 
 
 class AzureRunner(BaseRunner):
