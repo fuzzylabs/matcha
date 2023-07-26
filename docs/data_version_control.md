@@ -9,7 +9,8 @@ You can find all the specifications for the data version control resource in the
 
 ## Using the provisioned resources with the `dvc` package
 Let's work through a short example of provisioning a set of resources using matcha, then setting up data version control
-with the popular `dvc` package, the documentation for which can be found [here](https://dvc.org/doc).
+with the popular `dvc` package such that it versions and stores data on the provisioned resources.
+The documentation for the `dvc` package can be found [here](https://dvc.org/doc).
 
 First, let's provision a set of resources:
 
@@ -39,4 +40,5 @@ data, and where to push new, versionable data. This is done as below:
 It's important to make sure your connection string is stored in `config.local`, so your connection string never appears 
 in any public repository.
 
-That's it! Just 4 commands and you're up and running.
+That's it! Whenever you run `dvc push`, `dvc pull` or `dvc checkout`, you or whoever you grant access to your storage
+container is interacting with the azure storage container provisioned by matcha specifically for data version control.
