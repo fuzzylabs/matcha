@@ -31,12 +31,14 @@ class AnalyticsEvent(str, Enum):
 
 
 def execute_analytics_event(
-    func: Callable, *args, **kwargs
+    func: Callable[..., Any], *args: Any, **kwargs: Any
 ) -> Tuple[Optional[MatchaState], Any]:
     """Exists to Temporarily fix misleading error messages coming from track decorator.
 
     Args:
         func (Callable): The function decorated by track.
+        *args (Any): arguments passed to the function.
+        **kwargs (Any): additional key word arguments passed to the function.
 
     Returns:
         The result of the call to func, the error code.
@@ -123,7 +125,7 @@ def track(event_name: AnalyticsEvent) -> Callable[..., Any]:
                     global_params.user_id,
                     event_name.value,
                     {
-                        "time_taken": te - ts,
+                        "time_taken": float(te) - float(ts),  # type: ignore
                         "error_type": f"{error_code.__class__}.{error_code.__class__.__name__}",
                         "command_succeeded": error_code is None,
                         "matcha_state_uuid": matcha_state_uuid,
