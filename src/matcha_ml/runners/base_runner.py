@@ -131,11 +131,11 @@ class BaseRunner:
             )
             raise typer.Exit()
 
-    def _apply_terraform(self, msg: str = "") -> None:
+    def _apply_terraform(self, msg: str) -> None:
         """Run terraform apply to create resources on cloud.
 
         Args:
-            msg (str) : Message to display. Default is empty string.
+            msg (str) : Name of the type of resource (e.g. "Remote State" or "Matcha").
 
         Raises:
             MatchaTerraformError: if 'terraform apply' failed.
