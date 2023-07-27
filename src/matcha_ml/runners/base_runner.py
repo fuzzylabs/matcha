@@ -131,8 +131,11 @@ class BaseRunner:
             )
             raise typer.Exit()
 
-    def _apply_terraform(self) -> None:
+    def _apply_terraform(self, msg: str = "") -> None:
         """Run terraform apply to create resources on cloud.
+
+        Args:
+            msg (str) : Name of the type of resource (e.g. "Remote State" or "Matcha").
 
         Raises:
             MatchaTerraformError: if 'terraform apply' failed.
@@ -147,11 +150,19 @@ class BaseRunner:
 
             if tf_result.return_code != 0:
                 raise MatchaTerraformError(tf_error=tf_result.std_err)
-        print_status(
-            build_substep_success_status(
-                f"{Emojis.CHECKMARK.value} Matcha resources have been provisioned!\n"
+
+        if msg:
+            print_status(
+                build_substep_success_status(
+                    f"{Emojis.CHECKMARK.value} {msg} resources have been provisioned!\n"
+                )
             )
-        )
+        else:
+            print_status(
+                build_substep_success_status(
+                    f"{Emojis.CHECKMARK.value} Resources have been provisioned!\n"
+                )
+            )
 
     def _destroy_terraform(self, msg: str = "") -> None:
         """Destroy the provisioned resources.

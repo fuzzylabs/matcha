@@ -119,9 +119,9 @@ def test_apply_terraform(capsys: SysCapture):
     """
     template_runner = BaseRunner()
     template_runner.tfs.apply = MagicMock(return_value=TerraformResult(0, "", ""))
-    expected = "Matcha resources have been provisioned!"
+    expected = "Remote State resources have been provisioned!"
 
-    template_runner._apply_terraform()
+    template_runner._apply_terraform(msg="Remote State")
     captured = capsys.readouterr()
 
     assert expected in captured.out
