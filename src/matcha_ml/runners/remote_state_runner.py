@@ -63,7 +63,7 @@ class RemoteStateRunner(BaseRunner):
         self._validate_terraform_config()
         self._validate_kubeconfig(base_path=".kube/config")
         self._initialize_terraform(msg="Remote State")
-        self._apply_terraform()
+        self._apply_terraform(msg="Remote State")
         return self._get_terraform_output()
 
     def deprovision(self) -> None:
