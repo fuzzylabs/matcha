@@ -131,7 +131,7 @@ def test_apply_terraform(capsys: SysCapture):
     )
 
     with pytest.raises(MatchaTerraformError) as exc_info:
-        template_runner._apply_terraform()
+        template_runner._apply_terraform("Matcha")
         assert (
             str(exc_info.value)
             == "Terraform failed because of the following error: 'Apply failed'."
