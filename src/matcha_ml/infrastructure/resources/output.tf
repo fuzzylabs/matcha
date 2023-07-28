@@ -14,6 +14,7 @@ output "pipeline_zenml_storage_path" {
   value       = module.zenml_storage.zenml_blobstorage_container_path
 }
 
+
 output "pipeline_zenml_connection_string" {
   description = "The primary connection string for the ZenML Azure Storage Account"
   value       = module.zenml_storage.zenml_primary_connection_string
@@ -74,4 +75,20 @@ output "cloud_azure_prefix"{
 output "cloud_azure_location"{
   description = "The Azure location in which the resources are provisioned" 
   value = var.location
+}
+
+output "data_version_control_primary_connection_string"{
+  description = "The primary connection string for the ZenML Azure Storage Account"
+  value = module.data_version_control_storage.primary_connection_string
+  sensitive = true
+}
+
+output "data_version_control_storage_container_name"{
+  description = "The name of the container used for data version control"
+  value = module.data_version_control_storage.storage_container_name
+}
+
+output "data_version_control_storage_account_name"{
+  description = "The name of the storage account for data version control"
+  value = module.data_version_control_storage.storage_account_name
 }

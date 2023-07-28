@@ -15,6 +15,7 @@ SUBMODULE_NAMES = [
     "azure_container_registry",
     "zen_server/zenml_helm",
     "zen_server/zenml_helm/templates",
+    "data_version_control_storage",
 ]
 
 
