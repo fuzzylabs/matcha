@@ -1,3 +1,38 @@
+# v0.2.7
+
+# 💾 Data Version Control!
+
+A fundamental part of Machine Learning is data, without it the learning part cannot happen, and therefore an important part of any MLOps infrastructure stack. Keeping track of that data and being able to version it is important, it enables the reproduction of experiments.
+
+In this release of Matcha, we've added infrastructure to support data version control as part of our default stack.
+
+You can get the information necessary to hook the infrastructure up to your favorite data version control tool by doing the following:
+
+```python
+data_version_control = matcha.get('data-version-control')
+```
+
+OR
+
+```bash
+matcha get data-version-control
+```
+
+## 🐛 Bug Fixes + Improvements
+We've also been busy fixing a whole bunch of bugs and improvements:
+
+* [RPD-261] [BUG] destroy leads to missing matcha config file error ([#165](https://github.com/fuzzylabs/matcha/pull/165))
+* [RPD-276] [BUG] Turning analytics on causes hanging in the analytics service ([#168](https://github.com/fuzzylabs/matcha/pull/168))
+* [RPD-271] [BUG] Fix orphaned NetworkWatcherRG resource group ([#167](https://github.com/fuzzylabs/matcha/pull/167))
+* [RPD-279] [BUG] Automatically deal with stale states ([#170](https://github.com/fuzzylabs/matcha/pull/170))
+* [RPD-274] [BUG] Fix inaccurate provisioning messages ([#177](https://github.com/fuzzylabs/matcha/pull/177))
+* [RPD-263] add inference of zenml version from environment ([#178](https://github.com/fuzzylabs/matcha/pull/178))
+* [RPD-272] Updates to documentation ([#166](https://github.com/fuzzylabs/matcha/pull/166))
+* [RPD-273] Improvements to the provision user experience ([#173](https://github.com/fuzzylabs/matcha/pull/173))
+
+See all changes here: https://github.com/fuzzylabs/matcha/compare/v0.2.6...v0.2.7
+
+---
 # v0.2.6
 
 # 🔌 Matcha as an API!

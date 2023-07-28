@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "matcha-ml"
-version = "0.2.6"
+version = "0.2.7"
 description = "Matcha: An open source tool for provisioning MLOps environments to the cloud."
 authors = ["FuzzyLabs <info@fuzzylabs.ai>"]
 license = "Apache-2.0"
