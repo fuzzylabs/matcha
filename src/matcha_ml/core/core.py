@@ -35,7 +35,8 @@ def zenml_version_is_supported() -> bool:
             )
             return False
     except:
-        warn(f"No local installation of ZenMl found. Defaulting to version {MAJOR_MINOR_ZENML_VERSION}.")
+        warn(f"No local installation of ZenMl found. Defaulting to version {MAJOR_MINOR_ZENML_VERSION} for remote "
+             f"resources.")
         return True
 
 
