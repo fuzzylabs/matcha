@@ -292,17 +292,21 @@ class RemoteStateManager:
         )
 
     @contextlib.contextmanager
-    def use_remote_state(self) -> Iterator[None]:
+    def use_remote_state(self, destroy: bool = False) -> Iterator[None]:
         """Context manager to use remote state.
 
         Downloads the state before executing the code.
         Upload the state when context is finished.
+
+        Args:
+            destroy (bool): Flag for whether the command being run is 'destroy' or not.
         """
         self.download(os.getcwd())
 
         yield None
 
-        self.upload(os.path.join(".matcha", "infrastructure"))
+        if not destroy:
+            self.upload(os.path.join(".matcha", "infrastructure"))
 
     def lock(self) -> None:
         """Lock remote state.
@@ -335,10 +339,15 @@ class RemoteStateManager:
             )
 
     @contextlib.contextmanager
-    def use_lock(self) -> Iterator[None]:
-        """Context manager to lock state."""
+    def use_lock(self, destroy: bool = False) -> Iterator[None]:
+        """Context manager to lock state.
+
+        Args:
+            destroy (bool): Flag for whether the command being run is 'destroy' or not.
+        """
         self.lock()
         try:
             yield
         finally:
-            self.unlock()
+            if not destroy:
+                self.unlock()

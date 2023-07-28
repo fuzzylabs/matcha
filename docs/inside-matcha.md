@@ -33,3 +33,5 @@ The user can use `get` to request information on specific resources or propertie
 ## `destroy`
 
 Once the user has finished with their provisioned environment, `destroy` enables them to tear down the resources. It works by calling the `destroy` Terraform command via the `python-terraform` library, which interacts with the configured Terraform files in the `.matcha/` directory.
+
+> You may also notice that an additional resource has appeared in Azure called 'NetworkWatcherRG' (if it wasn't already there). This is a resource that is automatically provisioned by Azure in each region when there is in-coming traffic to a provisioned resource and isn't controlled by Matcha. More information can be found [here](https://learn.microsoft.com/en-us/azure/network-watcher/network-watcher-monitoring-overview) on how to manage or remove this resource.

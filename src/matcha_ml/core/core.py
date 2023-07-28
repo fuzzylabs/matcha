@@ -1,6 +1,7 @@
 """The core functionality for Matcha API."""
 import os
 from typing import Optional
+from warnings import warn
 
 from matcha_ml.cli._validation import get_command_validation
 from matcha_ml.cli.ui.print_messages import print_status
@@ -13,6 +14,22 @@ from matcha_ml.services.global_parameters_service import GlobalParameters
 from matcha_ml.state import MatchaStateService, RemoteStateManager
 from matcha_ml.state.matcha_state import MatchaState
 from matcha_ml.templates.azure_template import AzureTemplate
+
+
+MAJOR_MINOR_ZENML_VERSION = "0.36"
+
+
+def zenml_version_is_supported() -> None:
+    """Check the zenml version of the local environment against the version matcha is expecting."""
+    try:
+        import zenml
+        if zenml.__version__[:3] != MAJOR_MINOR_ZENML_VERSION:
+            warn(
+                f"Matcha expects ZenML version {MAJOR_MINOR_ZENML_VERSION}.x, but you have version {zenml.__version__}."
+            )
+    except:
+        warn(f"No local installation of ZenMl found. Defaulting to version {MAJOR_MINOR_ZENML_VERSION} for remote "
+             f"resources.")
 
 
 @track(event_name=AnalyticsEvent.GET)
@@ -117,7 +134,9 @@ def destroy() -> None:
         )
 
     template_runner = AzureRunner()
-    with remote_state_manager.use_lock(), remote_state_manager.use_remote_state():
+    with remote_state_manager.use_lock(
+        destroy=True
+    ), remote_state_manager.use_remote_state(destroy=True):
         template_runner.deprovision()
         remote_state_manager.deprovision_remote_state()
 
@@ -184,6 +203,7 @@ def provision(
         MatchaError: If prefix is not valid.
         MatchaError: If region is not valid.
     """
+    zenml_version_is_supported()
     remote_state_manager = RemoteStateManager()
     template_runner = AzureRunner()
 

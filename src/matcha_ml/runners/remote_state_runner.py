@@ -38,9 +38,7 @@ class RemoteStateRunner(BaseRunner):
 
         prefix = "remote_state_storage"
         account_name = tf_outputs[f"{prefix}_account_name"]["value"]
-        resource_group_name = tf_outputs[f"{prefix}_resource_group_name"][
-            "value"
-        ]
+        resource_group_name = tf_outputs[f"{prefix}_resource_group_name"]["value"]
         container_name = tf_outputs[f"{prefix}_container_name"]["value"]
 
         return account_name, container_name, resource_group_name
@@ -65,7 +63,7 @@ class RemoteStateRunner(BaseRunner):
         self._validate_terraform_config()
         self._validate_kubeconfig(base_path=".kube/config")
         self._initialize_terraform(msg="Remote State")
-        self._apply_terraform()
+        self._apply_terraform(msg="Remote State")
         return self._get_terraform_output()
 
     def deprovision(self) -> None:

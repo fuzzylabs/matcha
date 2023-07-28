@@ -48,7 +48,7 @@ class AzureRunner(BaseRunner):
         self._validate_terraform_config()
         self._validate_kubeconfig(base_path=".kube/config")
         self._initialize_terraform(msg="Matcha")
-        self._apply_terraform()
+        self._apply_terraform(msg="Matcha")
         tf_output = self.tfs.terraform_client.output()
         matcha_state_service = MatchaStateService(terraform_output=tf_output)
         self._show_terraform_outputs(matcha_state_service._state)

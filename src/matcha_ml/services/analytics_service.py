@@ -3,6 +3,7 @@
 This approach to collecting usage data was inspired by ZenML; source: https://github.com/zenml-io/zenml/blob/main/src/zenml/utils/analytics_utils.py
 """
 import functools
+import logging
 from enum import Enum
 from time import perf_counter
 from typing import Any, Callable, Optional, Tuple
@@ -15,7 +16,10 @@ from matcha_ml.services._validation import _check_uuid
 from matcha_ml.services.global_parameters_service import GlobalParameters
 from matcha_ml.state import MatchaState, MatchaStateService
 
-analytics.write_key = "qwBKAvY6MEUvv5XIs4rE07ohf5neT3sx"
+WRITE_KEY = "qwBKAvY6MEUvv5XIs4rE07ohf5neT3sx"
+
+# Suppress Segment warnings
+logging.getLogger("segment").setLevel(logging.FATAL)
 
 
 class AnalyticsEvent(str, Enum):
@@ -27,12 +31,14 @@ class AnalyticsEvent(str, Enum):
 
 
 def execute_analytics_event(
-    func: Callable, *args, **kwargs
+    func: Callable[..., Any], *args: Any, **kwargs: Any
 ) -> Tuple[Optional[MatchaState], Any]:
     """Exists to Temporarily fix misleading error messages coming from track decorator.
 
     Args:
         func (Callable): The function decorated by track.
+        *args (Any): arguments passed to the function.
+        **kwargs (Any): additional key word arguments passed to the function.
 
     Returns:
         The result of the call to func, the error code.
@@ -57,6 +63,9 @@ def track(event_name: AnalyticsEvent) -> Callable[..., Any]:
 
         Args:
             func (Callable[..., Any]): The function that is being decorated
+
+        Returns:
+            Callable[..., Any]: The function that is being decorated
         """
 
         @functools.wraps(func)
@@ -110,11 +119,13 @@ def track(event_name: AnalyticsEvent) -> Callable[..., Any]:
                     result, error_code = execute_analytics_event(func, *args, **kwargs)
                     te = perf_counter()
 
-                analytics.track(
+                client = analytics.Client(WRITE_KEY, max_retries=1, debug=False)
+
+                client.track(
                     global_params.user_id,
                     event_name.value,
                     {
-                        "time_taken": te - ts,
+                        "time_taken": float(te) - float(ts),  # type: ignore
                         "error_type": f"{error_code.__class__}.{error_code.__class__.__name__}",
                         "command_succeeded": error_code is None,
                         "matcha_state_uuid": matcha_state_uuid,

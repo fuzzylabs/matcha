@@ -27,6 +27,7 @@ Next, you'll need to install a couple of things.
 
 * Python 3.8 or newer, along with Virtual Env and PIP.
 * The Azure command line tool. Instructions on installing this can be found [here](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli).
+* Docker. This is used to build images locally, before running them on Azure. Instructions for installing Docker can be found [here](https://www.docker.com/). The Docker daemon will need to be running on your system.
 * Terraform. We use this to provision services inside Azure. You'll find installation instructions for your platform [here](https://developer.hashicorp.com/terraform/downloads?product_intent=terraform). We recommend version 1.4 or newer.
 
 # The movie recommender
@@ -73,7 +74,7 @@ az login
 
 When you run this command, you'll be taken to the Azure login screen in a web browser window, and you'll be asked if you want to allow the Azure CLI to access your Azure account. You'll need to grant this permission in order for Matcha to gain access to your Azure account when it provisions infrastructure.
 
-> Note: you'll need certain permissions in order for Matcha to work. If you're unsure, you can just run `matcha` and it will tell you if you're missing any permissions. For specifics around permissions, please see our explainer on [Azure Permissions](azure-permissions.md).
+> Note: you'll need certain permissions for Matcha to work. If you're unsure, you can run `matcha provision` and if your Azure account is missing the required permissions, the `provision` command will tell you. For specifics around permissions, please see our explainer on [Azure Permissions](azure-permissions.md).
 
 Next, let's provision:
 
@@ -232,4 +233,6 @@ The final thing you'll want to do is decommission the infrastructure that Matcha
 matcha destroy
 ```
 
-> Note that this command is irreversible will remove all the resources deployed by `matcha provision` including the resource group, so make sure you save any data you wish to keep before running this command.
+> Note: that this command is irreversible will remove all the resources deployed by `matcha provision` including the resource group, so make sure you save any data you wish to keep before running this command.
+> 
+> You may also notice that an additional resource has appeared in Azure called 'NetworkWatcherRG' (if it wasn't already there). This is a resource that is automatically provisioned by Azure in each region when there is in-coming traffic to a provisioned resource and isn't controlled by Matcha. More information can be found [here](https://learn.microsoft.com/en-us/azure/network-watcher/network-watcher-monitoring-overview) on how to manage or remove this resource.
