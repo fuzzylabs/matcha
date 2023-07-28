@@ -1,6 +1,7 @@
 """The core functionality for Matcha API."""
 import os
 from typing import Optional
+from warnings import warn
 
 from matcha_ml.cli._validation import get_command_validation
 from matcha_ml.cli.ui.print_messages import print_status
@@ -13,6 +14,29 @@ from matcha_ml.services.global_parameters_service import GlobalParameters
 from matcha_ml.state import MatchaStateService, RemoteStateManager
 from matcha_ml.state.matcha_state import MatchaState
 from matcha_ml.templates.azure_template import AzureTemplate
+
+
+MAJOR_MINOR_ZENML_VERSION = "0.36"
+
+
+def zenml_version_is_supported() -> bool:
+    """Check the zenml version of the local environment against the version matcha is expecting.
+
+    Returns:
+        True if the local zenml version is what matcha expects, False otherwise.
+    """
+    try:
+        import zenml
+        if zenml.__version__[:3] == MAJOR_MINOR_ZENML_VERSION:
+            return True
+        else:
+            warn(
+                f"Matcha expects ZenML version {MAJOR_MINOR_ZENML_VERSION}.x, but you have version {zenml.__version__}."
+            )
+            return False
+    except:
+        warn(f"No local installation of ZenMl found. Defaulting to version {MAJOR_MINOR_ZENML_VERSION}.")
+        return True
 
 
 @track(event_name=AnalyticsEvent.GET)
