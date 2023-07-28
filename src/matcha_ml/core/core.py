@@ -20,11 +20,7 @@ MAJOR_MINOR_ZENML_VERSION = "0.36"
 
 
 def zenml_version_is_supported() -> None:
-    """Check the zenml version of the local environment against the version matcha is expecting.
-
-    Returns:
-        True if the local zenml version is what matcha expects, False otherwise.
-    """
+    """Check the zenml version of the local environment against the version matcha is expecting."""
     try:
         import zenml
         if zenml.__version__[:3] != MAJOR_MINOR_ZENML_VERSION:
