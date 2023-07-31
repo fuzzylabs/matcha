@@ -27,10 +27,16 @@ from matcha_ml.errors import MatchaError, MatchaInputError
 
 app = typer.Typer(no_args_is_help=True, pretty_exceptions_show_locals=False)
 analytics_app = typer.Typer(no_args_is_help=True, pretty_exceptions_show_locals=False)
+stack_app = typer.Typer(no_args_is_help=True, pretty_exceptions_show_locals=False)
 app.add_typer(
     analytics_app,
     name="analytics",
     help="Enable or disable the collection of anonymous usage data (enabled by default).",
+)
+app.add_typer(
+    stack_app,
+    name="stack",
+    help="Configure the stack for Matcha to provision.",
 )
 
 
@@ -240,6 +246,23 @@ def opt_in() -> None:
         "Thank you for enabling data collection, this helps us improve matcha and anonymously understand how people are using the tool."
     )
     core.analytics_opt_in()
+
+
+@stack_app.command(help="Define the stack for Matcha to provision.")
+def set(stack: str = typer.Argument("default")) -> None:
+    """Define the stack for Matcha to provision.
+
+    Args:
+        stack (Optional[str]): the name of the stack to provision.
+
+    Raises:
+        Exit: Exit if input is not a defined stack.
+    """
+    try:
+        core.stack_set(stack)
+    except MatchaInputError as e:
+        print_error(str(e))
+        raise typer.Exit()
 
 
 if __name__ == "__main__":
