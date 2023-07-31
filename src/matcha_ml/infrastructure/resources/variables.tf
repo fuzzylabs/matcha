@@ -21,6 +21,12 @@ variable "password" {
   sensitive   = true
 }
 
+variable "zenmlserver_image_tag" {
+  description = "The tag to use for the zenmlserver docker image."
+  default     = "latest"
+  type        = string
+}
+
 # seldon variables
 variable "seldon_name" {
   description = "Name of the Seldon deployment"

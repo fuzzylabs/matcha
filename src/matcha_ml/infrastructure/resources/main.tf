@@ -79,6 +79,8 @@ module "zenserver" {
   # ZenServer credentials
   username = var.username
   password = var.password
+
+  zenmlserver_image_tag = var.zenmlserver_image_tag
 }
 
 

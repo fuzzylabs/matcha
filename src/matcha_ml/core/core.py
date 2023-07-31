@@ -203,7 +203,7 @@ def provision(
         MatchaError: If prefix is not valid.
         MatchaError: If region is not valid.
     """
-    zenml_version_is_supported()
+    # zenml_version_is_supported()
     remote_state_manager = RemoteStateManager()
     template_runner = AzureRunner()
 
@@ -249,8 +249,13 @@ def provision(
 
         azure_template = AzureTemplate()
 
+        try:
+            import zenml
+            zenml_version = zenml.__version__
+        except:
+            zenml_version = "latest"
         config = azure_template.build_template_configuration(
-            location=location, prefix=prefix, password=password
+            location=location, prefix=prefix, password=password, zenmlserver_image_tag=zenml_version
         )
         azure_template.build_template(config, template, destination, verbose)
 
