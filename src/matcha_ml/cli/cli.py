@@ -253,7 +253,7 @@ def set(stack: str = typer.Argument("default")) -> None:
     """Define the stack for Matcha to provision.
 
     Args:
-        stack (Optional[str]): the name of the stack to provision.
+        stack (str): the name of the stack to provision.
 
     Raises:
         Exit: Exit if input is not a defined stack.
