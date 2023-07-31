@@ -21,7 +21,7 @@ variable "password" {
   sensitive   = true
 }
 
-variable "zenmlserver_image_tag" {
+variable "zenmlserver_version" {
   description = "The tag to use for the zenmlserver docker image."
   default     = "latest"
   type        = string

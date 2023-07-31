@@ -87,8 +87,8 @@ resource "helm_release" "zen_server" {
     value = var.deploy_db ? false : var.database_ssl_verify_server_cert
   }
   set {
-    name = "zenml.image.tag"
-    value = var.zenmlserver_image_tag
+    name = "zenml.version"
+    value = var.zenmlserver_version
   }
   depends_on = [
     resource.kubernetes_namespace.zen_server

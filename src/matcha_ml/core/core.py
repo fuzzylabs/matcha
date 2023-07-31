@@ -16,20 +16,19 @@ from matcha_ml.state.matcha_state import MatchaState
 from matcha_ml.templates.azure_template import AzureTemplate
 
 
-MAJOR_MINOR_ZENML_VERSION = "0.36"
-
-
-def zenml_version_is_supported() -> None:
+def infer_zenml_version() -> str:
     """Check the zenml version of the local environment against the version matcha is expecting."""
+
     try:
         import zenml
-        if zenml.__version__[:3] != MAJOR_MINOR_ZENML_VERSION:
-            warn(
-                f"Matcha expects ZenML version {MAJOR_MINOR_ZENML_VERSION}.x, but you have version {zenml.__version__}."
-            )
+        version = zenml.__version__
+        print(f"\nMatcha detected zenml version {version}, so will use the same version on the remote resources." )
     except:
-        warn(f"No local installation of ZenMl found. Defaulting to version {MAJOR_MINOR_ZENML_VERSION} for remote "
-             f"resources.")
+        version = "latest"
+        print(f"\nMatcha didn't find a zenml installation locally, so will install the latest release of zenml on the "
+              f"remote resources.")
+
+    return version
 
 
 @track(event_name=AnalyticsEvent.GET)
@@ -249,13 +248,9 @@ def provision(
 
         azure_template = AzureTemplate()
 
-        try:
-            import zenml
-            zenml_version = zenml.__version__
-        except:
-            zenml_version = "latest"
+        zenml_version = infer_zenml_version()
         config = azure_template.build_template_configuration(
-            location=location, prefix=prefix, password=password, zenmlserver_image_tag=zenml_version
+            location=location, prefix=prefix, password=password, zenmlserver_version=zenml_version
         )
         azure_template.build_template(config, template, destination, verbose)
 

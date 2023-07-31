@@ -80,7 +80,7 @@ module "zenserver" {
   username = var.username
   password = var.password
 
-  zenmlserver_image_tag = var.zenmlserver_image_tag
+  zenmlserver_version = var.zenmlserver_version
 }
 
 
