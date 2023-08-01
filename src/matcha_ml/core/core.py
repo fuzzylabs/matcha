@@ -15,7 +15,6 @@ from matcha_ml.state import MatchaStateService, RemoteStateManager
 from matcha_ml.state.matcha_state import MatchaState
 from matcha_ml.templates.azure_template import AzureTemplate
 
-
 MAJOR_MINOR_ZENML_VERSION = "0.36"
 
 
@@ -23,13 +22,16 @@ def zenml_version_is_supported() -> None:
     """Check the zenml version of the local environment against the version matcha is expecting."""
     try:
         import zenml
+
         if zenml.__version__[:3] != MAJOR_MINOR_ZENML_VERSION:
             warn(
                 f"Matcha expects ZenML version {MAJOR_MINOR_ZENML_VERSION}.x, but you have version {zenml.__version__}."
             )
     except:
-        warn(f"No local installation of ZenMl found. Defaulting to version {MAJOR_MINOR_ZENML_VERSION} for remote "
-             f"resources.")
+        warn(
+            f"No local installation of ZenMl found. Defaulting to version {MAJOR_MINOR_ZENML_VERSION} for remote "
+            f"resources."
+        )
 
 
 @track(event_name=AnalyticsEvent.GET)
@@ -259,3 +261,8 @@ def provision(
         matcha_state_service = MatchaStateService()
 
         return matcha_state_service.fetch_resources_from_state_file()
+
+
+def stack_set(stack: str) -> str:
+    """Placeholder for core matcha stack set functionality."""
+    return stack
