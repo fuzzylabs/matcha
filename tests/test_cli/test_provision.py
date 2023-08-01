@@ -143,6 +143,7 @@ def test_cli_provision_command(
         "location": "uksouth",
         "prefix": "matcha",
         "password": "default",
+        "zenmlserver_version": "latest"
     }
 
     assert_infrastructure(
@@ -199,6 +200,7 @@ def test_cli_provision_command_with_args(
         "location": "uksouth",
         "prefix": "matcha",
         "password": "ninja",
+        "zenmlserver_version": "latest"
     }
 
     assert_infrastructure(
@@ -245,6 +247,7 @@ def test_cli_provision_command_with_prefix(
         "location": "uksouth",
         "prefix": "coffee",
         "password": "default",
+        "zenmlserver_version": "latest"
     }
 
     assert_infrastructure(
@@ -289,6 +292,7 @@ def test_cli_provision_command_with_default_prefix(
         "location": "uksouth",
         "prefix": "matcha",
         "password": "default",
+        "zenmlserver_version": "latest"
     }
 
     assert_infrastructure(
