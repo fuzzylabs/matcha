@@ -6,7 +6,7 @@ import functools
 import logging
 from enum import Enum
 from time import perf_counter
-from typing import Any, Callable, Optional, Tuple
+from typing import Annotated, Any, Callable, Optional, Tuple
 from warnings import warn
 
 from segment import analytics
@@ -30,10 +30,44 @@ class AnalyticsEvent(str, Enum):
     GET = "get"
 
 
-def execute_analytics_event(
+def _get_state_uuid() -> Optional[str]:
+    """A function for retrieving the Matcha State UUID.
+
+    Returns:
+        matcha_state_uuid (Optional[MatchaResourceProperty]): The Matcha State UUID if present.
+
+    Raises:
+    MatchaError where the Matcha state UUID fails validation.
+    """
+    try:
+        matcha_state_service = MatchaStateService()
+    except MatchaError:
+        matcha_state_service = None
+
+    matcha_state_uuid: Optional[str] = None
+    if matcha_state_service and matcha_state_service.state_exists():
+        try:
+            state_id_component = matcha_state_service.get_component("id")
+        except MatchaError:
+            state_id_component = None
+
+        if state_id_component is not None:
+            matcha_state_uuid = state_id_component.find_property(
+                property_name="matcha_uuid"
+            ).value
+
+            try:
+                _check_uuid(str(matcha_state_uuid))
+            except MatchaError as err:
+                raise err
+
+    return matcha_state_uuid
+
+
+def _execute_analytics_event(
     func: Callable[..., Any], *args: Any, **kwargs: Any
 ) -> Tuple[Optional[MatchaState], Any]:
-    """Exists to Temporarily fix misleading error messages coming from track decorator.
+    """Executes the function decorated by track.
 
     Args:
         func (Callable): The function decorated by track.
@@ -49,6 +83,63 @@ def execute_analytics_event(
     except Exception as e:
         error_code = e
     return result, error_code
+
+
+def _time_event(
+    func: Callable[..., Any], *args: Any, **kwargs: Any
+) -> Tuple[Any, Exception, float, float]:
+    """Times the execution of the function decorated by track.
+
+    Args:
+        func (Callable): The function decorated by track.
+        *args (Any): arguments passed to the function.
+        **kwargs (Any): additional keyword arguments passed to the function.
+
+    Returns:
+        Tuple[Any, Exception, float, float]: The result of the call to func, the error code, the start time of execution, the end time of execution.
+    """
+    ts = perf_counter()
+    result, error_code = _execute_analytics_event(func, *args, **kwargs)
+    te = perf_counter()
+
+    return result, error_code, ts, te
+
+
+def _post_event(
+    event_name: AnalyticsEvent,
+    matcha_state_uuid: Optional[str],
+    global_params: GlobalParameters,
+    error_code: Optional[Exception],
+    time_taken: float,
+) -> Tuple[Annotated[bool, "success"], Annotated[str, "message"]]:
+    """Posts the tracked analytics to Segment.
+
+    Args:
+        event_name (AnalyticsEvent): The enumerated name of the analytics event.
+        matcha_state_uuid (str): the uuid for the Matcha state file.
+        global_params (GlobalParameters): The GlobalParameters object containing the user id.
+        error_code (Optional[Exception]): The error propagated by a failing underlying command.
+        time_taken (float): The time taken for the underlying command to execute.
+
+    Returns:
+        A boolean representing the status of the event posting, the message representing the status of the event posting.
+    """
+    client = analytics.Client(WRITE_KEY, max_retries=1, debug=False)
+
+    try:
+        client.track(
+            global_params.user_id,
+            event_name.value,
+            {
+                "time_taken": time_taken,
+                "error_type": f"{error_code.__class__}.{error_code.__class__.__name__}",
+                "command_succeeded": error_code is None,
+                "matcha_state_uuid": matcha_state_uuid,
+            },
+        )
+        return True, "Event tracked."
+    except:
+        return False, "Event not tracked."
 
 
 def track(event_name: AnalyticsEvent) -> Callable[..., Any]:
@@ -80,59 +171,32 @@ def track(event_name: AnalyticsEvent) -> Callable[..., Any]:
                 Any: the result of the wrapped function.
             """
             global_params = GlobalParameters()
-            result, error_code, te, ts = None, None, None, None
+
+            # tests if the tracking event name is in the enums
             if event_name.value not in {event.value for event in AnalyticsEvent}:
                 warn("Event not recognized by analytics service.")
 
+            # do the tracking
             if not global_params.analytics_opt_out:
+                result, error_code, ts, te = None, None, None, None
+                matcha_state_uuid = None
+
                 if event_name.value in [event_name.PROVISION, event_name.GET]:
-                    ts = perf_counter()
-                    result, error_code = execute_analytics_event(func, *args, **kwargs)
-                    te = perf_counter()
+                    result, error_code, ts, te = _time_event(func, *args, **kwargs)
+                    matcha_state_uuid = _get_state_uuid()
+                elif event_name.value in [event_name.DESTROY]:
+                    result, error_code, ts, te = _time_event(func, *args, **kwargs)
 
-                try:
-                    matcha_state_service = MatchaStateService()
-                except Exception as e:
-                    matcha_state_service = None
-                    error_code = e
+                time_taken = te - ts if te is not None and ts is not None else 0.0
 
-                # Get the matcha.state UUID if it exists
-                matcha_state_uuid: Optional[str] = None
-                if matcha_state_service and matcha_state_service.state_exists():
-                    try:
-                        state_id_component = matcha_state_service.get_component("id")
-                    except MatchaError:
-                        state_id_component = None
-
-                    if state_id_component is not None:
-                        matcha_state_uuid = state_id_component.find_property(
-                            property_name="matcha_uuid"
-                        ).value
-
-                        try:
-                            _check_uuid(str(matcha_state_uuid))
-                        except MatchaError as err:
-                            raise err
-
-                if event_name.value in [event_name.DESTROY]:
-                    ts = perf_counter()
-                    result, error_code = execute_analytics_event(func, *args, **kwargs)
-                    te = perf_counter()
-
-                client = analytics.Client(WRITE_KEY, max_retries=1, debug=False)
-
-                client.track(
-                    global_params.user_id,
-                    event_name.value,
-                    {
-                        "time_taken": float(te) - float(ts),  # type: ignore
-                        "error_type": f"{error_code.__class__}.{error_code.__class__.__name__}",
-                        "command_succeeded": error_code is None,
-                        "matcha_state_uuid": matcha_state_uuid,
-                    },
+                _, _ = _post_event(
+                    event_name=event_name,
+                    matcha_state_uuid=matcha_state_uuid,
+                    global_params=global_params,
+                    error_code=error_code,
+                    time_taken=time_taken,
                 )
-                if error_code is not None:
-                    raise error_code
+
             else:
                 result = func(*args, **kwargs)
 
