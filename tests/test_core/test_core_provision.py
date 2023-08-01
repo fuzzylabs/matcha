@@ -210,6 +210,7 @@ def test_provision_copies_infrastructure_templates_with_specified_values(
         "location": "uksouth",
         "prefix": "coffee",
         "password": "default",
+        "zenmlserver_version": "latest"
     }
 
     assert_infrastructure(
