@@ -1,5 +1,4 @@
 """Test suit to test the stack command and all its subcommands."""
-from unittest.mock import patch
 
 from typer.testing import CliRunner
 
@@ -53,16 +52,11 @@ def test_cli_stack_set_command_without_args(runner: CliRunner) -> None:
     Args:
         runner (CliRunner): typer CLI runner
     """
-    with patch(f"{INTERNAL_FUNCTION_STUB}.stack_set") as mocked_stack_set:
-        mocked_stack_set.return_value = "default"
+    result = runner.invoke(app, ["stack", "set"])
 
-        result = runner.invoke(app, ["stack", "set"])
+    assert result.exit_code == 0
 
-        assert result.exit_code == 0
-
-        mocked_stack_set.assert_called_once_with("default")
-
-        assert "Matcha default stack has been set." in result.stdout
+    assert "Matcha default stack has been set." in result.stdout
 
 
 def test_cli_stack_set_command_with_args(runner: CliRunner) -> None:
@@ -71,13 +65,8 @@ def test_cli_stack_set_command_with_args(runner: CliRunner) -> None:
     Args:
         runner (CliRunner): typer CLI runner
     """
-    with patch(f"{INTERNAL_FUNCTION_STUB}.stack_set") as mocked_stack_set:
-        mocked_stack_set.return_value = "test_stack"
+    result = runner.invoke(app, ["stack", "set", "test_stack"])
 
-        result = runner.invoke(app, ["stack", "set", "test_stack"])
+    assert result.exit_code == 0
 
-        assert result.exit_code == 0
-
-        mocked_stack_set.assert_called_once_with("test_stack")
-
-        assert "Matcha test_stack stack has been set." in result.stdout
+    assert "Matcha test_stack stack has been set." in result.stdout
