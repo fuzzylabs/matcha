@@ -87,7 +87,7 @@ resource "helm_release" "zen_server" {
     value = var.deploy_db ? false : var.database_ssl_verify_server_cert
   }
   set {
-    name = "zenml.version"
+    name = zenml.image.tag
     value = var.zenmlserver_version
   }
   depends_on = [
