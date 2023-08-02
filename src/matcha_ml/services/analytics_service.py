@@ -14,7 +14,7 @@ from segment import analytics
 from matcha_ml.errors import MatchaError
 from matcha_ml.services._validation import _check_uuid
 from matcha_ml.services.global_parameters_service import GlobalParameters
-from matcha_ml.state import MatchaState, MatchaStateService
+from matcha_ml.state import MatchaResourceProperty, MatchaState, MatchaStateService
 
 WRITE_KEY = "qwBKAvY6MEUvv5XIs4rE07ohf5neT3sx"
 
@@ -30,11 +30,11 @@ class AnalyticsEvent(str, Enum):
     GET = "get"
 
 
-def _get_state_uuid() -> Optional[str]:
+def _get_state_uuid() -> MatchaResourceProperty:
     """A function for retrieving the Matcha State UUID.
 
     Returns:
-        matcha_state_uuid (Optional[MatchaResourceProperty]): The Matcha State UUID if present.
+        matcha_state_uuid (MatchaResourceProperty): The Matcha State UUID if present.
 
     Raises:
     MatchaError where the Matcha state UUID fails validation.
@@ -44,7 +44,6 @@ def _get_state_uuid() -> Optional[str]:
     except MatchaError:
         matcha_state_service = None
 
-    matcha_state_uuid: Optional[str] = None
     if matcha_state_service and matcha_state_service.state_exists():
         try:
             state_id_component = matcha_state_service.get_component("id")
@@ -54,10 +53,10 @@ def _get_state_uuid() -> Optional[str]:
         if state_id_component is not None:
             matcha_state_uuid = state_id_component.find_property(
                 property_name="matcha_uuid"
-            ).value
+            )
 
             try:
-                _check_uuid(str(matcha_state_uuid))
+                _check_uuid(str(matcha_state_uuid.value))
             except MatchaError as err:
                 raise err
 
@@ -116,7 +115,7 @@ def _post_event(
 
     Args:
         event_name (AnalyticsEvent): The enumerated name of the analytics event.
-        matcha_state_uuid (str): the uuid for the Matcha state file.
+        matcha_state_uuid (Optional[MatchaResourceProperty]): the uuid for the Matcha state file.
         global_params (GlobalParameters): The GlobalParameters object containing the user id.
         error_code (Optional[Exception]): The error propagated by a failing underlying command.
         time_taken (float): The time taken for the underlying command to execute.
@@ -126,20 +125,16 @@ def _post_event(
     """
     client = analytics.Client(WRITE_KEY, max_retries=1, debug=False)
 
-    try:
-        client.track(
-            global_params.user_id,
-            event_name.value,
-            {
-                "time_taken": time_taken,
-                "error_type": f"{error_code.__class__}.{error_code.__class__.__name__}",
-                "command_succeeded": error_code is None,
-                "matcha_state_uuid": matcha_state_uuid,
-            },
-        )
-        return True, "Event tracked."
-    except:
-        return False, "Event not tracked."
+    return client.track(
+        global_params.user_id,
+        event_name.value,
+        {
+            "time_taken": time_taken,
+            "error_type": f"{error_code.__class__}.{error_code.__class__.__name__}",
+            "command_succeeded": error_code is None,
+            "matcha_state_uuid": matcha_state_uuid,
+        },
+    )
 
 
 def track(event_name: AnalyticsEvent) -> Callable[..., Any]:
@@ -179,19 +174,20 @@ def track(event_name: AnalyticsEvent) -> Callable[..., Any]:
             # do the tracking
             if not global_params.analytics_opt_out:
                 result, error_code, ts, te = None, None, None, None
-                matcha_state_uuid = None
 
                 if event_name.value in [event_name.PROVISION, event_name.GET]:
                     result, error_code, ts, te = _time_event(func, *args, **kwargs)
-                    matcha_state_uuid = _get_state_uuid()
-                elif event_name.value in [event_name.DESTROY]:
+
+                matcha_state_uuid: MatchaResourceProperty = _get_state_uuid()
+
+                if event_name.value in [event_name.DESTROY]:
                     result, error_code, ts, te = _time_event(func, *args, **kwargs)
 
                 time_taken = te - ts if te is not None and ts is not None else 0.0
 
                 _, _ = _post_event(
                     event_name=event_name,
-                    matcha_state_uuid=matcha_state_uuid,
+                    matcha_state_uuid=matcha_state_uuid.value,
                     global_params=global_params,
                     error_code=error_code,
                     time_taken=time_taken,
