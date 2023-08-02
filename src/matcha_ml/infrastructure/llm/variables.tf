@@ -1,15 +1,12 @@
 variable "prefix" {
   description = "A prefix used for all resources"
   type        = string
-  # REVERT
-  default     = "christest1"
+  default     = "matcha"
 }
 
 variable "location" {
   description = "The Azure Region in which all resources should be provisioned"
   type        = string
-  # REMOVE
-  default = "uksouth"
 }
 
 variable "username" {
@@ -22,8 +19,6 @@ variable "password" {
   description = "Password for ZenServer"
   type        = string
   sensitive   = true
-  # REMOVE
-  default = "default"
 }
 
 # seldon variables
@@ -37,5 +32,4 @@ variable "seldon_namespace" {
   description = "Namespace for Seldon resources"
   type        = string
   default     = "seldon-system"
-
 }
