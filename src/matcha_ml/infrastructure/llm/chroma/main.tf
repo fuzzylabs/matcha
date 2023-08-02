@@ -1,60 +1,3 @@
-# locals {
-#   pvc_manifest = yamldecode(file("${path.module}/chroma-server-index-persistentvolumeclaim.yaml"))
-#   deployment_manifest = yamldecode(file("${path.module}/server-deployment.yaml"))
-#   service_manifest = yamldecode(file("${path.module}/server-service.yaml"))
-# }
-
-# resource "kubernetes_persistent_volume_claim" "pvc" {
-#   metadata {
-#     name = local.pvc_manifest.metadata.name
-#   }
-
-#   spec {
-#     access_modes = local.pvc_manifest.spec.accessModes
-#     resources {
-#       requests = {
-#         storage = local.pvc_manifest.spec.resources.requests.storage
-#       }
-#     }
-#     storage_class_name = local.pvc_manifest.spec.storageClassName
-#   }
-# }
-
-# resource "kubernetes_deployment" "chroma-server" {
-#   metadata {
-#     name = local.deployment_manifest.metadata.name
-#   }
-
-#   spec {
-#     selector {
-#       match_labels = local.deployment_manifest.spec.selector.matchLabels
-#     }
-
-#     template {
-#       metadata {
-#         labels = local.deployment_manifest.spec.template.metadata.labels
-#       }
-
-#       spec {
-#         container {
-#           name  = local.deployment_manifest.spec.template.spec.containers[0].name
-#           image = "chroma-image:latest"  # Set the updated container image here
-#           port {
-#             container_port = local.deployment_manifest.spec.template.spec.containers[0].ports[0].containerPort
-#           }
-#         }
-#       }
-#     }
-#   }
-# }
-
-
-locals {
-  pvc_manifest = yamldecode(file("${path.module}/chroma-server-index-persistentvolumeclaim.yaml"))
-  deployment_manifest = yamldecode(file("${path.module}/server-deployment.yaml"))
-  service_manifest = yamldecode(file("${path.module}/server-service.yaml"))
-}
-
 resource "kubernetes_deployment" "chroma-server" {
   metadata {
     name = "chroma-server"
@@ -113,14 +56,11 @@ resource "kubernetes_deployment" "chroma-server" {
 resource "kubernetes_persistent_volume_claim" "pvc" {
   metadata {
     name = "chroma-server-index"
-    labels = {
-      "io.kompose.service" = "chroma-server-index"
-    }
   }
 
   spec {
     access_modes = ["ReadWriteOnce"]
-    storage_class_name = "standard"
+    storage_class_name = "default"
     resources {
       requests = {
         storage = "100Mi"
@@ -129,31 +69,30 @@ resource "kubernetes_persistent_volume_claim" "pvc" {
   }
 }
 
-
 resource "kubernetes_service" "chroma-service" {
   metadata {
-    name = local.service_manifest.metadata.name
+    name = "chroma-service"
   }
 
   spec {
-    selector = local.service_manifest.spec.selector
+    selector = {"app": "chroma-server"}
 
     port {
-      name       = local.service_manifest.spec.ports[0].name
-      port       = local.service_manifest.spec.ports[0].port
-      target_port = local.service_manifest.spec.ports[0].targetPort
+      name       = "8123"
+      port       = 8123
+      target_port = 8123
     }
 
     port {
-      name       = local.service_manifest.spec.ports[1].name
-      port       = local.service_manifest.spec.ports[1].port
-      target_port = local.service_manifest.spec.ports[1].targetPort
+      name       = "9000"
+      port       = 9000
+      target_port = 9000
     }
 
     port {
-      name       = local.service_manifest.spec.ports[2].name
-      port       = local.service_manifest.spec.ports[2].port
-      target_port = local.service_manifest.spec.ports[2].targetPort
+      name       = "8000"
+      port       = 8000
+      target_port = 8000
     }
 
   }
