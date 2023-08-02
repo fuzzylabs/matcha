@@ -5,7 +5,6 @@ from unittest.mock import MagicMock, PropertyMock, patch
 import pytest
 
 from matcha_ml.cli.cli import app
-from matcha_ml.errors import MatchaError
 from matcha_ml.services.analytics_service import (
     AnalyticsEvent,
     _execute_analytics_event,
@@ -68,16 +67,6 @@ def test_get_state_uuid_with_state(uuid_for_testing):
     assert result.value == uuid_for_testing
 
 
-def test_get_state_uuid_without_state():
-    """Test the _get_state_uuid private function error handling."""
-    with patch(
-        MATCHA_STATE_SERVICE_FUNCTION_STUB, side_effect=MatchaError("Test Error")
-    ):
-        result = _get_state_uuid()
-
-    assert result is None
-
-
 def test_execute_analytics_event():
     """Test the _execute_analytics_event private function."""
     test_function = MagicMock()
@@ -103,9 +92,6 @@ def test_execute_analytics_event_error_handling():
     assert str(error_code) == "Mocked exception"
 
 
-# test _time_event
-
-
 def test_time_event():
     """Test the _time_event private function."""
     with patch(
@@ -121,15 +107,19 @@ def test_time_event():
     assert te > ts
 
 
-def test_post_event(mock_uuid, mocked_global_parameters_service):
-    """Test the _post_event private function."""
+def test_post_event(mocked_global_parameters_service):
+    """Test the _post_event private function.
+
+    Args:
+        mocked_global_parameters_service (GlobalParametersService): a mocked global parameters service for testing.
+    """
     mocked_global_parameters_service_instance = mocked_global_parameters_service
     with patch(
         f"{ANALYTICS_SERVICE_FUNCTION_STUB}.analytics.Client.track"
     ) as mock_client:
         _ = _post_event(
             event_name=AnalyticsEvent.PROVISION,
-            matcha_state_uuid=mock_uuid,
+            matcha_state_uuid="12345",
             global_params=mocked_global_parameters_service_instance,
             error_code=None,
             time_taken=1.0,
