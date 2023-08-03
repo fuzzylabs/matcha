@@ -202,7 +202,6 @@ def provision(
         MatchaError: If prefix is not valid.
         MatchaError: If region is not valid.
     """
-    # zenml_version_is_supported()
     remote_state_manager = RemoteStateManager()
     template_runner = AzureRunner()
 
