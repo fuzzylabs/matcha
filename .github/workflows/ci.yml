@@ -6,7 +6,10 @@ on:
     branches:
       - main
       - develop
-      - '**feature**'
+      - 'feature/*'
+      - 'hotfix/*'
+      - 'release/*'
+      - 'fixes/*'
   push:
     branches:
       - main
