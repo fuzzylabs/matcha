@@ -161,7 +161,12 @@ class MatchaConfigService:
             )
 
     @staticmethod
-    def config_file_exists():
+    def config_file_exists() -> bool:
+        """A convencience function which checks for the existence of the matcha.config.json file.
+
+        Returns:
+            True if the matcha.config.json file exists, False otherwise.
+        """
         return os.path.exists(os.path.join(os.getcwd(), DEFAULT_CONFIG_NAME))
 
     @staticmethod
