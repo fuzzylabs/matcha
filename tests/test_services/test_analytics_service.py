@@ -5,6 +5,7 @@ from unittest.mock import MagicMock, PropertyMock, patch
 import pytest
 
 from matcha_ml.cli.cli import app
+from matcha_ml.errors import MatchaError
 from matcha_ml.services.analytics_service import (
     AnalyticsEvent,
     _execute_analytics_event,
@@ -50,6 +51,17 @@ def mocked_global_parameters_service(matcha_testing_directory, uuid_for_testing)
         yield GlobalParameters()
 
 
+@pytest.fixture
+def mocked_matcha_state_service():
+    """A fixture returning a mocked MatchaStateService instance.
+
+    Yields:
+        (MatchaStateService): a mocked MatchaStateService instance.
+    """
+    with patch(MATCHA_STATE_SERVICE_FUNCTION_STUB) as mocked_matcha_state_service_class:
+        yield mocked_matcha_state_service_class()
+
+
 def test_get_state_uuid_with_state(uuid_for_testing):
     """Test the _get_state_uuid private function where state exists.
 
@@ -65,6 +77,45 @@ def test_get_state_uuid_with_state(uuid_for_testing):
         result = _get_state_uuid()
 
     assert result.value == uuid_for_testing
+
+
+def test_get_state_uuid_without_state(mocked_matcha_state_service):
+    """Test the _get_state_uuid private function where no state exists.
+
+    Args:
+        mocked_matcha_state_service (MatchaStateService): a mocked MatchaStateService instance.
+    """
+    mocked_matcha_state_service.side_effect = MatchaError("test")
+
+    with pytest.raises(MatchaError):
+        _ = _get_state_uuid()
+
+
+@patch(MATCHA_STATE_SERVICE_FUNCTION_STUB)
+def test_get_state_uuid_without_id_component(mocked_matcha_state_service):
+    """Test the _get_state_uuid private function where state lacks an ID component.
+
+    Args:
+        mocked_matcha_state_service (MatchaStateService): a mocked MatchaStateService instance.
+    """
+    mocked_matcha_state_service = PropertyMock
+    mocked_matcha_state_service.side_effect = MatchaError("test")
+
+    with pytest.raises(MatchaError):
+        _ = _get_state_uuid()
+
+
+@patch(f"{ANALYTICS_SERVICE_FUNCTION_STUB}._check_uuid")
+def test_get_state_uuid_without_valid_uuid(mocked_check_uuid):
+    """Test the _get_state_uuid private function where an invalid uuid is returned.
+
+    Args:
+        mocked_check_uuid (function): a mocked _check_uuid function.
+    """
+    mocked_check_uuid.side_effect = MatchaError("test")
+
+    with pytest.raises(MatchaError):
+        _ = _get_state_uuid()
 
 
 def test_execute_analytics_event():

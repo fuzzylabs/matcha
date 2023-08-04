@@ -30,35 +30,31 @@ class AnalyticsEvent(str, Enum):
     GET = "get"
 
 
-def _get_state_uuid() -> MatchaResourceProperty:
+def _get_state_uuid() -> Optional[MatchaResourceProperty]:
     """A function for retrieving the Matcha State UUID.
 
     Returns:
-        matcha_state_uuid (MatchaResourceProperty): The Matcha State UUID if present.
+        matcha_state_uuid (Optional[MatchaResourceProperty]): The Matcha State UUID if present.
 
     Raises:
-    MatchaError where the Matcha state UUID fails validation.
+        MatchaError: where the MatchaStateService fails to instantiate, the MatchaStateService does not have an 'id' component, or the Matcha state UUID fails validation.
     """
     try:
         matcha_state_service = MatchaStateService()
     except MatchaError:
-        matcha_state_service = None
+        return None
 
-    if matcha_state_service and matcha_state_service.state_exists():
-        try:
-            state_id_component = matcha_state_service.get_component("id")
-        except MatchaError:
-            state_id_component = None
+    try:
+        state_id_component = matcha_state_service.get_component("id")
+    except MatchaError:
+        return None
 
-        if state_id_component is not None:
-            matcha_state_uuid = state_id_component.find_property(
-                property_name="matcha_uuid"
-            )
+    matcha_state_uuid = state_id_component.find_property(property_name="matcha_uuid")
 
-            try:
-                _check_uuid(str(matcha_state_uuid.value))
-            except MatchaError as err:
-                raise err
+    try:
+        _check_uuid(str(matcha_state_uuid.value))
+    except MatchaError as err:
+        raise err
 
     return matcha_state_uuid
 
@@ -106,7 +102,7 @@ def _time_event(
 
 def _post_event(
     event_name: AnalyticsEvent,
-    matcha_state_uuid: Optional[str],
+    matcha_state_uuid: Optional[MatchaResourceProperty],
     global_params: GlobalParameters,
     error_code: Optional[Exception],
     time_taken: float,
@@ -124,6 +120,9 @@ def _post_event(
         A boolean representing the status of the event posting, the message representing the status of the event posting.
     """
     client = analytics.Client(WRITE_KEY, max_retries=1, debug=False)
+
+    if matcha_state_uuid:
+        matcha_state_uuid = matcha_state_uuid.value
 
     return client.track(
         global_params.user_id,
@@ -167,32 +166,33 @@ def track(event_name: AnalyticsEvent) -> Callable[..., Any]:
             """
             global_params = GlobalParameters()
 
-            # tests if the tracking event name is in the enums
+            # checks if the tracking event name is a valid enum
             if event_name.value not in {event.value for event in AnalyticsEvent}:
                 warn("Event not recognized by analytics service.")
 
-            # do the tracking
             if not global_params.analytics_opt_out:
                 result, error_code, ts, te = None, None, None, None
 
                 if event_name.value in [event_name.PROVISION, event_name.GET]:
                     result, error_code, ts, te = _time_event(func, *args, **kwargs)
 
-                matcha_state_uuid: MatchaResourceProperty = _get_state_uuid()
+                matcha_state_uuid: Optional[MatchaResourceProperty] = _get_state_uuid()
 
                 if event_name.value in [event_name.DESTROY]:
                     result, error_code, ts, te = _time_event(func, *args, **kwargs)
 
                 time_taken = te - ts if te is not None and ts is not None else 0.0
 
-                _, _ = _post_event(
+                _post_event(
                     event_name=event_name,
-                    matcha_state_uuid=matcha_state_uuid.value,
+                    matcha_state_uuid=matcha_state_uuid,
                     global_params=global_params,
                     error_code=error_code,
                     time_taken=time_taken,
                 )
 
+                # if not event[0]:
+                #     warn("Analytics for f{event_name} were not posted to Segment.")
             else:
                 result = func(*args, **kwargs)
 
