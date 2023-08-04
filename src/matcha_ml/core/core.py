@@ -17,7 +17,7 @@ from matcha_ml.state.matcha_state import MatchaState
 from matcha_ml.templates.azure_template import AzureTemplate
 
 
-class StackTypeMeta(EnumMeta):  # this is probably overkill, but we might need  it if we'll support custom stacks later.
+class StackTypeMeta(EnumMeta):  # this is probably overkill, but we might need it if we'll support custom stacks later.
     def __contains__(cls, item):
         try:
             cls(item)
@@ -296,16 +296,13 @@ def stack_set(stack_type: str) -> None:
             "name": stack_enum.name
         }
     }
-    # 1. check for existing config file
-    # 2. if file exists, add to it by to_dict(), update, then from_dict(), then write
-    # 3. if file does not exist, create one and write to it
-    # possibly this would be easier if there was a function in matcha_config which handled these steps.
+
     if MatchaConfigService.config_file_exists():
         config = MatchaConfigService.read_matcha_config()
         config_dict = config.to_dict()
         config_dict.update(stack_dict)
     else:
-        config_dict = MatchaConfig.from_dict(stack_dict)
+        config_dict = stack_dict
 
     config = MatchaConfig.from_dict(config_dict)
     MatchaConfigService.write_matcha_config(config)
