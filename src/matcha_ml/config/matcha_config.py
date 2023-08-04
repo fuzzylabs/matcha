@@ -99,7 +99,7 @@ class MatchaConfig:
         return state_dictionary
 
     @staticmethod
-    def from_dict(state_dict: Dict[str, Dict[str, str]]) -> MatchaConfig:
+    def from_dict(state_dict: Dict[str, Dict[str, str]]) -> "MatchaConfig":
         """A function to convert a dictionary representation of the Matcha config file into a MatchaConfig instance.
 
         Args:
