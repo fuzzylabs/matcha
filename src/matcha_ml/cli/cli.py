@@ -259,8 +259,8 @@ def set(stack: str = typer.Argument("default")) -> None:
         Exit: Exit if input is not a defined stack.
     """
     try:
-        set_stack = core.stack_set(stack)
-        print_status(build_status(f"Matcha {set_stack} stack has been set."))
+        core.stack_set(stack)
+        print_status(build_status(f"Matcha {stack} stack has been set."))
     except MatchaInputError as e:
         print_error(str(e))
         raise typer.Exit()

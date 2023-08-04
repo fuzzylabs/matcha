@@ -65,8 +65,8 @@ def test_cli_stack_set_command_with_args(runner: CliRunner) -> None:
     Args:
         runner (CliRunner): typer CLI runner
     """
-    result = runner.invoke(app, ["stack", "set", "test_stack"])
+    result = runner.invoke(app, ["stack", "set", "default"])
 
     assert result.exit_code == 0
 
-    assert "Matcha test_stack stack has been set." in result.stdout
+    assert "Matcha default stack has been set." in result.stdout
