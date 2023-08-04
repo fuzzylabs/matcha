@@ -161,6 +161,10 @@ class MatchaConfigService:
             )
 
     @staticmethod
+    def config_file_exists():
+        return os.path.exists(os.path.join(os.getcwd(), DEFAULT_CONFIG_NAME))
+
+    @staticmethod
     def delete_matcha_config() -> None:
         """A function for deleting the local Matcha config file.
 

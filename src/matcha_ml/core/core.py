@@ -6,7 +6,7 @@ from enum import Enum, EnumMeta
 from matcha_ml.cli._validation import get_command_validation
 from matcha_ml.cli.ui.print_messages import print_status
 from matcha_ml.cli.ui.status_message_builders import build_warning_status
-from matcha_ml.config import MatchaConfigService
+from matcha_ml.config import MatchaConfigService, MatchaConfig
 from matcha_ml.core._validation import is_valid_prefix, is_valid_region
 from matcha_ml.errors import MatchaError, MatchaInputError
 from matcha_ml.runners import AzureRunner
@@ -283,12 +283,30 @@ def provision(
         return matcha_state_service.fetch_resources_from_state_file()
 
 
-def stack_set(stack_type: str) -> str:
+def stack_set(stack_type: str) -> None:
     """Placeholder for core matcha stack set functionality."""
 
     if stack_type.lower() not in StackType:
         raise MatchaInputError(f"{stack_type} is not a valid stack type.")
 
     stack_enum = StackType(stack_type)
-    return stack_type
+
+    stack_dict = {
+        "stack": {
+            "name": stack_enum.name
+        }
+    }
+    # 1. check for existing config file
+    # 2. if file exists, add to it by to_dict(), update, then from_dict(), then write
+    # 3. if file does not exist, create one and write to it
+    # possibly this would be easier if there was a function in matcha_config which handled these steps.
+    if MatchaConfigService.config_file_exists():
+        config = MatchaConfigService.read_matcha_config()
+        config_dict = config.to_dict()
+        config_dict.update(stack_dict)
+    else:
+        config_dict = MatchaConfig.from_dict(stack_dict)
+
+    config = MatchaConfig.from_dict(config_dict)
+    MatchaConfigService.write_matcha_config(config)
 
