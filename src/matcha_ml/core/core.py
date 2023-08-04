@@ -283,13 +283,17 @@ def provision(
         return matcha_state_service.fetch_resources_from_state_file()
 
 
-def stack_set(stack_type: str) -> None:
-    """Placeholder for core matcha stack set functionality."""
+def stack_set(stack_name: str) -> None:
+    """A function for updating the stack type in the local matcha.config.json file.
 
-    if stack_type.lower() not in StackType:
-        raise MatchaInputError(f"{stack_type} is not a valid stack type.")
+    Args:
+        stack_name (str): the name of the type of stack to be specified in the config file.
+    """
 
-    stack_enum = StackType(stack_type)
+    if stack_name.lower() not in StackType:
+        raise MatchaInputError(f"{stack_name} is not a valid stack type.")
+
+    stack_enum = StackType(stack_name)
 
     stack_dict = {
         "stack": {
