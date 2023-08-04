@@ -128,7 +128,11 @@ class MatchaConfigService:
 
     @staticmethod
     def write_matcha_config(matcha_config: MatchaConfig) -> None:
-        """A function for writing the local Matcha config file."""
+        """A function for writing the local Matcha config file.
+
+        Args:
+            matcha_config (MatchaConfig): the MatchaConfig representation of the MatchaConfig instance.
+        """
         local_config_file = os.path.join(os.getcwd(), DEFAULT_CONFIG_NAME)
 
         with open(local_config_file, "w") as file:
