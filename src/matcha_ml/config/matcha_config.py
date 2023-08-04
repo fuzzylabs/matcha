@@ -144,6 +144,9 @@ class MatchaConfigService:
 
         Returns:
            MatchaConfig: the MatchaConfig representation of the MatchaConfig instance.
+
+        Raises:
+            MatchaError: raises a MatchaError if the local config file could not be read.
         """
         local_config_file = os.path.join(os.getcwd(), DEFAULT_CONFIG_NAME)
 
@@ -154,7 +157,7 @@ class MatchaConfigService:
             return MatchaConfig.from_dict(local_config)
         else:
             raise MatchaError(
-                "No 'matcha.config.json' file found, please generate one by running 'matcha provision', or add an existing 'matcha.config.json' file to the root project directory."
+                f"No '{DEFAULT_CONFIG_NAME}' file found, please generate one by running 'matcha provision', or add an existing ''{DEFAULT_CONFIG_NAME}'' file to the root project directory."
             )
 
     @staticmethod
