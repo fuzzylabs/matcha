@@ -80,6 +80,26 @@ def _execute_analytics_event(
     return result, error_code
 
 
+def _time_event(
+    func: Callable[..., Any], *args: Any, **kwargs: Any
+) -> Tuple[Any, Exception, float, float]:
+    """Times the execution of the function decorated by track.
+
+    Args:
+        func (Callable): The function decorated by track.
+        *args (Any): arguments passed to the function.
+        **kwargs (Any): additional keyword arguments passed to the function.
+
+    Returns:
+        Tuple[Any, Exception, float, float]: The result of the call to func, the error code, the start time of execution, the end time of execution.
+    """
+    ts = perf_counter()
+    result, error_code = _execute_analytics_event(func, *args, **kwargs)
+    te = perf_counter()
+
+    return result, error_code, ts, te
+
+
 def track(event_name: AnalyticsEvent) -> Callable[..., Any]:
     """Track decorator for tracking user analytics with Segment.
 
@@ -115,22 +135,13 @@ def track(event_name: AnalyticsEvent) -> Callable[..., Any]:
 
             if not global_params.analytics_opt_out:
                 if event_name.value in [event_name.PROVISION, event_name.GET]:
-                    ts = perf_counter()
-                    result, error_code = _execute_analytics_event(func, *args, **kwargs)
-                    te = perf_counter()
-
-                try:
-                    MatchaStateService()
-                except Exception as e:
-                    error_code = e
+                    result, error_code, ts, te = _time_event(func, *args, **kwargs)
 
                 # Get the matcha.state UUID if it exists
                 matcha_state_uuid: Optional[MatchaResourceProperty] = _get_state_uuid()
 
                 if event_name.value in [event_name.DESTROY]:
-                    ts = perf_counter()
-                    result, error_code = _execute_analytics_event(func, *args, **kwargs)
-                    te = perf_counter()
+                    result, error_code, ts, te = _time_event(func, *args, **kwargs)
 
                 client = analytics.Client(WRITE_KEY, max_retries=1, debug=False)
 
