@@ -59,7 +59,7 @@ def _get_state_uuid() -> Optional[MatchaResourceProperty]:
     return matcha_state_uuid
 
 
-def execute_analytics_event(
+def _execute_analytics_event(
     func: Callable[..., Any], *args: Any, **kwargs: Any
 ) -> Tuple[Optional[MatchaState], Any]:
     """Exists to Temporarily fix misleading error messages coming from track decorator.
@@ -116,7 +116,7 @@ def track(event_name: AnalyticsEvent) -> Callable[..., Any]:
             if not global_params.analytics_opt_out:
                 if event_name.value in [event_name.PROVISION, event_name.GET]:
                     ts = perf_counter()
-                    result, error_code = execute_analytics_event(func, *args, **kwargs)
+                    result, error_code = _execute_analytics_event(func, *args, **kwargs)
                     te = perf_counter()
 
                 try:
@@ -129,7 +129,7 @@ def track(event_name: AnalyticsEvent) -> Callable[..., Any]:
 
                 if event_name.value in [event_name.DESTROY]:
                     ts = perf_counter()
-                    result, error_code = execute_analytics_event(func, *args, **kwargs)
+                    result, error_code = _execute_analytics_event(func, *args, **kwargs)
                     te = perf_counter()
 
                 client = analytics.Client(WRITE_KEY, max_retries=1, debug=False)
