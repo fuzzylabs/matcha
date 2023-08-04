@@ -1,12 +1,12 @@
 """The core functionality for Matcha API."""
 import os
 from typing import Optional
-from warnings import warn
 
 from enum import Enum, EnumMeta
 from matcha_ml.cli._validation import get_command_validation
 from matcha_ml.cli.ui.print_messages import print_status
 from matcha_ml.cli.ui.status_message_builders import build_warning_status
+from matcha_ml.config import MatchaConfigService
 from matcha_ml.core._validation import is_valid_prefix, is_valid_region
 from matcha_ml.errors import MatchaError, MatchaInputError
 from matcha_ml.runners import AzureRunner
@@ -15,8 +15,6 @@ from matcha_ml.services.global_parameters_service import GlobalParameters
 from matcha_ml.state import MatchaStateService, RemoteStateManager
 from matcha_ml.state.matcha_state import MatchaState
 from matcha_ml.templates.azure_template import AzureTemplate
-
-MAJOR_MINOR_ZENML_VERSION = "0.36"
 
 
 class StackTypeMeta(EnumMeta):  # this is probably overkill, but we might need  it if we'll support custom stacks later.
@@ -34,20 +32,23 @@ class StackType(Enum, metaclass=StackTypeMeta):
     LLM = "llm"
 
 
-def zenml_version_is_supported() -> None:
+def infer_zenml_version() -> str:
     """Check the zenml version of the local environment against the version matcha is expecting."""
     try:
         import zenml
 
-        if zenml.__version__[:3] != MAJOR_MINOR_ZENML_VERSION:
-            warn(
-                f"Matcha expects ZenML version {MAJOR_MINOR_ZENML_VERSION}.x, but you have version {zenml.__version__}."
-            )
-    except:
-        warn(
-            f"No local installation of ZenMl found. Defaulting to version {MAJOR_MINOR_ZENML_VERSION} for remote "
-            f"resources."
+        version = zenml.__version__
+        print(
+            f"\nMatcha detected zenml version {version}, so will use the same version on the remote resources."
         )
+    except:
+        version = "latest"
+        print(
+            "\nMatcha didn't find a zenml installation locally, so will install the latest release of zenml on the "
+            "remote resources."
+        )
+
+    return version
 
 
 @track(event_name=AnalyticsEvent.GET)
@@ -221,7 +222,6 @@ def provision(
         MatchaError: If prefix is not valid.
         MatchaError: If region is not valid.
     """
-    zenml_version_is_supported()
     remote_state_manager = RemoteStateManager()
     template_runner = AzureRunner()
 
@@ -237,7 +237,7 @@ def provision(
                     "Matcha has detected a stale state file. This means that your local configuration is out of sync with the remote state, the resource group may have been removed. Deleting existing state config."
                 )
             )
-        remote_state_manager.remove_matcha_config()
+        MatchaConfigService.delete_matcha_config()
         template_runner.remove_matcha_dir()
 
     if remote_state_manager.is_state_provisioned():
@@ -267,8 +267,12 @@ def provision(
 
         azure_template = AzureTemplate()
 
+        zenml_version = infer_zenml_version()
         config = azure_template.build_template_configuration(
-            location=location, prefix=prefix, password=password
+            location=location,
+            prefix=prefix,
+            password=password,
+            zenmlserver_version=zenml_version,
         )
         azure_template.build_template(config, template, destination, verbose)
 

@@ -161,8 +161,7 @@ variable "zenmlserver_image_repo" {
   default     = "zenmldocker/zenml-server"
   type        = string
 }
-variable "zenmlserver_image_tag" {
+variable "zenmlserver_version" {
   description = "The tag to use for the zenmlserver docker image."
-  default     = "latest"
   type        = string
 }
