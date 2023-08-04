@@ -58,7 +58,19 @@ class MatchaConfig:
     components: List[MatchaConfigComponent]
 
     def find_component(self, component_name: str) -> MatchaConfigComponent:
-        """docstring."""
+        """Given a component name, find the component that matches it.
+
+        Note: this only works under the assumption of none-duplicated properties.
+
+        Args:
+            component_name (str): the name of the component.
+
+        Raises:
+            MatchaError: if the component could not be found.
+
+        Returns:
+            MatchaConfigComponent: the component that matches the component_name parameter.
+        """
         component = next(
             filter(lambda component: component.name == component_name, self.components),
             None,
@@ -116,7 +128,7 @@ class MatchaConfigService:
 
     @staticmethod
     def write_matcha_config(matcha_config: MatchaConfig) -> None:
-        """docstring."""
+        """A function for writing the local Matcha config file."""
         local_config_file = os.path.join(os.getcwd(), DEFAULT_CONFIG_NAME)
 
         with open(local_config_file, "w") as file:
@@ -138,7 +150,7 @@ class MatchaConfigService:
             return MatchaConfig.from_dict(local_config)
         else:
             raise MatchaError(
-                "No 'matcha.config.json file found, please generate one by running 'matcha provision', or add an existing 'matcha.config.json' file to the root project directory."
+                "No 'matcha.config.json' file found, please generate one by running 'matcha provision', or add an existing 'matcha.config.json' file to the root project directory."
             )
 
     @staticmethod
@@ -146,7 +158,7 @@ class MatchaConfigService:
         """A function for deleting the local Matcha config file.
 
         Raises:
-        MatchaError: raises a MatchaError if the local config file could not be removed.
+            MatchaError: raises a MatchaError if the local config file could not be removed.
         """
         local_config_file = os.path.join(os.getcwd(), DEFAULT_CONFIG_NAME)
 

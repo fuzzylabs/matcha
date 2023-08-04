@@ -63,7 +63,7 @@ class RemoteStateManager:
         """Configuration property.
 
         Returns:
-            RemoteStateConfig: configuration read from the file system
+            MatchaConfig: configuration read from the file system
 
         Raises:
             MatchaError: if configuration file failed to load.

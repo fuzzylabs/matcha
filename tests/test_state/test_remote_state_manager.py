@@ -232,7 +232,6 @@ def test_provision_remote_state(
         state_storage_destination_path, state_storage_expected_tf_vars
     )
 
-    print(matcha_testing_directory, valid_config_testing_directory)
     assert matcha_testing_directory == valid_config_testing_directory
 
     assert_matcha_config(matcha_testing_directory, mocked_matcha_config_json_object)
