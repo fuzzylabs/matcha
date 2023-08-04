@@ -1,11 +1,11 @@
 """The core functionality for Matcha API."""
 import os
 from typing import Optional
-from warnings import warn
 
 from matcha_ml.cli._validation import get_command_validation
 from matcha_ml.cli.ui.print_messages import print_status
 from matcha_ml.cli.ui.status_message_builders import build_warning_status
+from matcha_ml.config import MatchaConfigService
 from matcha_ml.core._validation import is_valid_prefix, is_valid_region
 from matcha_ml.errors import MatchaError, MatchaInputError
 from matcha_ml.runners import AzureRunner
@@ -18,15 +18,19 @@ from matcha_ml.templates.azure_template import AzureTemplate
 
 def infer_zenml_version() -> str:
     """Check the zenml version of the local environment against the version matcha is expecting."""
-
     try:
         import zenml
+
         version = zenml.__version__
-        print(f"\nMatcha detected zenml version {version}, so will use the same version on the remote resources." )
+        print(
+            f"\nMatcha detected zenml version {version}, so will use the same version on the remote resources."
+        )
     except:
         version = "latest"
-        print(f"\nMatcha didn't find a zenml installation locally, so will install the latest release of zenml on the "
-              f"remote resources.")
+        print(
+            "\nMatcha didn't find a zenml installation locally, so will install the latest release of zenml on the "
+            "remote resources."
+        )
 
     return version
 
@@ -217,7 +221,7 @@ def provision(
                     "Matcha has detected a stale state file. This means that your local configuration is out of sync with the remote state, the resource group may have been removed. Deleting existing state config."
                 )
             )
-        remote_state_manager.remove_matcha_config()
+        MatchaConfigService.delete_matcha_config()
         template_runner.remove_matcha_dir()
 
     if remote_state_manager.is_state_provisioned():
@@ -249,7 +253,10 @@ def provision(
 
         zenml_version = infer_zenml_version()
         config = azure_template.build_template_configuration(
-            location=location, prefix=prefix, password=password, zenmlserver_version=zenml_version
+            location=location,
+            prefix=prefix,
+            password=password,
+            zenmlserver_version=zenml_version,
         )
         azure_template.build_template(config, template, destination, verbose)
 

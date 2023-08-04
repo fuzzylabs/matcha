@@ -5,7 +5,7 @@ import random
 import tempfile
 import uuid
 from pathlib import Path
-from typing import Iterator
+from typing import Dict, Iterator
 from unittest.mock import PropertyMock, patch
 
 import pytest
@@ -14,6 +14,12 @@ from azure.mgmt.confluent.models._confluent_management_client_enums import (
 )
 from typer.testing import CliRunner
 
+from matcha_ml.config import (
+    MatchaConfig,
+    MatchaConfigComponent,
+    MatchaConfigComponentProperty,
+    MatchaConfigService,
+)
 from matcha_ml.services import AzureClient
 from matcha_ml.services.azure_service import ROLE_ID_MAPPING
 from matcha_ml.services.terraform_service import TerraformConfig
@@ -241,3 +247,71 @@ def state_file_as_object(uuid_for_testing: uuid.UUID) -> MatchaState:
             ),
         ]
     )
+
+
+@pytest.fixture
+def mocked_matcha_config_json_object() -> Dict[str, Dict[str, str]]:
+    """A fixture returning a dictionary representation of the matcha.config.json file.
+
+    Returns:
+        matcha_config (Dict[str, Dict[str, str]]): a dictionary representation of the matcha.config.json file
+    """
+    matcha_config = {
+        "remote_state_bucket": {
+            "account_name": "test-account",
+            "container_name": "test-container",
+            "resource_group_name": "test-rg",
+        }
+    }
+
+    return matcha_config
+
+
+@pytest.fixture
+def mocked_matcha_config_component_property() -> MatchaConfigComponentProperty:
+    """A fixture returning a mocked MatchaConfigComponentProperty instance.
+
+    Returns:
+        (MatchaConfigComponentProperty): a mocked MatchaConfigComponentProperty instance.
+    """
+    return MatchaConfigComponentProperty(name="account_name", value="test_account_name")
+
+
+@pytest.fixture
+def mocked_matcha_config_component(mocked_matcha_config_json_object):
+    """A fixture returning a mocked MatchaConfigComponentProperty instance.
+
+    Args:
+        mocked_matcha_config_json_object (Dict[str, Dict[str, str]]): a dictionary representation of the matcha.config.json file
+
+    Returns:
+        (MatchaConfigComponentProperty): a mocked MatchaConfigComponentProperty instance.
+    """
+    properties = []
+    for key, value in mocked_matcha_config_json_object["remote_state_bucket"].items():
+        properties.append(MatchaConfigComponentProperty(name=key, value=value))
+
+    return MatchaConfigComponent(name="remote_state_bucket", properties=properties)
+
+
+@pytest.fixture
+def mocked_matcha_config(mocked_matcha_config_component):
+    """A fixture returning a mocked MatchaConfig instance.
+
+    Args:
+        mocked_matcha_config_component (MatchaConfigComponent): a mocked MatchaConfigComponent instance.
+
+    Returns:
+        (MatchaConfig): a mocked MatchaConfig instance.
+    """
+    return MatchaConfig([mocked_matcha_config_component])
+
+
+@pytest.fixture
+def mocked_matcha_config_service():
+    """A fixture representing a mocked MatchaConfigService.
+
+    Returns:
+    (MatchaConfigService): a mocked MatchaConfigService instance.
+    """
+    return MatchaConfigService()
