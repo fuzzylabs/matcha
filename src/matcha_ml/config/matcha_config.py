@@ -6,6 +6,8 @@ from typing import Dict, List
 
 from matcha_ml.errors import MatchaError
 
+DEFAULT_CONFIG_NAME = "matcha.config.json"
+
 
 @dataclass
 class MatchaConfigComponentProperty:
@@ -55,6 +57,20 @@ class MatchaConfig:
 
     components: List[MatchaConfigComponent]
 
+    def find_component(self, component_name: str) -> MatchaConfigComponent:
+        """docstring."""
+        component = next(
+            filter(lambda component: component.name == component_name, self.components),
+            None,
+        )
+
+        if component is None:
+            raise MatchaError(
+                f"The component with the name '{component_name}' could not be found."
+            )
+
+        return component
+
     def to_dict(self) -> Dict[str, Dict[str, str]]:
         """A function to convert the MatchaConfig class into a dictionary.
 
@@ -99,19 +115,31 @@ class MatchaConfigService:
     """A service for handling the Matcha config file."""
 
     @staticmethod
+    def write_matcha_config(matcha_config: MatchaConfig) -> None:
+        """docstring."""
+        local_config_file = os.path.join(os.getcwd(), DEFAULT_CONFIG_NAME)
+
+        with open(local_config_file, "w") as file:
+            json.dump(matcha_config.to_dict(), file)
+
+    @staticmethod
     def read_matcha_config() -> MatchaConfig:
         """A function for reading the Matcha config file into a MatchaConfig object.
 
         Returns:
            MatchaConfig: the MatchaConfig representation of the MatchaConfig instance.
         """
-        local_config_file = os.path.join(os.getcwd(), "matcha.config.json")
+        local_config_file = os.path.join(os.getcwd(), DEFAULT_CONFIG_NAME)
 
         if os.path.exists(local_config_file):
             with open(local_config_file) as config:
                 local_config = json.load(config)
 
-        return MatchaConfig.from_dict(local_config)
+            return MatchaConfig.from_dict(local_config)
+        else:
+            raise MatchaError(
+                "No 'matcha.config.json file found, please generate one by running 'matcha provision', or add an existing 'matcha.config.json' file to the root project directory."
+            )
 
     @staticmethod
     def delete_matcha_config() -> None:
@@ -120,7 +148,7 @@ class MatchaConfigService:
         Raises:
         MatchaError: raises a MatchaError if the local config file could not be removed.
         """
-        local_config_file = os.path.join(os.getcwd(), "matcha.config.json")
+        local_config_file = os.path.join(os.getcwd(), DEFAULT_CONFIG_NAME)
 
         try:
             os.remove(local_config_file)

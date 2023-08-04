@@ -6,6 +6,7 @@ from warnings import warn
 from matcha_ml.cli._validation import get_command_validation
 from matcha_ml.cli.ui.print_messages import print_status
 from matcha_ml.cli.ui.status_message_builders import build_warning_status
+from matcha_ml.config import MatchaConfigService
 from matcha_ml.core._validation import is_valid_prefix, is_valid_region
 from matcha_ml.errors import MatchaError, MatchaInputError
 from matcha_ml.runners import AzureRunner
@@ -15,7 +16,6 @@ from matcha_ml.state import MatchaStateService, RemoteStateManager
 from matcha_ml.state.matcha_state import MatchaState
 from matcha_ml.templates.azure_template import AzureTemplate
 
-
 MAJOR_MINOR_ZENML_VERSION = "0.36"
 
 
@@ -23,13 +23,16 @@ def zenml_version_is_supported() -> None:
     """Check the zenml version of the local environment against the version matcha is expecting."""
     try:
         import zenml
+
         if zenml.__version__[:3] != MAJOR_MINOR_ZENML_VERSION:
             warn(
                 f"Matcha expects ZenML version {MAJOR_MINOR_ZENML_VERSION}.x, but you have version {zenml.__version__}."
             )
     except:
-        warn(f"No local installation of ZenMl found. Defaulting to version {MAJOR_MINOR_ZENML_VERSION} for remote "
-             f"resources.")
+        warn(
+            f"No local installation of ZenMl found. Defaulting to version {MAJOR_MINOR_ZENML_VERSION} for remote "
+            f"resources."
+        )
 
 
 @track(event_name=AnalyticsEvent.GET)
@@ -219,7 +222,7 @@ def provision(
                     "Matcha has detected a stale state file. This means that your local configuration is out of sync with the remote state, the resource group may have been removed. Deleting existing state config."
                 )
             )
-        remote_state_manager.remove_matcha_config()
+        MatchaConfigService.delete_matcha_config()
         template_runner.remove_matcha_dir()
 
     if remote_state_manager.is_state_provisioned():

@@ -1,16 +1,21 @@
 """Remote state manager module."""
 import contextlib
-import dataclasses
 import os
 from typing import Iterator, Optional
 
 from azure.core.exceptions import ResourceExistsError
-from dataclasses_json import DataClassJsonMixin
 
-from matcha_ml.cli.ui.print_messages import print_error, print_status
+from matcha_ml.cli.ui.print_messages import print_status
 from matcha_ml.cli.ui.status_message_builders import (
     build_step_success_status,
     build_warning_status,
+)
+from matcha_ml.config import (
+    DEFAULT_CONFIG_NAME,
+    MatchaConfig,
+    MatchaConfigComponent,
+    MatchaConfigComponentProperty,
+    MatchaConfigService,
 )
 from matcha_ml.constants import LOCK_FILE_NAME
 from matcha_ml.errors import MatchaError
@@ -18,32 +23,10 @@ from matcha_ml.runners.remote_state_runner import RemoteStateRunner
 from matcha_ml.storage import AzureStorage
 from matcha_ml.templates import RemoteStateTemplate
 
-DEFAULT_CONFIG_NAME = "matcha.config.json"
 ALREADY_LOCKED_MESSAGE = (
     "Remote state is already locked, maybe someone else is using matcha?"
     " If you think this is a mistake, you can unlock the state by running 'matcha force-unlock'."
 )
-
-
-@dataclasses.dataclass
-class RemoteStateBucketConfig(DataClassJsonMixin):
-    """Dataclass to store state bucket configuration."""
-
-    # Azure storage account name
-    account_name: str
-
-    # Azure storage container name
-    container_name: str
-
-    # Azure resource group name
-    resource_group_name: str
-
-
-@dataclasses.dataclass
-class RemoteStateConfig(DataClassJsonMixin):
-    """Dataclass to store remote state configuration."""
-
-    remote_state_bucket: RemoteStateBucketConfig
 
 
 class RemoteStateManager:
@@ -75,17 +58,8 @@ class RemoteStateManager:
         """
         return os.path.exists(self.config_path)
 
-    def _load_configuration(self) -> RemoteStateConfig:
-        """Load configuration file.
-
-        Returns:
-            RemoteStateConfig: remote state configuration
-        """
-        with open(self.config_path) as f:
-            return RemoteStateConfig.from_json(f.read())
-
     @property
-    def configuration(self) -> RemoteStateConfig:
+    def configuration(self) -> MatchaConfig:
         """Configuration property.
 
         Returns:
@@ -95,7 +69,7 @@ class RemoteStateManager:
             MatchaError: if configuration file failed to load.
         """
         try:
-            return self._load_configuration()
+            return MatchaConfigService.read_matcha_config()
         except Exception as e:
             raise MatchaError(f"Error while loading state configuration: {e}")
 
@@ -114,8 +88,16 @@ class RemoteStateManager:
         if self._azure_storage is None:
             try:
                 self._azure_storage = AzureStorage(
-                    account_name=self.configuration.remote_state_bucket.account_name,
-                    resource_group_name=self.configuration.remote_state_bucket.resource_group_name,
+                    account_name=self.configuration.find_component(
+                        "remote_state_bucket"
+                    )
+                    .find_property("account_name")
+                    .value,
+                    resource_group_name=self.configuration.find_component(
+                        "remote_state_bucket"
+                    )
+                    .find_property("resource_group_name")
+                    .value,
                 )
             except Exception as e:
                 raise MatchaError(f"Error while creating Azure Storage client: {e}")
@@ -151,7 +133,10 @@ class RemoteStateManager:
             str: Hash content of file on remote storage in hexadecimal string
         """
         return self.azure_storage.get_hash_remote_state(
-            self.configuration.remote_state_bucket.container_name, remote_path
+            self.configuration.find_component("remote_state_bucket")
+            .find_property("container_name")
+            .value,
+            remote_path,
         )
 
     def is_state_provisioned(self) -> bool:
@@ -167,7 +152,9 @@ class RemoteStateManager:
             return False
 
         if not self._bucket_exists(
-            self.configuration.remote_state_bucket.container_name
+            self.configuration.find_component("remote_state_bucket")
+            .find_property("container_name")
+            .value
         ):
             return False
 
@@ -213,13 +200,23 @@ class RemoteStateManager:
         state_storage_template.build_template(config, template, destination, verbose)
 
         account_name, container_name, resource_group_name = template_runner.provision()
-        self._write_matcha_config(account_name, container_name, resource_group_name)
+        properties = [
+            MatchaConfigComponentProperty(name="account_name", value=account_name),
+            MatchaConfigComponentProperty(name="container_name", value=container_name),
+            MatchaConfigComponentProperty(
+                name="resource_group_name", value=resource_group_name
+            ),
+        ]
+        remote_state_bucket_component = MatchaConfigComponent(
+            name="remote_state_bucket", properties=properties
+        )
+        matcha_config = MatchaConfig(components=[remote_state_bucket_component])
+        MatchaConfigService.write_matcha_config(matcha_config=matcha_config)
         print_status(
             build_step_success_status(
                 "Provisioning Matcha resource group and remote state is complete!"
             )
         )
-        print()
 
     def deprovision_remote_state(self) -> None:
         """Destroy the state bucket provisioned."""
@@ -227,47 +224,7 @@ class RemoteStateManager:
         template_runner = RemoteStateRunner()
 
         template_runner.deprovision()
-        self.remove_matcha_config()
-
-    def _write_matcha_config(
-        self, account_name: str, container_name: str, resource_group_name: str
-    ) -> None:
-        """Write the outputs of the Terraform deployed state storage to a bucket config file.
-
-        Args:
-            account_name (str): the storage account name of the remote state storage provisioned.
-            container_name (str): the container name of the remote state storage provisioned.
-            resource_group_name (str): Azure client ID.
-        """
-        remote_state_bucket_config = RemoteStateBucketConfig(
-            account_name=account_name,
-            container_name=container_name,
-            resource_group_name=resource_group_name,
-        )
-        remote_state_config = RemoteStateConfig(
-            remote_state_bucket=remote_state_bucket_config
-        )
-
-        matcha_config = remote_state_config.to_json(indent=4)
-
-        with open(self.config_path, "w") as f:
-            f.write(matcha_config)
-
-        print_status(
-            build_step_success_status(
-                f"The matcha configuration is written to {self.config_path}"
-            )
-        )
-
-    def remove_matcha_config(self) -> None:
-        """Remove the matcha.config.json file."""
-        try:
-            os.remove(self.config_path)
-            self._azure_storage = None
-        except FileNotFoundError:
-            print_error(
-                f"Failed to remove the matcha.config.json file at {self.config_path}, file not found."
-            )
+        MatchaConfigService.delete_matcha_config()
 
     def download(self, dest_folder_path: str) -> None:
         """Download the remote state into the local matcha state directory.
@@ -276,7 +233,9 @@ class RemoteStateManager:
             dest_folder_path (str): Path to local matcha state directory
         """
         self.azure_storage.download_folder(
-            container_name=self.configuration.remote_state_bucket.container_name,
+            container_name=self.configuration.find_component("remote_state_bucket")
+            .find_property("container_name")
+            .value,
             dest_folder_path=dest_folder_path,
         )
 
@@ -287,7 +246,9 @@ class RemoteStateManager:
             local_folder_path (str): Path to local matcha state directory
         """
         self.azure_storage.upload_folder(
-            container_name=self.configuration.remote_state_bucket.container_name,
+            container_name=self.configuration.find_component("remote_state_bucket")
+            .find_property("container_name")
+            .value,
             src_folder_path=local_folder_path,
         )
 
@@ -316,7 +277,9 @@ class RemoteStateManager:
         """
         try:
             self.azure_storage.create_empty(
-                container_name=self.configuration.remote_state_bucket.container_name,
+                container_name=self.configuration.find_component("remote_state_bucket")
+                .find_property("container_name")
+                .value,
                 blob_name=LOCK_FILE_NAME,
             )
         except ResourceExistsError:
@@ -325,7 +288,9 @@ class RemoteStateManager:
     def unlock(self) -> None:
         """Unlock remote state."""
         if not self.azure_storage.blob_exists(
-            container_name=self.configuration.remote_state_bucket.container_name,
+            container_name=self.configuration.find_component("remote_state_bucket")
+            .find_property("container_name")
+            .value,
             blob_name=LOCK_FILE_NAME,
         ):
             print_status(
@@ -334,7 +299,9 @@ class RemoteStateManager:
             return
         else:
             self.azure_storage.delete_blob(
-                container_name=self.configuration.remote_state_bucket.container_name,
+                container_name=self.configuration.find_component("remote_state_bucket")
+                .find_property("container_name")
+                .value,
                 blob_name=LOCK_FILE_NAME,
             )
 

@@ -6,20 +6,23 @@ from typing import Dict, Iterator
 from unittest.mock import MagicMock, PropertyMock, patch
 
 import pytest
-from _pytest.capture import SysCapture
 from azure.mgmt.confluent.models._confluent_management_client_enums import (  # type: ignore [import]
     ProvisionState,
 )
 
+from matcha_ml.config import (
+    DEFAULT_CONFIG_NAME,
+    MatchaConfig,
+    MatchaConfigComponent,
+    MatchaConfigComponentProperty,
+    MatchaConfigService,
+)
 from matcha_ml.errors import MatchaError
 from matcha_ml.runners.remote_state_runner import RemoteStateRunner
 from matcha_ml.state import RemoteStateManager
 from matcha_ml.state.remote_state_manager import (
     ALREADY_LOCKED_MESSAGE,
-    DEFAULT_CONFIG_NAME,
     LOCK_FILE_NAME,
-    RemoteStateBucketConfig,
-    RemoteStateConfig,
 )
 from matcha_ml.templates.remote_state_template import SUBMODULE_NAMES
 
@@ -30,36 +33,61 @@ TEMPLATE_DIR = os.path.join(
 
 
 @pytest.fixture
-def remote_state_config() -> RemoteStateConfig:
-    """Fixture for a remote state configuration.
+def mocked_matcha_config_json_object() -> Dict[str, Dict[str, str]]:
+    """A fixture returning a dictionary representation of the matcha.config.json file.
 
     Returns:
-        RemoteStateConfig: valid config
+        matcha_config (Dict[str, Dict[str, str]]): a dictionary representation of the matcha.config.json file
     """
-    return RemoteStateConfig(
-        remote_state_bucket=RemoteStateBucketConfig(
-            account_name="test-account",
-            container_name="test-container",
-            resource_group_name="test-rg",
-        )
-    )
-
-
-@pytest.fixture
-def expected_matcha_config() -> Dict[str, Dict[str, str]]:
-    """A fixture for the expected json configuration for testing whether configs are generated as expected.
-
-    Returns:
-        Dict[str, Dict[str, str]]: the expected matcha configuration.
-    """
-    config = {
+    matcha_config = {
         "remote_state_bucket": {
             "account_name": "test-account",
             "container_name": "test-container",
             "resource_group_name": "test-rg",
         }
     }
-    return config
+
+    return matcha_config
+
+
+@pytest.fixture
+def mocked_matcha_config_component_property() -> MatchaConfigComponentProperty:
+    """A fixture returning a mocked MatchaConfigComponentProperty instance.
+
+    Returns:
+        (MatchaConfigComponentProperty): a mocked MatchaConfigComponentProperty instance.
+    """
+    return MatchaConfigComponentProperty(name="account_name", value="test_account_name")
+
+
+@pytest.fixture
+def mocked_matcha_config_component(mocked_matcha_config_json_object):
+    """A fixture returning a mocked MatchaConfigComponentProperty instance.
+
+    Args:
+        mocked_matcha_config_json_object (Dict[str, Dict[str, str]]): a dictionary representation of the matcha.config.json file
+
+    Returns:
+        (MatchaConfigComponentProperty): a mocked MatchaConfigComponentProperty instance.
+    """
+    properties = []
+    for key, value in mocked_matcha_config_json_object["remote_state_bucket"].items():
+        properties.append(MatchaConfigComponentProperty(name=key, value=value))
+
+    return MatchaConfigComponent(name="remote_state_bucket", properties=properties)
+
+
+@pytest.fixture
+def mocked_matcha_config(mocked_matcha_config_component):
+    """A fixture returning a mocked MatchaConfig instance.
+
+    Args:
+        mocked_matcha_config_component (MatchaConfigComponent): a mocked MatchaConfigComponent instance.
+
+    Returns:
+        (MatchaConfig): a mocked MatchaConfig instance.
+    """
+    return MatchaConfig([mocked_matcha_config_component])
 
 
 @pytest.fixture
@@ -81,21 +109,20 @@ def broken_config_testing_directory(matcha_testing_directory: str) -> str:
 
 @pytest.fixture
 def valid_config_testing_directory(
-    matcha_testing_directory: str, remote_state_config: RemoteStateConfig
+    matcha_testing_directory: str, mocked_matcha_config: MatchaConfig
 ) -> str:
     """Fixture for a valid configuration file in temp working directory.
 
     Args:
         matcha_testing_directory (str): temporary working directory path
-        remote_state_config (RemoteStateConfig): configuration to write to the config file
+        mocked_matcha_config (RemoteStateConfig): configuration to write to the config file
 
     Returns:
         str: temporary working directory path that the configuration was written to
     """
-    config_path = os.path.join(matcha_testing_directory, DEFAULT_CONFIG_NAME)
+    os.chdir(matcha_testing_directory)
 
-    with open(config_path, "w") as f:
-        f.write(remote_state_config.to_json())
+    MatchaConfigService.write_matcha_config(mocked_matcha_config)
 
     return matcha_testing_directory
 
@@ -170,7 +197,9 @@ def assert_matcha_config(
 
 
 def test_provision_remote_state(
-    matcha_testing_directory: str, expected_matcha_config: Dict[str, Dict[str, str]]
+    matcha_testing_directory: str,
+    mocked_matcha_config_json_object: Dict[str, Dict[str, str]],
+    valid_config_testing_directory: str,
 ):
     """Test that provision_state_storage behaves as expected.
 
@@ -179,7 +208,8 @@ def test_provision_remote_state(
 
     Args:
         matcha_testing_directory (str): temporary working directory for tests.
-        expected_matcha_config (Dict[str, Dict[str, str]]): the expected matcha config.
+        mocked_matcha_config_json_object (Dict[str, Dict[str, str]]): the expected matcha config.
+        valid_config_testing_directory (str): a testing directory containing a test config file.
     """
     os.chdir(matcha_testing_directory)
 
@@ -202,7 +232,10 @@ def test_provision_remote_state(
         state_storage_destination_path, state_storage_expected_tf_vars
     )
 
-    assert_matcha_config(matcha_testing_directory, expected_matcha_config)
+    print(matcha_testing_directory, valid_config_testing_directory)
+    assert matcha_testing_directory == valid_config_testing_directory
+
+    assert_matcha_config(matcha_testing_directory, mocked_matcha_config_json_object)
 
 
 def test_deprovision_remote_state(matcha_testing_directory: str) -> None:
@@ -211,6 +244,7 @@ def test_deprovision_remote_state(matcha_testing_directory: str) -> None:
     Args:
         matcha_testing_directory (str): temporary working directory for tests.
     """
+    os.chdir(matcha_testing_directory)
     with patch(
         "matcha_ml.runners.remote_state_runner.RemoteStateRunner.deprovision"
     ) as destroy:
@@ -228,27 +262,6 @@ def test_deprovision_remote_state(matcha_testing_directory: str) -> None:
 
         template_runner = RemoteStateRunner()
         template_runner.deprovision.assert_called()
-
-
-def test_write_matcha_config(
-    matcha_testing_directory: str, expected_matcha_config: Dict[str, Dict[str, str]]
-):
-    """Test whether the write_matcha_config() function is able to write the expected config to the expected destination.
-
-    Args:
-        matcha_testing_directory (str): temporary working directory for tests.
-        expected_matcha_config (Dict[str, Dict[str, str]]): the expected matcha config.
-    """
-    os.chdir(matcha_testing_directory)
-    remote_state_manager = RemoteStateManager(
-        os.path.join(matcha_testing_directory, DEFAULT_CONFIG_NAME)
-    )
-
-    remote_state_manager._write_matcha_config(
-        "test-account", "test-container", "test-rg"
-    )
-
-    assert_matcha_config(matcha_testing_directory, expected_matcha_config)
 
 
 def test_is_state_provisioned_true(
@@ -498,29 +511,6 @@ def test_is_state_provisioned_returns_false_when_resource_group_does_not_exist(
 
     # Make sure the check for the storage container is not called
     mock_azure_storage_instance.container_exists.assert_not_called()
-
-
-def test_remove_matcha_config(capsys: SysCapture):
-    """Test the functionality of the `remove_matcha_config` function by verifying if it correctly catches the "File not found" error and throws the expected error message.
-
-    Args:
-        capsys (SysCapture): fixture to capture stdout and stderr
-    """
-    remote_state_manager = RemoteStateManager()
-
-    mock_non_exist_path = "not_exist"
-    # Verify path do not exists
-    assert not os.path.exists(mock_non_exist_path)
-
-    remote_state_manager.config_path = mock_non_exist_path
-
-    remote_state_manager.remove_matcha_config()
-
-    captured = capsys.readouterr()
-
-    expected_output = f"Failed to remove the matcha.config.json file at {mock_non_exist_path}, file not found."
-
-    assert expected_output in captured.err
 
 
 def test_is_state_stale_false(valid_config_testing_directory: str):
