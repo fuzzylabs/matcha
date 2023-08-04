@@ -3,6 +3,7 @@ import os
 from typing import Optional
 from warnings import warn
 
+from enum import Enum, EnumMeta
 from matcha_ml.cli._validation import get_command_validation
 from matcha_ml.cli.ui.print_messages import print_status
 from matcha_ml.cli.ui.status_message_builders import build_warning_status
@@ -16,6 +17,21 @@ from matcha_ml.state.matcha_state import MatchaState
 from matcha_ml.templates.azure_template import AzureTemplate
 
 MAJOR_MINOR_ZENML_VERSION = "0.36"
+
+
+class StackTypeMeta(EnumMeta):  # this is probably overkill, but we might need  it if we'll support custom stacks later.
+    def __contains__(cls, item):
+        try:
+            cls(item)
+        except ValueError:
+            return False
+        else:
+            return True
+
+
+class StackType(Enum, metaclass=StackTypeMeta):
+    DEFAULT = "default"
+    LLM = "llm"
 
 
 def zenml_version_is_supported() -> None:
@@ -263,6 +279,12 @@ def provision(
         return matcha_state_service.fetch_resources_from_state_file()
 
 
-def stack_set(stack: str) -> str:
+def stack_set(stack_type: str) -> str:
     """Placeholder for core matcha stack set functionality."""
-    return stack
+
+    if stack_type.lower() not in StackType:
+        raise MatchaInputError(f"{stack_type} is not a valid stack type.")
+
+    stack_enum = StackType(stack_type)
+    return stack_type
+
