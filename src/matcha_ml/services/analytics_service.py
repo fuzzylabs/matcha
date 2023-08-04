@@ -14,7 +14,7 @@ from segment import analytics
 from matcha_ml.errors import MatchaError
 from matcha_ml.services._validation import _check_uuid
 from matcha_ml.services.global_parameters_service import GlobalParameters
-from matcha_ml.state import MatchaState, MatchaStateService
+from matcha_ml.state import MatchaResourceProperty, MatchaState, MatchaStateService
 
 WRITE_KEY = "qwBKAvY6MEUvv5XIs4rE07ohf5neT3sx"
 
@@ -28,6 +28,35 @@ class AnalyticsEvent(str, Enum):
     PROVISION = "provision"
     DESTROY = "destroy"
     GET = "get"
+
+
+def _get_state_uuid() -> Optional[MatchaResourceProperty]:
+    """A function for retrieving the Matcha State UUID.
+
+    Returns:
+        matcha_state_uuid (Optional[MatchaResourceProperty]): The Matcha State UUID if present.
+
+    Raises:
+        MatchaError: where the MatchaStateService fails to instantiate, the MatchaStateService does not have an 'id' component, or the Matcha state UUID fails validation.
+    """
+    try:
+        matcha_state_service = MatchaStateService()
+    except MatchaError:
+        return None
+
+    try:
+        state_id_component = matcha_state_service.get_component("id")
+    except MatchaError:
+        return None
+
+    matcha_state_uuid = state_id_component.find_property(property_name="matcha_uuid")
+
+    try:
+        _check_uuid(str(matcha_state_uuid.value))
+    except MatchaError as err:
+        raise err
+
+    return matcha_state_uuid
 
 
 def execute_analytics_event(
@@ -91,28 +120,27 @@ def track(event_name: AnalyticsEvent) -> Callable[..., Any]:
                     te = perf_counter()
 
                 try:
-                    matcha_state_service = MatchaStateService()
+                    MatchaStateService()
                 except Exception as e:
-                    matcha_state_service = None
                     error_code = e
 
                 # Get the matcha.state UUID if it exists
-                matcha_state_uuid: Optional[str] = None
-                if matcha_state_service and matcha_state_service.state_exists():
-                    try:
-                        state_id_component = matcha_state_service.get_component("id")
-                    except MatchaError:
-                        state_id_component = None
+                matcha_state_uuid: Optional[MatchaResourceProperty] = _get_state_uuid()
+                # if matcha_state_service and matcha_state_service.state_exists():
+                #     try:
+                #         state_id_component = matcha_state_service.get_component("id")
+                #     except MatchaError:
+                #         state_id_component = None
 
-                    if state_id_component is not None:
-                        matcha_state_uuid = state_id_component.find_property(
-                            property_name="matcha_uuid"
-                        ).value
+                #     if state_id_component is not None:
+                #         matcha_state_uuid = state_id_component.find_property(
+                #             property_name="matcha_uuid"
+                #         ).value
 
-                        try:
-                            _check_uuid(str(matcha_state_uuid))
-                        except MatchaError as err:
-                            raise err
+                #         try:
+                #             _check_uuid(str(matcha_state_uuid))
+                #         except MatchaError as err:
+                #             raise err
 
                 if event_name.value in [event_name.DESTROY]:
                     ts = perf_counter()

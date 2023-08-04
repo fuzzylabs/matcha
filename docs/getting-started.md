@@ -124,7 +124,7 @@ Pipeline
    - server-url: <url>
    - server-username: ********
    - storage-path: az://<path>
-  
+
 Data version control
     - flavor: FLAVOR
     - connection-string: ********
@@ -241,5 +241,5 @@ matcha destroy
 ```
 
 > Note: that this command is irreversible will remove all the resources deployed by `matcha provision` including the resource group, so make sure you save any data you wish to keep before running this command.
-> 
+>
 > You may also notice that an additional resource has appeared in Azure called 'NetworkWatcherRG' (if it wasn't already there). This is a resource that is automatically provisioned by Azure in each region when there is in-coming traffic to a provisioned resource and isn't controlled by Matcha. More information can be found [here](https://learn.microsoft.com/en-us/azure/network-watcher/network-watcher-monitoring-overview) on how to manage or remove this resource.
