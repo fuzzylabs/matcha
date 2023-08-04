@@ -126,21 +126,6 @@ def track(event_name: AnalyticsEvent) -> Callable[..., Any]:
 
                 # Get the matcha.state UUID if it exists
                 matcha_state_uuid: Optional[MatchaResourceProperty] = _get_state_uuid()
-                # if matcha_state_service and matcha_state_service.state_exists():
-                #     try:
-                #         state_id_component = matcha_state_service.get_component("id")
-                #     except MatchaError:
-                #         state_id_component = None
-
-                #     if state_id_component is not None:
-                #         matcha_state_uuid = state_id_component.find_property(
-                #             property_name="matcha_uuid"
-                #         ).value
-
-                #         try:
-                #             _check_uuid(str(matcha_state_uuid))
-                #         except MatchaError as err:
-                #             raise err
 
                 if event_name.value in [event_name.DESTROY]:
                     ts = perf_counter()
