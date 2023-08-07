@@ -293,7 +293,7 @@ def stack_set(stack_name: str) -> None:
     if stack_name.lower() not in StackType:
         raise MatchaInputError(f"{stack_name} is not a valid stack type.")
 
-    stack_enum = StackType(stack_name)
+    stack_enum = StackType(stack_name.lower())
 
     stack_dict = {
         "stack": {
