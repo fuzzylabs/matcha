@@ -121,17 +121,14 @@ def _post_event(
     """
     client = analytics.Client(WRITE_KEY, max_retries=1, debug=False)
 
-    if matcha_state_uuid:
-        matcha_state_uuid = matcha_state_uuid.value
-
-    return client.track(
+    return client.track(  # type: ignore
         global_params.user_id,
         event_name.value,
         {
             "time_taken": time_taken,
             "error_type": f"{error_code.__class__}.{error_code.__class__.__name__}",
             "command_succeeded": error_code is None,
-            "matcha_state_uuid": matcha_state_uuid,
+            "matcha_state_uuid": matcha_state_uuid.value if matcha_state_uuid else None,
         },
     )
 
@@ -176,6 +173,7 @@ def track(event_name: AnalyticsEvent) -> Callable[..., Any]:
                 if event_name.value in [event_name.PROVISION, event_name.GET]:
                     result, error_code, ts, te = _time_event(func, *args, **kwargs)
 
+                # Get the matcha.state UUID if it exists
                 matcha_state_uuid: Optional[MatchaResourceProperty] = _get_state_uuid()
 
                 if event_name.value in [event_name.DESTROY]:
@@ -191,8 +189,8 @@ def track(event_name: AnalyticsEvent) -> Callable[..., Any]:
                     time_taken=time_taken,
                 )
 
-                # if not event[0]:
-                #     warn("Analytics for f{event_name} were not posted to Segment.")
+                if error_code is not None:
+                    raise error_code
             else:
                 result = func(*args, **kwargs)
 

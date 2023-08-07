@@ -170,7 +170,7 @@ def test_post_event(mocked_global_parameters_service):
     ) as mock_client:
         _ = _post_event(
             event_name=AnalyticsEvent.PROVISION,
-            matcha_state_uuid="12345",
+            matcha_state_uuid=None,
             global_params=mocked_global_parameters_service_instance,
             error_code=None,
             time_taken=1.0,
