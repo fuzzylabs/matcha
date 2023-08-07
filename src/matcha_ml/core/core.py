@@ -6,7 +6,7 @@ from enum import Enum, EnumMeta
 from matcha_ml.cli._validation import get_command_validation
 from matcha_ml.cli.ui.print_messages import print_status
 from matcha_ml.cli.ui.status_message_builders import build_warning_status
-from matcha_ml.config import MatchaConfigService, MatchaConfig
+from matcha_ml.config import MatchaConfigService, MatchaConfigComponent, MatchaConfigComponentProperty
 from matcha_ml.core._validation import is_valid_prefix, is_valid_region
 from matcha_ml.errors import MatchaError, MatchaInputError
 from matcha_ml.runners import AzureRunner
@@ -295,11 +295,15 @@ def stack_set(stack_name: str) -> None:
 
     stack_enum = StackType(stack_name.lower())
 
-    stack_dict = {
-        "stack": {
-            "name": stack_enum.name
-        }
-    }
+    stack = MatchaConfigComponent(
+        name="stack",
+        properties=[
+            MatchaConfigComponentProperty(
+                name='type',
+                value=stack_enum.name
+            )
+        ]
+    )
 
-    MatchaConfigService.update(stack_dict)
+    MatchaConfigService.update(stack)
 

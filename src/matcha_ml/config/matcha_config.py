@@ -170,44 +170,24 @@ class MatchaConfigService:
         return os.path.exists(os.path.join(os.getcwd(), DEFAULT_CONFIG_NAME))
 
     @staticmethod
-    def _update_with_matcha_config(configuration: MatchaConfig) -> None:
-        """A placeholder function for updating the matcha configuration using a MatchaConfig object.\
+    def update(components: Union[MatchaConfigComponent, List[MatchaConfigComponent]]) -> None:
+        """A function which updates the matcha config file.
+
+        If no config file exists, this function will create one.
 
         Args:
-            configuration (MatchaConfig): A MatchaConfig object holding new configuration information for matcha.
+            components (dict): A list of, or single MatchaConfigComponent object(s).
         """
-        raise NotImplementedError
+        if isinstance(components, MatchaConfigComponent):
+            components = [components]
 
-    @staticmethod
-    def _update_with_dict(configuration):
-        """A function for updating the matcha configuration with a dictionary.
-
-        Args:
-            configuration (dict): A dict holding new configuration information for matcha.
-        """
         if MatchaConfigService.config_file_exists():
             config = MatchaConfigService.read_matcha_config()
-            config_dict = config.to_dict()
-            config_dict.update(configuration)
+            config.components += components
         else:
-            config_dict = configuration
+            config = MatchaConfig(components)
 
-        config = MatchaConfig.from_dict(config_dict)
         MatchaConfigService.write_matcha_config(config)
-
-    @staticmethod
-    def update(configuration: Union[dict, MatchaConfig]) -> None:
-        """A function which updates the existing matcha config file with the information stored in the dict argument.
-
-        Args:
-            configuration (dict): The dict defining new matcha configuration information.
-        """
-        if isinstance(configuration, MatchaConfig):
-            MatchaConfigService._update_with_matcha_config(configuration)
-        elif isinstance(configuration, dict):
-            MatchaConfigService._update_with_dict(configuration)
-        else:
-            raise RuntimeError("The configuration provided was not in a supported format.")
 
     @staticmethod
     def delete_matcha_config() -> None:
