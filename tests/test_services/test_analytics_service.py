@@ -185,7 +185,7 @@ def test_segment_track_receives_the_correct_arguments(
     uuid_for_testing,
     mock_state_file,
 ):
-    """Test no the Segment track function receives the expected arguments when a user is opted in to analytics.
+    """Test the Segment track function receives the expected arguments when a user is opted in to analytics.
 
     Args:
         runner (CliRunner): typer CLI runner

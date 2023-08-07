@@ -33,6 +33,7 @@ from matcha_ml.state.matcha_state import (
 
 UUID_VERSION = 4
 INTERNAL_FUNCTION_STUB = "matcha_ml.services.AzureClient"
+ANALYTICS_SERVICE_INTERNAL_FUNCTION_STUB = "matcha_ml.services.analytics_service"
 
 
 @pytest.fixture
@@ -106,7 +107,7 @@ def mocked_segment_track_decorator():
     with patch(
         "matcha_ml.services.analytics_service.analytics.Client.track"
     ) as track_analytics:
-        track_analytics.return_value = None
+        track_analytics.return_value = (True, "test_message")
 
         yield track_analytics
 

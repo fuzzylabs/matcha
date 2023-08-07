@@ -4,9 +4,10 @@ This approach to collecting usage data was inspired by ZenML; source: https://gi
 """
 import functools
 import logging
+from dataclasses import dataclass
 from enum import Enum
 from time import perf_counter
-from typing import Annotated, Any, Callable, Optional, Tuple
+from typing import Any, Callable, Optional, Tuple
 from warnings import warn
 
 from segment import analytics
@@ -28,6 +29,14 @@ class AnalyticsEvent(str, Enum):
     PROVISION = "provision"
     DESTROY = "destroy"
     GET = "get"
+
+
+@dataclass
+class PostEvent:
+    """A dataclass to represent the return value of the _post_event method."""
+
+    success: bool
+    message: str
 
 
 def _get_state_uuid() -> Optional[MatchaResourceProperty]:
@@ -106,7 +115,7 @@ def _post_event(
     global_params: GlobalParameters,
     error_code: Optional[Exception],
     time_taken: float,
-) -> Tuple[Annotated[bool, "success"], Annotated[str, "message"]]:
+) -> PostEvent:
     """Posts the tracked analytics to Segment.
 
     Args:
@@ -117,11 +126,11 @@ def _post_event(
         time_taken (float): The time taken for the underlying command to execute.
 
     Returns:
-        A boolean representing the status of the event posting, the message representing the status of the event posting.
+        (PostEvent): a PostEvent object representing the return of the Segment track method.
     """
     client = analytics.Client(WRITE_KEY, max_retries=1, debug=False)
 
-    return client.track(  # type: ignore
+    event = client.track(
         global_params.user_id,
         event_name.value,
         {
@@ -131,6 +140,8 @@ def _post_event(
             "matcha_state_uuid": matcha_state_uuid.value if matcha_state_uuid else None,
         },
     )
+
+    return PostEvent(success=event[0], message=event[1])
 
 
 def track(event_name: AnalyticsEvent) -> Callable[..., Any]:
