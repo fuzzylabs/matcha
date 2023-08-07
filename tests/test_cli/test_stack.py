@@ -83,9 +83,19 @@ def test_stack_set_stack_not_recognized(runner: CliRunner) -> None:
     assert "random is not a valid stack type" in result.stdout
 
 
-def test_stack_set_file_created() -> None:
+def test_stack_set_file_created(matcha_testing_directory) -> None:
+    """Test that stack_set cli command creates a config file if one doesn't exist.
+
+    Args:
+        matcha_testing_directory (str): a temporary working directory.
+    """
     pass
 
 
-def test_stack_set_file_modified() -> None:
+def test_stack_set_file_modified(matcha_testing_directory) -> None:
+    """Test that if a config file exists, stack set cli command modifies the file.
+
+    Args:
+        matcha_testing_directory (str): temporary working directory.
+    """
     pass

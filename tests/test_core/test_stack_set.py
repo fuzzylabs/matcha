@@ -1,4 +1,5 @@
 import pytest
+import os
 
 from matcha_ml.core import stack_set
 from matcha_ml.config import MatchaConfigService, MatchaConfig
@@ -10,6 +11,7 @@ def test_stack_set_valid_no_existing_file(matcha_testing_directory):
     Args:
         matcha_testing_directory (str): temporary working directory
     """
+    os.chdir(matcha_testing_directory)
     stack_set(stack_name="llm")
     config = MatchaConfigService.read_matcha_config()
     assert config.to_dict() == {"stack": {"name": "LLM"}}
@@ -34,6 +36,7 @@ def test_stack_set_existing_file(mocked_matcha_config_json_object, matcha_testin
     Args:
         matcha_testing_directory (str): temporary working directory
     """
+    os.chdir(matcha_testing_directory)
     config = MatchaConfig.from_dict(
         mocked_matcha_config_json_object
     )
