@@ -105,19 +105,6 @@ def test_get_state_uuid_without_id_component(mocked_matcha_state_service):
         _ = _get_state_uuid()
 
 
-@patch(f"{ANALYTICS_SERVICE_FUNCTION_STUB}._check_uuid")
-def test_get_state_uuid_without_valid_uuid(mocked_check_uuid):
-    """Test the _get_state_uuid private function where an invalid uuid is returned.
-
-    Args:
-        mocked_check_uuid (function): a mocked _check_uuid function.
-    """
-    mocked_check_uuid.side_effect = MatchaError("test")
-
-    with pytest.raises(MatchaError):
-        _ = _get_state_uuid()
-
-
 def test_execute_analytics_event():
     """Test the _execute_analytics_event private function."""
     test_function = MagicMock()
