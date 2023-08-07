@@ -299,7 +299,7 @@ def stack_set(stack_name: str) -> None:
         name="stack",
         properties=[
             MatchaConfigComponentProperty(
-                name='type',
+                name='name',
                 value=stack_enum.name
             )
         ]
