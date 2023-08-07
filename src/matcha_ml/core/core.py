@@ -301,5 +301,5 @@ def stack_set(stack_name: str) -> None:
         }
     }
 
-    MatchaConfigService.update_config_with_dict(stack_dict)
+    MatchaConfigService.update(stack_dict)
 

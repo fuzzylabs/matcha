@@ -2,7 +2,7 @@
 import json
 import os
 from dataclasses import dataclass
-from typing import Dict, List
+from typing import Dict, List, Union
 
 from matcha_ml.errors import MatchaError
 
@@ -170,11 +170,20 @@ class MatchaConfigService:
         return os.path.exists(os.path.join(os.getcwd(), DEFAULT_CONFIG_NAME))
 
     @staticmethod
-    def update_config_with_dict(configuration: dict) -> None:
-        """A function which updates the existing matcha config file with the information stored in the dict argument.
+    def _update_with_matcha_config(configuration: MatchaConfig) -> None:
+        """A placeholder function for updating the matcha configuration using a MatchaConfig object.\
 
         Args:
-            configuration (dict): The dict defining new matcha configuration information.
+            configuration (MatchaConfig): A MatchaConfig object holding new configuration information for matcha.
+        """
+        raise NotImplementedError
+
+    @staticmethod
+    def _update_with_dict(configuration):
+        """A function for updating the matcha configuration with a dictionary.
+
+        Args:
+            configuration (dict): A dict holding new configuration information for matcha.
         """
         if MatchaConfigService.config_file_exists():
             config = MatchaConfigService.read_matcha_config()
@@ -185,6 +194,19 @@ class MatchaConfigService:
 
         config = MatchaConfig.from_dict(config_dict)
         MatchaConfigService.write_matcha_config(config)
+
+    @staticmethod
+    def update(configuration: Union[dict, MatchaConfig]) -> None:
+        """A function which updates the existing matcha config file with the information stored in the dict argument.
+
+        Args:
+            configuration (dict): The dict defining new matcha configuration information.
+        """
+        if isinstance(configuration, MatchaConfig):
+            MatchaConfigService._update_with_matcha_config(configuration)
+
+        if isinstance(configuration, dict):
+            MatchaConfigService._update_with_dict(configuration)
 
     @staticmethod
     def delete_matcha_config() -> None:
