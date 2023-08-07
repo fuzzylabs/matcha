@@ -267,6 +267,7 @@ def mocked_matcha_config_json_object() -> Dict[str, Dict[str, str]]:
     return matcha_config
 
 
+
 @pytest.fixture
 def mocked_matcha_config_component_property() -> MatchaConfigComponentProperty:
     """A fixture returning a mocked MatchaConfigComponentProperty instance.

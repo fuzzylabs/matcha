@@ -70,3 +70,21 @@ def test_cli_stack_set_command_with_args(runner: CliRunner) -> None:
     assert result.exit_code == 0
 
     assert "Matcha default stack has been set." in result.stdout
+
+
+def test_stack_set_stack_not_recognised(runner: CliRunner) -> None:
+    """Tests the cli stack set sub-command behaviour when an unrecognised stack name is passed.
+
+    Args:
+        runner (CliRunner): typer CLI runner
+    """
+    result = runner.invoke(app, ["stack", "set", "random"])
+    assert result.exit_code == 0
+    assert "random is not a valid stack type" in result.stdout
+
+
+def test_stack_set_file_created() -> None:
+    pass
+
+def test_stack_set_file_modified() -> None:
+    pass

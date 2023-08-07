@@ -170,6 +170,23 @@ class MatchaConfigService:
         return os.path.exists(os.path.join(os.getcwd(), DEFAULT_CONFIG_NAME))
 
     @staticmethod
+    def update_config_with_dict(configuration: dict) -> None:
+        """A function which updates the existing matcha config file with the information stored in the dict argument.
+
+        Args:
+            configuration (dict): The dict defining new matcha configuration information.
+        """
+        if MatchaConfigService.config_file_exists():
+            config = MatchaConfigService.read_matcha_config()
+            config_dict = config.to_dict()
+            config_dict.update(configuration)
+        else:
+            config_dict = configuration
+
+        config = MatchaConfig.from_dict(config_dict)
+        MatchaConfigService.write_matcha_config(config)
+
+    @staticmethod
     def delete_matcha_config() -> None:
         """A function for deleting the local Matcha config file.
 

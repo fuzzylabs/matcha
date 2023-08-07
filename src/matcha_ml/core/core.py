@@ -301,13 +301,5 @@ def stack_set(stack_name: str) -> None:
         }
     }
 
-    if MatchaConfigService.config_file_exists():
-        config = MatchaConfigService.read_matcha_config()
-        config_dict = config.to_dict()
-        config_dict.update(stack_dict)
-    else:
-        config_dict = stack_dict
-
-    config = MatchaConfig.from_dict(config_dict)
-    MatchaConfigService.write_matcha_config(config)
+    MatchaConfigService.update_config_with_dict(stack_dict)
 
