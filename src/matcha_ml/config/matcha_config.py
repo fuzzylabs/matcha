@@ -204,9 +204,10 @@ class MatchaConfigService:
         """
         if isinstance(configuration, MatchaConfig):
             MatchaConfigService._update_with_matcha_config(configuration)
-
-        if isinstance(configuration, dict):
+        elif isinstance(configuration, dict):
             MatchaConfigService._update_with_dict(configuration)
+        else:
+            raise RuntimeError("The configuration provided was not in a supported format.")
 
     @staticmethod
     def delete_matcha_config() -> None:
