@@ -121,9 +121,6 @@ def _post_event(
     """
     client = analytics.Client(WRITE_KEY, max_retries=1, debug=False)
 
-    if matcha_state_uuid:
-        matcha_state_uuid_value = matcha_state_uuid.value
-
     return client.track(  # type: ignore
         global_params.user_id,
         event_name.value,
@@ -131,7 +128,7 @@ def _post_event(
             "time_taken": time_taken,
             "error_type": f"{error_code.__class__}.{error_code.__class__.__name__}",
             "command_succeeded": error_code is None,
-            "matcha_state_uuid": matcha_state_uuid_value,
+            "matcha_state_uuid": matcha_state_uuid.value if matcha_state_uuid else None,
         },
     )
 
