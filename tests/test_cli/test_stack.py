@@ -73,7 +73,7 @@ def test_cli_stack_set_command_with_args(runner: CliRunner) -> None:
 
 
 def test_stack_set_stack_not_recognized(runner: CliRunner) -> None:
-    """Tests the cli stack set sub-command behaviour when an unrecognised stack name is passed.
+    """Tests the cli stack set sub-command behavior when an unrecognized stack name is passed.
 
     Args:
         runner (CliRunner): typer CLI runner
