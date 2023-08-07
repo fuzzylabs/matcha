@@ -72,7 +72,7 @@ def test_cli_stack_set_command_with_args(runner: CliRunner) -> None:
     assert "Matcha default stack has been set." in result.stdout
 
 
-def test_stack_set_stack_not_recognised(runner: CliRunner) -> None:
+def test_stack_set_stack_not_recognized(runner: CliRunner) -> None:
     """Tests the cli stack set sub-command behaviour when an unrecognised stack name is passed.
 
     Args:
@@ -85,6 +85,7 @@ def test_stack_set_stack_not_recognised(runner: CliRunner) -> None:
 
 def test_stack_set_file_created() -> None:
     pass
+
 
 def test_stack_set_file_modified() -> None:
     pass
