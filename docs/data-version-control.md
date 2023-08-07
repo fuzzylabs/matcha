@@ -1,10 +1,10 @@
 # Data Version Control
 
 One of the resources that matcha provisions by default is a storage container for data. The storage container is
-tool-agnostic, so whether you want to use the `dvc` package, `LakeFS` or some other data version control package is 
+tool-agnostic, so whether you want to use the `dvc` package, `LakeFS` or some other data version control package is
 up to you.
 
-You can find all the specifications for the data version control resource in the 
+You can find all the specifications for the data version control resource in the
 `infrastructure/data_version_control_storage` folder inside `matcha_ml`.
 
 ## Using the provisioned resources with the `dvc` package
@@ -29,15 +29,15 @@ This will print something like the following to your terminal:
         - account-name: ACCOUNT_NAME
         - container-name: CONTAINER_NAME
 
-Now that we have our connection string (you should keep this a secret), assuming you have followed the steps from the 
-dvc docs for initializing and adding files for `dvc` to track, we can tell the `dvc` package where to look for historic 
+Now that we have our connection string (you should keep this a secret), assuming you have followed the steps from the
+dvc docs for initializing and adding files for `dvc` to track, we can tell the `dvc` package where to look for historic
 data, and where to push new, versionable data. This is done as below:
 
     $ dvc remote modify --local my_dvc connection_string CONNECTION_STRING
     $ dvc remote modify my_dvc url azure://CONTAINER_NAME
     $ dvc remote modify my_dvc account_name STORAGE_ACCOUNT_NAME
 
-It's important to make sure your connection string is stored in `config.local`, so your connection string never appears 
+It's important to make sure your connection string is stored in `config.local`, so your connection string never appears
 in any public repository.
 
 That's it! Whenever you run `dvc push`, `dvc pull` or `dvc checkout`, you or whoever you grant access to your storage

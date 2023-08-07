@@ -26,7 +26,7 @@ zenml:
   deploymentType:
 
   # The ZenML authentication scheme. Use one of:
-  # 
+  #
   # NO_AUTH - No authentication
   # HTTP_BASIC - HTTP Basic authentication
   # OAUTH2_PASSWORD_BEARER - OAuth2 password bearer with JWT tokens
@@ -40,7 +40,7 @@ zenml:
   #   from secrets import token_hex
   #   token_hex(32)
   #   ```
-  #   
+  #
   # or:
   #
   #   ```shell
@@ -124,7 +124,7 @@ zenml:
       #   from secrets import token_hex
       #   token_hex(32)
       #   ```
-      #   
+      #
       # or:
       #
       #   ```shell
