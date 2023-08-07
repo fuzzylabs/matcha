@@ -6,7 +6,7 @@ import functools
 import logging
 from enum import Enum
 from time import perf_counter
-from typing import Any, Callable, Optional, Tuple
+from typing import Annotated, Any, Callable, Optional, Tuple
 from warnings import warn
 
 from segment import analytics
@@ -100,6 +100,42 @@ def _time_event(
     return result, error_code, ts, te
 
 
+def _post_event(
+    event_name: AnalyticsEvent,
+    matcha_state_uuid: Optional[MatchaResourceProperty],
+    global_params: GlobalParameters,
+    error_code: Optional[Exception],
+    time_taken: float,
+) -> Tuple[Annotated[bool, "success"], Annotated[str, "message"]]:
+    """Posts the tracked analytics to Segment.
+
+    Args:
+        event_name (AnalyticsEvent): The enumerated name of the analytics event.
+        matcha_state_uuid (Optional[MatchaResourceProperty]): the uuid for the Matcha state file.
+        global_params (GlobalParameters): The GlobalParameters object containing the user id.
+        error_code (Optional[Exception]): The error propagated by a failing underlying command.
+        time_taken (float): The time taken for the underlying command to execute.
+
+    Returns:
+        A boolean representing the status of the event posting, the message representing the status of the event posting.
+    """
+    client = analytics.Client(WRITE_KEY, max_retries=1, debug=False)
+
+    if matcha_state_uuid:
+        matcha_state_uuid_value = matcha_state_uuid.value
+
+    return client.track(  # type: ignore
+        global_params.user_id,
+        event_name.value,
+        {
+            "time_taken": time_taken,
+            "error_type": f"{error_code.__class__}.{error_code.__class__.__name__}",
+            "command_succeeded": error_code is None,
+            "matcha_state_uuid": matcha_state_uuid_value,
+        },
+    )
+
+
 def track(event_name: AnalyticsEvent) -> Callable[..., Any]:
     """Track decorator for tracking user analytics with Segment.
 
@@ -143,18 +179,16 @@ def track(event_name: AnalyticsEvent) -> Callable[..., Any]:
                 if event_name.value in [event_name.DESTROY]:
                     result, error_code, ts, te = _time_event(func, *args, **kwargs)
 
-                client = analytics.Client(WRITE_KEY, max_retries=1, debug=False)
+                time_taken = te - ts if te is not None and ts is not None else 0.0
 
-                client.track(
-                    global_params.user_id,
-                    event_name.value,
-                    {
-                        "time_taken": float(te) - float(ts),  # type: ignore
-                        "error_type": f"{error_code.__class__}.{error_code.__class__.__name__}",
-                        "command_succeeded": error_code is None,
-                        "matcha_state_uuid": matcha_state_uuid,
-                    },
+                _post_event(
+                    event_name=event_name,
+                    matcha_state_uuid=matcha_state_uuid,
+                    global_params=global_params,
+                    error_code=error_code,
+                    time_taken=time_taken,
                 )
+
                 if error_code is not None:
                     raise error_code
             else:
