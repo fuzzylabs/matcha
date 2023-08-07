@@ -211,7 +211,7 @@ class RemoteStateManager:
             name="remote_state_bucket", properties=properties
         )
         matcha_config = MatchaConfig(components=[remote_state_bucket_component])
-        MatchaConfigService.write_matcha_config(matcha_config=matcha_config)
+        MatchaConfigService.update_config_with_dict(matcha_config.to_dict())
         print_status(
             build_step_success_status(
                 "Provisioning Matcha resource group and remote state is complete!"
