@@ -148,10 +148,11 @@ class RemoteStateManager:
         if not self._configuration_file_exists():
             return False
 
-        if (
-            "remote_state_bucket"
-            not in MatchaConfigService.read_matcha_config().to_dict()
-        ):
+        try:
+            MatchaConfigService.read_matcha_config().find_component(
+                "remote_state_bucket"
+            )
+        except MatchaError:
             return False
 
         if not self._resource_group_exists():
@@ -175,10 +176,11 @@ class RemoteStateManager:
         if not self._configuration_file_exists():
             return False
 
-        if (
-            "remote_state_bucket"
-            not in MatchaConfigService.read_matcha_config().to_dict()
-        ):
+        try:
+            MatchaConfigService.read_matcha_config().find_component(
+                "remote_state_bucket"
+            )
+        except MatchaError:
             return False
 
         return not self._resource_group_exists()
