@@ -99,8 +99,9 @@ class RemoteStateManager:
                     .find_property("resource_group_name")
                     .value,
                 )
-            except Exception as e:
-                raise MatchaError(f"Error while creating Azure Storage client: {e}")
+            except Exception:
+                # raise MatchaError(f"Error while creating Azure Storage client: {e}")
+                return None
 
         return self._azure_storage
 
@@ -145,6 +146,9 @@ class RemoteStateManager:
         Returns:
             bool: is state provisioned
         """
+        if self.azure_storage is None:
+            return False
+
         if not self._configuration_file_exists():
             return False
 
@@ -166,6 +170,9 @@ class RemoteStateManager:
         Returns:
             bool: True, if state is stale
         """
+        if self.azure_storage is None:
+            return False
+
         return bool(
             self._configuration_file_exists() and not self._resource_group_exists()
         )

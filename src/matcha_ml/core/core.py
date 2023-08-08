@@ -1,12 +1,12 @@
 """The core functionality for Matcha API."""
 import os
+from enum import Enum, EnumMeta
 from typing import Optional
 
-from enum import Enum, EnumMeta
 from matcha_ml.cli._validation import get_command_validation
 from matcha_ml.cli.ui.print_messages import print_status
 from matcha_ml.cli.ui.status_message_builders import build_warning_status
-from matcha_ml.config import MatchaConfigService, MatchaConfig
+from matcha_ml.config import MatchaConfig, MatchaConfigService
 from matcha_ml.core._validation import is_valid_prefix, is_valid_region
 from matcha_ml.errors import MatchaError, MatchaInputError
 from matcha_ml.runners import AzureRunner
@@ -17,7 +17,9 @@ from matcha_ml.state.matcha_state import MatchaState
 from matcha_ml.templates.azure_template import AzureTemplate
 
 
-class StackTypeMeta(EnumMeta):  # this is probably overkill, but we might need it if we'll support custom stacks later.
+class StackTypeMeta(
+    EnumMeta
+):  # this is probably overkill, but we might need it if we'll support custom stacks later.
     def __contains__(cls, item):
         try:
             cls(item)
@@ -256,13 +258,23 @@ def provision(
     # Provision resource group and remote state storage
     remote_state_manager.provision_remote_state(location, prefix)
 
+    try:
+        stack_name = (
+            MatchaConfigService.read_matcha_config()
+            .find_component("stack")
+            .find_property("name")
+        )
+    except MatchaError:
+        # UPDATE MATCHA CONFIG FILE WITH DEFAULT STACK
+        stack_name = "default"
+
     with remote_state_manager.use_lock(), remote_state_manager.use_remote_state():
         project_directory = os.getcwd()
         destination = os.path.join(
             project_directory, ".matcha", "infrastructure", "resources"
         )
         template = os.path.join(
-            os.path.dirname(__file__), os.pardir, "infrastructure", "resources"
+            os.path.dirname(__file__), os.pardir, "infrastructure", stack_name.lower()
         )
 
         azure_template = AzureTemplate()
@@ -289,17 +301,12 @@ def stack_set(stack_name: str) -> None:
     Args:
         stack_name (str): the name of the type of stack to be specified in the config file.
     """
-
     if stack_name.lower() not in StackType:
         raise MatchaInputError(f"{stack_name} is not a valid stack type.")
 
     stack_enum = StackType(stack_name)
 
-    stack_dict = {
-        "stack": {
-            "name": stack_enum.name
-        }
-    }
+    stack_dict = {"stack": {"name": stack_enum.name}}
 
     if MatchaConfigService.config_file_exists():
         config = MatchaConfigService.read_matcha_config()
@@ -310,4 +317,3 @@ def stack_set(stack_name: str) -> None:
 
     config = MatchaConfig.from_dict(config_dict)
     MatchaConfigService.write_matcha_config(config)
-
