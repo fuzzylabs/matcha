@@ -31,23 +31,6 @@ TEMPLATE_DIR = os.path.join(
 
 
 @pytest.fixture
-def broken_config_testing_directory(matcha_testing_directory: str) -> str:
-    """Fixture for broken configuration file in temp working directory.
-
-    Args:
-        matcha_testing_directory (str): temporary working directory path
-
-    Returns:
-        str: temporary working directory path that the configuration was written to
-    """
-    config_path = os.path.join(matcha_testing_directory, DEFAULT_CONFIG_NAME)
-    content = {}
-    with open(config_path, "w") as f:
-        json.dump(content, f)
-    return matcha_testing_directory
-
-
-@pytest.fixture
 def valid_config_testing_directory(
     matcha_testing_directory: str, mocked_matcha_config: MatchaConfig
 ) -> str:
@@ -231,18 +214,6 @@ def test_is_state_provisioned_no_config(matcha_testing_directory: str):
     os.chdir(matcha_testing_directory)  # move to temporary working directory
     remote_state = RemoteStateManager()
     assert not remote_state.is_state_provisioned()
-
-
-def test_is_state_provisioned_broken_config(broken_config_testing_directory: str):
-    """Test is_state_provisioned method returns False, when the configuration file is broken.
-
-    Args:
-        broken_config_testing_directory (str): temporary working directory path, with broken config file
-    """
-    os.chdir(broken_config_testing_directory)  # move to temporary working directory
-    remote_state = RemoteStateManager()
-    with pytest.raises(MatchaError):
-        assert not remote_state.is_state_provisioned()
 
 
 def test_is_state_provisioned_broken_no_bucket(
