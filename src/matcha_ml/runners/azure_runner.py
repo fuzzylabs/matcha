@@ -42,16 +42,19 @@ class AzureRunner(BaseRunner):
         if os.path.exists(target):
             shutil.rmtree(target)
 
-    def provision(self) -> None:
-        """Provision resources required for the deployment."""
+    def provision(self) -> MatchaStateService:
+        """Provision resources required for the deployment.
+
+        Returns:
+        (MatchaStateService): a MatchaStateService instance initialized with Terraform output
+        """
         self._check_terraform_installation()
         self._validate_terraform_config()
         self._validate_kubeconfig(base_path=".kube/config")
         self._initialize_terraform(msg="Matcha")
         self._apply_terraform(msg="Matcha")
         tf_output = self.tfs.terraform_client.output()
-        matcha_state_service = MatchaStateService(terraform_output=tf_output)
-        self._show_terraform_outputs(matcha_state_service._state)
+        return MatchaStateService(terraform_output=tf_output)
 
     def deprovision(self) -> None:
         """Destroy the provisioned resources."""
