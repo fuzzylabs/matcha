@@ -99,7 +99,7 @@ class RemoteStateManager:
                     .find_property("resource_group_name")
                     .value,
                 )
-            except Exception as e: 
+            except Exception as e:
                 raise MatchaError(f"Error while creating Azure Storage client: {e}")
 
         return self._azure_storage
@@ -147,8 +147,11 @@ class RemoteStateManager:
         """
         if not self._configuration_file_exists():
             return False
-        
-        if "remote_state_bucket" not in MatchaConfigService.read_matcha_config().to_dict():
+
+        if (
+            "remote_state_bucket"
+            not in MatchaConfigService.read_matcha_config().to_dict()
+        ):
             return False
 
         if not self._resource_group_exists():
@@ -171,8 +174,11 @@ class RemoteStateManager:
         """
         if not self._configuration_file_exists():
             return False
-        
-        if "remote_state_bucket" not in MatchaConfigService.read_matcha_config().to_dict():
+
+        if (
+            "remote_state_bucket"
+            not in MatchaConfigService.read_matcha_config().to_dict()
+        ):
             return False
 
         return bool(
