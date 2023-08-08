@@ -181,9 +181,7 @@ class RemoteStateManager:
         ):
             return False
 
-        return bool(
-            self._configuration_file_exists() and not self._resource_group_exists()
-        )
+        return not self._resource_group_exists()
 
     def provision_remote_state(
         self, location: str, prefix: str, verbose: Optional[bool] = False

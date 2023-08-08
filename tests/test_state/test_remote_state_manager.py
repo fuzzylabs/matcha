@@ -435,9 +435,22 @@ def test_is_state_stale_false(valid_config_testing_directory: str):
         "matcha_ml.state.remote_state_manager.RemoteStateManager._configuration_file_exists"
     ) as config_file_exists, patch(
         "matcha_ml.state.remote_state_manager.RemoteStateManager._resource_group_exists"
-    ) as resource_group_exists:
+    ) as resource_group_exists, patch(
+        "matcha_ml.state.remote_state_manager.MatchaConfigService.read_matcha_config"
+    ) as matcha_config, patch(
+        "matcha_ml.state.remote_state_manager.MatchaConfig.to_dict"
+    ) as matcha_config_dict:
         config_file_exists.return_value = True
         resource_group_exists.return_value = True
+        matcha_config.return_value = MatchaConfig([])
+        matcha_config_dict.return_value = {
+            "stack": {"name": "DEFAULT"},
+            "remote_state_bucket": {
+                "account_name": "test",
+                "container_name": "test",
+                "resource_group_name": "test-resources",
+            },
+        }
         remote_state = RemoteStateManager()
         assert not remote_state.is_state_stale()
 
@@ -454,8 +467,22 @@ def test_is_state_stale_no_resource_group(matcha_testing_directory: str):
         "matcha_ml.state.remote_state_manager.RemoteStateManager._configuration_file_exists"
     ) as config_file_exists, patch(
         "matcha_ml.state.remote_state_manager.RemoteStateManager._resource_group_exists"
-    ) as resource_group_exists:
+    ) as resource_group_exists, patch(
+        "matcha_ml.state.remote_state_manager.MatchaConfigService.read_matcha_config"
+    ) as matcha_config, patch(
+        "matcha_ml.state.remote_state_manager.MatchaConfig.to_dict"
+    ) as matcha_config_dict:
         config_file_exists.return_value = True
         resource_group_exists.return_value = False
+        matcha_config.return_value = MatchaConfig([])
+        matcha_config_dict.return_value = {
+            "stack": {"name": "DEFAULT"},
+            "remote_state_bucket": {
+                "account_name": "test",
+                "container_name": "test",
+                "resource_group_name": "test-resources",
+            },
+        }
+
         remote_state = RemoteStateManager()
         assert remote_state.is_state_stale()
