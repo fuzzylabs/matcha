@@ -70,12 +70,9 @@ class BaseTemplate:
             if sub_folder_path
             else destination
         )
-        print(files)
         for source_path in files:
-            print(source_path)
             filename = os.path.basename(source_path)
             destination_path = os.path.join(destination_folder, filename)
-            print(destination_path)
             copy(source_path, destination_path)
 
     def copy_main_module_files(self, template_src: str, destination: str) -> None:

@@ -2,7 +2,7 @@
 import json
 import os
 from dataclasses import dataclass
-from typing import Dict, List
+from typing import Dict, List, Union
 
 from matcha_ml.errors import MatchaError
 
@@ -168,6 +168,26 @@ class MatchaConfigService:
             True if the matcha.config.json file exists, False otherwise.
         """
         return os.path.exists(os.path.join(os.getcwd(), DEFAULT_CONFIG_NAME))
+
+    @staticmethod
+    def update(components: Union[MatchaConfigComponent, List[MatchaConfigComponent]]) -> None:
+        """A function which updates the matcha config file.
+
+        If no config file exists, this function will create one.
+
+        Args:
+            components (dict): A list of, or single MatchaConfigComponent object(s).
+        """
+        if isinstance(components, MatchaConfigComponent):
+            components = [components]
+
+        if MatchaConfigService.config_file_exists():
+            config = MatchaConfigService.read_matcha_config()
+            config.components += components
+        else:
+            config = MatchaConfig(components)
+
+        MatchaConfigService.write_matcha_config(config)
 
     @staticmethod
     def delete_matcha_config() -> None:

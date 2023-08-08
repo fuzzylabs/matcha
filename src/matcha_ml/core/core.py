@@ -6,7 +6,11 @@ from typing import Optional
 from matcha_ml.cli._validation import get_command_validation
 from matcha_ml.cli.ui.print_messages import print_status
 from matcha_ml.cli.ui.status_message_builders import build_warning_status
-from matcha_ml.config import MatchaConfig, MatchaConfigService
+from matcha_ml.config import (
+    MatchaConfigComponent,
+    MatchaConfigComponentProperty,
+    MatchaConfigService,
+)
 from matcha_ml.core._validation import is_valid_prefix, is_valid_region
 from matcha_ml.errors import MatchaError, MatchaInputError
 from matcha_ml.runners import AzureRunner
@@ -265,8 +269,10 @@ def provision(
             .find_property("name")
         )
     except MatchaError:
-        # UPDATE MATCHA CONFIG FILE WITH DEFAULT STACK
-        stack_name = "default"
+        stack_name = MatchaConfigComponentProperty(name="name", value="default")
+        MatchaConfigService.update(
+            MatchaConfigComponent(name="stack", properties=[stack_name])
+        )
 
     with remote_state_manager.use_lock(), remote_state_manager.use_remote_state():
         project_directory = os.getcwd()
@@ -274,7 +280,10 @@ def provision(
             project_directory, ".matcha", "infrastructure", "resources"
         )
         template = os.path.join(
-            os.path.dirname(__file__), os.pardir, "infrastructure", stack_name.lower()
+            os.path.dirname(__file__),
+            os.pardir,
+            "infrastructure",
+            stack_name.value.lower(),
         )
 
         azure_template = AzureTemplate()
@@ -304,16 +313,11 @@ def stack_set(stack_name: str) -> None:
     if stack_name.lower() not in StackType:
         raise MatchaInputError(f"{stack_name} is not a valid stack type.")
 
-    stack_enum = StackType(stack_name)
+    stack_enum = StackType(stack_name.lower())
 
-    stack_dict = {"stack": {"name": stack_enum.name}}
+    stack = MatchaConfigComponent(
+        name="stack",
+        properties=[MatchaConfigComponentProperty(name="name", value=stack_enum.name)],
+    )
 
-    if MatchaConfigService.config_file_exists():
-        config = MatchaConfigService.read_matcha_config()
-        config_dict = config.to_dict()
-        config_dict.update(stack_dict)
-    else:
-        config_dict = stack_dict
-
-    config = MatchaConfig.from_dict(config_dict)
-    MatchaConfigService.write_matcha_config(config)
+    MatchaConfigService.update(stack)
