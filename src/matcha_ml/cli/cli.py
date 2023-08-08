@@ -260,7 +260,7 @@ def set(stack: str = typer.Argument("default")) -> None:
     """
     try:
         core.stack_set(stack)
-        print_status(build_status(f"Matcha {stack} stack has been set."))
+        print_status(build_status(f"Matcha '{stack}' stack has been set."))
     except MatchaInputError as e:
         print_error(str(e))
         raise typer.Exit()
