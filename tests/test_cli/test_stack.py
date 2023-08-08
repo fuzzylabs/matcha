@@ -49,12 +49,16 @@ def test_cli_stack_set_command_help_option(runner: CliRunner) -> None:
     assert "Define the stack for Matcha to provision." in result.stdout
 
 
-def test_cli_stack_set_command_without_args(runner: CliRunner) -> None:
+def test_cli_stack_set_command_without_args(
+    matcha_testing_directory: str, runner: CliRunner
+) -> None:
     """Tests the cli stack set sub-command.
 
     Args:
+        matcha_testing_directory (str): a temporary working directory.
         runner (CliRunner): typer CLI runner.
     """
+    os.chdir(matcha_testing_directory)
     result = runner.invoke(app, ["stack", "set"])
 
     assert result.exit_code == 0
@@ -71,6 +75,7 @@ def test_cli_stack_set_command_with_args(
         matcha_testing_directory (str): a temporary working directory.
         runner (CliRunner): typer CLI runner.
     """
+    os.chdir(matcha_testing_directory)
     result = runner.invoke(app, ["stack", "set", "default"])
 
     assert result.exit_code == 0
