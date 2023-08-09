@@ -2,19 +2,8 @@
 import os
 import shutil
 
-from matcha_ml.cli.ui.print_messages import (
-    print_json,
-    print_status,
-)
-from matcha_ml.cli.ui.resource_message_builders import (
-    dict_to_json,
-    hide_sensitive_in_output,
-)
-from matcha_ml.cli.ui.status_message_builders import (
-    build_status,
-)
 from matcha_ml.runners.base_runner import BaseRunner
-from matcha_ml.state.matcha_state import MatchaState, MatchaStateService
+from matcha_ml.state.matcha_state import MatchaStateService
 
 
 class AzureRunner(BaseRunner):
@@ -23,17 +12,6 @@ class AzureRunner(BaseRunner):
     def __init__(self) -> None:
         """Initialize AzureRunner class."""
         super().__init__()
-
-    def _show_terraform_outputs(self, matcha_state: MatchaState) -> None:
-        """Print the formatted Terraform outputs.
-
-        Args:
-            matcha_state (MatchaState): Terraform outputs in a MatchaState format.
-        """
-        print_status(build_status("Here are the endpoints for what's been provisioned"))
-        resources_dict = hide_sensitive_in_output(matcha_state.to_dict())
-        resources_json = dict_to_json(resources_dict)
-        print_json(resources_json)
 
     def remove_matcha_dir(self) -> None:
         """Removes the project's .matcha directory"."""
@@ -46,7 +24,7 @@ class AzureRunner(BaseRunner):
         """Provision resources required for the deployment.
 
         Returns:
-        (MatchaStateService): a MatchaStateService instance initialized with Terraform output
+            (MatchaStateService): a MatchaStateService instance initialized with Terraform output
         """
         self._check_terraform_installation()
         self._validate_terraform_config()

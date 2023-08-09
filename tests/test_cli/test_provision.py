@@ -82,7 +82,6 @@ def assert_infrastructure(
     with open(variables_file_path) as f:
         tf_vars = json.load(f)
 
-    print(tf_vars, expected_tf_vars)
     assert tf_vars == expected_tf_vars
 
     if check_matcha_state_file:
