@@ -6,7 +6,7 @@ import pytest
 
 from matcha_ml.config import MatchaConfig, MatchaConfigService
 from matcha_ml.core import stack_set
-from matcha_ml.errors import MatchaInputError
+from matcha_ml.errors import MatchaError, MatchaInputError
 
 
 def test_stack_set_valid_no_existing_file(
@@ -79,6 +79,6 @@ def test_stack_set_resources_already_provisioned():
     """Test that an error is raised if resources are provisioned when stack_set() is called."""
     with patch(
         "matcha_ml.state.remote_state_manager.RemoteStateManager.is_state_provisioned"
-    ) as is_state_provisioned, pytest.raises(RuntimeError):
+    ) as is_state_provisioned, pytest.raises(MatchaError):
         is_state_provisioned.return_value = True
         stack_set("LLM")
