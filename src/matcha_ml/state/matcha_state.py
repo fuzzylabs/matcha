@@ -5,7 +5,6 @@ import hashlib
 import json
 import os
 import uuid
-from collections import defaultdict
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Tuple
 
@@ -182,7 +181,7 @@ class MatchaStateService:
 
         def _parse_terraform_output_resource_name(
             output_name: str,
-        ) -> Tuple[str, str, str]:
+        ) -> Tuple[MatchaResource, str, str]:
             """Build resource output for each Terraform output.
 
             Format for Terraform output names is:
@@ -195,11 +194,11 @@ class MatchaStateService:
             Returns:
                 Tuple[str, str, str]: the resource output for matcha.state.
             """
-            resource_type: Optional[str] = None
+            resource_type = None
 
             for key in RESOURCE_NAMES:
                 if key in output_name:
-                    resource_type = key
+                    resource_type = MatchaResource(key)
                     break
 
             if resource_type is None:
@@ -207,29 +206,60 @@ class MatchaStateService:
                     f"A valid resource type for the output '{output_name}' does not exist."
                 )
 
-            flavor_and_resource_name = output_name[len(resource_type) + 1 :]
+            flavor_and_resource_name = output_name[len(resource_type.name) + 1 :]
 
             flavor, resource_name = flavor_and_resource_name.split("_", maxsplit=1)
             resource_name = resource_name.replace("_", "-")
-            resource_type = resource_type.replace("_", "-")
+            resource_type = resource_type.name.replace("_", "-")  # type: ignore
 
             return resource_type, flavor, resource_name
 
-        state_outputs: Dict[str, Dict[str, str]] = defaultdict(dict)
+        matcha_components: List[MatchaStateComponent] = []
 
-        for output_name, properties in terraform_output.items():
+        for output_name, output_value in terraform_output.items():
             (
                 resource_type,
                 flavor,
                 resource_name,
             ) = _parse_terraform_output_resource_name(output_name)
-            state_outputs[resource_type].setdefault("flavor", flavor)
-            state_outputs[resource_type][resource_name] = properties["value"]  # type: ignore
+
+            components_list = [
+                component.resource.name for component in matcha_components
+            ]
+
+            if resource_type.name in components_list:
+                # add just the properties
+                for component in matcha_components:
+                    if resource_type.name == component.resource.name:
+                        component.properties.append(
+                            MatchaResourceProperty(
+                                name=resource_name, value=output_value
+                            )
+                        )
+            else:
+                # add the component
+                matcha_components.append(
+                    MatchaStateComponent(
+                        resource=resource_type,
+                        properties=[
+                            MatchaResourceProperty(name="flavor", value=flavor),
+                            MatchaResourceProperty(
+                                name=resource_name, value=output_value
+                            ),
+                        ],
+                    )
+                )
 
         # Create a unique matcha state identifier
-        state_outputs["id"] = {"matcha_uuid": str(uuid.uuid4())}
+        matcha_uuid_component = MatchaStateComponent(
+            resource=MatchaResource(name="id"),
+            properties=[
+                MatchaResourceProperty(name="matcha_uuid", value=str(uuid.uuid4()))
+            ],
+        )
+        matcha_components.append(matcha_uuid_component)
 
-        return MatchaState.from_dict(state_outputs)
+        return MatchaState(matcha_components)
 
     def _write_state(self, matcha_state: MatchaState) -> None:
         """Writes a given MatchaState object to the matcha.state file.
