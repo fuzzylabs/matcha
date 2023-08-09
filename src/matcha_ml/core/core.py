@@ -24,9 +24,19 @@ from matcha_ml.templates.azure_template import AzureTemplate
 class StackTypeMeta(
     EnumMeta
 ):  # this is probably overkill, but we might need it if we'll support custom stacks later.
-    def __contains__(cls, item):
+    """Metaclass for the StackType Enum."""
+
+    def __contains__(self, item: str) -> bool:  # type: ignore
+        """Dunder method for checking if an item is a member of the enum.
+
+        Args:
+            item (str): the quantity to check for in the Enum.
+
+        Returns:
+            True if item is a member of the Enum, False otherwise.
+        """
         try:
-            cls(item)
+            self(item)
         except ValueError:
             return False
         else:
@@ -34,6 +44,8 @@ class StackTypeMeta(
 
 
 class StackType(Enum, metaclass=StackTypeMeta):
+    """Enum defining matcha stack types."""
+
     DEFAULT = "default"
     LLM = "llm"
 
@@ -41,13 +53,13 @@ class StackType(Enum, metaclass=StackTypeMeta):
 def infer_zenml_version() -> str:
     """Check the zenml version of the local environment against the version matcha is expecting."""
     try:
-        import zenml
+        import zenml  # type: ignore
 
-        version = zenml.__version__
+        version = str(zenml.__version__)
         print(
             f"\nMatcha detected zenml version {version}, so will use the same version on the remote resources."
         )
-    except:
+    except ImportError:
         version = "latest"
         print(
             "\nMatcha didn't find a zenml installation locally, so will install the latest release of zenml on the "
@@ -310,6 +322,12 @@ def stack_set(stack_name: str) -> None:
     Args:
         stack_name (str): the name of the type of stack to be specified in the config file.
     """
+    if RemoteStateManager().is_state_provisioned():
+        raise MatchaError(
+            "The remote resources are already provisioned. Changing the stack now will not "
+            "change the remote state."
+        )
+
     if stack_name.lower() not in StackType:
         raise MatchaInputError(f"{stack_name} is not a valid stack type.")
 
