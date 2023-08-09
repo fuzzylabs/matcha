@@ -214,7 +214,7 @@ class MatchaStateService:
 
             return resource_type, flavor, resource_name
 
-        matcha_components: List[MatchaStateComponent] = []
+        matcha_state = MatchaState(components=[])
 
         for output_name, output_value in terraform_output.items():
             (
@@ -224,12 +224,12 @@ class MatchaStateService:
             ) = _parse_terraform_output_resource_name(output_name)
 
             components_list = [
-                component.resource.name for component in matcha_components
+                component.resource.name for component in matcha_state.components
             ]
 
             if resource_type.name in components_list:
                 # add just the properties
-                for component in matcha_components:
+                for component in matcha_state.components:
                     if resource_type.name == component.resource.name:
                         component.properties.append(
                             MatchaResourceProperty(
@@ -238,7 +238,7 @@ class MatchaStateService:
                         )
             else:
                 # add the component
-                matcha_components.append(
+                matcha_state.components.append(
                     MatchaStateComponent(
                         resource=resource_type,
                         properties=[
@@ -257,9 +257,9 @@ class MatchaStateService:
                 MatchaResourceProperty(name="matcha_uuid", value=str(uuid.uuid4()))
             ],
         )
-        matcha_components.append(matcha_uuid_component)
+        matcha_state.components.append(matcha_uuid_component)
 
-        return MatchaState(matcha_components)
+        return matcha_state
 
     def _write_state(self, matcha_state: MatchaState) -> None:
         """Writes a given MatchaState object to the matcha.state file.
