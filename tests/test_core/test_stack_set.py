@@ -1,5 +1,6 @@
 """Test suite to test the stack set functionality in matcha."""
 import os
+from unittest.mock import patch
 
 import pytest
 
@@ -16,11 +17,23 @@ def test_stack_set_valid_no_existing_file(matcha_testing_directory):
     """
     os.chdir(matcha_testing_directory)
 
-    stack_set(stack_name="llm")
+    with patch(
+        "matcha_ml.state.remote_state_manager.RemoteStateManager.is_state_provisioned"
+    ) as is_state_provisioned:
+        is_state_provisioned.return_value = False
+        stack_set(stack_name="llm")
+
     config = MatchaConfigService.read_matcha_config()
     assert config.to_dict() == {"stack": {"name": "LLM"}}
 
-    stack_set(stack_name="default")
+    MatchaConfigService.delete_matcha_config()
+
+    with patch(
+        "matcha_ml.state.remote_state_manager.RemoteStateManager.is_state_provisioned"
+    ) as is_state_provisioned:
+        is_state_provisioned.return_value = False
+        stack_set(stack_name="default")
+
     config = MatchaConfigService.read_matcha_config()
     assert config.to_dict() == {"stack": {"name": "DEFAULT"}}
 
@@ -31,7 +44,10 @@ def test_stack_set_invalid(matcha_testing_directory):
     Args:
         matcha_testing_directory (str): temporary working directory
     """
-    with pytest.raises(MatchaInputError):
+    with pytest.raises(MatchaInputError), patch(
+        "matcha_ml.state.remote_state_manager.RemoteStateManager.is_state_provisioned"
+    ) as is_state_provisioned:
+        is_state_provisioned.return_value = False
         stack_set("nonsense")
 
 
@@ -50,7 +66,12 @@ def test_stack_set_existing_file(
     config_dict = config.to_dict()
     MatchaConfigService.write_matcha_config(config)
 
-    stack_set("llm")
+    with patch(
+        "matcha_ml.state.remote_state_manager.RemoteStateManager.is_state_provisioned"
+    ) as is_state_provisioned:
+        is_state_provisioned.return_value = False
+        stack_set("llm")
+
     new_config = MatchaConfigService.read_matcha_config()
     new_config_dict = new_config.to_dict()
 
