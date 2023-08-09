@@ -308,7 +308,7 @@ def stack_set(stack_name: str) -> None:
         stack_name (str): the name of the type of stack to be specified in the config file.
     """
     if RemoteStateManager().is_state_provisioned():
-        raise RuntimeError(
+        raise MatchaError(
             "The remote resources are already provisioned. Changing the stack now will not "
             "change the remote state."
         )

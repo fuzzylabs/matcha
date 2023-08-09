@@ -254,14 +254,14 @@ def set(stack: str = typer.Argument("default")) -> None:
 
     Args:
         stack (str): the name of the stack to provision.
-
-    Raises:
-        Exit: Exit if input is not a defined stack.
     """
     try:
         core.stack_set(stack)
         print_status(build_status(f"Matcha '{stack}' stack has been set."))
     except MatchaInputError as e:
+        print_error(str(e))
+        raise typer.Exit()
+    except MatchaError as e:
         print_error(str(e))
         raise typer.Exit()
 
