@@ -4,8 +4,10 @@ imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
+
 # ZenML server related options.
 zenml:
+
   replicaCount: 1
 
   image:
@@ -24,7 +26,7 @@ zenml:
   deploymentType:
 
   # The ZenML authentication scheme. Use one of:
-  #
+  # 
   # NO_AUTH - No authentication
   # HTTP_BASIC - HTTP Basic authentication
   # OAUTH2_PASSWORD_BEARER - OAuth2 password bearer with JWT tokens
@@ -38,7 +40,7 @@ zenml:
   #   from secrets import token_hex
   #   token_hex(32)
   #   ```
-  #
+  #   
   # or:
   #
   #   ```shell
@@ -70,20 +72,27 @@ zenml:
   # Use your own password here
   defaultPassword: zenml
 
+  # Implicit authentication methods featured by service connectors that support
+  # them are disabled by default, for security reasons. This is because they
+  # allow users to authenticate to the cloud provider where ZenML is running
+  # without having to provide any credentials.
+  enableImplicitAuthMethods: false
+
   # MySQL database configuration. If not set, a local sqlite database will be
   # used, which will not be persisted across pod restarts.
   # NOTE: the certificate files need to be copied in the helm chart folder and
   # the paths configured here need to be relative to the root of the helm chart.
-  database:
-    {}
+  database: {}
     # url: "mysql://admin:password@zenml-mysql:3306/database"
     # sslCa: /path/to/ca.pem
     # sslCert: /path/to/client-cert.pem
     # sslKey: /path/to/client-key.pem
     # sslVerifyServerCert: True
 
+
   # Secrets store settings. This is used to store centralized secrets.
   secretsStore:
+
     # Set to false to disable the secrets store.
     enabled: true
 
@@ -106,6 +115,7 @@ zenml:
     # SQL secrets store configuration. Only relevant if the `sql` secrets store
     # type is configured.
     sql:
+
       # The secret key used to encrypt secrets in the SQL database. Only relevant
       # if the SQL secrets store type is used. This should be set to a random
       # string with a recommended length of at least 32 characters, e.g.:
@@ -114,7 +124,7 @@ zenml:
       #   from secrets import token_hex
       #   token_hex(32)
       #   ```
-      #
+      #   
       # or:
       #
       #   ```shell
@@ -135,6 +145,7 @@ zenml:
     # AWS secrets store configuration. Only relevant if the `aws` secrets store
     # type is configured.
     aws:
+
       # The AWS region to use. This must be set to the region where the AWS
       # Secrets Manager service that you want to use is located.
       region_name: us-east-1
@@ -160,9 +171,11 @@ zenml:
       # starvation in the ZenML server on high load.
       secret_list_refresh_timeout: 0
 
+
     # GCP secrets store configuration. Only relevant if the `gcp` secrets store
     # type is configured.
     gcp:
+
       # The GCP project ID to use. This must be set to the project ID where the
       # GCP Secrets Manager service that you want to use is located.
       project_id: my-gcp-project
@@ -179,6 +192,7 @@ zenml:
     # AWS Key Vault secrets store configuration. Only relevant if the `azure`
     # secrets store type is configured.
     azure:
+
       # The name of the Azure Key Vault. This must be set to point to the Azure
       # Key Vault instance that you want to use.
       key_vault_name:
@@ -197,6 +211,7 @@ zenml:
     # HashiCorp Vault secrets store configuration. Only relevant if the `hashicorp`
     # secrets store type is configured
     hashicorp:
+
       # The url of the HashiCorp Vault server
       vault_addr: https://vault.example.com
       # The token used to authenticate with the Vault server
@@ -210,6 +225,7 @@ zenml:
     # Custom secrets store configuration. Only relevant if the `custom` secrets
     # store type is configured.
     custom:
+
       # The class path of the custom secrets store implementation. This should
       # point to a full Python class that extends the
       # `zenml.zen_stores.secrets_stores.base_secrets_store.BaseSecretsStore`
@@ -234,11 +250,11 @@ zenml:
   secretEnvironment: {}
 
   service:
-    type: LoadBalancer # Changed from ClusterIP
+    type: LoadBalancer  # changed from ClusterIP
     port: 80
 
   ingress:
-    enabled: false # Changed from true
+    enabled: false  # changed from true
     className: "nginx"
     annotations:
       nginx.ingress.kubernetes.io/ssl-redirect: "true"
@@ -262,6 +278,7 @@ zenml:
       generateCerts: false
       secretName: zenml-tls-certs
 
+
 serviceAccount:
   # Specifies whether a service account should be created
   create: true
@@ -273,8 +290,7 @@ serviceAccount:
 
 podAnnotations: {}
 
-podSecurityContext:
-  {}
+podSecurityContext: {}
   # fsGroup: 2000
 
 securityContext:
@@ -284,8 +300,7 @@ securityContext:
   #   drop:
   #   - ALL
 
-resources:
-  {}
+resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little
   # resources, such as Minikube. If you do want to specify resources, uncomment the following

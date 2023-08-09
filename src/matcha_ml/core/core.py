@@ -1,11 +1,16 @@
 """The core functionality for Matcha API."""
 import os
+from enum import Enum, EnumMeta
 from typing import Optional
-from warnings import warn
 
 from matcha_ml.cli._validation import get_command_validation
 from matcha_ml.cli.ui.print_messages import print_status
 from matcha_ml.cli.ui.status_message_builders import build_warning_status
+from matcha_ml.config import (
+    MatchaConfigComponent,
+    MatchaConfigComponentProperty,
+    MatchaConfigService,
+)
 from matcha_ml.core._validation import is_valid_prefix, is_valid_region
 from matcha_ml.errors import MatchaError, MatchaInputError
 from matcha_ml.runners import AzureRunner
@@ -15,23 +20,53 @@ from matcha_ml.state import MatchaStateService, RemoteStateManager
 from matcha_ml.state.matcha_state import MatchaState
 from matcha_ml.templates.azure_template import AzureTemplate
 
-MAJOR_MINOR_ZENML_VERSION = "0.36"
+
+class StackTypeMeta(
+    EnumMeta
+):  # this is probably overkill, but we might need it if we'll support custom stacks later.
+    """Metaclass for the StackType Enum."""
+
+    def __contains__(self, item: str) -> bool:  # type: ignore
+        """Dunder method for checking if an item is a member of the enum.
+
+        Args:
+            item (str): the quantity to check for in the Enum.
+
+        Returns:
+            True if item is a member of the Enum, False otherwise.
+        """
+        try:
+            self(item)
+        except ValueError:
+            return False
+        else:
+            return True
 
 
-def zenml_version_is_supported() -> None:
+class StackType(Enum, metaclass=StackTypeMeta):
+    """Enum defining matcha stack types."""
+
+    DEFAULT = "default"
+    LLM = "llm"
+
+
+def infer_zenml_version() -> str:
     """Check the zenml version of the local environment against the version matcha is expecting."""
     try:
-        import zenml
+        import zenml  # type: ignore
 
-        if zenml.__version__[:3] != MAJOR_MINOR_ZENML_VERSION:
-            warn(
-                f"Matcha expects ZenML version {MAJOR_MINOR_ZENML_VERSION}.x, but you have version {zenml.__version__}."
-            )
-    except:
-        warn(
-            f"No local installation of ZenMl found. Defaulting to version {MAJOR_MINOR_ZENML_VERSION} for remote "
-            f"resources."
+        version = str(zenml.__version__)
+        print(
+            f"\nMatcha detected zenml version {version}, so will use the same version on the remote resources."
         )
+    except ImportError:
+        version = "latest"
+        print(
+            "\nMatcha didn't find a zenml installation locally, so will install the latest release of zenml on the "
+            "remote resources."
+        )
+
+    return version
 
 
 @track(event_name=AnalyticsEvent.GET)
@@ -205,7 +240,6 @@ def provision(
         MatchaError: If prefix is not valid.
         MatchaError: If region is not valid.
     """
-    zenml_version_is_supported()
     remote_state_manager = RemoteStateManager()
     template_runner = AzureRunner()
 
@@ -221,7 +255,7 @@ def provision(
                     "Matcha has detected a stale state file. This means that your local configuration is out of sync with the remote state, the resource group may have been removed. Deleting existing state config."
                 )
             )
-        remote_state_manager.remove_matcha_config()
+        MatchaConfigService.delete_matcha_config()
         template_runner.remove_matcha_dir()
 
     if remote_state_manager.is_state_provisioned():
@@ -251,8 +285,12 @@ def provision(
 
         azure_template = AzureTemplate()
 
+        zenml_version = infer_zenml_version()
         config = azure_template.build_template_configuration(
-            location=location, prefix=prefix, password=password
+            location=location,
+            prefix=prefix,
+            password=password,
+            zenmlserver_version=zenml_version,
         )
         azure_template.build_template(config, template, destination, verbose)
 
@@ -263,6 +301,26 @@ def provision(
         return matcha_state_service.fetch_resources_from_state_file()
 
 
-def stack_set(stack: str) -> str:
-    """Placeholder for core matcha stack set functionality."""
-    return stack
+def stack_set(stack_name: str) -> None:
+    """A function for updating the stack type in the local matcha.config.json file.
+
+    Args:
+        stack_name (str): the name of the type of stack to be specified in the config file.
+    """
+    if RemoteStateManager().is_state_provisioned():
+        raise MatchaError(
+            "The remote resources are already provisioned. Changing the stack now will not "
+            "change the remote state."
+        )
+
+    if stack_name.lower() not in StackType:
+        raise MatchaInputError(f"{stack_name} is not a valid stack type.")
+
+    stack_enum = StackType(stack_name.lower())
+
+    stack = MatchaConfigComponent(
+        name="stack",
+        properties=[MatchaConfigComponentProperty(name="name", value=stack_enum.name)],
+    )
+
+    MatchaConfigService.update(stack)
