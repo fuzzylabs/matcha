@@ -58,8 +58,7 @@ def test_cli_stack_set_command_without_args(
         runner (CliRunner): typer CLI runner
         mocked_remote_state_manager_is_state_provisioned_false (RemoteStateManager): A mocked RemoteStateManager object
     """
-    with mocked_remote_state_manager_is_state_provisioned_false:
-        result = runner.invoke(app, ["stack", "set"])
+    result = runner.invoke(app, ["stack", "set"])
 
     assert result.exit_code == 0
 
@@ -75,8 +74,7 @@ def test_cli_stack_set_command_with_args(
         runner (CliRunner): typer CLI runner
         mocked_remote_state_manager_is_state_provisioned_false (RemoteStateManager): A mocked remote state manager
     """
-    with mocked_remote_state_manager_is_state_provisioned_false:
-        result = runner.invoke(app, ["stack", "set", "default"])
+    result = runner.invoke(app, ["stack", "set", "default"])
 
     assert result.exit_code == 0
 
@@ -92,8 +90,7 @@ def test_stack_set_stack_not_recognized(
         runner (CliRunner): typer CLI runner
         mocked_remote_state_manager_is_state_provisioned_false (RemoteStateManager): A mocked remote state manager
     """
-    with mocked_remote_state_manager_is_state_provisioned_false:
-        result = runner.invoke(app, ["stack", "set", "random"])
+    result = runner.invoke(app, ["stack", "set", "random"])
 
     assert result.exit_code == 0
     assert "random is not a valid stack type" in result.stdout
@@ -112,8 +109,8 @@ def test_stack_set_file_created(
         mocked_remote_state_manager_is_state_provisioned_false (RemoteStateManager): A mocked remote state manager
     """
     os.chdir(matcha_testing_directory)
-    with mocked_remote_state_manager_is_state_provisioned_false:
-        result = runner.invoke(app, ["stack", "set", "llm"])
+
+    result = runner.invoke(app, ["stack", "set", "llm"])
 
     assert result.exit_code == 0
 
@@ -140,8 +137,8 @@ def test_stack_set_file_modified(
     config = MatchaConfig.from_dict(mocked_matcha_config_json_object)
     config_dict = config.to_dict()
     MatchaConfigService.write_matcha_config(config)
-    with mocked_remote_state_manager_is_state_provisioned_false:
-        result = runner.invoke(app, ["stack", "set", "llm"])
+
+    result = runner.invoke(app, ["stack", "set", "llm"])
     assert result.exit_code == 0
 
     new_config = MatchaConfigService.read_matcha_config()

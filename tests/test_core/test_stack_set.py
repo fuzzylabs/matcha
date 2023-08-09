@@ -20,16 +20,14 @@ def test_stack_set_valid_no_existing_file(
     """
     os.chdir(matcha_testing_directory)
 
-    with mocked_remote_state_manager_is_state_provisioned_false:
-        stack_set(stack_name="llm")
+    stack_set(stack_name="llm")
 
     config = MatchaConfigService.read_matcha_config()
     assert config.to_dict() == {"stack": {"name": "LLM"}}
 
     MatchaConfigService.delete_matcha_config()
 
-    with mocked_remote_state_manager_is_state_provisioned_false:
-        stack_set(stack_name="default")
+    stack_set(stack_name="default")
 
     config = MatchaConfigService.read_matcha_config()
     assert config.to_dict() == {"stack": {"name": "DEFAULT"}}
@@ -44,9 +42,7 @@ def test_stack_set_invalid(
         matcha_testing_directory (str): temporary working directory
         mocked_remote_state_manager_is_state_provisioned_false (RemoteStateManager): A mocked remote state manager
     """
-    with mocked_remote_state_manager_is_state_provisioned_false, pytest.raises(
-        MatchaInputError
-    ):
+    with pytest.raises(MatchaInputError):
         stack_set("nonsense")
 
 
@@ -68,8 +64,7 @@ def test_stack_set_existing_file(
     config_dict = config.to_dict()
     MatchaConfigService.write_matcha_config(config)
 
-    with mocked_remote_state_manager_is_state_provisioned_false:
-        stack_set("llm")
+    stack_set("llm")
 
     new_config = MatchaConfigService.read_matcha_config()
     new_config_dict = new_config.to_dict()
