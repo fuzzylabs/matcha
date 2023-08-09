@@ -267,7 +267,6 @@ def mocked_matcha_config_json_object() -> Dict[str, Dict[str, str]]:
     return matcha_config
 
 
-
 @pytest.fixture
 def mocked_matcha_config_component_property() -> MatchaConfigComponentProperty:
     """A fixture returning a mocked MatchaConfigComponentProperty instance.
@@ -316,3 +315,17 @@ def mocked_matcha_config_service():
     (MatchaConfigService): a mocked MatchaConfigService instance.
     """
     return MatchaConfigService()
+
+
+@pytest.fixture
+def mocked_remote_state_manager_is_state_provisioned_false():
+    """A fixture for providing context within which RemoteStateManager.is_state_provisioned always returns false.
+
+    Yields:
+        A mocked RemoteStateManager object with a patched is_state_provisioned method.
+    """
+    with patch(
+        "matcha_ml.state.remote_state_manager.RemoteStateManager.is_state_provisioned"
+    ) as is_state_provisioned:
+        is_state_provisioned.return_value = False
+        yield is_state_provisioned
