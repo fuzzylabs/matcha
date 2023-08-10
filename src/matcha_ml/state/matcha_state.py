@@ -242,19 +242,15 @@ class MatchaStateService:
                 resource_name,
             ) = _parse_terraform_output_resource_name(output_name)
 
-            components_list = [
-                component.resource.name for component in matcha_state.components
-            ]
+            component = matcha_state.get_component(resource_type.name)
 
-            if resource_type.name in components_list:
+            if component:
                 # add just the properties
-                for component in matcha_state.components:
-                    if resource_type.name == component.resource.name:
-                        component.properties.append(
-                            MatchaResourceProperty(
-                                name=resource_name, value=output_value["value"]
-                            )
-                        )
+                component.properties.append(
+                    MatchaResourceProperty(
+                        name=resource_name, value=output_value["value"]
+                    )
+                )
             else:
                 # add the component
                 matcha_state.components.append(
@@ -358,7 +354,6 @@ class MatchaStateService:
             return MatchaState(components=[])
 
         if property_name is None:
-
             return MatchaState(components=[component])
 
         property = component.find_property(property_name=property_name)
