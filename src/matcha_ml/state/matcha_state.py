@@ -128,7 +128,7 @@ class MatchaStateService:
     def __init__(
         self,
         matcha_state: Optional[MatchaState] = None,
-        terraform_output: Optional[Dict[str, str]] = None,
+        terraform_output: Optional[Dict[str, Dict[str, str]]] = None,
     ) -> None:
         """Constructor for the MatchaStateService.
 
@@ -168,7 +168,7 @@ class MatchaStateService:
         return bool(os.path.isfile(cls.matcha_state_path))
 
     def build_state_from_terraform_output(
-        self, terraform_output: Dict[str, str]
+        self, terraform_output: Dict[str, Dict[str, str]]
     ) -> MatchaState:
         """Builds a MatchaState class from a terraform output dictionary.
 
@@ -210,7 +210,7 @@ class MatchaStateService:
 
             flavor, resource_name = flavor_and_resource_name.split("_", maxsplit=1)
             resource_name = resource_name.replace("_", "-")
-            resource_type = resource_type.name.replace("_", "-")  # type: ignore
+            resource_type.name = resource_type.name.replace("_", "-")
 
             return resource_type, flavor, resource_name
 
@@ -226,14 +226,14 @@ class MatchaStateService:
             components_list = [
                 component.resource.name for component in matcha_state.components
             ]
-
+            print(output_name, output_value)
             if resource_type.name in components_list:
                 # add just the properties
                 for component in matcha_state.components:
                     if resource_type.name == component.resource.name:
                         component.properties.append(
                             MatchaResourceProperty(
-                                name=resource_name, value=output_value
+                                name=resource_name, value=output_value["value"]
                             )
                         )
             else:
@@ -244,7 +244,7 @@ class MatchaStateService:
                         properties=[
                             MatchaResourceProperty(name="flavor", value=flavor),
                             MatchaResourceProperty(
-                                name=resource_name, value=output_value
+                                name=resource_name, value=output_value["value"]
                             ),
                         ],
                     )
