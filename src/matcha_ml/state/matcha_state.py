@@ -226,7 +226,7 @@ class MatchaStateService:
             components_list = [
                 component.resource.name for component in matcha_state.components
             ]
-            print(output_name, output_value)
+
             if resource_type.name in components_list:
                 # add just the properties
                 for component in matcha_state.components:
