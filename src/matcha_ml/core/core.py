@@ -274,17 +274,7 @@ def provision(
     # Provision resource group and remote state storage
     remote_state_manager.provision_remote_state(location, prefix)
 
-    try:
-        stack_name = (
-            MatchaConfigService.read_matcha_config()
-            .find_component("stack")
-            .find_property("name")
-        )
-    except MatchaError:
-        stack_name = MatchaConfigComponentProperty(name="name", value="default")
-        MatchaConfigService.update(
-            MatchaConfigComponent(name="stack", properties=[stack_name])
-        )
+    stack_name = MatchaConfigService.get_current_stack_name()
 
     with remote_state_manager.use_lock(), remote_state_manager.use_remote_state():
         project_directory = os.getcwd()
@@ -295,7 +285,7 @@ def provision(
             os.path.dirname(__file__),
             os.pardir,
             "infrastructure",
-            stack_name.value.lower(),
+            stack_name.lower(),
         )
 
         azure_template = AzureTemplate()
