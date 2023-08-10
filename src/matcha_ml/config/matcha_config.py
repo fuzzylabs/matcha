@@ -127,6 +127,30 @@ class MatchaConfigService:
     """A service for handling the Matcha config file."""
 
     @staticmethod
+    def get_current_stack_name() -> str:
+        """Gets the current stack name from the Matcha Config if it exists, if it does not exist set it to default.
+
+        Returns:
+            str: The name of the current stack being used as a string.
+        """
+        try:
+            stack_name = (
+                MatchaConfigService.read_matcha_config()
+                .find_component("stack")
+                .find_property("name")
+            ).value
+        except MatchaError:
+            stack_name = "default"
+            stack_config_component = MatchaConfigComponentProperty(
+                name="name", value=stack_name
+            )
+            MatchaConfigService.update(
+                MatchaConfigComponent(name="stack", properties=[stack_config_component])
+            )
+
+        return stack_name
+
+    @staticmethod
     def write_matcha_config(matcha_config: MatchaConfig) -> None:
         """A function for writing the local Matcha config file.
 
@@ -170,7 +194,9 @@ class MatchaConfigService:
         return os.path.exists(os.path.join(os.getcwd(), DEFAULT_CONFIG_NAME))
 
     @staticmethod
-    def update(components: Union[MatchaConfigComponent, List[MatchaConfigComponent]]) -> None:
+    def update(
+        components: Union[MatchaConfigComponent, List[MatchaConfigComponent]]
+    ) -> None:
         """A function which updates the matcha config file.
 
         If no config file exists, this function will create one.

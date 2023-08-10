@@ -8,7 +8,7 @@ from matcha_ml.cli._validation import (
     prefix_typer_callback,
     region_typer_callback,
 )
-from matcha_ml.cli.constants import RESOURCE_MSG, STATE_RESOURCE_MSG
+from matcha_ml.cli.constants import STACK_RESOURCE_MSG_DICT, STATE_RESOURCE_MSG
 from matcha_ml.cli.ui.print_messages import (
     print_error,
     print_resource_output,
@@ -23,6 +23,7 @@ from matcha_ml.cli.ui.status_message_builders import (
     build_step_success_status,
 )
 from matcha_ml.cli.ui.user_approval_functions import is_user_approved
+from matcha_ml.config import MatchaConfigService
 from matcha_ml.errors import MatchaError, MatchaInputError
 
 app = typer.Typer(no_args_is_help=True, pretty_exceptions_show_locals=False)
@@ -110,7 +111,12 @@ def provision(
         Exit: Exit if resources are already provisioned.
     """
     location, prefix, password = fill_provision_variables(location, prefix, password)
-    if is_user_approved(verb="provision", resources=RESOURCE_MSG):
+
+    stack = MatchaConfigService.get_current_stack_name()
+
+    resources = STACK_RESOURCE_MSG_DICT[stack]
+
+    if is_user_approved(verb="provision", resources=resources, stack=stack):
         try:
             _ = core.provision(location, prefix, password, verbose)
         except MatchaError as e:
@@ -177,7 +183,13 @@ def destroy() -> None:
     Raises:
         Exit: Exit if core.destroy throws a MatchaError.
     """
-    if is_user_approved(verb="destroy", resources=RESOURCE_MSG + STATE_RESOURCE_MSG):
+    stack = MatchaConfigService.get_current_stack_name()
+
+    if is_user_approved(
+        verb="destroy",
+        resources=STACK_RESOURCE_MSG_DICT[stack] + STATE_RESOURCE_MSG,
+        stack=stack,
+    ):
         try:
             core.destroy()
             print_status(build_step_success_status("Destroying resources is complete!"))

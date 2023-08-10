@@ -16,6 +16,13 @@ RESOURCE_MSG = [
     ("ZenServer", "A zenml server required for remote orchestration"),
 ]
 
+LLM_STACK_RESOURCES = [("ChromaDB", "A vector database for document retrieval")]
+
+STACK_RESOURCE_MSG_DICT = {
+    "DEFAULT": RESOURCE_MSG,
+    "LLM": RESOURCE_MSG + LLM_STACK_RESOURCES,
+}
+
 STATE_RESOURCE_MSG = [
     ("Azure Resource Group", "The resource group containing the provisioned resources"),
     ("Matcha State Container", "A storage container for tracking matcha state"),
