@@ -3,8 +3,15 @@ import os
 from typing import Optional
 
 from matcha_ml.cli._validation import get_command_validation
-from matcha_ml.cli.ui.print_messages import print_status
-from matcha_ml.cli.ui.status_message_builders import build_warning_status
+from matcha_ml.cli.ui.print_messages import (
+    print_json,
+    print_status,
+)
+from matcha_ml.cli.ui.resource_message_builders import (
+    dict_to_json,
+    hide_sensitive_in_output,
+)
+from matcha_ml.cli.ui.status_message_builders import build_status, build_warning_status
 from matcha_ml.config import MatchaConfigService
 from matcha_ml.core._validation import is_valid_prefix, is_valid_region
 from matcha_ml.errors import MatchaError, MatchaInputError
@@ -33,6 +40,18 @@ def infer_zenml_version() -> str:
         )
 
     return version
+
+
+def _show_terraform_outputs(matcha_state: MatchaState) -> None:
+    """Print the formatted Terraform outputs.
+
+    Args:
+        matcha_state (MatchaState): Terraform outputs in a MatchaState format.
+    """
+    print_status(build_status("Here are the endpoints for what's been provisioned"))
+    resources_dict = hide_sensitive_in_output(matcha_state.to_dict())
+    resources_json = dict_to_json(resources_dict)
+    print_json(resources_json)
 
 
 @track(event_name=AnalyticsEvent.GET)
@@ -260,8 +279,9 @@ def provision(
         )
         azure_template.build_template(config, template, destination, verbose)
 
-        template_runner.provision()
+        matcha_state_service = template_runner.provision()
 
-        matcha_state_service = MatchaStateService()
+        if verbose:
+            _show_terraform_outputs(matcha_state_service._state)
 
         return matcha_state_service.fetch_resources_from_state_file()

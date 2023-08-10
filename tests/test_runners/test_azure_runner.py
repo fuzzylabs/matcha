@@ -7,11 +7,9 @@ from unittest import mock
 from unittest.mock import MagicMock
 
 import pytest
-from _pytest.capture import SysCapture
 
 from matcha_ml.runners import AzureRunner
 from matcha_ml.state.matcha_state import (
-    MatchaState,
     MatchaStateService,
 )
 
@@ -147,7 +145,6 @@ def test_write_outputs_state(
     template_runner._validate_terraform_config = MagicMock()
     template_runner._initialize_terraform = MagicMock()
     template_runner._apply_terraform = MagicMock()
-    template_runner._show_terraform_outputs = MagicMock()
     template_runner.tfs.terraform_client.output = MagicMock(wraps=mock_output)
 
     with does_not_raise():
@@ -156,31 +153,6 @@ def test_write_outputs_state(
             template_runner.provision()
         with open(MatchaStateService.matcha_state_path) as f:
             assert json.load(f) == expected_outputs_show_sensitive
-
-
-def test_show_terraform_outputs(
-    template_runner: AzureRunner,
-    capsys: SysCapture,
-    expected_outputs_hide_sensitive: dict,
-    state_file_as_object: MatchaState,
-    matcha_testing_directory: str,
-):
-    """Test service shows the correct terraform output.
-
-    Args:
-        template_runner (AzureRunner): a AzureRunner object instance
-        capsys (SysCapture): fixture to capture stdout and stderr
-        expected_outputs_hide_sensitive (dict): expected output from terraform
-        state_file_as_object (MatchaState): mock MatchaState dataclass object
-        matcha_testing_directory (str): Testing directory
-    """
-    os.chdir(matcha_testing_directory)
-    with does_not_raise():
-        template_runner._show_terraform_outputs(state_file_as_object)
-        captured = capsys.readouterr()
-
-        for output in expected_outputs_hide_sensitive:
-            assert output in captured.out
 
 
 def test_remove_matcha_dir(matcha_testing_directory: str, template_runner: AzureRunner):
@@ -211,7 +183,6 @@ def test_provision(matcha_testing_directory: str, template_runner: AzureRunner):
     template_runner._validate_terraform_config = MagicMock()
     template_runner._initialize_terraform = MagicMock()
     template_runner._apply_terraform = MagicMock()
-    template_runner._show_terraform_outputs = MagicMock()
 
     os.makedirs(os.path.join(matcha_testing_directory, ".matcha", "infrastructure"))
 
