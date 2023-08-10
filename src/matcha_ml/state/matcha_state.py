@@ -79,6 +79,25 @@ class MatchaState:
 
     components: List[MatchaStateComponent]
 
+    def get_component(self, resource_name: str) -> Optional[MatchaStateComponent]:
+        """Get a component of the state given a resource name.
+
+        Args:
+            resource_name (str): the components resource name
+
+        Returns:
+            MatchaStateComponent: the state component matching the resource name parameter.
+        """
+        component = next(
+            filter(
+                lambda component: component.resource.name == resource_name,
+                self.components,
+            ),
+            None,
+        )
+
+        return component
+
     def to_dict(self) -> Dict[str, Dict[str, str]]:
         """Convert the MatchaState object to a dictionary.
 
@@ -291,16 +310,26 @@ class MatchaStateService:
         local_config_file = os.path.join(os.getcwd(), "matcha.config.json")
 
         # the resource group name from the state object
-        matcha_state_resource_group = (
-            self.get_component("cloud").find_property("resource-group-name").value
-        )
 
-        if self.state_exists() and os.path.exists(local_config_file):
+        # matcha_state_resource_group: Optional[str] = (
+        #     self.get_component("cloud").find_property("resource-group-name").value
+        # )
+
+        cloud_component = self.get_component("cloud")
+
+        if (
+            self.state_exists()
+            and os.path.exists(local_config_file)
+            and cloud_component
+        ):
             with open(local_config_file) as config:
                 local_config = json.load(config)
 
+                resource_group_property = cloud_component.find_property(
+                    "resource-group-name"
+                ).value
             return bool(
-                matcha_state_resource_group
+                resource_group_property
                 != local_config["remote_state_bucket"]["resource_group_name"]
             )
         else:
@@ -323,12 +352,15 @@ class MatchaStateService:
         if resource_name is None:
             return self._state
 
-        if property_name is None:
-            return MatchaState(
-                components=[self.get_component(resource_name=resource_name)]
-            )
-
         component = self.get_component(resource_name=resource_name)
+
+        if component is None:
+            return MatchaState(components=[])
+
+        if property_name is None:
+
+            return MatchaState(components=[component])
+
         property = component.find_property(property_name=property_name)
 
         return MatchaState(
@@ -337,32 +369,16 @@ class MatchaStateService:
             ]
         )
 
-    def get_component(self, resource_name: str) -> MatchaStateComponent:
+    def get_component(self, resource_name: str) -> Optional[MatchaStateComponent]:
         """Get a component of the state given a resource name.
 
         Args:
             resource_name (str): the components resource name
 
-        Raises:
-            MatchaError: if the component cannot be found in the state.
-
         Returns:
             MatchaStateComponent: the state component matching the resource name parameter.
         """
-        component = next(
-            filter(
-                lambda component: component.resource.name == resource_name,
-                self._state.components,
-            ),
-            None,
-        )
-
-        if component is None:
-            raise MatchaError(
-                f"The component with the name '{resource_name}' could not be found in the state."
-            )
-
-        return component
+        return self._state.get_component(resource_name=resource_name)
 
     def get_resource_names(self) -> List[str]:
         """Method for returning all existing resource names.

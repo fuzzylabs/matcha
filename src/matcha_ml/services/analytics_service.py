@@ -53,9 +53,14 @@ def _get_state_uuid() -> Optional[MatchaResourceProperty]:
     except MatchaError:
         return None
 
-    try:
-        state_id_component = matcha_state_service.get_component("id")
-    except MatchaError:
+    # try:
+
+    # except MatchaError:
+    #     return None
+
+    state_id_component = matcha_state_service.get_component("id")
+
+    if state_id_component is None:
         return None
 
     matcha_state_uuid = state_id_component.find_property(property_name="matcha_uuid")

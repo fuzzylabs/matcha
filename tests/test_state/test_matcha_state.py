@@ -365,13 +365,9 @@ def test_get_component_not_found(
         matcha_state_service (MatchaStateService): the Matcha state service testing instance.
     """
     invalid_resource_name = "not a resource"
-    with pytest.raises(MatchaError) as err:
-        _ = matcha_state_service.get_component(resource_name=invalid_resource_name)
+    component = matcha_state_service.get_component(resource_name=invalid_resource_name)
 
-    assert (
-        str(err.value)
-        == "The component with the name 'not a resource' could not be found in the state."
-    )
+    assert component is None
 
 
 def test_state_component_find_property_expected(
