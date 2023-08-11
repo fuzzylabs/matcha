@@ -324,7 +324,7 @@ def test_stale_remote_state_file_is_removed(matcha_testing_directory: str):
             "container_name": "test-container",
             "resource_group_name": "test-rg",
         },
-        "stack": {"name": "default"},
+        "stack": {"name": "DEFAULT"},
     }
 
     with mock.patch(
