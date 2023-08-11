@@ -271,21 +271,27 @@ def provision(
     except MatchaInputError as e:
         raise e
 
+    if MatchaConfigService.get_stack() is None:
+        stack_set("default")
+
     # Provision resource group and remote state storage
     remote_state_manager.provision_remote_state(location, prefix)
-
-    stack_name = MatchaConfigService.get_current_stack_name()
 
     with remote_state_manager.use_lock(), remote_state_manager.use_remote_state():
         project_directory = os.getcwd()
         destination = os.path.join(
             project_directory, ".matcha", "infrastructure", "resources"
         )
+
+        stack = MatchaConfigService.get_stack()
+        if stack is not None:
+            stack_name = stack.value.lower()
+
         template = os.path.join(
             os.path.dirname(__file__),
             os.pardir,
             "infrastructure",
-            stack_name.lower(),
+            stack_name,
         )
 
         azure_template = AzureTemplate()

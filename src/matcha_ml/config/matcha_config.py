@@ -2,7 +2,7 @@
 import json
 import os
 from dataclasses import dataclass
-from typing import Dict, List, Union
+from typing import Dict, List, Optional, Union
 
 from matcha_ml.errors import MatchaError
 
@@ -127,28 +127,22 @@ class MatchaConfigService:
     """A service for handling the Matcha config file."""
 
     @staticmethod
-    def get_current_stack_name() -> str:
-        """Gets the current stack name from the Matcha Config if it exists, if it does not exist set it to default.
+    def get_stack() -> Optional[MatchaConfigComponentProperty]:
+        """Gets the current stack name from the Matcha Config if it exists.
 
         Returns:
-            str: The name of the current stack being used as a string.
+            Optional[MatchaConfigComponentProperty]: The name of the current stack being used as a config component object.
         """
         try:
-            stack_name = (
+            stack = (
                 MatchaConfigService.read_matcha_config()
                 .find_component("stack")
                 .find_property("name")
-            ).value
+            )
         except MatchaError:
-            stack_name = "default"
-            stack_config_component = MatchaConfigComponentProperty(
-                name="name", value=stack_name
-            )
-            MatchaConfigService.update(
-                MatchaConfigComponent(name="stack", properties=[stack_config_component])
-            )
+            stack = None
 
-        return stack_name
+        return stack
 
     @staticmethod
     def write_matcha_config(matcha_config: MatchaConfig) -> None:
