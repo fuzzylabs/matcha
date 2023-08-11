@@ -86,7 +86,7 @@ class MatchaState:
             resource_name (str): the components resource name
 
         Returns:
-            MatchaStateComponent: the state component matching the resource name parameter.
+            Optional[MatchaStateComponent]: the state component matching the resource name parameter.
         """
         component = next(
             filter(
@@ -244,7 +244,7 @@ class MatchaStateService:
 
             component = matcha_state.get_component(resource_type.name)
 
-            if component:
+            if component is not None:
                 # add just the properties
                 component.properties.append(
                     MatchaResourceProperty(
@@ -304,12 +304,6 @@ class MatchaStateService:
     def is_local_state_stale(self) -> bool:
         """Checks for congruence between the local config file and the local state file."""
         local_config_file = os.path.join(os.getcwd(), "matcha.config.json")
-
-        # the resource group name from the state object
-
-        # matcha_state_resource_group: Optional[str] = (
-        #     self.get_component("cloud").find_property("resource-group-name").value
-        # )
 
         cloud_component = self.get_component("cloud")
 
