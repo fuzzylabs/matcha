@@ -70,7 +70,6 @@ class BaseTemplate:
             if sub_folder_path
             else destination
         )
-
         for source_path in files:
             filename = os.path.basename(source_path)
             destination_path = os.path.join(destination_folder, filename)

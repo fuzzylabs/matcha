@@ -2,7 +2,7 @@
 import json
 import os
 from dataclasses import dataclass
-from typing import Dict, List, Union
+from typing import Dict, List, Optional, Union
 
 from matcha_ml.errors import MatchaError
 
@@ -127,6 +127,24 @@ class MatchaConfigService:
     """A service for handling the Matcha config file."""
 
     @staticmethod
+    def get_stack() -> Optional[MatchaConfigComponentProperty]:
+        """Gets the current stack name from the Matcha Config if it exists.
+
+        Returns:
+            Optional[MatchaConfigComponentProperty]: The name of the current stack being used as a config component object.
+        """
+        try:
+            stack = (
+                MatchaConfigService.read_matcha_config()
+                .find_component("stack")
+                .find_property("name")
+            )
+        except MatchaError:
+            stack = None
+
+        return stack
+
+    @staticmethod
     def write_matcha_config(matcha_config: MatchaConfig) -> None:
         """A function for writing the local Matcha config file.
 
@@ -170,7 +188,9 @@ class MatchaConfigService:
         return os.path.exists(os.path.join(os.getcwd(), DEFAULT_CONFIG_NAME))
 
     @staticmethod
-    def update(components: Union[MatchaConfigComponent, List[MatchaConfigComponent]]) -> None:
+    def update(
+        components: Union[MatchaConfigComponent, List[MatchaConfigComponent]]
+    ) -> None:
         """A function which updates the matcha config file.
 
         If no config file exists, this function will create one.

@@ -271,6 +271,9 @@ def provision(
     except MatchaInputError as e:
         raise e
 
+    if MatchaConfigService.get_stack() is None:
+        stack_set("default")
+
     # Provision resource group and remote state storage
     remote_state_manager.provision_remote_state(location, prefix)
 
@@ -279,8 +282,16 @@ def provision(
         destination = os.path.join(
             project_directory, ".matcha", "infrastructure", "resources"
         )
+
+        stack = MatchaConfigService.get_stack()
+        if stack is not None:
+            stack_name = stack.value
+
         template = os.path.join(
-            os.path.dirname(__file__), os.pardir, "infrastructure", "resources"
+            os.path.dirname(__file__),
+            os.pardir,
+            "infrastructure",
+            stack_name,
         )
 
         azure_template = AzureTemplate()
@@ -320,7 +331,7 @@ def stack_set(stack_name: str) -> None:
 
     stack = MatchaConfigComponent(
         name="stack",
-        properties=[MatchaConfigComponentProperty(name="name", value=stack_enum.name)],
+        properties=[MatchaConfigComponentProperty(name="name", value=stack_enum.value)],
     )
 
     MatchaConfigService.update(stack)

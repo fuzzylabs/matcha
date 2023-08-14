@@ -15,6 +15,7 @@ from matcha_ml.config import (
     MatchaConfig,
     MatchaConfigService,
 )
+from matcha_ml.config.matcha_config import MatchaConfigComponent
 from matcha_ml.errors import MatchaError
 from matcha_ml.runners.remote_state_runner import RemoteStateRunner
 from matcha_ml.state import RemoteStateManager
@@ -28,23 +29,6 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 TEMPLATE_DIR = os.path.join(
     BASE_DIR, os.pardir, os.pardir, "src", "matcha_ml", "infrastructure"
 )
-
-
-@pytest.fixture
-def broken_config_testing_directory(matcha_testing_directory: str) -> str:
-    """Fixture for broken configuration file in temp working directory.
-
-    Args:
-        matcha_testing_directory (str): temporary working directory path
-
-    Returns:
-        str: temporary working directory path that the configuration was written to
-    """
-    config_path = os.path.join(matcha_testing_directory, DEFAULT_CONFIG_NAME)
-    content = {}
-    with open(config_path, "w") as f:
-        json.dump(content, f)
-    return matcha_testing_directory
 
 
 @pytest.fixture
@@ -231,18 +215,6 @@ def test_is_state_provisioned_no_config(matcha_testing_directory: str):
     os.chdir(matcha_testing_directory)  # move to temporary working directory
     remote_state = RemoteStateManager()
     assert not remote_state.is_state_provisioned()
-
-
-def test_is_state_provisioned_broken_config(broken_config_testing_directory: str):
-    """Test is_state_provisioned method returns False, when the configuration file is broken.
-
-    Args:
-        broken_config_testing_directory (str): temporary working directory path, with broken config file
-    """
-    os.chdir(broken_config_testing_directory)  # move to temporary working directory
-    remote_state = RemoteStateManager()
-    with pytest.raises(MatchaError):
-        assert not remote_state.is_state_provisioned()
 
 
 def test_is_state_provisioned_broken_no_bucket(
@@ -464,9 +436,13 @@ def test_is_state_stale_false(valid_config_testing_directory: str):
         "matcha_ml.state.remote_state_manager.RemoteStateManager._configuration_file_exists"
     ) as config_file_exists, patch(
         "matcha_ml.state.remote_state_manager.RemoteStateManager._resource_group_exists"
-    ) as resource_group_exists:
+    ) as resource_group_exists, patch(
+        "matcha_ml.state.remote_state_manager.MatchaConfigService.read_matcha_config"
+    ) as matcha_config:
         config_file_exists.return_value = True
         resource_group_exists.return_value = True
+        matcha_config.return_value = MatchaConfig([])
+
         remote_state = RemoteStateManager()
         assert not remote_state.is_state_stale()
 
@@ -483,8 +459,17 @@ def test_is_state_stale_no_resource_group(matcha_testing_directory: str):
         "matcha_ml.state.remote_state_manager.RemoteStateManager._configuration_file_exists"
     ) as config_file_exists, patch(
         "matcha_ml.state.remote_state_manager.RemoteStateManager._resource_group_exists"
-    ) as resource_group_exists:
+    ) as resource_group_exists, patch(
+        "matcha_ml.state.remote_state_manager.MatchaConfigService.read_matcha_config"
+    ) as matcha_config, patch(
+        "matcha_ml.state.remote_state_manager.MatchaConfig.find_component"
+    ) as matcha_config_get_component:
         config_file_exists.return_value = True
         resource_group_exists.return_value = False
+        matcha_config.return_value = MatchaConfig([])
+        matcha_config_get_component.return_value = MatchaConfigComponent(
+            name="remote_state_bucket", properties=[]
+        )
+
         remote_state = RemoteStateManager()
         assert remote_state.is_state_stale()

@@ -6,6 +6,7 @@ from typer.testing import CliRunner
 
 from matcha_ml.cli.cli import app
 from matcha_ml.config import MatchaConfig, MatchaConfigService
+from matcha_ml.state.remote_state_manager import RemoteStateManager
 
 INTERNAL_FUNCTION_STUB = "matcha_ml.core"
 
@@ -14,7 +15,7 @@ def test_cli_stack_command_help_option(runner: CliRunner) -> None:
     """Tests the --help option for the cli stack command.
 
     Args:
-        runner (CliRunner): typer CLI runner
+        runner (CliRunner): typer CLI runner.
     """
     result = runner.invoke(app, ["stack", "--help"])
 
@@ -27,7 +28,7 @@ def test_cli_stack_command_defaults_to_help(runner: CliRunner) -> None:
     """Tests the --help option for the cli stack command.
 
     Args:
-        runner (CliRunner): typer CLI runner
+        runner (CliRunner): typer CLI runner.
     """
     result = runner.invoke(app, ["stack"])
 
@@ -40,7 +41,7 @@ def test_cli_stack_set_command_help_option(runner: CliRunner) -> None:
     """Tests the --help option for the cli stack set sub-command.
 
     Args:
-        runner (CliRunner): typer CLI runner
+        runner (CliRunner): typer CLI runner.
     """
     result = runner.invoke(app, ["stack", "set", "--help"])
 
@@ -50,14 +51,18 @@ def test_cli_stack_set_command_help_option(runner: CliRunner) -> None:
 
 
 def test_cli_stack_set_command_without_args(
-    runner: CliRunner, mocked_remote_state_manager_is_state_provisioned_false
+    matcha_testing_directory: str,
+    runner: CliRunner,
+    mocked_remote_state_manager_is_state_provisioned_false: RemoteStateManager,
 ) -> None:
     """Tests the cli stack set sub-command.
 
     Args:
-        runner (CliRunner): typer CLI runner
-        mocked_remote_state_manager_is_state_provisioned_false (RemoteStateManager): A mocked RemoteStateManager object
+        matcha_testing_directory (str): a temporary working directory.
+        runner (CliRunner): typer CLI runner.
+        mocked_remote_state_manager_is_state_provisioned_false (RemoteStateManager): A mocked RemoteStateManager object.
     """
+    os.chdir(matcha_testing_directory)
     result = runner.invoke(app, ["stack", "set"])
 
     assert result.exit_code == 0
@@ -66,14 +71,18 @@ def test_cli_stack_set_command_without_args(
 
 
 def test_cli_stack_set_command_with_args(
-    runner: CliRunner, mocked_remote_state_manager_is_state_provisioned_false
+    matcha_testing_directory: str,
+    runner: CliRunner,
+    mocked_remote_state_manager_is_state_provisioned_false,
 ) -> None:
     """Tests the cli stack set sub-command.
 
     Args:
-        runner (CliRunner): typer CLI runner
-        mocked_remote_state_manager_is_state_provisioned_false (RemoteStateManager): A mocked remote state manager
+        matcha_testing_directory (str): a temporary working directory.
+        runner (CliRunner): typer CLI runner.
+        mocked_remote_state_manager_is_state_provisioned_false (RemoteStateManager): A mocked remote state manager.
     """
+    os.chdir(matcha_testing_directory)
     result = runner.invoke(app, ["stack", "set", "default"])
 
     assert result.exit_code == 0
@@ -115,7 +124,7 @@ def test_stack_set_file_created(
     assert result.exit_code == 0
 
     config = MatchaConfigService.read_matcha_config()
-    assert config.to_dict() == {"stack": {"name": "LLM"}}
+    assert config.to_dict() == {"stack": {"name": "llm"}}
 
 
 def test_stack_set_file_modified(
@@ -147,5 +156,5 @@ def test_stack_set_file_modified(
 
     assert len(new_config_dict) == len(config_dict) + 1
     assert "stack" in new_config_dict
-    assert new_config_dict["stack"]["name"] == "LLM"
+    assert new_config_dict["stack"]["name"] == "llm"
     assert config_dict.items() <= new_config_dict.items()

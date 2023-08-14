@@ -43,7 +43,7 @@ class RemoteStateManager:
         """Initialize Remote State Manager.
 
         Args:
-            config_path (Optional[str]): optional configuration file path
+            config_path (Optional[str]): optional configuration file path.
         """
         if config_path is not None:
             self.config_path = config_path
@@ -63,7 +63,7 @@ class RemoteStateManager:
         """Configuration property.
 
         Returns:
-            MatchaConfig: configuration read from the file system
+            MatchaConfig: configuration read from the file system.
 
         Raises:
             MatchaError: if configuration file failed to load.
@@ -77,13 +77,13 @@ class RemoteStateManager:
     def azure_storage(self) -> AzureStorage:
         """Azure Storage property.
 
-        If it was not initialized before, it will be initialized
+        If it was not initialized before, it will be initialized.
 
         Returns:
-            AzureStorage: to interact with blob storage on Azure
+            AzureStorage: to interact with blob storage on Azure.
 
         Raises:
-            MatchaError: if Azure Storage client failed to create
+            MatchaError: if Azure Storage client failed to create.
         """
         if self._azure_storage is None:
             try:
@@ -119,7 +119,7 @@ class RemoteStateManager:
         """Check if an Azure resource group already exists.
 
         Returns:
-            bool: True, if the resource group exists
+            bool: True, if the resource group exists.
         """
         return self.azure_storage.resource_group_exists
 
@@ -127,10 +127,10 @@ class RemoteStateManager:
         """Get the hash of remote matcha state file.
 
         Args:
-            remote_path (str) : Path to file on remote storage
+            remote_path (str) : Path to file on remote storage.
 
         Returns:
-            str: Hash content of file on remote storage in hexadecimal string
+            str: Hash content of file on remote storage in hexadecimal string.
         """
         return self.azure_storage.get_hash_remote_state(
             self.configuration.find_component("remote_state_bucket")
@@ -143,9 +143,16 @@ class RemoteStateManager:
         """Check if remote state has already been provisioned.
 
         Returns:
-            bool: is state provisioned
+            bool: is state provisioned.
         """
         if not self._configuration_file_exists():
+            return False
+
+        try:
+            MatchaConfigService.read_matcha_config().find_component(
+                "remote_state_bucket"
+            )
+        except MatchaError:
             return False
 
         if not self._resource_group_exists():
@@ -164,11 +171,19 @@ class RemoteStateManager:
         """Check if remote state has been destroyed.
 
         Returns:
-            bool: True, if state is stale
+            bool: True, if state is stale.
         """
-        return bool(
-            self._configuration_file_exists() and not self._resource_group_exists()
-        )
+        if not self._configuration_file_exists():
+            return False
+
+        try:
+            MatchaConfigService.read_matcha_config().find_component(
+                "remote_state_bucket"
+            )
+        except MatchaError:
+            return False
+
+        return not self._resource_group_exists()
 
     def provision_remote_state(
         self, location: str, prefix: str, verbose: Optional[bool] = False
@@ -176,7 +191,7 @@ class RemoteStateManager:
         """Provision the state bucket using templates.
 
         Args:
-            location (str): location of where this bucket will be provisioned
+            location (str): location of where this bucket will be provisioned.
             prefix (str): Prefix used for all resources, or empty string to fill in.
             verbose (Optional[bool], optional): additional output is show when True. Defaults to False.
         """
@@ -230,7 +245,7 @@ class RemoteStateManager:
         """Download the remote state into the local matcha state directory.
 
         Args:
-            dest_folder_path (str): Path to local matcha state directory
+            dest_folder_path (str): Path to local matcha state directory.
         """
         self.azure_storage.download_folder(
             container_name=self.configuration.find_component("remote_state_bucket")
