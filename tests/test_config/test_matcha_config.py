@@ -170,3 +170,35 @@ def test_matcha_config_service_delete_matcha_config_error_handling(
 
     with pytest.raises(MatchaError):
         mocked_matcha_config_service.delete_matcha_config()
+
+
+def test_find_component_expected(
+    mocked_matcha_config: MatchaConfig,
+):
+    """Test that a component is found when a valid component name is given.
+
+    Args:
+        mocked_matcha_config (MatchaConfig): a mocked MatchaConfig instance.
+    """
+    component = mocked_matcha_config.find_component(
+        component_name="remote_state_bucket"
+    )
+
+    assert component.find_property("account_name").value == "test-account"
+    assert component.find_property("container_name").value == "test-container"
+    assert component.find_property("resource_group_name").value == "test-rg"
+
+
+def test_find_component_not_found(
+    mocked_matcha_config: MatchaConfig,
+):
+    """Test that a component is not found when an invalid component name is given.
+
+    Args:
+        mocked_matcha_config (MatchaConfig): a mocked MatchaConfig instance.
+    """
+    component = mocked_matcha_config.find_component(
+        component_name="invalid_resource_name"
+    )
+
+    assert component is None
