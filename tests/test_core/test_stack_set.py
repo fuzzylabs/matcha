@@ -23,14 +23,14 @@ def test_stack_set_valid_no_existing_file(
     stack_set(stack_name="llm")
 
     config = MatchaConfigService.read_matcha_config()
-    assert config.to_dict() == {"stack": {"name": "LLM"}}
+    assert config.to_dict() == {"stack": {"name": "llm"}}
 
     MatchaConfigService.delete_matcha_config()
 
     stack_set(stack_name="default")
 
     config = MatchaConfigService.read_matcha_config()
-    assert config.to_dict() == {"stack": {"name": "DEFAULT"}}
+    assert config.to_dict() == {"stack": {"name": "default"}}
 
 
 def test_stack_set_invalid(
@@ -71,7 +71,7 @@ def test_stack_set_existing_file(
 
     assert len(new_config_dict) == len(config_dict) + 1
     assert "stack" in new_config_dict
-    assert new_config_dict["stack"]["name"] == "LLM"
+    assert new_config_dict["stack"]["name"] == "llm"
     assert config_dict.items() <= new_config_dict.items()
 
 

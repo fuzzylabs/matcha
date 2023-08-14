@@ -124,7 +124,7 @@ def test_stack_set_file_created(
     assert result.exit_code == 0
 
     config = MatchaConfigService.read_matcha_config()
-    assert config.to_dict() == {"stack": {"name": "LLM"}}
+    assert config.to_dict() == {"stack": {"name": "llm"}}
 
 
 def test_stack_set_file_modified(
@@ -156,5 +156,5 @@ def test_stack_set_file_modified(
 
     assert len(new_config_dict) == len(config_dict) + 1
     assert "stack" in new_config_dict
-    assert new_config_dict["stack"]["name"] == "LLM"
+    assert new_config_dict["stack"]["name"] == "llm"
     assert config_dict.items() <= new_config_dict.items()

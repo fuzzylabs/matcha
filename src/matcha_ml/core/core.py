@@ -331,7 +331,7 @@ def stack_set(stack_name: str) -> None:
 
     stack = MatchaConfigComponent(
         name="stack",
-        properties=[MatchaConfigComponentProperty(name="name", value=stack_enum.name)],
+        properties=[MatchaConfigComponentProperty(name="name", value=stack_enum.value)],
     )
 
     MatchaConfigService.update(stack)
