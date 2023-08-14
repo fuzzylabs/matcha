@@ -285,7 +285,7 @@ def provision(
 
         stack = MatchaConfigService.get_stack()
         if stack is not None:
-            stack_name = stack.value.lower()
+            stack_name = stack.value
 
         template = os.path.join(
             os.path.dirname(__file__),
