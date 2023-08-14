@@ -2,7 +2,7 @@
 import json
 import os
 from dataclasses import dataclass
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 from matcha_ml.errors import MatchaError
 
@@ -57,7 +57,7 @@ class MatchaConfig:
 
     components: List[MatchaConfigComponent]
 
-    def find_component(self, component_name: str) -> MatchaConfigComponent:
+    def find_component(self, component_name: str) -> Optional[MatchaConfigComponent]:
         """Given a component name, find the component that matches it.
 
         Note: this only works under the assumption of none-duplicated properties.
@@ -75,11 +75,6 @@ class MatchaConfig:
             filter(lambda component: component.name == component_name, self.components),
             None,
         )
-
-        if component is None:
-            raise MatchaError(
-                f"The component with the name '{component_name}' could not be found."
-            )
 
         return component
 
