@@ -317,8 +317,17 @@ def provision(
 def stack_set(stack_name: str) -> None:
     """A function for updating the stack type in the local matcha.config.json file.
 
+    Note: This cannot be run once there are provisioned resources.
+
+    Examples:
+        >>> stack_set(stack_name='default')
+
     Args:
         stack_name (str): the name of the type of stack to be specified in the config file.
+
+    Raises:
+        MatchaInputError: if the stack_name is not a valid stack type
+        MatchaError: if there are already resources provisioned.
     """
     if RemoteStateManager().is_state_provisioned():
         raise MatchaError(
