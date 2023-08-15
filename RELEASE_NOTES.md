@@ -1,3 +1,48 @@
+# Stacks 📚
+
+LLMs are all the rage at the moment, with new and improved models being released almost daily. These models are quite large (as implied by the name) and cannot be hosted on standard personal computers, therefore we need to use cloud infrastructure to manage and deploy these models. However, standing up and managing these cloud resources isn't typically the forte of a lot of those interested in LLMs.
+
+This is where Matcha comes in.
+
+With this latest release, we've introduced the notion of `stacks`. Specifically, an LLM stack which contains all the infrastructure needed to deploy your own LLM in a couple of commands (or via the API).
+
+These are two stacks available:
+
+* `default`: containing all the infrastructure that was previously deployed by Matcha.
+* `llm`: contains the same infrastructure as `default` but includes a vector database, giving you everything you need to get started with hosting your own LLM.
+
+You can set the stack either via the CLI:
+
+```bash
+matcha stack set default
+matcha provision
+```
+
+Or API:
+
+```python
+from matcha.core import stack_set, provision
+
+stack_set(stack_name = 'default')
+provision(location = "ukwest", prefix = "example", password = "password")
+```
+
+## Bug Fixes and Improvements 🐛
+
+* [[RPD-287] ZenML version inference for zensever](https://github.com/fuzzylabs/matcha/pull/180)
+* [[RPD-260] Add an object to handle the `matcha.config.json` file](https://github.com/fuzzylabs/matcha/pull/184)
+* [[RPD-249] Refactor `analytics_service` to simplify tracking decorator](https://github.com/fuzzylabs/matcha/pull/181)
+* [[RPD-236] Improved approach to check ignored folder when uploading and downloading](https://github.com/fuzzylabs/matcha/pull/186)
+* [[RPD-250] Move `_show_terraform_outputs()` into `provision`](https://github.com/fuzzylabs/matcha/pull/188)
+* [[RPD-259] Refactor `build_state_from_terraform_output` within `matcha_state.py` to use objects defined within `matcha_state.py`](https://github.com/fuzzylabs/matcha/pull/190)
+* [[RPD-290] Update MatchaConfig object to not throw an error when matching property/component is not found](https://github.com/fuzzylabs/matcha/pull/192)
+
+Date: 15th August 2023
+
+See all changes here: https://github.com/fuzzylabs/matcha/compare/v0.2.7...v0.2.8
+
+---
+
 # v0.2.7
 
 # 💾 Data Version Control!
