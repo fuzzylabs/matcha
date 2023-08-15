@@ -18,7 +18,7 @@ from matcha_ml.services.global_parameters_service import GlobalParameters
 from matcha_ml.state.matcha_state import (
     MatchaState,
 )
-from matcha_ml.templates.azure_template import SUBMODULE_NAMES
+from matcha_ml.templates.azure_template import DEFAULT_STACK
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -149,7 +149,7 @@ def assert_infrastructure(
         module_file_path = os.path.join(destination_path, module_file_name)
         assert os.path.exists(module_file_path)
 
-    for module_name in SUBMODULE_NAMES:
+    for module_name in DEFAULT_STACK:
         for module_file_name in glob.glob(
             os.path.join(TEMPLATE_DIR, module_name, "*.tf")
         ):
