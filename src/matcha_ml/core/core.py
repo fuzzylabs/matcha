@@ -18,7 +18,7 @@ from matcha_ml.services.analytics_service import AnalyticsEvent, track
 from matcha_ml.services.global_parameters_service import GlobalParameters
 from matcha_ml.state import MatchaStateService, RemoteStateManager
 from matcha_ml.state.matcha_state import MatchaState
-from matcha_ml.templates.azure_template import DEFAULT_STACK, LLM_STACK, AzureTemplate
+from matcha_ml.templates.azure_template import AzureTemplate
 
 
 class StackTypeMeta(
@@ -293,12 +293,8 @@ def provision(
             "infrastructure",
             stack_name,
         )
-        if stack_name == "llm":
-            submodule_names = DEFAULT_STACK + LLM_STACK
-        else:
-            submodule_names = DEFAULT_STACK
 
-        azure_template = AzureTemplate(submodule_names)
+        azure_template = AzureTemplate()
 
         zenml_version = infer_zenml_version()
         config = azure_template.build_template_configuration(
