@@ -1,5 +1,4 @@
 """Class to interact with Azure Storage."""
-import glob
 import hashlib
 import os
 import tempfile
@@ -10,7 +9,7 @@ from azure.storage.blob import BlobClient, BlobServiceClient, ContainerClient
 from matcha_ml.constants import LOCK_FILE_NAME
 from matcha_ml.services.azure_service import AzureClient
 
-IGNORE_FOLDERS = [".terraform"]
+IGNORE_FOLDERS = {".terraform"}
 
 
 class AzureStorage:
@@ -93,10 +92,12 @@ class AzureStorage:
                 file_path = os.path.join(root, filename)
 
                 # ignore uploading files in IGNORE_FOLDERS
-                if any(ignore_folder in file_path for ignore_folder in IGNORE_FOLDERS):
-                    continue
-
-                if file_path in blob_set:
+                if (
+                    not any(
+                        ignore_folder in file_path for ignore_folder in IGNORE_FOLDERS
+                    )
+                    and file_path in blob_set
+                ):
                     blob_set.remove(file_path)
 
                 blob_client = container_client.get_blob_client(blob=file_path)
@@ -248,10 +249,11 @@ class AzureStorage:
         # ensuring that it exclusively contains the files retrieved from Azure remote storage
         if os.path.exists(dest_folder_path):
             matcha_template_dir = os.path.join(os.getcwd(), ".matcha")
-            for path in glob.glob(f"{matcha_template_dir}/**/*", recursive=True):
-                # ignore deleting folders ignored in IGNORE_FOLDERS
-                if any(ignore_folder in path for ignore_folder in IGNORE_FOLDERS):
-                    continue
-
-                if os.path.isfile(path):
-                    os.remove(path)
+            for root, _, filenames in os.walk(matcha_template_dir):
+                for filename in filenames:
+                    file_path = os.path.join(root, filename)
+                    # ignore deleting folders ignored in IGNORE_FOLDERS
+                    if not any(
+                        ignore_folder in file_path for ignore_folder in IGNORE_FOLDERS
+                    ) and os.path.isfile(file_path):
+                        os.remove(file_path)

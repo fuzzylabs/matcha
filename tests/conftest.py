@@ -106,7 +106,7 @@ def mocked_segment_track_decorator():
     with patch(
         "matcha_ml.services.analytics_service.analytics.Client.track"
     ) as track_analytics:
-        track_analytics.return_value = None
+        track_analytics.return_value = (True, "test_message")
 
         yield track_analytics
 

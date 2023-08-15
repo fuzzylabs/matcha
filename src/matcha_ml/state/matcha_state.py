@@ -5,7 +5,6 @@ import hashlib
 import json
 import os
 import uuid
-from collections import defaultdict
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Tuple
 
@@ -80,6 +79,25 @@ class MatchaState:
 
     components: List[MatchaStateComponent]
 
+    def get_component(self, resource_name: str) -> Optional[MatchaStateComponent]:
+        """Get a component of the state given a resource name.
+
+        Args:
+            resource_name (str): the components resource name
+
+        Returns:
+            Optional[MatchaStateComponent]: the state component matching the resource name parameter.
+        """
+        component = next(
+            filter(
+                lambda component: component.resource.name == resource_name,
+                self.components,
+            ),
+            None,
+        )
+
+        return component
+
     def to_dict(self) -> Dict[str, Dict[str, str]]:
         """Convert the MatchaState object to a dictionary.
 
@@ -129,7 +147,7 @@ class MatchaStateService:
     def __init__(
         self,
         matcha_state: Optional[MatchaState] = None,
-        terraform_output: Optional[Dict[str, str]] = None,
+        terraform_output: Optional[Dict[str, Dict[str, str]]] = None,
     ) -> None:
         """Constructor for the MatchaStateService.
 
@@ -169,7 +187,7 @@ class MatchaStateService:
         return bool(os.path.isfile(cls.matcha_state_path))
 
     def build_state_from_terraform_output(
-        self, terraform_output: Dict[str, str]
+        self, terraform_output: Dict[str, Dict[str, str]]
     ) -> MatchaState:
         """Builds a MatchaState class from a terraform output dictionary.
 
@@ -182,7 +200,7 @@ class MatchaStateService:
 
         def _parse_terraform_output_resource_name(
             output_name: str,
-        ) -> Tuple[str, str, str]:
+        ) -> Tuple[MatchaResource, str, str]:
             """Build resource output for each Terraform output.
 
             Format for Terraform output names is:
@@ -195,11 +213,11 @@ class MatchaStateService:
             Returns:
                 Tuple[str, str, str]: the resource output for matcha.state.
             """
-            resource_type: Optional[str] = None
+            resource_type = None
 
             for key in RESOURCE_NAMES:
                 if key in output_name:
-                    resource_type = key
+                    resource_type = MatchaResource(key)
                     break
 
             if resource_type is None:
@@ -207,29 +225,56 @@ class MatchaStateService:
                     f"A valid resource type for the output '{output_name}' does not exist."
                 )
 
-            flavor_and_resource_name = output_name[len(resource_type) + 1 :]
+            flavor_and_resource_name = output_name[len(resource_type.name) + 1 :]
 
             flavor, resource_name = flavor_and_resource_name.split("_", maxsplit=1)
             resource_name = resource_name.replace("_", "-")
-            resource_type = resource_type.replace("_", "-")
+            resource_type.name = resource_type.name.replace("_", "-")
 
             return resource_type, flavor, resource_name
 
-        state_outputs: Dict[str, Dict[str, str]] = defaultdict(dict)
+        matcha_state = MatchaState(components=[])
 
-        for output_name, properties in terraform_output.items():
+        for output_name, output_value in terraform_output.items():
             (
                 resource_type,
                 flavor,
                 resource_name,
             ) = _parse_terraform_output_resource_name(output_name)
-            state_outputs[resource_type].setdefault("flavor", flavor)
-            state_outputs[resource_type][resource_name] = properties["value"]  # type: ignore
+
+            component = matcha_state.get_component(resource_type.name)
+
+            if component is not None:
+                # add just the properties
+                component.properties.append(
+                    MatchaResourceProperty(
+                        name=resource_name, value=output_value["value"]
+                    )
+                )
+            else:
+                # add the component
+                matcha_state.components.append(
+                    MatchaStateComponent(
+                        resource=resource_type,
+                        properties=[
+                            MatchaResourceProperty(name="flavor", value=flavor),
+                            MatchaResourceProperty(
+                                name=resource_name, value=output_value["value"]
+                            ),
+                        ],
+                    )
+                )
 
         # Create a unique matcha state identifier
-        state_outputs["id"] = {"matcha_uuid": str(uuid.uuid4())}
+        matcha_uuid_component = MatchaStateComponent(
+            resource=MatchaResource(name="id"),
+            properties=[
+                MatchaResourceProperty(name="matcha_uuid", value=str(uuid.uuid4()))
+            ],
+        )
+        matcha_state.components.append(matcha_uuid_component)
 
-        return MatchaState.from_dict(state_outputs)
+        return matcha_state
 
     def _write_state(self, matcha_state: MatchaState) -> None:
         """Writes a given MatchaState object to the matcha.state file.
@@ -260,17 +305,21 @@ class MatchaStateService:
         """Checks for congruence between the local config file and the local state file."""
         local_config_file = os.path.join(os.getcwd(), "matcha.config.json")
 
-        # the resource group name from the state object
-        matcha_state_resource_group = (
-            self.get_component("cloud").find_property("resource-group-name").value
-        )
+        cloud_component = self.get_component("cloud")
 
-        if self.state_exists() and os.path.exists(local_config_file):
+        if (
+            self.state_exists()
+            and os.path.exists(local_config_file)
+            and cloud_component
+        ):
             with open(local_config_file) as config:
                 local_config = json.load(config)
 
+                resource_group_property = cloud_component.find_property(
+                    "resource-group-name"
+                ).value
             return bool(
-                matcha_state_resource_group
+                resource_group_property
                 != local_config["remote_state_bucket"]["resource_group_name"]
             )
         else:
@@ -293,12 +342,14 @@ class MatchaStateService:
         if resource_name is None:
             return self._state
 
-        if property_name is None:
-            return MatchaState(
-                components=[self.get_component(resource_name=resource_name)]
-            )
-
         component = self.get_component(resource_name=resource_name)
+
+        if component is None:
+            return MatchaState(components=[])
+
+        if property_name is None:
+            return MatchaState(components=[component])
+
         property = component.find_property(property_name=property_name)
 
         return MatchaState(
@@ -307,32 +358,16 @@ class MatchaStateService:
             ]
         )
 
-    def get_component(self, resource_name: str) -> MatchaStateComponent:
+    def get_component(self, resource_name: str) -> Optional[MatchaStateComponent]:
         """Get a component of the state given a resource name.
 
         Args:
             resource_name (str): the components resource name
 
-        Raises:
-            MatchaError: if the component cannot be found in the state.
-
         Returns:
             MatchaStateComponent: the state component matching the resource name parameter.
         """
-        component = next(
-            filter(
-                lambda component: component.resource.name == resource_name,
-                self._state.components,
-            ),
-            None,
-        )
-
-        if component is None:
-            raise MatchaError(
-                f"The component with the name '{resource_name}' could not be found in the state."
-            )
-
-        return component
+        return self._state.get_component(resource_name=resource_name)
 
     def get_resource_names(self) -> List[str]:
         """Method for returning all existing resource names.

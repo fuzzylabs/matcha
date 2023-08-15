@@ -1,5 +1,10 @@
 """Matcha state sub-module."""
-from .matcha_state import MatchaState, MatchaStateService
+from .matcha_state import MatchaResourceProperty, MatchaState, MatchaStateService
 from .remote_state_manager import RemoteStateManager
 
-__all__ = ["RemoteStateManager", "MatchaStateService", "MatchaState"]
+__all__ = [
+    "RemoteStateManager",
+    "MatchaStateService",
+    "MatchaState",
+    "MatchaResourceProperty",
+]

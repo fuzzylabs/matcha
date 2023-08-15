@@ -54,15 +54,12 @@ def mocked_resource_template_runner() -> AzureRunner:
     ) as initialize, patch(
         f"{INTERNAL_FUNCTION_STUBS[0]}._apply_terraform"
     ) as apply, patch(
-        f"{INTERNAL_FUNCTION_STUBS[0]}._show_terraform_outputs"
-    ) as show, patch(
         f"{INTERNAL_FUNCTION_STUBS[0]}._check_terraform_installation"
     ) as check_tf_install, patch(
         f"{INTERNAL_FUNCTION_STUBS[0]}._validate_terraform_config"
     ) as validate_tf_config:
         initialize.return_value = None
         apply.return_value = None
-        show.return_value = None
         check_tf_install.return_value = None
         validate_tf_config.return_value = None
 

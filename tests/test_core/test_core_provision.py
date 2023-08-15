@@ -6,13 +6,18 @@ import uuid
 from pathlib import Path
 from typing import Dict, Iterator, Union
 from unittest import mock
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 import pytest
+from _pytest.capture import SysCapture
 
+from matcha_ml.cli.ui.resource_message_builders import (
+    dict_to_json,
+    hide_sensitive_in_output,
+)
 from matcha_ml.core import provision
 from matcha_ml.core._validation import LONGEST_RESOURCE_NAME, MAXIMUM_RESOURCE_NAME_LEN
-from matcha_ml.core.core import infer_zenml_version
+from matcha_ml.core.core import _show_terraform_outputs, infer_zenml_version
 from matcha_ml.errors import MatchaError, MatchaInputError
 from matcha_ml.services.global_parameters_service import GlobalParameters
 from matcha_ml.state.matcha_state import (
@@ -342,3 +347,51 @@ def test_stale_remote_state_file_is_removed(matcha_testing_directory: str):
 def test_version_inference_latest():
     """Test checking when zenml isn't installed, the latest version is returned."""
     assert infer_zenml_version() == "latest"
+
+
+def test_show_terraform_outputs(state_file_as_object, capsys: SysCapture):
+    """Tests the _show_terraform_outputs function makes the relevant function calls and outputs the desired string.
+
+    Args:
+        state_file_as_object (MatchaState): a mocked MatchaState object for use in testing
+        capsys (SysCapture): fixture to capture stdout and stderr
+    """
+    expected_output = """Here are the endpoints for what's been provisioned"""
+    expected_cloud = """"cloud": {
+    "flavor": "azure",
+    "resource-group-name": "test_resources"
+  }"""
+    expected_container_registry = """"container-registry": {
+    "flavor": "azure",
+    "registry-name": "azure_registry_name",
+    "registry-url": "azure_container_registry"
+  }"""
+    expected_pipeline = """"pipeline": {
+    "flavor": "zenml",
+    "connection-string": "********",
+    "server-password": "********",
+    "server-url": "zen_server_url"
+  }"""
+    expected_experiment_tracker = """"experiment-tracker": {
+    "flavor": "mlflow",
+    "tracking-url": "mlflow_test_url"
+  }"""
+
+    with patch(
+        "matcha_ml.core.core.dict_to_json", side_effect=dict_to_json
+    ) as mocked_dict_to_json, patch(
+        "matcha_ml.core.core.hide_sensitive_in_output",
+        side_effect=hide_sensitive_in_output,
+    ) as mocked_hide_sensitive_output:
+        _show_terraform_outputs(state_file_as_object)
+
+        mocked_hide_sensitive_output.assert_called()
+        mocked_dict_to_json.assert_called_once()
+
+        captured = capsys.readouterr()
+
+        assert expected_output in captured.out
+        assert expected_cloud in captured.out
+        assert expected_container_registry in captured.out
+        assert expected_pipeline in captured.out
+        assert expected_experiment_tracker in captured.out
