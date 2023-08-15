@@ -28,6 +28,9 @@ ALREADY_LOCKED_MESSAGE = (
     " If you think this is a mistake, you can unlock the state by running 'matcha force-unlock'."
 )
 
+REMOTE_STATE_BUCKET = "remote_state_bucket"
+CONTAINER_NAME = "container_name"
+
 
 class RemoteStateManager:
     """Remote State Manager class.
@@ -84,20 +87,30 @@ class RemoteStateManager:
 
         Raises:
             MatchaError: if Azure Storage client failed to create.
+            MatchaError: if the container name could not be found.
         """
         if self._azure_storage is None:
             try:
+                remote_state_bucket = self.configuration.find_component(
+                    REMOTE_STATE_BUCKET
+                )
+
+                if remote_state_bucket is None:
+                    raise MatchaError("the remote state could not be found.")
+
+                account_name = remote_state_bucket.find_property("account_name")
+                resource_group_name = remote_state_bucket.find_property(
+                    "resource_group_name"
+                )
+
+                if account_name is None or resource_group_name is None:
+                    raise MatchaError(
+                        "properties of the remote state could not be found."
+                    )
+
                 self._azure_storage = AzureStorage(
-                    account_name=self.configuration.find_component(
-                        "remote_state_bucket"
-                    )
-                    .find_property("account_name")
-                    .value,
-                    resource_group_name=self.configuration.find_component(
-                        "remote_state_bucket"
-                    )
-                    .find_property("resource_group_name")
-                    .value,
+                    account_name=account_name.value,
+                    resource_group_name=resource_group_name.value,
                 )
             except Exception as e:
                 raise MatchaError(f"Error while creating Azure Storage client: {e}")
@@ -131,11 +144,24 @@ class RemoteStateManager:
 
         Returns:
             str: Hash content of file on remote storage in hexadecimal string.
+
+        Raises:
+            MatchaError: if the remote state bucket could not be found.
+            MatchaError: if the container name could not be found.
         """
+        remote_state_bucket = self.configuration.find_component(REMOTE_STATE_BUCKET)
+
+        if remote_state_bucket is None:
+            raise MatchaError(
+                "the remote state could not be found, ensure there are provisioned resources."
+            )
+
+        container_name = remote_state_bucket.find_property(CONTAINER_NAME)
+        if container_name is None:
+            raise MatchaError("properties of the remote state could not be found.")
+
         return self.azure_storage.get_hash_remote_state(
-            self.configuration.find_component("remote_state_bucket")
-            .find_property("container_name")
-            .value,
+            container_name.value,
             remote_path,
         )
 
@@ -148,21 +174,18 @@ class RemoteStateManager:
         if not self._configuration_file_exists():
             return False
 
-        try:
-            MatchaConfigService.read_matcha_config().find_component(
-                "remote_state_bucket"
-            )
-        except MatchaError:
+        remote_state_bucket = self.configuration.find_component(REMOTE_STATE_BUCKET)
+        if remote_state_bucket is None:
             return False
 
         if not self._resource_group_exists():
             return False
 
-        if not self._bucket_exists(
-            self.configuration.find_component("remote_state_bucket")
-            .find_property("container_name")
-            .value
-        ):
+        container_name = remote_state_bucket.find_property(CONTAINER_NAME)
+        if container_name is None:
+            return False
+
+        if not self._bucket_exists(container_name.value):
             return False
 
         return True
@@ -176,11 +199,7 @@ class RemoteStateManager:
         if not self._configuration_file_exists():
             return False
 
-        try:
-            MatchaConfigService.read_matcha_config().find_component(
-                "remote_state_bucket"
-            )
-        except MatchaError:
+        if self.configuration.find_component(REMOTE_STATE_BUCKET) is None:
             return False
 
         return not self._resource_group_exists()
@@ -246,11 +265,26 @@ class RemoteStateManager:
 
         Args:
             dest_folder_path (str): Path to local matcha state directory.
+
+        Raises:
+            MatchaError: if the remote state bucket could not be found.
+            MatchaError: if the container name could not be found.
         """
+        remote_state_bucket = self.configuration.find_component(REMOTE_STATE_BUCKET)
+
+        if remote_state_bucket is None:
+            raise MatchaError(
+                "the remote state could not be found, ensure there are provisioned resources."
+            )
+
+        container_name = remote_state_bucket.find_property(CONTAINER_NAME)
+        if container_name is None:
+            raise MatchaError(
+                "properties of the remote state could not be found, ensure there are provisioned resources."
+            )
+
         self.azure_storage.download_folder(
-            container_name=self.configuration.find_component("remote_state_bucket")
-            .find_property("container_name")
-            .value,
+            container_name.value,
             dest_folder_path=dest_folder_path,
         )
 
@@ -259,11 +293,26 @@ class RemoteStateManager:
 
         Args:
             local_folder_path (str): Path to local matcha state directory
+
+        Raises:
+            MatchaError: if the remote state bucket could not be found.
+            MatchaError: if the container name could not be found.
         """
+        remote_state_bucket = self.configuration.find_component(REMOTE_STATE_BUCKET)
+
+        if remote_state_bucket is None:
+            raise MatchaError(
+                "the remote state could not be found, ensure there are provisioned resources."
+            )
+
+        container_name = remote_state_bucket.find_property(CONTAINER_NAME)
+        if container_name is None:
+            raise MatchaError(
+                "properties of the remote state could not be found, ensure there are provisioned resources."
+            )
+
         self.azure_storage.upload_folder(
-            container_name=self.configuration.find_component("remote_state_bucket")
-            .find_property("container_name")
-            .value,
+            container_name=container_name.value,
             src_folder_path=local_folder_path,
         )
 
@@ -288,24 +337,53 @@ class RemoteStateManager:
         """Lock remote state.
 
         Raises:
-            MatchaError: if the state is already locked
+            MatchaError: if the remote state bucket could not be found.
+            MatchaError: if the container could not be found.
+            MatchaError: if the state is already locked.
         """
+        remote_state_bucket = self.configuration.find_component(REMOTE_STATE_BUCKET)
+
+        if remote_state_bucket is None:
+            raise MatchaError(
+                "the remote state could not be found, ensure there are provisioned resources."
+            )
+
+        container_name = remote_state_bucket.find_property(CONTAINER_NAME)
+        if container_name is None:
+            raise MatchaError(
+                "properties of the remote state could not be found, ensure there are provisioned resources."
+            )
+
         try:
             self.azure_storage.create_empty(
-                container_name=self.configuration.find_component("remote_state_bucket")
-                .find_property("container_name")
-                .value,
+                container_name=container_name.value,
                 blob_name=LOCK_FILE_NAME,
             )
         except ResourceExistsError:
             raise MatchaError(ALREADY_LOCKED_MESSAGE)
 
     def unlock(self) -> None:
-        """Unlock remote state."""
+        """Unlock remote state.
+
+        Raises:
+            MatchaError: if the remote state bucket could not be found.
+            MatchaError: if the container name could not be found.
+        """
+        remote_state_bucket = self.configuration.find_component(REMOTE_STATE_BUCKET)
+
+        if remote_state_bucket is None:
+            raise MatchaError(
+                "the remote state could not be found, ensure there are provisioned resources."
+            )
+
+        container_name = remote_state_bucket.find_property(CONTAINER_NAME)
+        if container_name is None:
+            raise MatchaError(
+                "properties of the remote state could not be found, ensure there are provisioned resources."
+            )
+
         if not self.azure_storage.blob_exists(
-            container_name=self.configuration.find_component("remote_state_bucket")
-            .find_property("container_name")
-            .value,
+            container_name=container_name.value,
             blob_name=LOCK_FILE_NAME,
         ):
             print_status(
@@ -314,9 +392,7 @@ class RemoteStateManager:
             return
         else:
             self.azure_storage.delete_blob(
-                container_name=self.configuration.find_component("remote_state_bucket")
-                .find_property("container_name")
-                .value,
+                container_name=container_name.value,
                 blob_name=LOCK_FILE_NAME,
             )
 

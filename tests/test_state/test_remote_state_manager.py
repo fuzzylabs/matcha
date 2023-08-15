@@ -32,6 +32,23 @@ TEMPLATE_DIR = os.path.join(
 
 
 @pytest.fixture
+def broken_config_testing_directory(matcha_testing_directory: str) -> str:
+    """Fixture for broken configuration file in temp working directory.
+
+    Args:
+        matcha_testing_directory (str): temporary working directory path
+
+    Returns:
+        str: temporary working directory path that the configuration was written to
+    """
+    config_path = os.path.join(matcha_testing_directory, DEFAULT_CONFIG_NAME)
+    content = {}
+    with open(config_path, "w") as f:
+        json.dump(content, f)
+    return matcha_testing_directory
+
+
+@pytest.fixture
 def valid_config_testing_directory(
     matcha_testing_directory: str, mocked_matcha_config: MatchaConfig
 ) -> str:

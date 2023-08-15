@@ -24,7 +24,9 @@ class MatchaConfigComponent:
     name: str
     properties: List[MatchaConfigComponentProperty]
 
-    def find_property(self, property_name: str) -> MatchaConfigComponentProperty:
+    def find_property(
+        self, property_name: str
+    ) -> Optional[MatchaConfigComponentProperty]:
         """Given a property name, find the property that matches it.
 
         Note: this only works under the assumption of none-duplicated properties.
@@ -43,10 +45,10 @@ class MatchaConfigComponent:
             None,
         )
 
-        if property is None:
-            raise MatchaError(
-                f"The property with the name '{property_name}' could not be found."
-            )
+        # if property is None:
+        #     raise MatchaError(
+        #         f"The property with the name '{property_name}' could not be found."
+        #     )
 
         return property
 
@@ -57,16 +59,13 @@ class MatchaConfig:
 
     components: List[MatchaConfigComponent]
 
-    def find_component(self, component_name: str) -> MatchaConfigComponent:
+    def find_component(self, component_name: str) -> Optional[MatchaConfigComponent]:
         """Given a component name, find the component that matches it.
 
         Note: this only works under the assumption of none-duplicated properties.
 
         Args:
             component_name (str): the name of the component.
-
-        Raises:
-            MatchaError: if the component could not be found.
 
         Returns:
             MatchaConfigComponent: the component that matches the component_name parameter.
@@ -75,11 +74,6 @@ class MatchaConfig:
             filter(lambda component: component.name == component_name, self.components),
             None,
         )
-
-        if component is None:
-            raise MatchaError(
-                f"The component with the name '{component_name}' could not be found."
-            )
 
         return component
 
@@ -134,15 +128,19 @@ class MatchaConfigService:
             Optional[MatchaConfigComponentProperty]: The name of the current stack being used as a config component object.
         """
         try:
-            stack = (
-                MatchaConfigService.read_matcha_config()
-                .find_component("stack")
-                .find_property("name")
-            )
+            stack = MatchaConfigService.read_matcha_config().find_component("stack")
         except MatchaError:
             stack = None
 
-        return stack
+        if stack is None:
+            return None
+
+        name = stack.find_property("name")
+
+        if name is None:
+            return None
+
+        return name
 
     @staticmethod
     def write_matcha_config(matcha_config: MatchaConfig) -> None:
