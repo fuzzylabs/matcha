@@ -1,0 +1,18 @@
+# values.yaml
+image:
+  repository: ghcr.io/chroma-core/chroma
+  tag: 0.4.3
+
+resources:
+  requests:
+    memory: "256Mi"
+    cpu: "256m"
+  limits:
+    memory: "2Gi"
+    cpu: "2"
+
+pvc:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: default
+  requestsStorage: "100Mi"

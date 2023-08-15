@@ -33,7 +33,6 @@ from matcha_ml.state.matcha_state import (
 
 UUID_VERSION = 4
 INTERNAL_FUNCTION_STUB = "matcha_ml.services.AzureClient"
-ANALYTICS_SERVICE_INTERNAL_FUNCTION_STUB = "matcha_ml.services.analytics_service"
 
 
 @pytest.fixture
@@ -316,3 +315,17 @@ def mocked_matcha_config_service():
     (MatchaConfigService): a mocked MatchaConfigService instance.
     """
     return MatchaConfigService()
+
+
+@pytest.fixture
+def mocked_remote_state_manager_is_state_provisioned_false():
+    """A fixture for providing context within which RemoteStateManager.is_state_provisioned always returns false.
+
+    Yields:
+        A mocked RemoteStateManager object with a patched is_state_provisioned method.
+    """
+    with patch(
+        "matcha_ml.state.remote_state_manager.RemoteStateManager.is_state_provisioned"
+    ) as is_state_provisioned:
+        is_state_provisioned.return_value = False
+        yield is_state_provisioned

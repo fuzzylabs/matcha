@@ -9,6 +9,8 @@ import pytest
 from matcha_ml.config.matcha_config import (
     DEFAULT_CONFIG_NAME,
     MatchaConfig,
+    MatchaConfigComponent,
+    MatchaConfigComponentProperty,
     MatchaConfigService,
 )
 from matcha_ml.errors import MatchaError
@@ -202,3 +204,59 @@ def test_find_component_not_found(
     )
 
     assert component is None
+
+
+def test_matcha_config_service_update(
+    matcha_testing_directory, mocked_matcha_config_json_object
+) -> None:
+    """Test that the update function in MatchaConfigService creates the desired changes in config file.
+
+    Args:
+        matcha_testing_directory (str): A temporary working directory.
+        mocked_matcha_config_json_object (dict): A dictionary representation of a matcha config json file.
+    """
+    os.chdir(matcha_testing_directory)
+    config = MatchaConfig.from_dict(mocked_matcha_config_json_object)
+    config_dict = config.to_dict()
+
+    MatchaConfigService.write_matcha_config(config)
+
+    component = MatchaConfigComponent(
+        name="test",
+        properties=[MatchaConfigComponentProperty(name="name", value="passed")],
+    )
+
+    MatchaConfigService.update(component)
+
+    updated_config = MatchaConfigService.read_matcha_config()
+    updated_config_dict = updated_config.to_dict()
+
+    assert len(updated_config_dict) - 1 == len(config_dict)
+    assert config_dict.items() <= updated_config_dict.items()
+    assert updated_config_dict["test"]["name"] == "passed"
+
+    MatchaConfigService.delete_matcha_config()
+    MatchaConfigService.write_matcha_config(config)
+
+    components = [
+        MatchaConfigComponent(
+            name="test",
+            properties=[MatchaConfigComponentProperty(name="name", value="passed")],
+        ),
+        MatchaConfigComponent(
+            name="test2",
+            properties=[
+                MatchaConfigComponentProperty(name="name", value="passed_again")
+            ],
+        ),
+    ]
+
+    MatchaConfigService.update(components)
+
+    updated_config = MatchaConfigService.read_matcha_config()
+    updated_config_dict = updated_config.to_dict()
+
+    assert len(updated_config_dict) - 2 == len(config_dict)
+    assert config_dict.items() <= updated_config_dict.items()
+    assert updated_config_dict["test"]["name"] == "passed"
+    assert updated_config_dict["test2"]["name"] == "passed_again"

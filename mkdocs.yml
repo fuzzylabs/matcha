@@ -14,6 +14,7 @@ nav:
     - Azure Costs: 'costings.md'
   - Inside Matcha:
     - How does Matcha work: 'inside-matcha.md'
+    - Resource stacks: 'resource-stacks.md'
     - Why we collect usage data: 'privacy.md'
   - Tools:
     - Data Version Control: 'data-version-control.md'

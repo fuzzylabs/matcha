@@ -2,7 +2,7 @@
 import json
 import os
 from dataclasses import dataclass
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union
 
 from matcha_ml.errors import MatchaError
 
@@ -24,7 +24,9 @@ class MatchaConfigComponent:
     name: str
     properties: List[MatchaConfigComponentProperty]
 
-    def find_property(self, property_name: str) -> MatchaConfigComponentProperty:
+    def find_property(
+        self, property_name: str
+    ) -> Optional[MatchaConfigComponentProperty]:
         """Given a property name, find the property that matches it.
 
         Note: this only works under the assumption of none-duplicated properties.
@@ -43,10 +45,10 @@ class MatchaConfigComponent:
             None,
         )
 
-        if property is None:
-            raise MatchaError(
-                f"The property with the name '{property_name}' could not be found."
-            )
+        # if property is None:
+        #     raise MatchaError(
+        #         f"The property with the name '{property_name}' could not be found."
+        #     )
 
         return property
 
@@ -64,9 +66,6 @@ class MatchaConfig:
 
         Args:
             component_name (str): the name of the component.
-
-        Raises:
-            MatchaError: if the component could not be found.
 
         Returns:
             MatchaConfigComponent: the component that matches the component_name parameter.
@@ -122,6 +121,28 @@ class MatchaConfigService:
     """A service for handling the Matcha config file."""
 
     @staticmethod
+    def get_stack() -> Optional[MatchaConfigComponentProperty]:
+        """Gets the current stack name from the Matcha Config if it exists.
+
+        Returns:
+            Optional[MatchaConfigComponentProperty]: The name of the current stack being used as a config component object.
+        """
+        try:
+            stack = MatchaConfigService.read_matcha_config().find_component("stack")
+        except MatchaError:
+            stack = None
+
+        if stack is None:
+            return None
+
+        name = stack.find_property("name")
+
+        if name is None:
+            return None
+
+        return name
+
+    @staticmethod
     def write_matcha_config(matcha_config: MatchaConfig) -> None:
         """A function for writing the local Matcha config file.
 
@@ -154,6 +175,37 @@ class MatchaConfigService:
             raise MatchaError(
                 f"No '{DEFAULT_CONFIG_NAME}' file found, please generate one by running 'matcha provision', or add an existing ''{DEFAULT_CONFIG_NAME}'' file to the root project directory."
             )
+
+    @staticmethod
+    def config_file_exists() -> bool:
+        """A convencience function which checks for the existence of the matcha.config.json file.
+
+        Returns:
+            True if the matcha.config.json file exists, False otherwise.
+        """
+        return os.path.exists(os.path.join(os.getcwd(), DEFAULT_CONFIG_NAME))
+
+    @staticmethod
+    def update(
+        components: Union[MatchaConfigComponent, List[MatchaConfigComponent]]
+    ) -> None:
+        """A function which updates the matcha config file.
+
+        If no config file exists, this function will create one.
+
+        Args:
+            components (dict): A list of, or single MatchaConfigComponent object(s).
+        """
+        if isinstance(components, MatchaConfigComponent):
+            components = [components]
+
+        if MatchaConfigService.config_file_exists():
+            config = MatchaConfigService.read_matcha_config()
+            config.components += components
+        else:
+            config = MatchaConfig(components)
+
+        MatchaConfigService.write_matcha_config(config)
 
     @staticmethod
     def delete_matcha_config() -> None:
