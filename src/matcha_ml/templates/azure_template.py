@@ -17,7 +17,11 @@ DEFAULT_STACK = [
     "zen_server/zenml_helm/templates",
     "data_version_control_storage",
 ]
-LLM_STACK = DEFAULT_STACK + ["chroma"]
+LLM_STACK = DEFAULT_STACK + [
+    "chroma",
+    "chroma/chroma_helm",
+    "chroma/chroma_helm/templates",
+]
 
 
 class AzureTemplate(BaseTemplate):
