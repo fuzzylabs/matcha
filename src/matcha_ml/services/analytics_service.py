@@ -90,15 +90,10 @@ def track(event_name: AnalyticsEvent) -> Callable[..., Any]:
                     result, error_code = execute_analytics_event(func, *args, **kwargs)
                     te = perf_counter()
 
-                try:
-                    matcha_state_service = MatchaStateService()
-                except Exception as e:
-                    matcha_state_service = None
-                    error_code = e
-
                 # Get the matcha.state UUID if it exists
                 matcha_state_uuid: Optional[str] = None
-                if matcha_state_service and matcha_state_service.state_exists():
+                if MatchaStateService.state_exists():
+                    matcha_state_service = MatchaStateService()
                     try:
                         state_id_component = matcha_state_service.get_component("id")
                     except MatchaError:

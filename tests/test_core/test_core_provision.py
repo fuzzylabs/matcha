@@ -12,12 +12,13 @@ import pytest
 
 from matcha_ml.core import provision
 from matcha_ml.core._validation import LONGEST_RESOURCE_NAME, MAXIMUM_RESOURCE_NAME_LEN
+from matcha_ml.core.core import infer_zenml_version
 from matcha_ml.errors import MatchaError, MatchaInputError
 from matcha_ml.services.global_parameters_service import GlobalParameters
 from matcha_ml.state.matcha_state import (
     MatchaState,
 )
-from matcha_ml.templates.azure_template import SUBMODULE_NAMES
+from matcha_ml.templates.azure_template import DEFAULT_STACK
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -148,7 +149,7 @@ def assert_infrastructure(
         module_file_path = os.path.join(destination_path, module_file_name)
         assert os.path.exists(module_file_path)
 
-    for module_name in SUBMODULE_NAMES:
+    for module_name in DEFAULT_STACK:
         for module_file_name in glob.glob(
             os.path.join(TEMPLATE_DIR, module_name, "*.tf")
         ):
@@ -209,6 +210,7 @@ def test_provision_copies_infrastructure_templates_with_specified_values(
         "location": "uksouth",
         "prefix": "coffee",
         "password": "default",
+        "zenmlserver_version": "latest",
     }
 
     assert_infrastructure(
@@ -321,7 +323,8 @@ def test_stale_remote_state_file_is_removed(matcha_testing_directory: str):
             "account_name": "test-account",
             "container_name": "test-container",
             "resource_group_name": "test-rg",
-        }
+        },
+        "stack": {"name": "default"},
     }
 
     with mock.patch(
@@ -334,3 +337,8 @@ def test_stale_remote_state_file_is_removed(matcha_testing_directory: str):
         config_file_contents = json.load(f)
 
     assert expected_config_file_contents == config_file_contents
+
+
+def test_version_inference_latest():
+    """Test checking when zenml isn't installed, the latest version is returned."""
+    assert infer_zenml_version() == "latest"

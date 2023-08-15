@@ -9,7 +9,7 @@ import pytest
 from typer.testing import CliRunner
 
 from matcha_ml.cli.cli import app
-from matcha_ml.templates.azure_template import SUBMODULE_NAMES
+from matcha_ml.templates.azure_template import DEFAULT_STACK
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 TEMPLATE_DIR = os.path.join(
@@ -66,7 +66,7 @@ def assert_infrastructure(
         module_file_path = os.path.join(destination_path, module_file_name)
         assert os.path.exists(module_file_path)
 
-    for module_name in SUBMODULE_NAMES:
+    for module_name in DEFAULT_STACK:
         for module_file_name in glob.glob(
             os.path.join(TEMPLATE_DIR, module_name, "*.tf")
         ):
@@ -143,6 +143,7 @@ def test_cli_provision_command(
         "location": "uksouth",
         "prefix": "matcha",
         "password": "default",
+        "zenmlserver_version": "latest",
     }
 
     assert_infrastructure(
@@ -199,6 +200,7 @@ def test_cli_provision_command_with_args(
         "location": "uksouth",
         "prefix": "matcha",
         "password": "ninja",
+        "zenmlserver_version": "latest",
     }
 
     assert_infrastructure(
@@ -245,6 +247,7 @@ def test_cli_provision_command_with_prefix(
         "location": "uksouth",
         "prefix": "coffee",
         "password": "default",
+        "zenmlserver_version": "latest",
     }
 
     assert_infrastructure(
@@ -289,6 +292,7 @@ def test_cli_provision_command_with_default_prefix(
         "location": "uksouth",
         "prefix": "matcha",
         "password": "default",
+        "zenmlserver_version": "latest",
     }
 
     assert_infrastructure(
