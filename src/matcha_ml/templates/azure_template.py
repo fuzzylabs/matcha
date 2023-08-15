@@ -1,10 +1,10 @@
 """Build a template for provisioning resources on Azure using terraform files."""
-from typing import Optional
+from typing import List, Optional
 
 from matcha_ml.state import MatchaState, MatchaStateService
 from matcha_ml.templates.base_template import BaseTemplate, TemplateVariables
 
-SUBMODULE_NAMES = [
+DEFAULT_STACK = [
     "aks",
     "resource_group",
     "mlflow_module",
@@ -16,6 +16,8 @@ SUBMODULE_NAMES = [
     "zen_server/zenml_helm",
     "zen_server/zenml_helm/templates",
     "data_version_control_storage",
+]
+LLM_STACK = DEFAULT_STACK + [
     "chroma",
     "chroma/chroma_helm",
     "chroma/chroma_helm/templates",
@@ -29,13 +31,13 @@ class AzureTemplate(BaseTemplate):
         BaseTemplate: The base template class.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, submodule_names: List[str]) -> None:
         """Initialize the StateStorageTemplate with the submodule names.
 
         Args:
             submodule_names (List[str]): A list of submodule names.
         """
-        super().__init__(SUBMODULE_NAMES)
+        super().__init__(submodule_names)
 
     def build_template(
         self,

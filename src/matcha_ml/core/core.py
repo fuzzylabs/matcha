@@ -18,7 +18,7 @@ from matcha_ml.services.analytics_service import AnalyticsEvent, track
 from matcha_ml.services.global_parameters_service import GlobalParameters
 from matcha_ml.state import MatchaStateService, RemoteStateManager
 from matcha_ml.state.matcha_state import MatchaState
-from matcha_ml.templates.azure_template import AzureTemplate
+from matcha_ml.templates.azure_template import DEFAULT_STACK, LLM_STACK, AzureTemplate
 
 
 class StackTypeMeta(
@@ -294,7 +294,9 @@ def provision(
             stack_name,
         )
 
-        azure_template = AzureTemplate()
+        azure_template = AzureTemplate(
+            LLM_STACK if stack_name == StackType.LLM.value else DEFAULT_STACK
+        )
 
         zenml_version = infer_zenml_version()
         config = azure_template.build_template_configuration(
