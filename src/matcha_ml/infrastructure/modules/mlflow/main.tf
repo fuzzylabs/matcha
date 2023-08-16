@@ -8,3 +8,11 @@ module "mlflow" {
   storage_container_name    = module.storage.storage_container_name
   artifact_azure_access_key = module.storage.primary_access_key
 }
+
+module "storage" {
+  source = "./storage"
+
+  resource_group_name = module.resource_group.name
+  prefix              = var.prefix
+  location            = var.location
+}
