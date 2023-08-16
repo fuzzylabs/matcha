@@ -7,7 +7,7 @@ repos:
       - id: check-toml
       - id: check-yaml
         args: ["--unsafe"] # only check syntax for yaml files
-        exclude: ^src/matcha_ml/infrastructure/llm/zen_server
+        exclude: ^(src/matcha_ml/infrastructure/llm/zen_server|src/matcha_ml/infrastructure/modules/chroma/chroma|src/matcha_ml/infrastructure/modules/zenml/zen_server/zenml_helm)
       - id: check-json
       - id: mixed-line-ending
         files: "\\.(py|txt|yaml|json|md|toml|lock|cfg|html|sh|js|yml)$"
