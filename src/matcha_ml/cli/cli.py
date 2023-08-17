@@ -183,6 +183,7 @@ def destroy() -> None:
     Raises:
         Exit: Exit if core.destroy throws a MatchaError.
     """
+    print("HELLO")
     stack = MatchaConfigService.get_current_stack_name()
 
     if is_user_approved(

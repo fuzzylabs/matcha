@@ -56,7 +56,7 @@ class RemoteStateManager:
         Returns:
             bool: True, if the configuration file exists
         """
-        return os.path.exists(self.config_path)
+        return MatchaConfigService.config_file_exists()
 
     @property
     def configuration(self) -> MatchaConfig:
@@ -145,10 +145,10 @@ class RemoteStateManager:
         Returns:
             bool: is state provisioned
         """
-        if not self._configuration_file_exists():
+        if not self._resource_group_exists():
             return False
 
-        if not self._resource_group_exists():
+        if MatchaConfigService.is_preprovision_config():
             return False
 
         if not self._bucket_exists(
@@ -166,8 +166,22 @@ class RemoteStateManager:
         Returns:
             bool: True, if state is stale
         """
-        return bool(
-            self._configuration_file_exists() and not self._resource_group_exists()
+        config_exists = self._configuration_file_exists()
+        if config_exists:
+            is_preprovision_config = (
+                "resource_group"
+                not in MatchaConfigService.read_matcha_config().to_dict()
+            )
+        else:
+            is_preprovision_config = False
+        print("ISSTALESTATE:", config_exists, is_preprovision_config)
+        if is_preprovision_config:
+            resource_group_does_not_exist = False
+        else:
+            resource_group_does_not_exist = not self._resource_group_exists()
+        print("ISSUE IS NOT IN RESOURCE GROUP EXISTS IF THIS PRINTS")
+        return all(
+            [config_exists, not is_preprovision_config, resource_group_does_not_exist]
         )
 
     def provision_remote_state(

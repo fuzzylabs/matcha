@@ -127,12 +127,24 @@ class MatchaConfigService:
     """A service for handling the Matcha config file."""
 
     @staticmethod
+    def is_preprovision_config() -> bool:
+        """Check whether the config was created before matcha provision was executed."""
+        if MatchaConfigService.config_file_exists():
+            return (
+                "resource_group"
+                not in MatchaConfigService.read_matcha_config().to_dict()
+            )
+        else:
+            return True
+
+    @staticmethod
     def get_current_stack_name() -> str:
         """Gets the current stack name from the Matcha Config if it exists, if it does not exist set it to default.
 
         Returns:
             str: The name of the current stack being used as a string.
         """
+        print("Get current stack name called")
         try:
             stack_name = (
                 MatchaConfigService.read_matcha_config()
@@ -140,7 +152,8 @@ class MatchaConfigService:
                 .find_property("name")
             ).value
         except MatchaError:
-            stack_name = "default"
+            print("inside the except in get current stack name")
+            stack_name = "default".upper()
             stack_config_component = MatchaConfigComponentProperty(
                 name="name", value=stack_name
             )

@@ -6,13 +6,13 @@ import uuid
 from pathlib import Path
 from typing import Dict, Iterator, Union
 from unittest import mock
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 import pytest
 
 from matcha_ml.core import provision
-from matcha_ml.core.core import infer_zenml_version
 from matcha_ml.core._validation import LONGEST_RESOURCE_NAME, MAXIMUM_RESOURCE_NAME_LEN
+from matcha_ml.core.core import infer_zenml_version
 from matcha_ml.errors import MatchaError, MatchaInputError
 from matcha_ml.services.global_parameters_service import GlobalParameters
 from matcha_ml.state.matcha_state import (
@@ -93,6 +93,7 @@ def test_provision_returns_matcha_state(
         uuid_for_testing (uuid.UUID): Fixed UUID4 value.
     """
     os.chdir(matcha_testing_directory)
+
     with mock.patch(
         "matcha_ml.services.terraform_service.python_terraform.Terraform.output"
     ) as terraform_client_output, mock.patch(
@@ -210,7 +211,7 @@ def test_provision_copies_infrastructure_templates_with_specified_values(
         "location": "uksouth",
         "prefix": "coffee",
         "password": "default",
-        "zenmlserver_version": "latest"
+        "zenmlserver_version": "latest",
     }
 
     assert_infrastructure(
@@ -341,4 +342,3 @@ def test_stale_remote_state_file_is_removed(matcha_testing_directory: str):
 def test_version_inference_latest():
     """Test checking when zenml isn't installed, the latest version is returned."""
     assert infer_zenml_version() == "latest"
-
