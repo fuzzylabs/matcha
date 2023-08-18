@@ -130,12 +130,13 @@ class MatchaConfigService:
     def is_preprovision_config() -> bool:
         """Check whether the config was created before matcha provision was executed."""
         if MatchaConfigService.config_file_exists():
-            return (
-                "resource_group"
-                not in MatchaConfigService.read_matcha_config().to_dict()
-            )
+            config = MatchaConfigService.read_matcha_config().to_dict()
+            stack_present = "stack" in config
+            resource_group_not_present = "remote_state_bucket" not in config
+            return all([stack_present, resource_group_not_present])
+
         else:
-            return True
+            raise MatchaError("No matcha.config.json file found.")
 
     @staticmethod
     def get_current_stack_name() -> str:

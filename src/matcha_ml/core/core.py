@@ -241,20 +241,33 @@ def provision(
         MatchaError: If prefix is not valid.
         MatchaError: If region is not valid.
     """
+    if not MatchaConfigService.config_file_exists():
+        update_stack("default")
+
     print("ENTERING PROVISION in core.py")
     remote_state_manager = RemoteStateManager()
     print("ISSUE NOT IN RSM")
     template_runner = AzureRunner()
     print("ISSUE NOT IN AR")
 
+    if remote_state_manager.is_state_provisioned():
+        print("AND")
+        raise MatchaError(
+            "Error - Matcha has detected that there are resources already provisioned. Use 'matcha destroy' to remove the existing resources before trying to provision again."
+        )
+
     if MatchaStateService.state_exists():
         print("MATCHASTATEEXISTS")
         matcha_state_service = MatchaStateService()
+        print("issue not MSS")
         if matcha_state_service.is_local_state_stale():
+            print("removing matcha dir...")
             template_runner.remove_matcha_dir()
     print("HELLOO")
 
     print("BYE")
+
+    print("rsm is stale state", remote_state_manager.is_state_stale())
     if remote_state_manager.is_state_stale():
         print("HIIII")
         if verbose:
@@ -266,11 +279,7 @@ def provision(
         MatchaConfigService.delete_matcha_config()
         template_runner.remove_matcha_dir()
     print("HELLOOO")
-    if remote_state_manager.is_state_provisioned():
-        print("AND")
-        raise MatchaError(
-            "Error - Matcha has detected that there are resources already provisioned. Use 'matcha destroy' to remove the existing resources before trying to provision again."
-        )
+
     print("BYEE")
     # Input variable checks
     try:
@@ -311,18 +320,12 @@ def provision(
         return matcha_state_service.fetch_resources_from_state_file()
 
 
-def stack_set(stack_name: str) -> None:
-    """A function for updating the stack type in the local matcha.config.json file.
+def update_stack(stack_name: str) -> None:
+    """Update the matcha config file to hold stack information.
 
     Args:
-        stack_name (str): the name of the type of stack to be specified in the config file.
+        stack_name: The name of the stack to be provisioned.
     """
-    if RemoteStateManager().is_state_provisioned():
-        raise MatchaError(
-            "The remote resources are already provisioned. Changing the stack now will not "
-            "change the remote state."
-        )
-
     if stack_name.lower() not in StackType:
         raise MatchaInputError(f"{stack_name} is not a valid stack type.")
 
@@ -334,3 +337,18 @@ def stack_set(stack_name: str) -> None:
     )
 
     MatchaConfigService.update(stack)
+
+
+def stack_set(stack_name: str) -> None:
+    """A function for updating the stack type in the local matcha.config.json file.
+
+    Args:
+        stack_name (str): the name of the type of stack to be specified in the config file.
+    """
+    print("ENTERING STACK_SET")
+    if RemoteStateManager().is_state_provisioned():
+        raise MatchaError(
+            "The remote resources are already provisioned. Changing the stack now will not "
+            "change the remote state."
+        )
+    update_stack(stack_name)

@@ -145,10 +145,13 @@ class RemoteStateManager:
         Returns:
             bool: is state provisioned
         """
-        if not self._resource_group_exists():
+        if MatchaConfigService.config_file_exists():
+            if MatchaConfigService.is_preprovision_config():
+                return False
+        else:
             return False
 
-        if MatchaConfigService.is_preprovision_config():
+        if not self._resource_group_exists():
             return False
 
         if not self._bucket_exists(
@@ -168,18 +171,19 @@ class RemoteStateManager:
         """
         config_exists = self._configuration_file_exists()
         if config_exists:
-            is_preprovision_config = (
-                "resource_group"
-                not in MatchaConfigService.read_matcha_config().to_dict()
-            )
+            is_preprovision_config = MatchaConfigService.is_preprovision_config()
+            print("ISS.is_preprovision_config", is_preprovision_config)
         else:
             is_preprovision_config = False
         print("ISSTALESTATE:", config_exists, is_preprovision_config)
         if is_preprovision_config:
-            resource_group_does_not_exist = False
+            resource_group_does_not_exist = True
         else:
             resource_group_does_not_exist = not self._resource_group_exists()
         print("ISSUE IS NOT IN RESOURCE GROUP EXISTS IF THIS PRINTS")
+        print(
+            [config_exists, not is_preprovision_config, resource_group_does_not_exist]
+        )
         return all(
             [config_exists, not is_preprovision_config, resource_group_does_not_exist]
         )

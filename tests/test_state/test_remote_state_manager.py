@@ -483,8 +483,12 @@ def test_is_state_stale_no_resource_group(matcha_testing_directory: str):
         "matcha_ml.state.remote_state_manager.RemoteStateManager._configuration_file_exists"
     ) as config_file_exists, patch(
         "matcha_ml.state.remote_state_manager.RemoteStateManager._resource_group_exists"
-    ) as resource_group_exists:
+    ) as resource_group_exists, patch(
+        "matcha_ml.state.remote_state_manager.MatchaConfigService.is_preprovision_config"
+    ) as preprovision_config:
         config_file_exists.return_value = True
         resource_group_exists.return_value = False
+        preprovision_config.return_value = False
         remote_state = RemoteStateManager()
+        print(remote_state.is_state_stale())
         assert remote_state.is_state_stale()

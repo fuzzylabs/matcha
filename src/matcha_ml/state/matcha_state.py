@@ -9,6 +9,7 @@ from collections import defaultdict
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Tuple
 
+from matcha_ml.config import MatchaConfigService
 from matcha_ml.constants import MATCHA_STATE_PATH
 from matcha_ml.errors import MatchaError, MatchaInputError
 
@@ -265,14 +266,17 @@ class MatchaStateService:
             self.get_component("cloud").find_property("resource-group-name").value
         )
 
-        if self.state_exists() and os.path.exists(local_config_file):
-            with open(local_config_file) as config:
-                local_config = json.load(config)
+        if self.state_exists() and MatchaConfigService.config_file_exists():
+            if MatchaConfigService.is_preprovision_config():
+                return False
+            else:
+                with open(local_config_file) as config:
+                    local_config = json.load(config)
 
-            return bool(
-                matcha_state_resource_group
-                != local_config["remote_state_bucket"]["resource_group_name"]
-            )
+                return bool(
+                    matcha_state_resource_group
+                    != local_config["remote_state_bucket"]["resource_group_name"]
+                )
         else:
             return False
 
