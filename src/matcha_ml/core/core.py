@@ -164,7 +164,6 @@ def destroy() -> None:
         Matcha Error: where no state has been provisioned.
     """
     remote_state_manager = RemoteStateManager()
-    print("here")
     if not remote_state_manager.is_state_provisioned():
         raise MatchaError(
             "Error - resources that have not been provisioned cannot be destroyed. Run 'matcha provision' to get started!"
@@ -175,7 +174,6 @@ def destroy() -> None:
         destroy=True
     ), remote_state_manager.use_remote_state(destroy=True):
         template_runner.deprovision()
-        print("here2")
         remote_state_manager.deprovision_remote_state()
 
 
@@ -244,32 +242,20 @@ def provision(
     if not MatchaConfigService.config_file_exists():
         update_stack("default")
 
-    print("ENTERING PROVISION in core.py")
     remote_state_manager = RemoteStateManager()
-    print("ISSUE NOT IN RSM")
     template_runner = AzureRunner()
-    print("ISSUE NOT IN AR")
 
     if remote_state_manager.is_state_provisioned():
-        print("AND")
         raise MatchaError(
             "Error - Matcha has detected that there are resources already provisioned. Use 'matcha destroy' to remove the existing resources before trying to provision again."
         )
 
     if MatchaStateService.state_exists():
-        print("MATCHASTATEEXISTS")
         matcha_state_service = MatchaStateService()
-        print("issue not MSS")
         if matcha_state_service.is_local_state_stale():
-            print("removing matcha dir...")
             template_runner.remove_matcha_dir()
-    print("HELLOO")
 
-    print("BYE")
-
-    print("rsm is stale state", remote_state_manager.is_state_stale())
     if remote_state_manager.is_state_stale():
-        print("HIIII")
         if verbose:
             print_status(
                 build_warning_status(
@@ -278,9 +264,7 @@ def provision(
             )
         MatchaConfigService.delete_matcha_config()
         template_runner.remove_matcha_dir()
-    print("HELLOOO")
 
-    print("BYEE")
     # Input variable checks
     try:
         prefix = prefix.lower()
@@ -288,12 +272,11 @@ def provision(
         _ = is_valid_region(location)
     except MatchaInputError as e:
         raise e
-    print("LINE 281")
+
     # Provision resource group and remote state storage
     remote_state_manager.provision_remote_state(location, prefix)
 
     with remote_state_manager.use_lock(), remote_state_manager.use_remote_state():
-        print("ENTERING WITH")
         project_directory = os.getcwd()
         destination = os.path.join(
             project_directory, ".matcha", "infrastructure", "resources"
@@ -345,7 +328,6 @@ def stack_set(stack_name: str) -> None:
     Args:
         stack_name (str): the name of the type of stack to be specified in the config file.
     """
-    print("ENTERING STACK_SET")
     if RemoteStateManager().is_state_provisioned():
         raise MatchaError(
             "The remote resources are already provisioned. Changing the stack now will not "

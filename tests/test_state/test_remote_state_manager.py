@@ -490,5 +490,4 @@ def test_is_state_stale_no_resource_group(matcha_testing_directory: str):
         resource_group_exists.return_value = False
         preprovision_config.return_value = False
         remote_state = RemoteStateManager()
-        print(remote_state.is_state_stale())
         assert remote_state.is_state_stale()

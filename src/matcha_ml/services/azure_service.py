@@ -260,7 +260,6 @@ class AzureClient:
         Returns:
             bool: True, if the resource group exists
         """
-        print("Made it to resource-group_exists")
         rg_state = self.resource_group_state(resource_group_name)
 
         return isinstance(rg_state, ProvisionState)

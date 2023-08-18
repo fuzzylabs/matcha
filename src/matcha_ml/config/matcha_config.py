@@ -145,7 +145,6 @@ class MatchaConfigService:
         Returns:
             str: The name of the current stack being used as a string.
         """
-        print("Get current stack name called")
         try:
             stack_name = (
                 MatchaConfigService.read_matcha_config()
@@ -153,7 +152,6 @@ class MatchaConfigService:
                 .find_property("name")
             ).value
         except MatchaError:
-            print("inside the except in get current stack name")
             stack_name = "default".upper()
             stack_config_component = MatchaConfigComponentProperty(
                 name="name", value=stack_name
