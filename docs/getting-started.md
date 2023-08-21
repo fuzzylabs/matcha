@@ -180,7 +180,7 @@ import matcha_ml.core as matcha
 _ = matcha.get(resource_name="experiment_tracker", property_name="flavor")
 ```
 
-> Note: the `get()` method will return a `MatchaState` object which represents the provisioned state. The `MatchaState` object contians the `get_component()` method, which will return (where applicable) a `MatchaStateComponent` object representing the specified Matcha state component. In turn, each `MatchaStateComponent` object has a `find_property()` method that will allow the user to be able to access individual component properties.
+> Note: the `get()` method will return a `MatchaState` object which represents the provisioned state. The `MatchaState` object contains the `get_component()` method, which will return (where applicable) a `MatchaStateComponent` object representing the specified Matcha state component. In turn, each `MatchaStateComponent` object has a `find_property()` method that will allow the user to be able to access individual component properties.
 
 # &#129309; Sharing resources
 
