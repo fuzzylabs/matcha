@@ -12,3 +12,8 @@ variable "resource_group_name" {
   description = "The name of the resource group to create the Kubernetes cluster in"
   type        = string
 }
+
+variable "vm_size" {
+  description = "The Azure VM size to use."
+  type        = string
+}

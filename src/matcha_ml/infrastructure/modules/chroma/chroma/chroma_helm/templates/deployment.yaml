@@ -2,11 +2,11 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Release.Name }}-chroma-server
+  name: {{ .Release.Name }}-server
 spec:
   selector:
     matchLabels:
-      app: {{ .Release.Name }}-chroma-server
+      app: {{ .Release.Name }}-server
   template:
     metadata:
       labels:
@@ -21,9 +21,9 @@ spec:
 {{ toYaml .Values.resources | indent 12 }}
           volumeMounts:
             - mountPath: /index_data
-              name: chroma-server-index
+              name: {{ .Release.Name }}-server-index
       restartPolicy: Always
       volumes:
         - name: chroma-server-index
           persistentVolumeClaim:
-            claimName: {{ .Release.Name }}-chroma-server-index
+            claimName: {{ .Release.Name }}-server-index

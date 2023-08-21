@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ .Release.Name }}-chroma-server-index
+  name: {{ .Release.Name }}-server-index
 spec:
   accessModes:
     - ReadWriteOnce
