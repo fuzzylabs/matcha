@@ -91,7 +91,7 @@ API:
 ```python
 import matcha_ml.core as matcha
 
-_ = matcha.provision(location="uksouth", prefix="test123", password="strong_password")
+matcha_state_object: MatchaState = matcha.provision(location="uksouth", prefix="test123", password="strong_password")
 ```
 
 Initially, Matcha will ask you a few questions about how you'd like your infrastructure to be set up. Specifically, it will ask for a _location_ for your infrastructure, a _prefix_ to deploy it to. Once these details are provided, Matcha will proceed to initialize a remote state manager and ask for a password. After that, it will go ahead of provision infrastructure.
@@ -169,7 +169,7 @@ API:
 ```python
 import matcha_ml.core as matcha
 
-_ = matcha.get()
+matcha_state_object: MatchaState = matcha.get() 
 ```
 
 As with the CLI tool, users have the ability to 'get' specific resources by passing optional `resource_name` and `property_name` arguments to the get function, as demonstrated below:
@@ -177,7 +177,7 @@ As with the CLI tool, users have the ability to 'get' specific resources by pass
 ```python
 import matcha_ml.core as matcha
 
-_ = matcha.get(resource_name="experiment_tracker", property_name="flavor")
+matcha_state_object: MatchaState = matcha.get(resource_name="experiment_tracker", property_name="flavor")
 ```
 
 > Note: the `get()` method will return a `MatchaState` object which represents the provisioned state. The `MatchaState` object contains the `get_component()` method, which will return (where applicable) a `MatchaStateComponent` object representing the specified Matcha state component. In turn, each `MatchaStateComponent` object has a `find_property()` method that will allow the user to be able to access individual component properties.
