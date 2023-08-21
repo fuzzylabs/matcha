@@ -35,36 +35,6 @@ resource "helm_release" "zen_server" {
     value = var.analytics_opt_in
   }
 
-  # # Ingress set up
-  # set {
-  #   name  = "zenml.rootUrlPath"
-  #   value = var.ingress_path != "" ? "/${var.ingress_path}" : ""
-  # }
-  # set {
-  #   name  = "zenml.ingress.path"
-  #   value = var.ingress_path != "" ? "/${var.ingress_path}/?(.*)" : "/"
-  # }
-  # set {
-  #   name  = "zenml.ingress.annotations.nginx\\.ingress\\.kubernetes\\.io/rewrite-target"
-  #   value = var.ingress_path != "" ? "/$1" : ""
-  # }
-  # set {
-  #   name  = "zenml.ingress.host"
-  #   value = var.create_ingress_controller ? "${data.kubernetes_service.ingress-controller[0].status.0.load_balancer.0.ingress.0.ip}.nip.io" : "${var.ingress_controller_hostname}.nip.io"
-  # }
-  # set {
-  #   name  = "zenml.ingress.tls.enabled"
-  #   value = var.ingress_tls
-  # }
-  # set {
-  #   name  = "zenml.ingress.tls.generateCerts"
-  #   value = var.ingress_tls_generate_certs
-  # }
-  # set {
-  #   name  = "zenml.ingress.tls.secretName"
-  #   value = "${var.prefix}-${var.ingress_tls_secret_name}"
-  # }
-
   # set parameters for the mysql database
   set {
     name  = "zenml.database.url"
@@ -94,19 +64,3 @@ resource "helm_release" "zen_server" {
     resource.kubernetes_namespace.zen_server
   ]
 }
-
-# data "kubernetes_secret" "certificates" {
-#   metadata {
-#     name      = "${var.prefix}-${var.ingress_tls_secret_name}"
-#     namespace = "${var.prefix}-${var.namespace}"
-#   }
-#   binary_data = {
-#     "tls.crt" = ""
-#     "tls.key" = ""
-#     "ca.crt"  = ""
-#   }
-
-#   depends_on = [
-#     helm_release.zen-server
-#   ]
-# }
