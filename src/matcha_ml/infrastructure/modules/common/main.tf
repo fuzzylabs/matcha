@@ -18,6 +18,7 @@ module "aks" {
   prefix              = var.prefix
   location            = var.location
   resource_group_name = module.resource_group.name
+  vm_size             = var.vm_size
 }
 
 module "acr" {
