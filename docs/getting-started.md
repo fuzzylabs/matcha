@@ -2,6 +2,8 @@
 
 In this guide, we'll walk you through how to provision your first machine learning infrastructure to Azure, and then use that infrastructure to train and deploy a model. The model we're using is a movie recommender, and we picked this because it's one that beginners can get up and running with quickly.
 
+There are two ways to interact with Matcha; via the CLI tool, or through the API. Throughout this guide we'll demonstrate how to get started using either method.
+
 There are five things we'll cover:
 
 * [Pre-requisites](#pre-requisites): everything you need to set up before starting.
@@ -78,16 +80,27 @@ When you run this command, you'll be taken to the Azure login screen in a web br
 
 Next, let's provision:
 
+CLI:
 ```bash
 matcha provision
 ```
 
-Initially, Matcha will ask you a few questions about how you'd like your infrastructure to be set up. Specifically, it will ask for a _name_ for your infrastructure, a _region_ to deploy it to. Once these details are provided, Matcha will proceed to initialize a remote state manager and ask for a password. After that, it will go ahead of provision infrastructure.
+> Note: users have the choice of passing optional arguments representing the location, prefix, and password parameters by using '--location', '--prefix', or '--password'. For example; `--location uksouth --prefix test123 --password strong_password`. 
+
+API:
+```python
+import matcha_ml.core as matcha
+
+matcha_state_object: MatchaState = matcha.provision(location="uksouth", prefix="test123", password="strong_password")
+```
+
+Initially, Matcha will ask you a few questions about how you'd like your infrastructure to be set up. Specifically, it will ask for a _location_ for your infrastructure, a _prefix_ to deploy it to. Once these details are provided, Matcha will proceed to initialize a remote state manager and ask for a password. After that, it will go ahead of provision infrastructure.
 
 > Note: provisioning can take up to 20 minutes.
 
 Once provisioning is completed, you can query Matcha, using the `get` command:
 
+CLI:
 ```bash
 matcha get
 ```
@@ -151,6 +164,23 @@ Experiment tracker
 > Note: You can also get these outputs in either json or YAML format using the following: `matcha get --output json`
 
 By default, Matcha will hide sensitive resource properties. If you need one of these properties, then you can add the `--show-sensitive` flag to your `get` command.
+
+API:
+```python
+import matcha_ml.core as matcha
+
+matcha_state_object: MatchaState = matcha.get() 
+```
+
+As with the CLI tool, users have the ability to 'get' specific resources by passing optional `resource_name` and `property_name` arguments to the get function, as demonstrated below:
+
+```python
+import matcha_ml.core as matcha
+
+matcha_state_object: MatchaState = matcha.get(resource_name="experiment_tracker", property_name="flavor")
+```
+
+> Note: the `get()` method will return a `MatchaState` object which represents the provisioned state. The `MatchaState` object contains the `get_component()` method, which will return (where applicable) a `MatchaStateComponent` object representing the specified Matcha state component. In turn, each `MatchaStateComponent` object has a `find_property()` method that will allow the user to be able to access individual component properties.
 
 # &#129309; Sharing resources
 
@@ -236,8 +266,16 @@ This will result in a score, which represents how strongly we recommend movie ID
 
 The final thing you'll want to do is decommission the infrastructure that Matcha has set up during this guide. Matcha includes a `destroy` command which will remove everything that has been provisioned, which avoids running up an Azure bill!
 
+CLI:
 ```bash
 matcha destroy
+```
+
+API:
+```python
+import matcha_ml.core as matcha
+
+matcha.destroy()
 ```
 
 > Note: that this command is irreversible will remove all the resources deployed by `matcha provision` including the resource group, so make sure you save any data you wish to keep before running this command.
