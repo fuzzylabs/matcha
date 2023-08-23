@@ -1,0 +1,2302 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="provision your MLOps stack to Azure in one step">
+      
+      
+      
+      
+        <link rel="prev" href="../data-version-control/">
+      
+      
+      
+      <link rel="icon" href="../img/favicon.png">
+      <meta name="generator" content="mkdocs-1.5.2, mkdocs-material-9.2.3">
+    
+    
+      
+        <title>API Reference - Open source MLOps on Azure in one step</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.0e669242.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../css/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+   <link href="../assets/stylesheets/glightbox.min.css" rel="stylesheet"/><style>
+        html.glightbox-open { overflow: initial; height: 100%; }
+        .gslide-title { margin-top: 0px; user-select: text; }
+        .gslide-desc { color: #666; user-select: text; }
+        .gslide-image img { background: white; }
+        
+            .gscrollbar-fixer { padding-right: 15px; }
+            .gdesc-inner { font-size: 0.75rem; }
+            body[data-md-color-scheme="slate"] .gdesc-inner { background: var(--md-default-bg-color);}
+            body[data-md-color-scheme="slate"] .gslide-title { color: var(--md-default-fg-color);}
+            body[data-md-color-scheme="slate"] .gslide-desc { color: var(--md-default-fg-color);}
+            </style> <script src="../assets/javascripts/glightbox.min.js"></script></head>
+  
+  
+    <body dir="ltr">
+  
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var key of Object.keys(palette.color))document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#api-reference-documentation" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Open source MLOps on Azure in one step" class="md-header__button md-logo" aria-label="Open source MLOps on Azure in one step" data-md-component="logo">
+      
+  <img src="../img/logo-white.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Open source MLOps on Azure in one step
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              API Reference
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/fuzzylabs/matcha" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    fuzzylabs/matcha-ml
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Open source MLOps on Azure in one step" class="md-nav__button md-logo" aria-label="Open source MLOps on Azure in one step" data-md-component="logo">
+      
+  <img src="../img/logo-white.png" alt="logo">
+
+    </a>
+    Open source MLOps on Azure in one step
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/fuzzylabs/matcha" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    fuzzylabs/matcha-ml
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Introduction
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Getting started
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Getting started
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Deploying your first model
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Concepts
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Concepts
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../workflows/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Workflows
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../azure-permissions/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Azure Permissions
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../costings/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Azure Costs
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Inside Matcha
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Inside Matcha
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../inside-matcha/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    How does Matcha work
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../resource-stacks/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Resource stacks
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../privacy/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Why we collect usage data
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Tools
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            Tools
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data-version-control/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Data Version Control
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    API Reference
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    API Reference
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#src.matcha_ml.core.core" class="md-nav__link">
+    src.matcha_ml.core.core
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#src.matcha_ml.core.core.StackType" class="md-nav__link">
+    StackType
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#src.matcha_ml.core.core.StackTypeMeta" class="md-nav__link">
+    StackTypeMeta
+  </a>
+  
+    <nav class="md-nav" aria-label="StackTypeMeta">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#src.matcha_ml.core.core.StackTypeMeta.__contains__" class="md-nav__link">
+    __contains__()
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#src.matcha_ml.core.core.analytics_opt_in" class="md-nav__link">
+    analytics_opt_in()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#src.matcha_ml.core.core.analytics_opt_out" class="md-nav__link">
+    analytics_opt_out()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#src.matcha_ml.core.core.destroy" class="md-nav__link">
+    destroy()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#src.matcha_ml.core.core.get" class="md-nav__link">
+    get()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#src.matcha_ml.core.core.infer_zenml_version" class="md-nav__link">
+    infer_zenml_version()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#src.matcha_ml.core.core.provision" class="md-nav__link">
+    provision()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#src.matcha_ml.core.core.remove_state_lock" class="md-nav__link">
+    remove_state_lock()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#src.matcha_ml.core.core.stack_set" class="md-nav__link">
+    stack_set()
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#src.matcha_ml.core.core" class="md-nav__link">
+    src.matcha_ml.core.core
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#src.matcha_ml.core.core.StackType" class="md-nav__link">
+    StackType
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#src.matcha_ml.core.core.StackTypeMeta" class="md-nav__link">
+    StackTypeMeta
+  </a>
+  
+    <nav class="md-nav" aria-label="StackTypeMeta">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#src.matcha_ml.core.core.StackTypeMeta.__contains__" class="md-nav__link">
+    __contains__()
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#src.matcha_ml.core.core.analytics_opt_in" class="md-nav__link">
+    analytics_opt_in()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#src.matcha_ml.core.core.analytics_opt_out" class="md-nav__link">
+    analytics_opt_out()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#src.matcha_ml.core.core.destroy" class="md-nav__link">
+    destroy()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#src.matcha_ml.core.core.get" class="md-nav__link">
+    get()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#src.matcha_ml.core.core.infer_zenml_version" class="md-nav__link">
+    infer_zenml_version()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#src.matcha_ml.core.core.provision" class="md-nav__link">
+    provision()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#src.matcha_ml.core.core.remove_state_lock" class="md-nav__link">
+    remove_state_lock()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#src.matcha_ml.core.core.stack_set" class="md-nav__link">
+    stack_set()
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+<h1 id="api-reference-documentation">API Reference Documentation</h1>
+
+
+<div class="doc doc-object doc-module">
+
+
+<a id="src.matcha_ml.core.core"></a>
+  <div class="doc doc-contents first">
+  
+      <p>The core functionality for Matcha API.</p>
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="src.matcha_ml.core.core.StackType" class="doc doc-heading">
+          <span class="doc doc-object-name doc-class-name">StackType</span>
+
+
+</h2>
+
+
+  <div class="doc doc-contents ">
+          <p class="doc doc-class-bases">
+            Bases: <code><span title="enum.Enum">Enum</span></code></p>
+
+  
+      <p>Enum defining matcha stack types.</p>
+
+            <details class="quote">
+              <summary>Source code in <code>src/matcha_ml/core/core.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">StackType</span><span class="p">(</span><span class="n">Enum</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">StackTypeMeta</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Enum defining matcha stack types.&quot;&quot;&quot;</span>
+
+    <span class="n">DEFAULT</span> <span class="o">=</span> <span class="s2">&quot;default&quot;</span>
+    <span class="n">LLM</span> <span class="o">=</span> <span class="s2">&quot;llm&quot;</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="src.matcha_ml.core.core.StackTypeMeta" class="doc doc-heading">
+          <span class="doc doc-object-name doc-class-name">StackTypeMeta</span>
+
+
+</h2>
+
+
+  <div class="doc doc-contents ">
+          <p class="doc doc-class-bases">
+            Bases: <code><span title="enum.EnumMeta">EnumMeta</span></code></p>
+
+  
+      <p>Metaclass for the StackType Enum.</p>
+
+            <details class="quote">
+              <summary>Source code in <code>src/matcha_ml/core/core.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">StackTypeMeta</span><span class="p">(</span>
+    <span class="n">EnumMeta</span>
+<span class="p">):</span>  <span class="c1"># this is probably overkill, but we might need it if we&#39;ll support custom stacks later.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Metaclass for the StackType Enum.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>  <span class="c1"># type: ignore</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Dunder method for checking if an item is a member of the enum.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            item (str): the quantity to check for in the Enum.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            True if item is a member of the Enum, False otherwise.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="src.matcha_ml.core.core.StackTypeMeta.__contains__" class="doc doc-heading">
+          <span class="doc doc-object-name doc-function-name">__contains__</span>
+
+
+</h3>
+<div class="highlight"><pre><span></span><code><span class="fm">__contains__</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Dunder method for checking if an item is a member of the enum.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>item</code></td>
+          <td>
+                <code>str</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>the quantity to check for in the Enum.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code>bool</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>True if item is a member of the Enum, False otherwise.</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+          <details class="quote">
+            <summary>Source code in <code>src/matcha_ml/core/core.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>  <span class="c1"># type: ignore</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Dunder method for checking if an item is a member of the enum.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        item (str): the quantity to check for in the Enum.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        True if item is a member of the Enum, False otherwise.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="bp">self</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">True</span>
+</code></pre></div></td></tr></table></div>
+          </details>
+  </div>
+
+</div>
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h2 id="src.matcha_ml.core.core.analytics_opt_in" class="doc doc-heading">
+          <span class="doc doc-object-name doc-function-name">analytics_opt_in</span>
+
+
+</h2>
+<div class="highlight"><pre><span></span><code><span class="n">analytics_opt_in</span><span class="p">()</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Enable the collection of anonymous usage data (enabled by default).</p>
+<p>More information regarding why we collect usage data, and how it is used, can be found
+<a href="https://mymatcha.ai/privacy/">here</a>.</p>
+
+          <details class="quote">
+            <summary>Source code in <code>src/matcha_ml/core/core.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span>
+<span class="normal">212</span>
+<span class="normal">213</span>
+<span class="normal">214</span>
+<span class="normal">215</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">analytics_opt_in</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Enable the collection of anonymous usage data (enabled by default).</span>
+
+<span class="sd">    More information regarding why we collect usage data, and how it is used, can be found</span>
+<span class="sd">    [here](https://mymatcha.ai/privacy/).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">GlobalParameters</span><span class="p">()</span><span class="o">.</span><span class="n">analytics_opt_out</span> <span class="o">=</span> <span class="kc">False</span>
+</code></pre></div></td></tr></table></div>
+          </details>
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h2 id="src.matcha_ml.core.core.analytics_opt_out" class="doc doc-heading">
+          <span class="doc doc-object-name doc-function-name">analytics_opt_out</span>
+
+
+</h2>
+<div class="highlight"><pre><span></span><code><span class="n">analytics_opt_out</span><span class="p">()</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Disable the collection of anonymous usage data.</p>
+<p>More information regarding why we collect usage data, and how it is used, can be found
+<a href="https://mymatcha.ai/privacy/">here</a>.</p>
+
+          <details class="quote">
+            <summary>Source code in <code>src/matcha_ml/core/core.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">200</span>
+<span class="normal">201</span>
+<span class="normal">202</span>
+<span class="normal">203</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">analytics_opt_out</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Disable the collection of anonymous usage data.</span>
+
+<span class="sd">    More information regarding why we collect usage data, and how it is used, can be found</span>
+<span class="sd">    [here](https://mymatcha.ai/privacy/).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">GlobalParameters</span><span class="p">()</span><span class="o">.</span><span class="n">analytics_opt_out</span> <span class="o">=</span> <span class="kc">True</span>
+</code></pre></div></td></tr></table></div>
+          </details>
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h2 id="src.matcha_ml.core.core.destroy" class="doc doc-heading">
+          <span class="doc doc-object-name doc-function-name">destroy</span>
+
+
+</h2>
+<div class="highlight"><pre><span></span><code><span class="n">destroy</span><span class="p">()</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Destroy the provisioned cloud resources.</p>
+<p>Decommission the cloud infrastructure built by Matcha when provision has been called either historically or during
+this session. After calling destroy, the resources provisioned by matcha should no longer be active on your
+chosen provider's UI.</p>
+
+
+
+  <p><strong>Raises:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code>Matcha Error</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>where no state has been provisioned.</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+          <details class="quote">
+            <summary>Source code in <code>src/matcha_ml/core/core.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">174</span>
+<span class="normal">175</span>
+<span class="normal">176</span>
+<span class="normal">177</span>
+<span class="normal">178</span>
+<span class="normal">179</span>
+<span class="normal">180</span>
+<span class="normal">181</span>
+<span class="normal">182</span>
+<span class="normal">183</span>
+<span class="normal">184</span>
+<span class="normal">185</span>
+<span class="normal">186</span>
+<span class="normal">187</span>
+<span class="normal">188</span>
+<span class="normal">189</span>
+<span class="normal">190</span>
+<span class="normal">191</span>
+<span class="normal">192</span>
+<span class="normal">193</span>
+<span class="normal">194</span>
+<span class="normal">195</span>
+<span class="normal">196</span>
+<span class="normal">197</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@track</span><span class="p">(</span><span class="n">event_name</span><span class="o">=</span><span class="n">AnalyticsEvent</span><span class="o">.</span><span class="n">DESTROY</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">destroy</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Destroy the provisioned cloud resources.</span>
+
+<span class="sd">    Decommission the cloud infrastructure built by Matcha when provision has been called either historically or during</span>
+<span class="sd">    this session. After calling destroy, the resources provisioned by matcha should no longer be active on your</span>
+<span class="sd">    chosen provider&#39;s UI.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        Matcha Error: where no state has been provisioned.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">remote_state_manager</span> <span class="o">=</span> <span class="n">RemoteStateManager</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">remote_state_manager</span><span class="o">.</span><span class="n">is_state_provisioned</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="n">MatchaError</span><span class="p">(</span>
+            <span class="s2">&quot;Error - resources that have not been provisioned cannot be destroyed. Run &#39;matcha provision&#39; to get started!&quot;</span>
+        <span class="p">)</span>
+
+    <span class="n">template_runner</span> <span class="o">=</span> <span class="n">AzureRunner</span><span class="p">()</span>
+    <span class="k">with</span> <span class="n">remote_state_manager</span><span class="o">.</span><span class="n">use_lock</span><span class="p">(</span>
+        <span class="n">destroy</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">),</span> <span class="n">remote_state_manager</span><span class="o">.</span><span class="n">use_remote_state</span><span class="p">(</span><span class="n">destroy</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="n">template_runner</span><span class="o">.</span><span class="n">deprovision</span><span class="p">()</span>
+        <span class="n">remote_state_manager</span><span class="o">.</span><span class="n">deprovision_remote_state</span><span class="p">()</span>
+</code></pre></div></td></tr></table></div>
+          </details>
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h2 id="src.matcha_ml.core.core.get" class="doc doc-heading">
+          <span class="doc doc-object-name doc-function-name">get</span>
+
+
+</h2>
+<div class="highlight"><pre><span></span><code><span class="n">get</span><span class="p">(</span><span class="n">resource_name</span><span class="p">,</span> <span class="n">property_name</span><span class="p">)</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Return information regarding a previously provisioned resource based on the resource and property names provided.</p>
+<p>The information is returned in the form of a <code>MatchaState</code> object containing various <code>MatchaStateComponent</code> objects.
+The <code>MatchaStateComponent</code> objects in turn hold <code>MatchaResource</code> and <code>MatchaResourceProperty</code> components.
+If no resource name is provided, all resources are returned.</p>
+
+
+
+<p><strong>Examples:</strong></p>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;cloud&quot;</span><span class="p">,</span> <span class="s2">&quot;resource-group-name&quot;</span><span class="p">)</span>
+<span class="go">MatchaState(components=[MatchaStateComponent(resource=MatchaResource(name=&#39;cloud&#39;),</span>
+<span class="go">properties=[MatchaResourceProperty(name=&#39;resource-group-name&#39;, value=&#39;test_resources&#39;)])])</span>
+</code></pre></div>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;experiment-tracker&quot;</span><span class="p">,</span> <span class="s2">&quot;flavor&quot;</span><span class="p">)</span>
+<span class="go">MatchaState(components=[MatchaStateComponent(resource=MatchaResource(name=&#39;experiment-tracker&#39;),</span>
+<span class="go">properties=[MatchaResourceProperty(name=&#39;flavor&#39;, value=&#39;mlflow&#39;)])])</span>
+</code></pre></div>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>resource_name</code></td>
+          <td>
+                <code><span title="typing.Optional">Optional</span>[str]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>name of the resource to get information for.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>property_name</code></td>
+          <td>
+                <code><span title="typing.Optional">Optional</span>[str]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>the property of the resource to get.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+<th>Name</th>        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+<td><code>MatchaState</code></td>          <td>
+                <code><span title="matcha_ml.state.matcha_state.MatchaState">MatchaState</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>the information of the provisioned resource.</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><strong>Raises:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code><span title="matcha_ml.errors.MatchaError">MatchaError</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Raised when the matcha state has not been initialized</p>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+                <code><span title="matcha_ml.errors.MatchaError">MatchaError</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Raised when the matcha.state file does not exist</p>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+                <code><span title="matcha_ml.errors.MatchaInputError">MatchaInputError</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Raised when the resource or property name does not exist in the matcha.state file</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+          <details class="quote">
+            <summary>Source code in <code>src/matcha_ml/core/core.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 91</span>
+<span class="normal"> 92</span>
+<span class="normal"> 93</span>
+<span class="normal"> 94</span>
+<span class="normal"> 95</span>
+<span class="normal"> 96</span>
+<span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span>
+<span class="normal">103</span>
+<span class="normal">104</span>
+<span class="normal">105</span>
+<span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span>
+<span class="normal">122</span>
+<span class="normal">123</span>
+<span class="normal">124</span>
+<span class="normal">125</span>
+<span class="normal">126</span>
+<span class="normal">127</span>
+<span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span>
+<span class="normal">166</span>
+<span class="normal">167</span>
+<span class="normal">168</span>
+<span class="normal">169</span>
+<span class="normal">170</span>
+<span class="normal">171</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@track</span><span class="p">(</span><span class="n">event_name</span><span class="o">=</span><span class="n">AnalyticsEvent</span><span class="o">.</span><span class="n">GET</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">get</span><span class="p">(</span>
+    <span class="n">resource_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">property_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MatchaState</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return information regarding a previously provisioned resource based on the resource and property names provided.</span>
+
+<span class="sd">    The information is returned in the form of a `MatchaState` object containing various `MatchaStateComponent` objects.</span>
+<span class="sd">    The `MatchaStateComponent` objects in turn hold `MatchaResource` and `MatchaResourceProperty` components.</span>
+<span class="sd">    If no resource name is provided, all resources are returned.</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; get(&quot;cloud&quot;, &quot;resource-group-name&quot;)</span>
+<span class="sd">        MatchaState(components=[MatchaStateComponent(resource=MatchaResource(name=&#39;cloud&#39;),</span>
+<span class="sd">        properties=[MatchaResourceProperty(name=&#39;resource-group-name&#39;, value=&#39;test_resources&#39;)])])</span>
+
+<span class="sd">        &gt;&gt;&gt; get(&quot;experiment-tracker&quot;, &quot;flavor&quot;)</span>
+<span class="sd">        MatchaState(components=[MatchaStateComponent(resource=MatchaResource(name=&#39;experiment-tracker&#39;),</span>
+<span class="sd">        properties=[MatchaResourceProperty(name=&#39;flavor&#39;, value=&#39;mlflow&#39;)])])</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        resource_name (Optional[str]): name of the resource to get information for.</span>
+<span class="sd">        property_name (Optional[str]): the property of the resource to get.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        MatchaState: the information of the provisioned resource.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        MatchaError: Raised when the matcha state has not been initialized</span>
+<span class="sd">        MatchaError: Raised when the matcha.state file does not exist</span>
+<span class="sd">        MatchaInputError: Raised when the resource or property name does not exist in the matcha.state file</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">resource_name</span><span class="p">:</span>
+        <span class="n">resource_name</span> <span class="o">=</span> <span class="n">resource_name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">property_name</span><span class="p">:</span>
+        <span class="n">property_name</span> <span class="o">=</span> <span class="n">property_name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+    <span class="n">remote_state</span> <span class="o">=</span> <span class="n">RemoteStateManager</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">remote_state</span><span class="o">.</span><span class="n">is_state_provisioned</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="n">MatchaError</span><span class="p">(</span>
+            <span class="s2">&quot;Error - matcha state has not been initialized, nothing to get.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">MatchaStateService</span><span class="o">.</span><span class="n">state_exists</span><span class="p">():</span>
+        <span class="c1"># if the state file doesn&#39;t exist, then download it from the remote</span>
+        <span class="n">remote_state</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">())</span>
+
+    <span class="n">matcha_state_service</span> <span class="o">=</span> <span class="n">MatchaStateService</span><span class="p">()</span>
+
+    <span class="k">with</span> <span class="n">remote_state</span><span class="o">.</span><span class="n">use_lock</span><span class="p">():</span>
+        <span class="n">local_hash</span> <span class="o">=</span> <span class="n">matcha_state_service</span><span class="o">.</span><span class="n">get_hash_local_state</span><span class="p">()</span>
+        <span class="n">remote_hash</span> <span class="o">=</span> <span class="n">remote_state</span><span class="o">.</span><span class="n">get_hash_remote_state</span><span class="p">(</span>
+            <span class="n">matcha_state_service</span><span class="o">.</span><span class="n">matcha_state_path</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">local_hash</span> <span class="o">!=</span> <span class="n">remote_hash</span><span class="p">:</span>
+            <span class="n">remote_state</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">())</span>
+
+            <span class="n">matcha_state_service</span> <span class="o">=</span> <span class="n">MatchaStateService</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">resource_name</span><span class="p">:</span>
+            <span class="n">get_command_validation</span><span class="p">(</span>
+                <span class="n">resource_name</span><span class="p">,</span>
+                <span class="n">matcha_state_service</span><span class="o">.</span><span class="n">get_resource_names</span><span class="p">(),</span>
+                <span class="s2">&quot;resource type&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">resource_name</span> <span class="ow">and</span> <span class="n">property_name</span><span class="p">:</span>
+            <span class="n">get_command_validation</span><span class="p">(</span>
+                <span class="n">property_name</span><span class="p">,</span>
+                <span class="n">matcha_state_service</span><span class="o">.</span><span class="n">get_property_names</span><span class="p">(</span><span class="n">resource_name</span><span class="p">),</span>
+                <span class="s2">&quot;property&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="n">result</span> <span class="o">=</span> <span class="n">matcha_state_service</span><span class="o">.</span><span class="n">fetch_resources_from_state_file</span><span class="p">(</span>
+            <span class="n">resource_name</span><span class="p">,</span> <span class="n">property_name</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">result</span>
+</code></pre></div></td></tr></table></div>
+          </details>
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h2 id="src.matcha_ml.core.core.infer_zenml_version" class="doc doc-heading">
+          <span class="doc doc-object-name doc-function-name">infer_zenml_version</span>
+
+
+</h2>
+<div class="highlight"><pre><span></span><code><span class="n">infer_zenml_version</span><span class="p">()</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Check the zenml version of the local environment against the version matcha is expecting.</p>
+
+          <details class="quote">
+            <summary>Source code in <code>src/matcha_ml/core/core.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span>
+<span class="normal">72</span>
+<span class="normal">73</span>
+<span class="normal">74</span>
+<span class="normal">75</span>
+<span class="normal">76</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">infer_zenml_version</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check the zenml version of the local environment against the version matcha is expecting.&quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">import</span> <span class="nn">zenml</span>  <span class="c1"># type: ignore</span>
+
+        <span class="n">version</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">zenml</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Matcha detected zenml version </span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2">, so will use the same version on the remote resources.&quot;</span>
+        <span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+        <span class="n">version</span> <span class="o">=</span> <span class="s2">&quot;latest&quot;</span>
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Matcha didn&#39;t find a zenml installation locally, so will install the latest release of zenml on the &quot;</span>
+            <span class="s2">&quot;remote resources.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">version</span>
+</code></pre></div></td></tr></table></div>
+          </details>
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h2 id="src.matcha_ml.core.core.provision" class="doc doc-heading">
+          <span class="doc doc-object-name doc-function-name">provision</span>
+
+
+</h2>
+<div class="highlight"><pre><span></span><code><span class="n">provision</span><span class="p">(</span><span class="n">location</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">password</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Provision cloud resources using existing Matcha Terraform templates.</p>
+<p>Provision cloud resources in the location provided. Provide a prefix for the Azure group's name and a password for
+the provisioned server. To show more output than the default, set verbose to True.</p>
+
+
+
+<p><strong>Examples:</strong></p>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">provision</span><span class="p">(</span><span class="n">location</span><span class="o">=</span><span class="s2">&quot;ukwest&quot;</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;myexample&quot;</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s2">&quot;example_password&quot;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="go">MatchaState(components=[MatchaStateComponent(resource=MatchaResource(name=&#39;cloud&#39;),</span>
+<span class="go">    properties=[MatchaResourceProperty(name=&#39;location&#39;, value=&#39;ukwest&#39;),</span>
+<span class="go">    MatchaResourceProperty(name=&#39;prefix&#39;, value=&#39;test&#39;)])])</span>
+</code></pre></div>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>location</code></td>
+          <td>
+                <code>str</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Azure location in which all resources will be provisioned.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>prefix</code></td>
+          <td>
+                <code>str</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Prefix used for all resources.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>password</code></td>
+          <td>
+                <code>str</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Password for the deployment server.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>verbose</code></td>
+          <td>
+                <code>bool optional</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>additional output is show when True. Defaults to False.</p>
+            </div>
+          </td>
+          <td>
+                <code>False</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+<th>Name</th>        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+<td><code>MatchaState</code></td>          <td>
+                <code><span title="matcha_ml.state.matcha_state.MatchaState">MatchaState</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>the information of the provisioned resources.</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><strong>Raises:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code><span title="matcha_ml.errors.MatchaError">MatchaError</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>If resources are already provisioned.</p>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+                <code><span title="matcha_ml.errors.MatchaError">MatchaError</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>If prefix is not valid.</p>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+                <code><span title="matcha_ml.errors.MatchaError">MatchaError</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>If region is not valid.</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+          <details class="quote">
+            <summary>Source code in <code>src/matcha_ml/core/core.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">229</span>
+<span class="normal">230</span>
+<span class="normal">231</span>
+<span class="normal">232</span>
+<span class="normal">233</span>
+<span class="normal">234</span>
+<span class="normal">235</span>
+<span class="normal">236</span>
+<span class="normal">237</span>
+<span class="normal">238</span>
+<span class="normal">239</span>
+<span class="normal">240</span>
+<span class="normal">241</span>
+<span class="normal">242</span>
+<span class="normal">243</span>
+<span class="normal">244</span>
+<span class="normal">245</span>
+<span class="normal">246</span>
+<span class="normal">247</span>
+<span class="normal">248</span>
+<span class="normal">249</span>
+<span class="normal">250</span>
+<span class="normal">251</span>
+<span class="normal">252</span>
+<span class="normal">253</span>
+<span class="normal">254</span>
+<span class="normal">255</span>
+<span class="normal">256</span>
+<span class="normal">257</span>
+<span class="normal">258</span>
+<span class="normal">259</span>
+<span class="normal">260</span>
+<span class="normal">261</span>
+<span class="normal">262</span>
+<span class="normal">263</span>
+<span class="normal">264</span>
+<span class="normal">265</span>
+<span class="normal">266</span>
+<span class="normal">267</span>
+<span class="normal">268</span>
+<span class="normal">269</span>
+<span class="normal">270</span>
+<span class="normal">271</span>
+<span class="normal">272</span>
+<span class="normal">273</span>
+<span class="normal">274</span>
+<span class="normal">275</span>
+<span class="normal">276</span>
+<span class="normal">277</span>
+<span class="normal">278</span>
+<span class="normal">279</span>
+<span class="normal">280</span>
+<span class="normal">281</span>
+<span class="normal">282</span>
+<span class="normal">283</span>
+<span class="normal">284</span>
+<span class="normal">285</span>
+<span class="normal">286</span>
+<span class="normal">287</span>
+<span class="normal">288</span>
+<span class="normal">289</span>
+<span class="normal">290</span>
+<span class="normal">291</span>
+<span class="normal">292</span>
+<span class="normal">293</span>
+<span class="normal">294</span>
+<span class="normal">295</span>
+<span class="normal">296</span>
+<span class="normal">297</span>
+<span class="normal">298</span>
+<span class="normal">299</span>
+<span class="normal">300</span>
+<span class="normal">301</span>
+<span class="normal">302</span>
+<span class="normal">303</span>
+<span class="normal">304</span>
+<span class="normal">305</span>
+<span class="normal">306</span>
+<span class="normal">307</span>
+<span class="normal">308</span>
+<span class="normal">309</span>
+<span class="normal">310</span>
+<span class="normal">311</span>
+<span class="normal">312</span>
+<span class="normal">313</span>
+<span class="normal">314</span>
+<span class="normal">315</span>
+<span class="normal">316</span>
+<span class="normal">317</span>
+<span class="normal">318</span>
+<span class="normal">319</span>
+<span class="normal">320</span>
+<span class="normal">321</span>
+<span class="normal">322</span>
+<span class="normal">323</span>
+<span class="normal">324</span>
+<span class="normal">325</span>
+<span class="normal">326</span>
+<span class="normal">327</span>
+<span class="normal">328</span>
+<span class="normal">329</span>
+<span class="normal">330</span>
+<span class="normal">331</span>
+<span class="normal">332</span>
+<span class="normal">333</span>
+<span class="normal">334</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@track</span><span class="p">(</span><span class="n">event_name</span><span class="o">=</span><span class="n">AnalyticsEvent</span><span class="o">.</span><span class="n">PROVISION</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">provision</span><span class="p">(</span>
+    <span class="n">location</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">password</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">verbose</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MatchaState</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Provision cloud resources using existing Matcha Terraform templates.</span>
+
+<span class="sd">    Provision cloud resources in the location provided. Provide a prefix for the Azure group&#39;s name and a password for</span>
+<span class="sd">    the provisioned server. To show more output than the default, set verbose to True.</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; provision(location=&quot;ukwest&quot;, prefix=&quot;myexample&quot;, password=&quot;example_password&quot;, verbose=False)</span>
+<span class="sd">        MatchaState(components=[MatchaStateComponent(resource=MatchaResource(name=&#39;cloud&#39;),</span>
+<span class="sd">            properties=[MatchaResourceProperty(name=&#39;location&#39;, value=&#39;ukwest&#39;),</span>
+<span class="sd">            MatchaResourceProperty(name=&#39;prefix&#39;, value=&#39;test&#39;)])])</span>
+
+
+<span class="sd">    Args:</span>
+<span class="sd">        location (str): Azure location in which all resources will be provisioned.</span>
+<span class="sd">        prefix (str): Prefix used for all resources.</span>
+<span class="sd">        password (str): Password for the deployment server.</span>
+<span class="sd">        verbose (bool optional): additional output is show when True. Defaults to False.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        MatchaState: the information of the provisioned resources.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        MatchaError: If resources are already provisioned.</span>
+<span class="sd">        MatchaError: If prefix is not valid.</span>
+<span class="sd">        MatchaError: If region is not valid.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">remote_state_manager</span> <span class="o">=</span> <span class="n">RemoteStateManager</span><span class="p">()</span>
+    <span class="n">template_runner</span> <span class="o">=</span> <span class="n">AzureRunner</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">MatchaStateService</span><span class="o">.</span><span class="n">state_exists</span><span class="p">():</span>
+        <span class="n">matcha_state_service</span> <span class="o">=</span> <span class="n">MatchaStateService</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">matcha_state_service</span><span class="o">.</span><span class="n">is_local_state_stale</span><span class="p">():</span>
+            <span class="n">template_runner</span><span class="o">.</span><span class="n">remove_matcha_dir</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">remote_state_manager</span><span class="o">.</span><span class="n">is_state_stale</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="n">print_status</span><span class="p">(</span>
+                <span class="n">build_warning_status</span><span class="p">(</span>
+                    <span class="s2">&quot;Matcha has detected a stale state file. This means that your local configuration is out of sync with the remote state, the resource group may have been removed. Deleting existing state config.&quot;</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="n">MatchaConfigService</span><span class="o">.</span><span class="n">delete_matcha_config</span><span class="p">()</span>
+        <span class="n">template_runner</span><span class="o">.</span><span class="n">remove_matcha_dir</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">remote_state_manager</span><span class="o">.</span><span class="n">is_state_provisioned</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="n">MatchaError</span><span class="p">(</span>
+            <span class="s2">&quot;Error - Matcha has detected that there are resources already provisioned. Use &#39;matcha destroy&#39; to remove the existing resources before trying to provision again.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="c1"># Input variable checks</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">prefix</span> <span class="o">=</span> <span class="n">prefix</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="n">_</span> <span class="o">=</span> <span class="n">is_valid_prefix</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span>
+        <span class="n">_</span> <span class="o">=</span> <span class="n">is_valid_region</span><span class="p">(</span><span class="n">location</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">MatchaInputError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">e</span>
+
+    <span class="k">if</span> <span class="n">MatchaConfigService</span><span class="o">.</span><span class="n">get_stack</span><span class="p">()</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">stack_set</span><span class="p">(</span><span class="s2">&quot;default&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Provision resource group and remote state storage</span>
+    <span class="n">remote_state_manager</span><span class="o">.</span><span class="n">provision_remote_state</span><span class="p">(</span><span class="n">location</span><span class="p">,</span> <span class="n">prefix</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">remote_state_manager</span><span class="o">.</span><span class="n">use_lock</span><span class="p">(),</span> <span class="n">remote_state_manager</span><span class="o">.</span><span class="n">use_remote_state</span><span class="p">():</span>
+        <span class="n">project_directory</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+        <span class="n">destination</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="n">project_directory</span><span class="p">,</span> <span class="s2">&quot;.matcha&quot;</span><span class="p">,</span> <span class="s2">&quot;infrastructure&quot;</span><span class="p">,</span> <span class="s2">&quot;resources&quot;</span>
+        <span class="p">)</span>
+
+        <span class="n">stack</span> <span class="o">=</span> <span class="n">MatchaConfigService</span><span class="o">.</span><span class="n">get_stack</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">stack</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">stack_name</span> <span class="o">=</span> <span class="n">stack</span><span class="o">.</span><span class="n">value</span>
+
+        <span class="n">template</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">pardir</span><span class="p">,</span>
+            <span class="s2">&quot;infrastructure&quot;</span><span class="p">,</span>
+            <span class="n">stack_name</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">azure_template</span> <span class="o">=</span> <span class="n">AzureTemplate</span><span class="p">(</span>
+            <span class="n">LLM_STACK</span> <span class="k">if</span> <span class="n">stack_name</span> <span class="o">==</span> <span class="n">StackType</span><span class="o">.</span><span class="n">LLM</span><span class="o">.</span><span class="n">value</span> <span class="k">else</span> <span class="n">DEFAULT_STACK</span>
+        <span class="p">)</span>
+
+        <span class="n">zenml_version</span> <span class="o">=</span> <span class="n">infer_zenml_version</span><span class="p">()</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">azure_template</span><span class="o">.</span><span class="n">build_template_configuration</span><span class="p">(</span>
+            <span class="n">location</span><span class="o">=</span><span class="n">location</span><span class="p">,</span>
+            <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span>
+            <span class="n">password</span><span class="o">=</span><span class="n">password</span><span class="p">,</span>
+            <span class="n">zenmlserver_version</span><span class="o">=</span><span class="n">zenml_version</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">azure_template</span><span class="o">.</span><span class="n">build_template</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">template</span><span class="p">,</span> <span class="n">destination</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
+
+        <span class="n">matcha_state_service</span> <span class="o">=</span> <span class="n">template_runner</span><span class="o">.</span><span class="n">provision</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="n">_show_terraform_outputs</span><span class="p">(</span><span class="n">matcha_state_service</span><span class="o">.</span><span class="n">_state</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">matcha_state_service</span><span class="o">.</span><span class="n">fetch_resources_from_state_file</span><span class="p">()</span>
+</code></pre></div></td></tr></table></div>
+          </details>
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h2 id="src.matcha_ml.core.core.remove_state_lock" class="doc doc-heading">
+          <span class="doc doc-object-name doc-function-name">remove_state_lock</span>
+
+
+</h2>
+<div class="highlight"><pre><span></span><code><span class="n">remove_state_lock</span><span class="p">()</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Unlock the remote state.</p>
+
+<details class="note" open>
+  <summary>Note</summary>
+  <p>The remote state is synced to a state file kept locally. The state will be locked when in use, and removing the
+state lock and making changes could result in a state file not consistent with what Matcha expects.</p>
+</details>
+          <details class="quote">
+            <summary>Source code in <code>src/matcha_ml/core/core.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">218</span>
+<span class="normal">219</span>
+<span class="normal">220</span>
+<span class="normal">221</span>
+<span class="normal">222</span>
+<span class="normal">223</span>
+<span class="normal">224</span>
+<span class="normal">225</span>
+<span class="normal">226</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">remove_state_lock</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Unlock the remote state.</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        The remote state is synced to a state file kept locally. The state will be locked when in use, and removing the</span>
+<span class="sd">        state lock and making changes could result in a state file not consistent with what Matcha expects.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">remote_state</span> <span class="o">=</span> <span class="n">RemoteStateManager</span><span class="p">()</span>
+    <span class="n">remote_state</span><span class="o">.</span><span class="n">unlock</span><span class="p">()</span>
+</code></pre></div></td></tr></table></div>
+          </details>
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h2 id="src.matcha_ml.core.core.stack_set" class="doc doc-heading">
+          <span class="doc doc-object-name doc-function-name">stack_set</span>
+
+
+</h2>
+<div class="highlight"><pre><span></span><code><span class="n">stack_set</span><span class="p">(</span><span class="n">stack_name</span><span class="p">)</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>A function for updating the stack type in the local matcha.config.json file.</p>
+<p>Note: This cannot be run once there are provisioned resources.</p>
+
+
+
+<p><strong>Examples:</strong></p>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">stack_set</span><span class="p">(</span><span class="n">stack_name</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">)</span>
+</code></pre></div>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>stack_name</code></td>
+          <td>
+                <code>str</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>the name of the type of stack to be specified in the config file.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><strong>Raises:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code><span title="matcha_ml.errors.MatchaInputError">MatchaInputError</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>if the stack_name is not a valid stack type</p>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+                <code><span title="matcha_ml.errors.MatchaError">MatchaError</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>if there are already resources provisioned.</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+          <details class="quote">
+            <summary>Source code in <code>src/matcha_ml/core/core.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">337</span>
+<span class="normal">338</span>
+<span class="normal">339</span>
+<span class="normal">340</span>
+<span class="normal">341</span>
+<span class="normal">342</span>
+<span class="normal">343</span>
+<span class="normal">344</span>
+<span class="normal">345</span>
+<span class="normal">346</span>
+<span class="normal">347</span>
+<span class="normal">348</span>
+<span class="normal">349</span>
+<span class="normal">350</span>
+<span class="normal">351</span>
+<span class="normal">352</span>
+<span class="normal">353</span>
+<span class="normal">354</span>
+<span class="normal">355</span>
+<span class="normal">356</span>
+<span class="normal">357</span>
+<span class="normal">358</span>
+<span class="normal">359</span>
+<span class="normal">360</span>
+<span class="normal">361</span>
+<span class="normal">362</span>
+<span class="normal">363</span>
+<span class="normal">364</span>
+<span class="normal">365</span>
+<span class="normal">366</span>
+<span class="normal">367</span>
+<span class="normal">368</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">stack_set</span><span class="p">(</span><span class="n">stack_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A function for updating the stack type in the local matcha.config.json file.</span>
+
+<span class="sd">    Note: This cannot be run once there are provisioned resources.</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; stack_set(stack_name=&#39;default&#39;)</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        stack_name (str): the name of the type of stack to be specified in the config file.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        MatchaInputError: if the stack_name is not a valid stack type</span>
+<span class="sd">        MatchaError: if there are already resources provisioned.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">RemoteStateManager</span><span class="p">()</span><span class="o">.</span><span class="n">is_state_provisioned</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="n">MatchaError</span><span class="p">(</span>
+            <span class="s2">&quot;The remote resources are already provisioned. Changing the stack now will not &quot;</span>
+            <span class="s2">&quot;change the remote state.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">stack_name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">StackType</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">MatchaInputError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stack_name</span><span class="si">}</span><span class="s2"> is not a valid stack type.&quot;</span><span class="p">)</span>
+
+    <span class="n">stack_enum</span> <span class="o">=</span> <span class="n">StackType</span><span class="p">(</span><span class="n">stack_name</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+
+    <span class="n">stack</span> <span class="o">=</span> <span class="n">MatchaConfigComponent</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;stack&quot;</span><span class="p">,</span>
+        <span class="n">properties</span><span class="o">=</span><span class="p">[</span><span class="n">MatchaConfigComponentProperty</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">stack_enum</span><span class="o">.</span><span class="n">value</span><span class="p">)],</span>
+    <span class="p">)</span>
+
+    <span class="n">MatchaConfigService</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">stack</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+          </details>
+  </div>
+
+</div>
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"/></svg>
+            Back to top
+          </button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; <a href="https://fuzzylabs.ai">Fuzzy Labs Ltd</a>
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        <div class="md-social">
+  
+    
+    
+    
+    
+    <a href="https://www.linkedin.com/company/fuzzy-labs/" target="_blank" rel="noopener" title="Fuzzy Labs on LinkedIn" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M416 32H31.9C14.3 32 0 46.5 0 64.3v383.4C0 465.5 14.3 480 31.9 480H416c17.6 0 32-14.5 32-32.3V64.3c0-17.8-14.4-32.3-32-32.3zM135.4 416H69V202.2h66.5V416zm-33.2-243c-21.3 0-38.5-17.3-38.5-38.5S80.9 96 102.2 96c21.2 0 38.5 17.3 38.5 38.5 0 21.3-17.2 38.5-38.5 38.5zm282.1 243h-66.4V312c0-24.8-.5-56.7-34.5-56.7-34.6 0-39.9 27-39.9 54.9V416h-66.4V202.2h63.7v29.2h.9c8.9-16.8 30.6-34.5 62.9-34.5 67.2 0 79.7 44.3 79.7 101.9V416z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+    <a href="https://www.twitter.com/fuzzylabsai/" target="_blank" rel="noopener" title="Fuzzy Labs on Twitter" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M459.37 151.716c.325 4.548.325 9.097.325 13.645 0 138.72-105.583 298.558-298.558 298.558-59.452 0-114.68-17.219-161.137-47.106 8.447.974 16.568 1.299 25.34 1.299 49.055 0 94.213-16.568 130.274-44.832-46.132-.975-84.792-31.188-98.112-72.772 6.498.974 12.995 1.624 19.818 1.624 9.421 0 18.843-1.3 27.614-3.573-48.081-9.747-84.143-51.98-84.143-102.985v-1.299c13.969 7.797 30.214 12.67 47.431 13.319-28.264-18.843-46.781-51.005-46.781-87.391 0-19.492 5.197-37.36 14.294-52.954 51.655 63.675 129.3 105.258 216.365 109.807-1.624-7.797-2.599-15.918-2.599-24.04 0-57.828 46.782-104.934 104.934-104.934 30.213 0 57.502 12.67 76.67 33.137 23.715-4.548 46.456-13.32 66.599-25.34-7.798 24.366-24.366 44.833-46.132 57.827 21.117-2.273 41.584-8.122 60.426-16.243-14.292 20.791-32.161 39.308-52.628 54.253z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    <script id="__config" type="application/json">{"base": "..", "features": ["content.code.copy", "navigation.top"], "search": "../assets/javascripts/workers/search.dfff1995.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.78eede0e.min.js"></script>
+      
+    
+  <script>document$.subscribe(() => {const lightbox = GLightbox({"touchNavigation": true, "loop": false, "zoomable": true, "draggable": true, "openEffect": "zoom", "closeEffect": "zoom", "slideEffect": "slide"});})</script></body>
+</html>

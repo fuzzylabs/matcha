@@ -1,0 +1,874 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="provision your MLOps stack to Azure in one step">
+      
+      
+      
+      
+        <link rel="prev" href="..">
+      
+      
+        <link rel="next" href="../workflows/">
+      
+      
+      <link rel="icon" href="../img/favicon.png">
+      <meta name="generator" content="mkdocs-1.5.2, mkdocs-material-9.2.3">
+    
+    
+      
+        <title>Deploying your first model - Open source MLOps on Azure in one step</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.0e669242.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../css/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+   <link href="../assets/stylesheets/glightbox.min.css" rel="stylesheet"/><style>
+        html.glightbox-open { overflow: initial; height: 100%; }
+        .gslide-title { margin-top: 0px; user-select: text; }
+        .gslide-desc { color: #666; user-select: text; }
+        .gslide-image img { background: white; }
+        
+            .gscrollbar-fixer { padding-right: 15px; }
+            .gdesc-inner { font-size: 0.75rem; }
+            body[data-md-color-scheme="slate"] .gdesc-inner { background: var(--md-default-bg-color);}
+            body[data-md-color-scheme="slate"] .gslide-title { color: var(--md-default-fg-color);}
+            body[data-md-color-scheme="slate"] .gslide-desc { color: var(--md-default-fg-color);}
+            </style> <script src="../assets/javascripts/glightbox.min.js"></script></head>
+  
+  
+    <body dir="ltr">
+  
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var key of Object.keys(palette.color))document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#deploying-your-first-model-with-matcha" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Open source MLOps on Azure in one step" class="md-header__button md-logo" aria-label="Open source MLOps on Azure in one step" data-md-component="logo">
+      
+  <img src="../img/logo-white.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Open source MLOps on Azure in one step
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Deploying your first model
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/fuzzylabs/matcha" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    fuzzylabs/matcha-ml
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Open source MLOps on Azure in one step" class="md-nav__button md-logo" aria-label="Open source MLOps on Azure in one step" data-md-component="logo">
+      
+  <img src="../img/logo-white.png" alt="logo">
+
+    </a>
+    Open source MLOps on Azure in one step
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/fuzzylabs/matcha" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    fuzzylabs/matcha-ml
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Introduction
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Getting started
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Getting started
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Deploying your first model
+  </span>
+  
+
+      </a>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Concepts
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Concepts
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../workflows/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Workflows
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../azure-permissions/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Azure Permissions
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../costings/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Azure Costs
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Inside Matcha
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Inside Matcha
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../inside-matcha/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    How does Matcha work
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../resource-stacks/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Resource stacks
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../privacy/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Why we collect usage data
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Tools
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            Tools
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data-version-control/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Data Version Control
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../references/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    API Reference
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+<h1 id="deploying-your-first-model-with-matcha">Deploying your first model with Matcha</h1>
+<p>In this guide, we'll walk you through how to provision your first machine learning infrastructure to Azure, and then use that infrastructure to train and deploy a model. The model we're using is a movie recommender, and we picked this because it's one that beginners can get up and running with quickly.</p>
+<p>There are two ways to interact with Matcha; via the CLI tool, or through the API. Throughout this guide we'll demonstrate how to get started using either method.</p>
+<p>There are five things we'll cover:</p>
+<ul>
+<li><a href="#pre-requisites">Pre-requisites</a>: everything you need to set up before starting.</li>
+<li><a href="#the-movie-recommender">The movie recommender</a>: downloading the example code and setting up your Python environment</li>
+<li><a href="#provisioning">Provisioning</a>: Using Matcha to provision your infrastructure</li>
+<li><a href="#sharing-resources">Sharing Resources</a>: Sharing resources with other people</li>
+<li><a href="#training-and-deploying">Training and deploying</a>: training a model on your provisioned infrastructure, deploying, and testing it</li>
+<li><a href="#destroying">Destroying</a>: tearing down provisioned infrastructure</li>
+</ul>
+<p>The movie recommender is one among several of example workflows that we've made available on Github; you can view all our examples <a href="https://github.com/fuzzylabs/matcha-examples">here</a>.</p>
+<blockquote>
+<p>Note: Matcha is still in alpha release. While we've worked hard to ensure there are no defects, there's a small chance that you'll find a bug or something that hasn't been documented as well as it could be. If that happens, we'd really value your feedback, which you can send by submitting an issue to Matcha on Github.</p>
+</blockquote>
+<h1 id="pre-requisites">Pre-requisites</h1>
+<h2 id="an-azure-cloud-environment">An Azure cloud environment</h2>
+<p>Matcha uses Azure to provision your infrastructure, so first you'll need to set up a <a href="https://azure.com">Microsoft® Azure account</a>.</p>
+<h2 id="tools-youll-need">Tools you'll need</h2>
+<p>Next, you'll need to install a couple of things.</p>
+<ul>
+<li>Python 3.8 or newer, along with Virtual Env and PIP.</li>
+<li>The Azure command line tool. Instructions on installing this can be found <a href="https://learn.microsoft.com/en-us/cli/azure/install-azure-cli">here</a>.</li>
+<li>Docker. This is used to build images locally, before running them on Azure. Instructions for installing Docker can be found <a href="https://www.docker.com/">here</a>. The Docker daemon will need to be running on your system.</li>
+<li>Terraform. We use this to provision services inside Azure. You'll find installation instructions for your platform <a href="https://developer.hashicorp.com/terraform/downloads?product_intent=terraform">here</a>. We recommend version 1.4 or newer.</li>
+</ul>
+<h1 id="the-movie-recommender">The movie recommender</h1>
+<p>Matcha has an <a href="https://github.com/fuzzylabs/matcha-examples">examples repository</a> on Github, and that's what we'll be working from in this guide. There are a number of different examples in that repository, but we'll focus on the movie recommender. Note, however, that all the examples have been designed to work in much the same way as this one.</p>
+<p>Start by cloning the examples repository:</p>
+<pre><code class="language-bash">git clone https://github.com/fuzzylabs/matcha-examples.git
+</code></pre>
+<p>Then, enter the <code>recommendation</code> directory and set up your Python environment:</p>
+<pre><code class="language-bash">cd recommendation
+python3 -m venv venv
+source venv/bin/activate
+</code></pre>
+<p>Now, let's install Matcha:</p>
+<pre><code class="language-bash">pip install matcha-ml
+</code></pre>
+<p>You can test that your installation is working by running</p>
+<pre><code class="language-bash">matcha --version
+</code></pre>
+<p>Which should reply with something like <code>Matcha version: &lt;version number&gt;</code>.</p>
+<p>Now you're ready to provision your infrastructure.</p>
+<h1 id="provisioning">Provisioning</h1>
+<p>Using the Azure CLI, you will need to authenticate:</p>
+<pre><code class="language-bash">az login
+</code></pre>
+<p>When you run this command, you'll be taken to the Azure login screen in a web browser window, and you'll be asked if you want to allow the Azure CLI to access your Azure account. You'll need to grant this permission in order for Matcha to gain access to your Azure account when it provisions infrastructure.</p>
+<blockquote>
+<p>Note: you'll need certain permissions for Matcha to work. If you're unsure, you can run <code>matcha provision</code> and if your Azure account is missing the required permissions, the <code>provision</code> command will tell you. For specifics around permissions, please see our explainer on <a href="../azure-permissions/">Azure Permissions</a>.</p>
+</blockquote>
+<p>Next, let's provision:</p>
+<p>CLI:</p>
+<pre><code class="language-bash">matcha provision
+</code></pre>
+<blockquote>
+<p>Note: users have the choice of passing optional arguments representing the location, prefix, and password parameters by using '--location', '--prefix', or '--password'. For example; <code>--location uksouth --prefix test123 --password strong_password</code>. </p>
+</blockquote>
+<p>API:</p>
+<pre><code class="language-python">import matcha_ml.core as matcha
+
+matcha_state_object: MatchaState = matcha.provision(location=&quot;uksouth&quot;, prefix=&quot;test123&quot;, password=&quot;strong_password&quot;)
+</code></pre>
+<p>Initially, Matcha will ask you a few questions about how you'd like your infrastructure to be set up. Specifically, it will ask for a <em>location</em> for your infrastructure, a <em>prefix</em> to deploy it to. Once these details are provided, Matcha will proceed to initialize a remote state manager and ask for a password. After that, it will go ahead of provision infrastructure.</p>
+<blockquote>
+<p>Note: provisioning can take up to 20 minutes.</p>
+</blockquote>
+<p>Once provisioning is completed, you can query Matcha, using the <code>get</code> command:</p>
+<p>CLI:</p>
+<pre><code class="language-bash">matcha get
+</code></pre>
+<p>You should have something similar to the following output:</p>
+<pre><code class="language-bash">Cloud
+   - flavor: azure
+   - resource-group-name: example-resources
+
+Container registry
+   - flavor: azure
+   - registry-name: crexample
+   - registry-url: &lt;url&gt;
+
+Experiment tracker
+   - flavor: mlflow
+   - tracking-url: &lt;url&gt;
+
+Model deployer
+   - flavor: seldon
+   - base-url: &lt;url&gt;
+   - workloads-namespace: matcha-seldon-workloads
+
+Orchestrator
+   - flavor: aks
+   - k8s-context: terraform-example-k8s
+
+Pipeline
+   - flavor: zenml
+   - connection-string: ********
+   - server-password: ********
+   - server-url: &lt;url&gt;
+   - server-username: ********
+   - storage-path: az://&lt;path&gt;
+
+Data version control
+    - flavor: FLAVOR
+    - connection-string: ********
+    - account-name: &lt;account_name&gt;
+    - container-name: &lt;container_name&gt;
+</code></pre>
+<p>You can also use <code>get</code> to inspect specific resources, for example:</p>
+<pre><code class="language-bash">matcha get experiment-tracker
+</code></pre>
+<p>With the following output:</p>
+<pre><code class="language-bash">Below are the resources provisioned.
+
+Experiment tracker
+   - flavor: mlflow
+   - tracking-url: &lt;url&gt;
+</code></pre>
+<blockquote>
+<p>Note: You can also get these outputs in either json or YAML format using the following: <code>matcha get --output json</code></p>
+</blockquote>
+<p>By default, Matcha will hide sensitive resource properties. If you need one of these properties, then you can add the <code>--show-sensitive</code> flag to your <code>get</code> command.</p>
+<p>API:</p>
+<pre><code class="language-python">import matcha_ml.core as matcha
+
+matcha_state_object: MatchaState = matcha.get() 
+</code></pre>
+<p>As with the CLI tool, users have the ability to 'get' specific resources by passing optional <code>resource_name</code> and <code>property_name</code> arguments to the get function, as demonstrated below:</p>
+<pre><code class="language-python">import matcha_ml.core as matcha
+
+matcha_state_object: MatchaState = matcha.get(resource_name=&quot;experiment_tracker&quot;, property_name=&quot;flavor&quot;)
+</code></pre>
+<blockquote>
+<p>Note: the <code>get()</code> method will return a <code>MatchaState</code> object which represents the provisioned state. The <code>MatchaState</code> object contains the <code>get_component()</code> method, which will return (where applicable) a <code>MatchaStateComponent</code> object representing the specified Matcha state component. In turn, each <code>MatchaStateComponent</code> object has a <code>find_property()</code> method that will allow the user to be able to access individual component properties.</p>
+</blockquote>
+<h1 id="sharing-resources">&#129309; Sharing resources</h1>
+<p>You'll notice that a configuration file is create as part of the provisioning process - it's called <code>matcha.config.json</code>. This file stores the information necessary for Matcha to identify the resource group and storage container that holds the details of the provisioned resources.</p>
+<p>When Matcha provision first runs, it creates a storage blob in Azure which holds details of the provisioned environment. For more detail, please see our <a href="../inside-matcha/">Inside Matcha &gt; How does Matcha work</a> section.</p>
+<p>In order to access your provisioned resources, other users will need to ensure this configuration file exists locally, in the same directory where the file was originally created. We suggest that the matcha.config.json file be included within the project repository and shared using GitHub or similar repository hosting tools. The user will also have to:</p>
+<ol>
+<li>Set the active Azure subscription to the one that contains the resource group.</li>
+<li>Ensure they have access to both the resource group and the storage bucket.</li>
+</ol>
+<blockquote>
+<p>Note: the shared file does not contain any sensitive information such as passwords or server endpoints.</p>
+</blockquote>
+<p>Matcha uses this file to find and pull the provisioned state information, which will allow multiple users to use the same provisioned resources.</p>
+<div align="center">
+    <a class="glightbox" href="/img/getting-started/shared-state.png" data-type="image" data-width="100%" data-height="auto" data-desc-position="bottom"><img src="/img/getting-started/shared-state.png" width="400"></a></img>
+</div>
+
+<h1 id="training-and-deploying">Training and deploying</h1>
+<p>Now that you've reached this point, you'll have provisioned the following infrastructure into Azure:</p>
+<ul>
+<li>The MLFlow experiment tracker and model registry.</li>
+<li>Seldon for model deployment and serving.</li>
+<li>A ZenML server. This example uses ZenML for defining and orchestrating the training and deployment pipelines.</li>
+<li>Kubernetes. This has two roles: firstly, it's where the training workload actually runs, and secondly it's the deployment environment for all of the above components.</li>
+<li>A storage container for versioning and storing data. For details on how to set this up, see <a href="../data-version-control/">here</a>.</li>
+</ul>
+<h2 id="setup">Setup</h2>
+<h2 id="setting-up">Setting up</h2>
+<p>Before you can train the model, there's a little setup to do. We've provided a convenient script that does this for you:</p>
+<pre><code class="language-bash">./setup.sh
+</code></pre>
+<p>You might wonder why this setup step is necessary, and what it's doing. While you've already set Matcha up, the code that will train the model needs to know a few things about your infrastructure before it can run. As you've seen, <code>matcha get</code> is what's used to query information about your infrastructure. Under the hood, the setup script for the movie recommender model actually invokes <code>matcha get</code> to find out everything it needs to know. Additionally, this script installs some Python dependencies that are specific to the machine learning task that we're working with; crucially, the <em>Surprise</em> library, which is part of Scikit-learn, which we're using to do the recommendation bit itself.</p>
+<h2 id="training">Training</h2>
+<p>Once the setup script completes, you're ready to train the model:</p>
+<pre><code class="language-bash">python run.py --train
+</code></pre>
+<h2 id="experiment-tracking">Experiment tracking</h2>
+<p>Training won't take too long. After it finishes, you'll be able to view the details of this training run in MLFlow. First, look up the URL to MLFlow:</p>
+<pre><code class="language-bash">matcha get experiment-tracker
+</code></pre>
+<p>Copy the tracking URL into a web browser. Then, from the <code>experiments</code> pane on the left-hand side of the MLFlow interface, you'll be able to select <code>recommendation_pipeline</code>. Each time the training pipeline runs, it will be logged here, so you can view historical runs alongside important details such as the training parameters or the model performance.</p>
+<p><a class="glightbox" href="../img/getting-started/recommendation-example-mlflow.png" data-type="image" data-width="100%" data-height="auto" data-desc-position="bottom"><img alt="Screenshot of the MLFlow user interface showing the recommendation pipeline runs" src="../img/getting-started/recommendation-example-mlflow.png" /></a></p>
+<h2 id="deploying">Deploying</h2>
+<p>Your model has been trained, but we can't interact with it until it has been deployed. Alongside the training pipeline, the movie recommender example includes a deployment pipeline, which will result in the model being deployed to Seldon, and made accessible as a web service.</p>
+<p>Run</p>
+<pre><code class="language-bash">python run.py --deploy
+</code></pre>
+<p>Once this has completed, you can test the model out. We've included a convenience script to help with this, called <code>inference.py</code>:</p>
+<pre><code class="language-bash">python inference.py --user 100 --movie 100
+</code></pre>
+<p>This will result in a score, which represents how strongly we recommend movie ID <code>100</code> to user ID <code>100</code>.</p>
+<h2 id="destroying">Destroying</h2>
+<p>The final thing you'll want to do is decommission the infrastructure that Matcha has set up during this guide. Matcha includes a <code>destroy</code> command which will remove everything that has been provisioned, which avoids running up an Azure bill!</p>
+<p>CLI:</p>
+<pre><code class="language-bash">matcha destroy
+</code></pre>
+<p>API:</p>
+<pre><code class="language-python">import matcha_ml.core as matcha
+
+matcha.destroy()
+</code></pre>
+<blockquote>
+<p>Note: that this command is irreversible will remove all the resources deployed by <code>matcha provision</code> including the resource group, so make sure you save any data you wish to keep before running this command.</p>
+<p>You may also notice that an additional resource has appeared in Azure called 'NetworkWatcherRG' (if it wasn't already there). This is a resource that is automatically provisioned by Azure in each region when there is in-coming traffic to a provisioned resource and isn't controlled by Matcha. More information can be found <a href="https://learn.microsoft.com/en-us/azure/network-watcher/network-watcher-monitoring-overview">here</a> on how to manage or remove this resource.</p>
+</blockquote>
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"/></svg>
+            Back to top
+          </button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; <a href="https://fuzzylabs.ai">Fuzzy Labs Ltd</a>
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        <div class="md-social">
+  
+    
+    
+    
+    
+    <a href="https://www.linkedin.com/company/fuzzy-labs/" target="_blank" rel="noopener" title="Fuzzy Labs on LinkedIn" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M416 32H31.9C14.3 32 0 46.5 0 64.3v383.4C0 465.5 14.3 480 31.9 480H416c17.6 0 32-14.5 32-32.3V64.3c0-17.8-14.4-32.3-32-32.3zM135.4 416H69V202.2h66.5V416zm-33.2-243c-21.3 0-38.5-17.3-38.5-38.5S80.9 96 102.2 96c21.2 0 38.5 17.3 38.5 38.5 0 21.3-17.2 38.5-38.5 38.5zm282.1 243h-66.4V312c0-24.8-.5-56.7-34.5-56.7-34.6 0-39.9 27-39.9 54.9V416h-66.4V202.2h63.7v29.2h.9c8.9-16.8 30.6-34.5 62.9-34.5 67.2 0 79.7 44.3 79.7 101.9V416z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+    <a href="https://www.twitter.com/fuzzylabsai/" target="_blank" rel="noopener" title="Fuzzy Labs on Twitter" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M459.37 151.716c.325 4.548.325 9.097.325 13.645 0 138.72-105.583 298.558-298.558 298.558-59.452 0-114.68-17.219-161.137-47.106 8.447.974 16.568 1.299 25.34 1.299 49.055 0 94.213-16.568 130.274-44.832-46.132-.975-84.792-31.188-98.112-72.772 6.498.974 12.995 1.624 19.818 1.624 9.421 0 18.843-1.3 27.614-3.573-48.081-9.747-84.143-51.98-84.143-102.985v-1.299c13.969 7.797 30.214 12.67 47.431 13.319-28.264-18.843-46.781-51.005-46.781-87.391 0-19.492 5.197-37.36 14.294-52.954 51.655 63.675 129.3 105.258 216.365 109.807-1.624-7.797-2.599-15.918-2.599-24.04 0-57.828 46.782-104.934 104.934-104.934 30.213 0 57.502 12.67 76.67 33.137 23.715-4.548 46.456-13.32 66.599-25.34-7.798 24.366-24.366 44.833-46.132 57.827 21.117-2.273 41.584-8.122 60.426-16.243-14.292 20.791-32.161 39.308-52.628 54.253z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    <script id="__config" type="application/json">{"base": "..", "features": ["content.code.copy", "navigation.top"], "search": "../assets/javascripts/workers/search.dfff1995.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.78eede0e.min.js"></script>
+      
+    
+  <script>document$.subscribe(() => {const lightbox = GLightbox({"touchNavigation": true, "loop": false, "zoomable": true, "draggable": true, "openEffect": "zoom", "closeEffect": "zoom", "slideEffect": "slide"});})</script></body>
+</html>
