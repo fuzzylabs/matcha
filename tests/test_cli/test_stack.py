@@ -1,6 +1,7 @@
 """Test suit to test the stack command and all its subcommands."""
 
 import os
+from unittest.mock import MagicMock, patch
 
 from typer.testing import CliRunner
 
@@ -8,7 +9,7 @@ from matcha_ml.cli.cli import app
 from matcha_ml.config import MatchaConfig, MatchaConfigService
 from matcha_ml.state.remote_state_manager import RemoteStateManager
 
-INTERNAL_FUNCTION_STUB = "matcha_ml.core"
+INTERNAL_FUNCTION_STUB = "matcha_ml.core.core"
 
 
 def test_cli_stack_command_help_option(runner: CliRunner) -> None:
@@ -158,3 +159,56 @@ def test_stack_set_file_modified(
     assert "stack" in new_config_dict
     assert new_config_dict["stack"]["name"] == "llm"
     assert config_dict.items() <= new_config_dict.items()
+
+
+def test_cli_stack_set_remove_help_option(runner: CliRunner) -> None:
+    """Tests the --help option for the cli stack remove sub-command.
+
+    Args:
+        runner (CliRunner): typer CLI runner.
+    """
+    result = runner.invoke(app, ["stack", "remove", "--help"])
+
+    assert result.exit_code == 0
+
+    assert "Remove a module from the current Matcha stack." in result.stdout
+
+
+def test_cli_stack_remove_command_without_args(runner: CliRunner) -> None:
+    """Tests the --help option for the cli stack remove sub-command.
+
+    Args:
+        runner (CliRunner): typer CLI runner.
+    """
+    result = runner.invoke(app, ["stack", "remove"])
+
+    assert result.exit_code == 0
+
+    assert (
+        "No module specified. Please run `matcha stack remove` again and provide the name\nof the module you wish to remove.\n"
+        in result.stdout
+    )
+
+
+@patch(f"{INTERNAL_FUNCTION_STUB}.stack_remove")
+def test_cli_stack_remove_command_with_args(
+    mocked_stack_remove: MagicMock,
+    matcha_testing_directory: str,
+    runner: CliRunner,
+) -> None:
+    """Tests the cli stack set sub-command with args.
+
+    Args:
+        mocked_stack_remove (MagicMock): a mocked stack_remove function.
+        matcha_testing_directory (str): a temporary working directory.
+        runner (CliRunner): typer CLI runner.
+    """
+    os.chdir(matcha_testing_directory)
+    result = runner.invoke(app, ["stack", "remove", "experiment_tracker"])
+
+    assert result.exit_code == 0
+    assert mocked_stack_remove.assert_called_once
+    assert (
+        "Matcha 'experiment_tracker' module has been removed from the current stack."
+        in result.stdout
+    )

@@ -23,6 +23,7 @@ from matcha_ml.cli.ui.status_message_builders import (
     build_step_success_status,
 )
 from matcha_ml.cli.ui.user_approval_functions import is_user_approved
+from matcha_ml.core.core import stack_remove
 from matcha_ml.errors import MatchaError, MatchaInputError
 
 app = typer.Typer(no_args_is_help=True, pretty_exceptions_show_locals=False)
@@ -265,22 +266,34 @@ def set(stack: str = typer.Argument("default")) -> None:
         print_error(str(e))
         raise typer.Exit()
 
+
 @stack_app.command(help="Remove a module from the current Matcha stack.")
-def remove(module: str = typer.Argument(None)):
+def remove(module: str = typer.Argument(None)) -> None:
     """Remove a module from the current Matcha stack.
 
     Args:
         module (str): the name of the module to be removed.
     """
-    try:
-        core.stack_remove(module)
-        print_status(build_status(f"Matcha '{module}' module has been removed from the current stack."))
-    except MatchaInputError as e:
-        print_error(str(e))
+    if module:
+        try:
+            stack_remove(module)
+            print_status(
+                build_status(
+                    f"Matcha '{module}' module has been removed from the current stack."
+                )
+            )
+        except MatchaInputError as e:
+            print_error(str(e))
+            raise typer.Exit()
+        except MatchaError as e:
+            print_error(str(e))
+            raise typer.Exit()
+    else:
+        print_error(
+            "No module specified. Please run `matcha stack remove` again and provide the name of the module you wish to remove."
+        )
         raise typer.Exit()
-    except MatchaError as e:
-        print_error(str(e))
-        raise typer.Exit()
+
 
 if __name__ == "__main__":
     app()
