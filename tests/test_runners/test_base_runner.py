@@ -168,17 +168,3 @@ def test_destroy_terraform(capsys: SysCapture):
             str(exc_info.value)
             == "Terraform failed because of the following error: 'Destroy failed'."
         )
-
-
-def test_provision():
-    """Test provision function in BaseRunner class raises NotImplemented exception."""
-    template_runner = BaseRunner()
-    with pytest.raises(NotImplementedError):
-        template_runner.provision()
-
-
-def test_deprovision():
-    """Test deprovision function in BaseRunner class raises NotImplemented exception."""
-    template_runner = BaseRunner()
-    with pytest.raises(NotImplementedError):
-        template_runner.deprovision()
