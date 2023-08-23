@@ -21,6 +21,13 @@ STATE_RESOURCE_MSG = [
     ("Matcha State Container", "A storage container for tracking matcha state"),
 ]
 
+LLM_STACK_RESOURCES = [("ChromaDB", "A vector database for document retrieval")]
+
+STACK_RESOURCE_MSG_DICT = {
+    "DEFAULT": RESOURCE_MSG,
+    "LLM": RESOURCE_MSG + LLM_STACK_RESOURCES,
+}
+
 INFRA_FACTS = [
     "Did you know that Matcha tea was created by accident?",
     "The brewing temperature of the water affects the taste of Matcha",
