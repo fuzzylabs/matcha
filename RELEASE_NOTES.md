@@ -1,3 +1,21 @@
+# v0.2.9
+
+This is a minor release to address a bug and improve documentation based on the changes introduced in v0.2.8.
+
+Date: 23rd August 2023
+
+## Bug Fixes
+
+* Fixed a circular import bug ([#201](https://github.com/fuzzylabs/matcha/pull/201))
+
+## Documentation
+
+* Adds API-based examples to the getting started guide ([#119](https://github.com/fuzzylabs/matcha/pull/199))
+
+See all changes here: https://github.com/fuzzylabs/matcha/compare/v0.2.8...v0.2.9
+
+---
+
 # Stacks 📚
 
 LLMs are all the rage at the moment, with new and improved models being released almost daily. These models are quite large (as implied by the name) and cannot be hosted on standard personal computers, therefore we need to use cloud infrastructure to manage and deploy these models. However, standing up and managing these cloud resources isn't typically the forte of a lot of those interested in LLMs.

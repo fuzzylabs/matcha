@@ -4,6 +4,8 @@ from typing import List, Optional, Set, Union
 
 from typer import BadParameter
 
+from matcha_ml.cli.ui.print_messages import print_status
+from matcha_ml.cli.ui.status_message_builders import build_status
 from matcha_ml.core._validation import is_valid_prefix, is_valid_region
 from matcha_ml.errors import MatchaInputError
 from matcha_ml.services import AzureClient
@@ -66,6 +68,7 @@ def region_typer_callback(region: str) -> str:
     Returns:
         str: the region after checks are passed.
     """
+    print_status(build_status("Validating region selection with Azure..."))
     if not region:
         return region
 
@@ -90,6 +93,7 @@ def prefix_typer_callback(prefix: str) -> str:
     Returns:
         str: if valid, the prefix is returned.
     """
+    print_status(build_status("Validating prefix selection with Azure..."))
     if not prefix:
         return prefix
 
