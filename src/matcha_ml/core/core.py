@@ -366,3 +366,7 @@ def stack_set(stack_name: str) -> None:
     )
 
     MatchaConfigService.update(stack)
+
+def stack_remove(module_name: str) -> str:
+    """A placeholder for the stack remove logic in core."""
+    return module_name

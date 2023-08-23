@@ -265,6 +265,22 @@ def set(stack: str = typer.Argument("default")) -> None:
         print_error(str(e))
         raise typer.Exit()
 
+@stack_app.command(help="Remove a module from the current Matcha stack.")
+def remove(module: str = typer.Argument(None)):
+    """Remove a module from the current Matcha stack.
+
+    Args:
+        module (str): the name of the module to be removed.
+    """
+    try:
+        core.stack_remove(module)
+        print_status(build_status(f"Matcha '{module}' module has been removed from the current stack."))
+    except MatchaInputError as e:
+        print_error(str(e))
+        raise typer.Exit()
+    except MatchaError as e:
+        print_error(str(e))
+        raise typer.Exit()
 
 if __name__ == "__main__":
     app()
