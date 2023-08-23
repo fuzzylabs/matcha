@@ -379,3 +379,25 @@ def test_cli_provision_command_with_password_mismatch(
     assert "Error: The two entered values do not match." in result.stdout
 
     mock_use_lock.assert_not_called()
+
+
+def test_cli_stack_message_on_provision_llm(
+    runner: CliRunner, matcha_testing_directory: str
+):
+    """Test that the stack message is updated if one of the predefined stack is chosen.
+
+    Args:
+        runner (CliRunner): typer CLI runner
+        matcha_testing_directory (str): temporary working directory
+    """
+    os.chdir(matcha_testing_directory)
+
+    runner.invoke(app, ["stack", "set", "llm"])
+    result = runner.invoke(
+        app, ["provision"], input="uksouth\nrand\nvalid\ndefault\ndefault\n"
+    )
+
+    assert result.exit_code == 0
+
+    assert "ChromaDB" in result.stdout
+    assert "llm-stack"
