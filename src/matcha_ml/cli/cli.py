@@ -266,5 +266,19 @@ def set(stack: str = typer.Argument("default")) -> None:
         raise typer.Exit()
 
 
+@stack_app.command(help="Add a module to the stack.")
+def add(stack_module: str) -> None:
+    """Add a module to the stack for Matcha to provision.
+
+    Args:
+        stack_module (str): the name of the module to add (e.g. 'seldon')
+    """
+    ...
+    # PLACEHOLDER IMPLEMENTATION
+    # try:
+    #   core.stack_add(stack_module)
+    # except MatchaInputError as e:
+
+
 if __name__ == "__main__":
     app()

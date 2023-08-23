@@ -1,7 +1,7 @@
 """Run terraform templates to provision and deprovision resources."""
 import os
 from multiprocessing.pool import ThreadPool
-from typing import Optional, Tuple
+from typing import Optional
 
 import typer
 
