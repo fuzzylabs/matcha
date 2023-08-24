@@ -379,3 +379,8 @@ def stack_add(module: str) -> None:
         MatchaError: if there are already resources provisioned.
     """
     ...
+
+
+def stack_remove(module_name: str) -> str:
+    """A placeholder for the stack remove logic in core."""
+    return module_name
