@@ -367,6 +367,20 @@ def stack_set(stack_name: str) -> None:
 
     MatchaConfigService.update(stack)
 
+
+def stack_add(module: str) -> None:
+    """A function for adding a module by name to the stack.
+
+    Args:
+        module (str): The name of the module to add.
+
+    Raises:
+        MatchaInputError: if the stack_name is not a valid stack type
+        MatchaError: if there are already resources provisioned.
+    """
+    ...
+
+
 def stack_remove(module_name: str) -> str:
     """A placeholder for the stack remove logic in core."""
     return module_name

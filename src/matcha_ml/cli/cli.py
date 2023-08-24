@@ -23,7 +23,7 @@ from matcha_ml.cli.ui.status_message_builders import (
     build_step_success_status,
 )
 from matcha_ml.cli.ui.user_approval_functions import is_user_approved
-from matcha_ml.core.core import stack_remove
+from matcha_ml.core.core import stack_add, stack_remove
 from matcha_ml.errors import MatchaError, MatchaInputError
 
 app = typer.Typer(no_args_is_help=True, pretty_exceptions_show_locals=False)
@@ -264,6 +264,34 @@ def set(stack: str = typer.Argument("default")) -> None:
         raise typer.Exit()
     except MatchaError as e:
         print_error(str(e))
+        raise typer.Exit()
+
+
+@stack_app.command(help="Add a module to the stack.")
+def add(module: str = typer.Argument(None)) -> None:
+    """Add a module to the stack for Matcha to provision.
+
+    Args:
+        module (str): the name of the module to add (e.g. 'seldon').
+    """
+    if module:
+        try:
+            stack_add(module)
+            print_status(
+                build_status(
+                    f"Matcha '{module}' module has been added to the current stack."
+                )
+            )
+        except MatchaInputError as e:
+            print_error(str(e))
+            raise typer.Exit()
+        except MatchaError as e:
+            print_error(str(e))
+            raise typer.Exit()
+    else:
+        print_error(
+            "No module specified. Please run `matcha stack add` again and provide the name of the module you wish to add."
+        )
         raise typer.Exit()
 
 
