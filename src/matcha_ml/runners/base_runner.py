@@ -1,7 +1,8 @@
 """Run terraform templates to provision and deprovision resources."""
 import os
+from abc import abstractmethod
 from multiprocessing.pool import ThreadPool
-from typing import Optional, Tuple
+from typing import Any, Optional
 
 import typer
 
@@ -18,7 +19,6 @@ from matcha_ml.services.terraform_service import (
     TerraformConfig,
     TerraformService,
 )
-from matcha_ml.state.matcha_state import MatchaStateService
 
 SPINNER = "dots"
 
@@ -183,10 +183,12 @@ class BaseRunner:
             if tf_result.return_code != 0:
                 raise MatchaTerraformError(tf_error=tf_result.std_err)
 
-    def provision(self) -> MatchaStateService:
+    @abstractmethod
+    def provision(self) -> Any:
         """Provision resources required for the deployment."""
-        raise NotImplementedError
+        pass
 
-    def deprovision(self) -> None:
+    @abstractmethod
+    def deprovision(self) -> Any:
         """Destroy the provisioned resources."""
-        raise NotImplementedError
+        pass
