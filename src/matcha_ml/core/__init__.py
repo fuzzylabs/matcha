@@ -6,6 +6,7 @@ from .core import (
     get,
     provision,
     remove_state_lock,
+    stack_add,
     stack_set,
 )
 
@@ -17,4 +18,5 @@ __all__ = [
     "destroy",
     "provision",
     "stack_set",
+    "stack_add",
 ]

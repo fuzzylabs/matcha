@@ -1,6 +1,7 @@
 """Test suit to test the stack command and all its subcommands."""
 
 import os
+from unittest.mock import patch
 
 from typer.testing import CliRunner
 
@@ -158,3 +159,53 @@ def test_stack_set_file_modified(
     assert "stack" in new_config_dict
     assert new_config_dict["stack"]["name"] == "llm"
     assert config_dict.items() <= new_config_dict.items()
+
+
+def test_cli_stack_set_add_help_option(runner: CliRunner) -> None:
+    """Tests the --help option for the cli stack add sub-command.
+
+    Args:
+        runner (CliRunner): typer CLI runner.
+    """
+    result = runner.invoke(app, ["stack", "add", "--help"])
+
+    assert result.exit_code == 0
+
+    assert "Add a module to the stack." in result.stdout
+
+
+def test_cli_stack_remove_command_without_args(runner: CliRunner) -> None:
+    """Tests the --help option for the cli stack remove sub-command.
+
+    Args:
+        runner (CliRunner): typer CLI runner.
+    """
+    result = runner.invoke(app, ["stack", "add"])
+
+    assert result.exit_code == 0
+
+    assert (
+        "No module specified. Please run `matcha stack add` again and" in result.stdout
+    )
+
+
+def test_cli_stack_add_command_with_args(
+    matcha_testing_directory: str,
+    runner: CliRunner,
+) -> None:
+    """Tests the cli stack set sub-command with args.
+
+    Args:
+        matcha_testing_directory (str): a temporary working directory.
+        runner (CliRunner): typer CLI runner.
+    """
+    os.chdir(matcha_testing_directory)
+    with patch(f"{INTERNAL_FUNCTION_STUB}.stack_add") as mocked_stack_add:
+        result = runner.invoke(app, ["stack", "add", "experiment_tracker"])
+
+    assert result.exit_code == 0
+    assert mocked_stack_add.assert_called_once
+    assert (
+        "Matcha 'experiment_tracker' module has been added to the current stack."
+        in result.stdout
+    )
