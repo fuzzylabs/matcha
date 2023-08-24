@@ -1,11 +1,43 @@
 """"Validation for core commands."""
 
+from enum import Enum, EnumMeta
+
 from matcha_ml.errors import MatchaInputError
 from matcha_ml.services import AzureClient
 
 # TODO: dynamically set both of these variables
 LONGEST_RESOURCE_NAME = "artifactstore"
 MAXIMUM_RESOURCE_NAME_LEN = 24
+
+
+class StackModuleMeta(EnumMeta):
+    """Metaclass for the StackModule Enum."""
+
+    def __contains__(self, item: str) -> bool:  # type: ignore
+        """Method for checking if an item is a member of the enum.
+
+        Args:
+            item (str): the quantity to check for in the Enum.
+
+        Returns:
+            True if item is a member of the Enum, False otherwise.
+        """
+        try:
+            self(item)
+        except ValueError:
+            return False
+        else:
+            return True
+
+
+class StackModule(Enum, metaclass=StackModuleMeta):
+    """Enum defining valid matcha stack modules."""
+
+    ZENML = "zenml"
+    COMMON = "common"
+    DVC = "dvc"
+    MLFLOW = "mlflow"
+    SELDON = "seldon"
 
 
 def _is_alphanumeric(prefix: str) -> bool:
@@ -100,3 +132,15 @@ def is_valid_region(region: str) -> bool:
     """
     azure_client = AzureClient()
     return bool(azure_client.is_valid_region(region))
+
+
+def stack_module_is_valid(module: str) -> bool:
+    """Checks whether a module name is valid.
+
+    Args:
+        module (str): The name of the stack module.
+
+    Returns:
+        bool: True, if the module exists in the StackModule enum, otherwise, False.
+    """
+    return module in StackModule
