@@ -11,7 +11,9 @@ import pytest
 import yaml
 
 from matcha_ml.cli.cli import app
+from matcha_ml.config.matcha_config import MatchaConfigComponentProperty
 from matcha_ml.core import get, remove_state_lock
+from matcha_ml.core.core import stack_add
 from matcha_ml.errors import MatchaInputError
 from matcha_ml.services.global_parameters_service import GlobalParameters
 from matcha_ml.state.matcha_state import (
@@ -356,3 +358,29 @@ def test_get_downloads_matcha_state_directory(mock_state_file, state_file_as_obj
 
     assert os.path.exists(state_file_location)
     assert state_file_as_object == get_result
+
+
+def test_stack_add_expected(matcha_testing_directory: str):
+    """Tests that the core stack_add function works as expected for a given input.
+
+    Args:
+        matcha_testing_directory (str): Mock directory for testing.
+    """
+    os.chdir(matcha_testing_directory)
+
+    with mock.patch(
+        "matcha_ml.core.core.RemoteStateManager"
+    ) as provisioned_state, mock.patch(
+        "matcha_ml.core.core.MatchaConfigService.add_property"
+    ) as add_property:
+        mock_remote_state_manager = MagicMock()
+        provisioned_state.return_value = mock_remote_state_manager
+        mock_remote_state_manager.is_state_provisioned.return_value = False
+        add_property.return_value = None
+
+        stack_add(module_type="experiment_tracker", module_flavor="mlflow")
+
+        add_property.assert_called_once_with(
+            "stack",
+            MatchaConfigComponentProperty(name="experiment_tracker", value="mlflow"),
+        )
