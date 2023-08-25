@@ -236,7 +236,7 @@ class MatchaConfigService:
 
     @staticmethod
     def remove_property(component_name: str, property_name: str) -> None:
-        """Method to remove a MatchaConfigComponentProperty to a Component, if it does not exist, this will create the component too.
+        """Method to remove a MatchaConfigComponentProperty to a Component.
 
         Args:
             component_name (str): Name of the component.
