@@ -419,5 +419,4 @@ def stack_add(module_type: str, module_flavor: str) -> None:
 
 def stack_remove(module_name: str) -> str:
     """A placeholder for the stack remove logic in core."""
-    MatchaConfigService.remove_property("stack", module_name)
     return module_name
