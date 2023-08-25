@@ -260,3 +260,25 @@ def test_matcha_config_service_update(
     assert config_dict.items() <= updated_config_dict.items()
     assert updated_config_dict["test"]["name"] == "passed"
     assert updated_config_dict["test2"]["name"] == "passed_again"
+
+
+def test_remove_property_expected(
+    mocked_matcha_config_component: MatchaConfigComponent,
+):
+    """Test that a component is removed if it exists.
+
+    Args:
+        mocked_matcha_config_component (MatchaConfigComponent): a mocked MatchaConfigComponent instance.
+    """
+    mocked_matcha_config_component.remove_property(property_name="account_name")
+    mocked_matcha_config_component.remove_property(property_name="resource_group_name")
+    mocked_matcha_config_component.remove_property(
+        property_name="not_an_existing_property_name"
+    )
+
+    assert mocked_matcha_config_component == MatchaConfigComponent(
+        name="remote_state_bucket",
+        properties=[
+            MatchaConfigComponentProperty(name="container_name", value="test-container")
+        ],
+    )
