@@ -236,11 +236,16 @@ class MatchaConfigService:
 
     @staticmethod
     def remove_property(component_name: str, property_name: str) -> None:
-        """Method to remove a MatchaConfigComponentProperty to a Component, if it does not exist, this will create the component too.
+        """Method to remove a MatchaConfigComponentProperty to a Component.
 
         Args:
             component_name (str): Name of the component.
             property_name (str): Name of the property within the component.
+
+
+        Raises:
+            MatchaError: raises a MatchaError if the local config file does not exist.
+            MatchaError: raises a MatchaError if the specified component does not exist.
         """
         if MatchaConfigService.config_file_exists():
             config = MatchaConfigService.read_matcha_config()
