@@ -9,7 +9,6 @@ from matcha_ml.core._validation import (
     _is_alphanumeric,
     _is_not_digits,
     is_valid_prefix,
-    stack_module_is_valid,
 )
 from matcha_ml.errors import MatchaInputError
 
@@ -97,18 +96,3 @@ def test_is_valid_prefix_invalid(
         is_valid_prefix(prefix)
 
     assert str(err.value) == error_msg
-
-
-def test_stack_module_is_valid_with_valid_module():
-    """Test stack module validation returns True when the module is valid."""
-    assert stack_module_is_valid("zenml")
-
-
-def test_stack_module_is_valid_with_valid_module_with_upper_case():
-    """Test stack module validation returns False when the module is fully upper case and not valid."""
-    assert not stack_module_is_valid("ZENML")
-
-
-def test_stack_module_is_valid_with_invalid_module():
-    """Test stack module validation returns False when the module does not exist."""
-    assert not stack_module_is_valid("invalidmodule")

@@ -229,12 +229,12 @@ def test_cli_stack_add_command_with_args(
     """
     os.chdir(matcha_testing_directory)
     with patch(f"{INTERNAL_FUNCTION_STUB}.stack_add") as mocked_stack_add:
-        result = runner.invoke(app, ["stack", "add", "experiment_tracker"])
+        result = runner.invoke(app, ["stack", "add", "experiment_tracker", "mlflow"])
 
     assert result.exit_code == 0
     assert mocked_stack_add.assert_called_once
     assert (
-        "Matcha 'experiment_tracker' module has been added to the current stack."
+        "Matcha 'experiment_tracker' module of flavor 'mlflow' has been added to the \ncurrent stack.\n"
         in result.stdout
     )
 
