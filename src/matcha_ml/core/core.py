@@ -368,19 +368,56 @@ def stack_set(stack_name: str) -> None:
     MatchaConfigService.update(stack)
 
 
-def stack_add(module: str) -> None:
+STACK_MODULES = {
+    "orchestrator": {"zenml": MatchaConfigComponentProperty("orchestrator", "zenml")},
+    "experiment_tracker": {
+        "mlflow": MatchaConfigComponentProperty("experiment_tracker", "mlflow")
+    },
+    "data_version_control": {
+        "dvc": MatchaConfigComponentProperty("data_version_control", "dvc")
+    },
+    "vector_database": {
+        "chroma": MatchaConfigComponentProperty("vector_database", "chroma")
+    },
+    "deployer": {"seldon": MatchaConfigComponentProperty("deployer", "seldon")},
+}
+
+
+def stack_add(module_type: str, module_flavor: str) -> None:
     """A function for adding a module by name to the stack.
 
     Args:
-        module (str): The name of the module to add.
+        module_type (str): The type of the module to add e.g. 'experiment_tracker'.
+        module_flavor (str): The flavor of module to add e.g. 'mlflow'.
 
     Raises:
         MatchaInputError: if the stack_name is not a valid stack type
         MatchaError: if there are already resources provisioned.
     """
-    ...
+    module_type = module_type.lower()
+    module_flavor = module_flavor.lower()
+
+    if RemoteStateManager().is_state_provisioned():
+        raise MatchaError(
+            "The remote resources are already provisioned. Changing the stack now will not "
+            "change the remote state."
+        )
+
+    if STACK_MODULES.get(module_type) is None:
+        raise MatchaInputError(f"The module type '{module_type}' does not exist.")
+
+    module_properties = STACK_MODULES.get(module_type, {}).get(module_flavor)
+
+    if module_properties is None:
+        raise MatchaInputError(
+            f"The module type '{module_type}' does not have a flavor '{module_flavor}'."
+        )
+
+    MatchaConfigService.add_property("stack", module_properties)
+    # UPDATE STACK NAME TO 'CUSTOM'
 
 
 def stack_remove(module_name: str) -> str:
     """A placeholder for the stack remove logic in core."""
+    MatchaConfigService.remove_property("stack", module_name)
     return module_name

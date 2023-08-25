@@ -268,29 +268,39 @@ def set(stack: str = typer.Argument("default")) -> None:
 
 
 @stack_app.command(help="Add a module to the stack.")
-def add(module: str = typer.Argument(None)) -> None:
+def add(module: str = typer.Argument(None), flavor: str = typer.Argument(None)) -> None:
     """Add a module to the stack for Matcha to provision.
 
     Args:
-        module (str): the name of the module to add (e.g. 'seldon').
+        module (str): the name of the module to add (e.g. 'orchestrator', 'experiment_tracker').
+        flavor (str): the sub-type of the module (e.g. 'mlflow' for the module experiment_tracker)
+
+    Example usage:
+        matcha stack add experiment_tracker mlflow
     """
     if module:
-        try:
-            stack_add(module)
-            print_status(
-                build_status(
-                    f"Matcha '{module}' module has been added to the current stack."
+        if flavor:
+            try:
+                stack_add(module, flavor)
+                print_status(
+                    build_status(
+                        f"Matcha '{module}' module of flavor '{flavor}' has been added to the current stack."
+                    )
                 )
+            except MatchaInputError as e:
+                print_error(str(e))
+                raise typer.Exit()
+            except MatchaError as e:
+                print_error(str(e))
+                raise typer.Exit()
+        else:
+            print_error(
+                f"No flavor specified. Please run `matcha stack add {module}` again and provide the flavor of the module you wish to add."
             )
-        except MatchaInputError as e:
-            print_error(str(e))
-            raise typer.Exit()
-        except MatchaError as e:
-            print_error(str(e))
             raise typer.Exit()
     else:
         print_error(
-            "No module specified. Please run `matcha stack add` again and provide the name of the module you wish to add."
+            "No module specified. Please run `matcha stack add` again and provide the name of the module and flavor of the module you wish to add."
         )
         raise typer.Exit()
 
