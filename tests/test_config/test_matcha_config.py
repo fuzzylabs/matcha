@@ -282,3 +282,66 @@ def test_remove_property_expected(
             MatchaConfigComponentProperty(name="container_name", value="test-container")
         ],
     )
+
+
+def test_add_property_expected(
+    matcha_testing_directory, mocked_matcha_config_json_object
+):
+    """Test adding a property.
+
+    Args:
+        matcha_testing_directory (str): A temporary working directory.
+        mocked_matcha_config_json_object (dict): A dictionary representation of a matcha config json file.
+    """
+    os.chdir(matcha_testing_directory)
+    config = MatchaConfig.from_dict(mocked_matcha_config_json_object)
+    config_dict = config.to_dict()
+
+    MatchaConfigService.write_matcha_config(config)
+
+    component_property = MatchaConfigComponentProperty(name="name", value="passed")
+    second_component_property = MatchaConfigComponentProperty(
+        name="location", value="ukwest"
+    )
+
+    MatchaConfigService.add_property(
+        component_name="test", component_property=component_property
+    )
+    MatchaConfigService.add_property(
+        component_name="test", component_property=second_component_property
+    )
+
+    updated_config = MatchaConfigService.read_matcha_config()
+    updated_config_dict = updated_config.to_dict()
+
+    assert len(updated_config_dict) - 1 == len(config_dict)
+    assert config_dict.items() <= updated_config_dict.items()
+    assert updated_config_dict["test"]["name"] == "passed"
+    assert updated_config_dict["test"]["location"] == "ukwest"
+
+
+def test_remove_property_config_service_expected(
+    matcha_testing_directory, mocked_matcha_config_json_object
+):
+    """Test removing a property from the ConfigService level.
+
+    Args:
+        matcha_testing_directory (str): A temporary working directory.
+        mocked_matcha_config_json_object (dict): A dictionary representation of a matcha config json file.
+    """
+    os.chdir(matcha_testing_directory)
+    config = MatchaConfig.from_dict(mocked_matcha_config_json_object)
+
+    MatchaConfigService.write_matcha_config(config)
+
+    config_dict = MatchaConfigService.read_matcha_config().to_dict()
+    assert config_dict["remote_state_bucket"]["account_name"] == "test-account"
+
+    MatchaConfigService.remove_property(
+        component_name="remote_state_bucket", property_name="account_name"
+    )
+
+    updated_config = MatchaConfigService.read_matcha_config()
+    updated_config_dict = updated_config.to_dict()
+
+    assert updated_config_dict.get("remote_state_bucket").get("account_name") is None
