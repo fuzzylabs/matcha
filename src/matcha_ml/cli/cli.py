@@ -1,8 +1,9 @@
 """Matcha CLI."""
-from typing import Optional, Tuple
+from __future__ import annotations
+
+from typing import Annotated, Optional, Tuple
 
 import typer
-from typing_extensions import Annotated
 
 from matcha_ml import __version__, core
 from matcha_ml.cli._validation import (
