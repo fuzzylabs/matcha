@@ -18,6 +18,7 @@ from matcha_ml.config import (
     MatchaConfigComponentProperty,
     MatchaConfigService,
 )
+from matcha_ml.constants import STACK_MODULES
 from matcha_ml.core._validation import is_valid_prefix, is_valid_region
 from matcha_ml.errors import MatchaError, MatchaInputError
 from matcha_ml.runners import AzureRunner
@@ -368,21 +369,6 @@ def stack_set(stack_name: str) -> None:
     MatchaConfigService.update(stack)
 
 
-STACK_MODULES = {
-    "orchestrator": {"zenml": MatchaConfigComponentProperty("orchestrator", "zenml")},
-    "experiment_tracker": {
-        "mlflow": MatchaConfigComponentProperty("experiment_tracker", "mlflow")
-    },
-    "data_version_control": {
-        "dvc": MatchaConfigComponentProperty("data_version_control", "dvc")
-    },
-    "vector_database": {
-        "chroma": MatchaConfigComponentProperty("vector_database", "chroma")
-    },
-    "deployer": {"seldon": MatchaConfigComponentProperty("deployer", "seldon")},
-}
-
-
 def stack_add(module_type: str, module_flavor: str) -> None:
     """A function for adding a module by name to the stack.
 
@@ -414,7 +400,11 @@ def stack_add(module_type: str, module_flavor: str) -> None:
         )
 
     MatchaConfigService.add_property("stack", module_properties)
-    # UPDATE STACK NAME TO 'CUSTOM'
+
+    # Update stack name to custom
+    MatchaConfigService.add_property(
+        "stack", MatchaConfigComponentProperty("name", "custom")
+    )
 
 
 def stack_remove(module_name: str) -> str:
