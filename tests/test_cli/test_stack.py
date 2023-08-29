@@ -187,6 +187,9 @@ def test_cli_stack_set_remove_help_option(runner: CliRunner) -> None:
     assert "Remove a module from the current Matcha stack." in result.stdout
 
 
+TWO_EXIT_CODE = 2
+
+
 def test_cli_stack_add_command_without_args(runner: CliRunner) -> None:
     """Tests the cli stack add sub-command without passing an argument.
 
@@ -195,11 +198,9 @@ def test_cli_stack_add_command_without_args(runner: CliRunner) -> None:
     """
     result = runner.invoke(app, ["stack", "add"])
 
-    assert result.exit_code == 0
+    assert result.exit_code == TWO_EXIT_CODE
 
-    assert (
-        "No module specified. Please run `matcha stack add` again and" in result.stdout
-    )
+    assert "Missing argument 'MODULE'." in result.stdout
 
 
 def test_cli_stack_remove_command_without_args(runner: CliRunner) -> None:
