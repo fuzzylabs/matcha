@@ -242,6 +242,7 @@ class MatchaConfigService:
             component_name (str): Name of the component.
             property_name (str): Name of the property within the component.
 
+
         Raises:
             MatchaError: raises a MatchaError if the local config file does not exist.
             MatchaError: raises a MatchaError if the specified component does not exist.

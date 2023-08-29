@@ -18,6 +18,7 @@ from matcha_ml.config import (
     MatchaConfigComponentProperty,
     MatchaConfigService,
 )
+from matcha_ml.constants import STACK_MODULES
 from matcha_ml.core._validation import is_valid_prefix, is_valid_region
 from matcha_ml.errors import MatchaError, MatchaInputError
 from matcha_ml.runners import AzureRunner
@@ -368,17 +369,42 @@ def stack_set(stack_name: str) -> None:
     MatchaConfigService.update(stack)
 
 
-def stack_add(module: str) -> None:
+def stack_add(module_type: str, module_flavor: str) -> None:
     """A function for adding a module by name to the stack.
 
     Args:
-        module (str): The name of the module to add.
+        module_type (str): The type of the module to add e.g. 'experiment_tracker'.
+        module_flavor (str): The flavor of module to add e.g. 'mlflow'.
 
     Raises:
         MatchaInputError: if the stack_name is not a valid stack type
         MatchaError: if there are already resources provisioned.
     """
-    ...
+    module_type = module_type.lower()
+    module_flavor = module_flavor.lower()
+
+    if RemoteStateManager().is_state_provisioned():
+        raise MatchaError(
+            "The remote resources are already provisioned. Changing the stack now will not "
+            "change the remote state."
+        )
+
+    if STACK_MODULES.get(module_type) is None:
+        raise MatchaInputError(f"The module type '{module_type}' does not exist.")
+
+    module_properties = STACK_MODULES.get(module_type, {}).get(module_flavor)
+
+    if module_properties is None:
+        raise MatchaInputError(
+            f"The module type '{module_type}' does not have a flavor '{module_flavor}'."
+        )
+
+    MatchaConfigService.add_property("stack", module_properties)
+
+    # Update stack name to custom
+    MatchaConfigService.add_property(
+        "stack", MatchaConfigComponentProperty("name", "custom")
+    )
 
 
 def stack_remove(module_name: str) -> str:

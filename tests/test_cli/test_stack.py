@@ -187,6 +187,9 @@ def test_cli_stack_set_remove_help_option(runner: CliRunner) -> None:
     assert "Remove a module from the current Matcha stack." in result.stdout
 
 
+TWO_EXIT_CODE = 2
+
+
 def test_cli_stack_add_command_without_args(runner: CliRunner) -> None:
     """Tests the cli stack add sub-command without passing an argument.
 
@@ -195,11 +198,9 @@ def test_cli_stack_add_command_without_args(runner: CliRunner) -> None:
     """
     result = runner.invoke(app, ["stack", "add"])
 
-    assert result.exit_code == 0
+    assert result.exit_code == TWO_EXIT_CODE
 
-    assert (
-        "No module specified. Please run `matcha stack add` again and" in result.stdout
-    )
+    assert "Missing argument 'MODULE'." in result.stdout
 
 
 def test_cli_stack_remove_command_without_args(runner: CliRunner) -> None:
@@ -229,12 +230,12 @@ def test_cli_stack_add_command_with_args(
     """
     os.chdir(matcha_testing_directory)
     with patch(f"{INTERNAL_FUNCTION_STUB}.stack_add") as mocked_stack_add:
-        result = runner.invoke(app, ["stack", "add", "experiment_tracker"])
+        result = runner.invoke(app, ["stack", "add", "experiment_tracker", "mlflow"])
 
     assert result.exit_code == 0
     assert mocked_stack_add.assert_called_once
     assert (
-        "Matcha 'experiment_tracker' module has been added to the current stack."
+        "Matcha 'experiment_tracker' module of flavor 'mlflow' has been added to the \ncurrent stack.\n"
         in result.stdout
     )
 
