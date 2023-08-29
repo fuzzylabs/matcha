@@ -270,8 +270,8 @@ def set(stack: str = typer.Argument("default")) -> None:
 
 @stack_app.command(help="Add a module to the stack.")
 def add(
-    module: Annotated[str, typer.Argument(None)],
-    flavor: Annotated[str, typer.Argument(None)],
+    module: Annotated[str, typer.Argument(help="The module name.")],
+    flavor: Annotated[str, typer.Argument(help="the flavor of the module.")],
 ) -> None:
     """Add a module to the stack for Matcha to provision.
 
