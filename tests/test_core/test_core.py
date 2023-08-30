@@ -11,9 +11,13 @@ import pytest
 import yaml
 
 from matcha_ml.cli.cli import app
-from matcha_ml.config.matcha_config import MatchaConfigComponentProperty
+from matcha_ml.config.matcha_config import (
+    MatchaConfig,
+    MatchaConfigComponentProperty,
+    MatchaConfigService,
+)
 from matcha_ml.core import get, remove_state_lock
-from matcha_ml.core.core import stack_add
+from matcha_ml.core.core import stack_add, stack_remove
 from matcha_ml.errors import MatchaError, MatchaInputError
 from matcha_ml.services.global_parameters_service import GlobalParameters
 from matcha_ml.state.matcha_state import (
@@ -471,3 +475,83 @@ def test_stack_add_with_existing_deployment(matcha_testing_directory: str):
             "The remote resources are already provisioned. Changing the stack now will not change the remote state."
             in str(e)
         )
+
+
+def test_stack_remove_with_state_provisioned(matcha_testing_directory):
+    """Tests that the core stack_remove function raises an exception when a deployment already exists.
+
+    Args:
+        matcha_testing_directory (str): Mock directory for testing.
+    """
+    os.chdir(matcha_testing_directory)
+
+    with mock.patch("matcha_ml.core.core.RemoteStateManager") as provisioned_state:
+        mock_remote_state_manager = MagicMock()
+        mock_remote_state_manager.is_state_provisioned.return_value = True
+        provisioned_state.return_value = mock_remote_state_manager
+
+        with pytest.raises(MatchaError) as e:
+            stack_remove(module_type="test_module")
+
+        assert (
+            "The remote resources are already provisioned. Changing the stack now will not change the remote state."
+            in str(e)
+        )
+
+
+def test_stack_remove_with_module_present(
+    matcha_testing_directory: str, mocked_matcha_config: MatchaConfig
+):
+    """Tests that the core stack_remove function removes a module when then module exists.
+
+    Args:
+        matcha_testing_directory (str): Mock directory for testing.
+        mocked_matcha_config (MatchaConfig): A mocked MatchaConfig object for testing.
+    """
+    os.chdir(matcha_testing_directory)
+    MatchaConfigService.write_matcha_config(mocked_matcha_config)
+
+    with mock.patch("matcha_ml.core.core.RemoteStateManager") as provisioned_state:
+        mock_remote_state_manager = MagicMock()
+        mock_remote_state_manager.is_state_provisioned.return_value = False
+        provisioned_state.return_value = mock_remote_state_manager
+        stack_remove(module_type="experiment_tracker")
+
+    new_matcha_config = MatchaConfigService.read_matcha_config()
+
+    new_matcha_config.to_dict()
+    mocked_matcha_config.to_dict()
+
+    assert mocked_matcha_config.find_component(
+        "remote_state_bucket"
+    ) == new_matcha_config.find_component("remote_state_bucket")
+    assert (
+        new_matcha_config.find_component("stack").find_property("name").value
+        == "custom"
+    )
+    assert not new_matcha_config.find_component("stack").find_property(
+        "experiment_tracker"
+    )
+
+
+def test_stack_remove_with_no_module(
+    matcha_testing_directory: str, mocked_matcha_config: MatchaConfig
+):
+    """Tests that the core stack_remove function raises an exception when a module does not exist.
+
+    Args:
+        matcha_testing_directory (str): Mock directory for testing.
+        mocked_matcha_config (MatchaConfig): A mocked MatchaConfig object for testing.
+    """
+    os.chdir(matcha_testing_directory)
+    MatchaConfigService.write_matcha_config(mocked_matcha_config)
+
+    with mock.patch(
+        "matcha_ml.core.core.RemoteStateManager"
+    ) as provisioned_state, pytest.raises(MatchaInputError) as e:
+        mock_remote_state_manager = MagicMock()
+        mock_remote_state_manager.is_state_provisioned.return_value = False
+        provisioned_state.return_value = mock_remote_state_manager
+        stack_remove(module_type="test_module")
+
+        assert "Module 'test_module' does not exist in the current stack." in str(e)

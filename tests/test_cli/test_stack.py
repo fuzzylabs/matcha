@@ -9,7 +9,7 @@ from matcha_ml.cli.cli import app
 from matcha_ml.config import MatchaConfig, MatchaConfigService
 from matcha_ml.state.remote_state_manager import RemoteStateManager
 
-INTERNAL_FUNCTION_STUB = "matcha_ml.core.core"
+INTERNAL_FUNCTION_STUB = "matcha_ml.cli.cli"
 
 
 def test_cli_stack_command_help_option(runner: CliRunner) -> None:
@@ -155,10 +155,13 @@ def test_stack_set_file_modified(
 
     new_config_dict = new_config.to_dict()
 
-    assert len(new_config_dict) == len(config_dict) + 1
+    assert len(new_config_dict) == len(config_dict)
     assert "stack" in new_config_dict
     assert new_config_dict["stack"]["name"] == "llm"
-    assert config_dict.items() <= new_config_dict.items()
+    assert (
+        config_dict["remote_state_bucket"].items()
+        == new_config_dict["remote_state_bucket"].items()
+    )
 
 
 def test_cli_stack_set_add_help_option(runner: CliRunner) -> None:

@@ -410,29 +410,34 @@ def stack_add(module_type: str, module_flavor: str) -> None:
     )
 
 
-def stack_remove(module: str) -> None:
+def stack_remove(module_type: str) -> None:
     """A function for removing a module by name in the stack.
 
     Args:
-        module (str): The name of the module to remove.
+        module_type (str): The name of the module to remove.
 
     Raises:
-        MatchaInputError: if the stack_name is not a valid stack type
         MatchaError: if there are already resources provisioned.
+        MatchaInputError: if the module_type is not a valid module within the current stack.
     """
-    ...
-    # # update the stack name any time a component is added/removed.
-    # # even better would be to assess the stack and name it as llm or default if it matches, otherwise "custom".
-    # # check state exists (MatchaStateService)
-    # if not MatchaStateService.state_exists:
-    #     raise MatchaError("Matcha has detected the presence of a 'matcha.state' file. If resources are already provisioned, run `matcha destroy` before trying to modify the stack.")
+    if RemoteStateManager().is_state_provisioned():
+        raise MatchaError(
+            "The remote resources are already provisioned. Changing the stack now will not "
+            "change the remote state."
+        )
 
-    # # check valid module (_validation)
-    # if not stack_module_is_valid:
-    #     raise MatchaInputError(f"'{module}' is not a valid module name")
-    # # check config file exists (MatchaConfigService)
-    # if MatchaConfigService.config_file_exists:
-    #     matcha_config = MatchaConfigService.read_matcha_config()
-    #     matcha_config.find_component("stack")
-    # else:
-    # # update config file (MatchaConfigService)
+    module_type = module_type.lower()
+
+    matcha_config = MatchaConfigService.read_matcha_config()
+    matcha_stack_component = matcha_config.find_component("stack")
+
+    if matcha_stack_component:
+        if matcha_stack_component.find_property(module_type):
+            MatchaConfigService.remove_property("stack", module_type)
+            MatchaConfigService.add_property(
+                "stack", MatchaConfigComponentProperty("name", "custom")
+            )
+        else:
+            raise MatchaInputError(
+                f"Module '{module_type}' does not exist in the current stack."
+            )

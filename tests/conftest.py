@@ -257,11 +257,15 @@ def mocked_matcha_config_json_object() -> Dict[str, Dict[str, str]]:
         matcha_config (Dict[str, Dict[str, str]]): a dictionary representation of the matcha.config.json file
     """
     matcha_config = {
+        "stack": {
+            "name": "default",
+            "experiment_tracker": "mlflow",
+        },
         "remote_state_bucket": {
             "account_name": "test-account",
             "container_name": "test-container",
             "resource_group_name": "test-rg",
-        }
+        },
     }
 
     return matcha_config
@@ -278,7 +282,9 @@ def mocked_matcha_config_component_property() -> MatchaConfigComponentProperty:
 
 
 @pytest.fixture
-def mocked_matcha_config_component(mocked_matcha_config_json_object):
+def mocked_matcha_config_remote_state_bucket_component(
+    mocked_matcha_config_json_object,
+):
     """A fixture returning a mocked MatchaConfigComponentProperty instance.
 
     Args:
@@ -295,16 +301,42 @@ def mocked_matcha_config_component(mocked_matcha_config_json_object):
 
 
 @pytest.fixture
-def mocked_matcha_config(mocked_matcha_config_component):
+def mocked_matcha_config_stack_component(mocked_matcha_config_json_object):
+    """A fixture returning a mocked MatchaConfigComponentProperty instance.
+
+    Args:
+        mocked_matcha_config_json_object (Dict[str, Dict[str, str]]): a dictionary representation of the matcha.config.json file
+
+    Returns:
+        (MatchaConfigComponentProperty): a mocked MatchaConfigComponentProperty instance.
+    """
+    properties = []
+    for key, value in mocked_matcha_config_json_object["stack"].items():
+        properties.append(MatchaConfigComponentProperty(name=key, value=value))
+
+    return MatchaConfigComponent(name="stack", properties=properties)
+
+
+@pytest.fixture
+def mocked_matcha_config(
+    mocked_matcha_config_remote_state_bucket_component,
+    mocked_matcha_config_stack_component,
+):
     """A fixture returning a mocked MatchaConfig instance.
 
     Args:
-        mocked_matcha_config_component (MatchaConfigComponent): a mocked MatchaConfigComponent instance.
+        mocked_matcha_config_remote_state_bucket_component (MatchaConfigComponent): a mocked MatchaConfigComponent instance representing the remote storage bucket component.
+        mocked_matcha_config_stack_component (MatchaConfigComponent): a mocked MatchaConfigComponent instance representing the stack component.
 
     Returns:
         (MatchaConfig): a mocked MatchaConfig instance.
     """
-    return MatchaConfig([mocked_matcha_config_component])
+    return MatchaConfig(
+        [
+            mocked_matcha_config_stack_component,
+            mocked_matcha_config_remote_state_bucket_component,
+        ]
+    )
 
 
 @pytest.fixture
