@@ -251,7 +251,7 @@ def opt_in() -> None:
 
 
 @stack_app.command(help="Define the stack for Matcha to provision.")
-def set(stack: str = typer.Argument("default")) -> None:
+def set(stack: Annotated[str, typer.Argument("default")]) -> None:
     """Define the stack for Matcha to provision.
 
     Args:
