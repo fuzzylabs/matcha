@@ -211,7 +211,7 @@ def test_cli_stack_remove_command_without_args(runner: CliRunner) -> None:
         runner (CliRunner): typer CLI runner.
     """
     result = runner.invoke(app, ["stack", "remove"])
-    assert result.exit_code == 0
+    assert result.exit_code == TWO_EXIT_CODE
 
     assert (
         "No module specified. Please run `matcha stack remove` again and provide the name\nof the module you wish to remove.\n"
@@ -257,7 +257,7 @@ def test_cli_stack_remove_command_with_args(
     os.chdir(matcha_testing_directory)
     result = runner.invoke(app, ["stack", "remove", "experiment_tracker"])
 
-    assert result.exit_code == TWO_EXIT_CODE
+    assert result.exit_code == 0
     assert mocked_stack_remove.assert_called_once
     assert (
         "Matcha 'experiment_tracker' module has been removed from the current stack."
