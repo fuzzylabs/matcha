@@ -23,7 +23,7 @@ from matcha_ml.services.global_parameters_service import GlobalParameters
 from matcha_ml.state.matcha_state import (
     MatchaState,
 )
-from matcha_ml.templates.azure_template import DEFAULT_STACK
+from matcha_ml.templates.azure_template import DEFAULT_STACK_TF
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -154,7 +154,7 @@ def assert_infrastructure(
         module_file_path = os.path.join(destination_path, module_file_name)
         assert os.path.exists(module_file_path)
 
-    for module_name in DEFAULT_STACK:
+    for module_name in DEFAULT_STACK_TF:
         for module_file_name in glob.glob(
             os.path.join(TEMPLATE_DIR, module_name, "*.tf")
         ):
@@ -329,7 +329,13 @@ def test_stale_remote_state_file_is_removed(matcha_testing_directory: str):
             "container_name": "test-container",
             "resource_group_name": "test-rg",
         },
-        "stack": {"name": "default"},
+        "stack": {
+            "name": "default",
+            "orchestrator": "zenml",
+            "experiment_tracker": "mlflow",
+            "data_version_control": "dvc",
+            "deployer": "seldon",
+        },
     }
 
     with mock.patch(

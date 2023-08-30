@@ -4,7 +4,7 @@ from typing import List, Optional
 from matcha_ml.state import MatchaState, MatchaStateService
 from matcha_ml.templates.base_template import BaseTemplate, TemplateVariables
 
-DEFAULT_STACK = [
+DEFAULT_STACK_TF = [
     "aks",
     "resource_group",
     "mlflow_module",
@@ -17,7 +17,7 @@ DEFAULT_STACK = [
     "zen_server/zenml_helm/templates",
     "data_version_control_storage",
 ]
-LLM_STACK = DEFAULT_STACK + [
+LLM_STACK_TF = DEFAULT_STACK_TF + [
     "chroma",
     "chroma/chroma_helm",
     "chroma/chroma_helm/templates",

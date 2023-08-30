@@ -18,7 +18,7 @@ from matcha_ml.config import (
     MatchaConfigComponentProperty,
     MatchaConfigService,
 )
-from matcha_ml.constants import STACK_MODULES
+from matcha_ml.constants import DEFAULT_STACK, LLM_STACK, STACK_MODULES
 from matcha_ml.core._validation import is_valid_prefix, is_valid_region
 from matcha_ml.errors import MatchaError, MatchaInputError
 from matcha_ml.runners import AzureRunner
@@ -26,7 +26,11 @@ from matcha_ml.services.analytics_service import AnalyticsEvent, track
 from matcha_ml.services.global_parameters_service import GlobalParameters
 from matcha_ml.state import MatchaStateService, RemoteStateManager
 from matcha_ml.state.matcha_state import MatchaState
-from matcha_ml.templates.azure_template import DEFAULT_STACK, LLM_STACK, AzureTemplate
+from matcha_ml.templates.azure_template import (
+    DEFAULT_STACK_TF,
+    LLM_STACK_TF,
+    AzureTemplate,
+)
 
 
 class StackTypeMeta(
@@ -315,7 +319,7 @@ def provision(
         )
 
         azure_template = AzureTemplate(
-            LLM_STACK if stack_name == StackType.LLM.value else DEFAULT_STACK
+            LLM_STACK_TF if stack_name == StackType.LLM.value else DEFAULT_STACK_TF
         )
 
         zenml_version = infer_zenml_version()
@@ -350,6 +354,27 @@ def stack_set(stack_name: str) -> None:
         MatchaInputError: if the stack_name is not a valid stack type
         MatchaError: if there are already resources provisioned.
     """
+
+    def _create_stack_component(stack_type: StackType) -> MatchaConfigComponent:
+        """Create the set of configuration component for the stack.
+
+        Args:
+            stack_type (StackType): the type of stack to create.
+
+        Returns:
+            MatchaConfigComponent: the stack component.
+        """
+        stack = MatchaConfigComponent(
+            name="stack",
+            properties=[
+                MatchaConfigComponentProperty(name="name", value=stack_type.value)
+            ],
+        )
+
+        stack.properties += LLM_STACK if stack_type == StackType.LLM else DEFAULT_STACK
+
+        return stack
+
     if RemoteStateManager().is_state_provisioned():
         raise MatchaError(
             "The remote resources are already provisioned. Changing the stack now will not "
@@ -359,12 +384,7 @@ def stack_set(stack_name: str) -> None:
     if stack_name.lower() not in StackType:
         raise MatchaInputError(f"{stack_name} is not a valid stack type.")
 
-    stack_enum = StackType(stack_name.lower())
-
-    stack = MatchaConfigComponent(
-        name="stack",
-        properties=[MatchaConfigComponentProperty(name="name", value=stack_enum.value)],
-    )
+    stack = _create_stack_component(stack_type=StackType(stack_name.lower()))
 
     MatchaConfigService.update(stack)
 

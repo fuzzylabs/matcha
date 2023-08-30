@@ -125,7 +125,17 @@ def test_stack_set_file_created(
     assert result.exit_code == 0
 
     config = MatchaConfigService.read_matcha_config()
-    assert config.to_dict() == {"stack": {"name": "llm"}}
+    expected_stack = {
+        "stack": {
+            "name": "llm",
+            "orchestrator": "zenml",
+            "experiment_tracker": "mlflow",
+            "data_version_control": "dvc",
+            "deployer": "seldon",
+            "vector_database": "chroma",
+        }
+    }
+    assert config.to_dict() == expected_stack
 
 
 def test_stack_set_file_modified(
