@@ -270,8 +270,8 @@ def set(stack: str = typer.Argument("default")) -> None:
 
 @stack_app.command(help="Add a module to the stack.")
 def add(
-    module: Annotated[str, typer.Argument(None, help="The module name.")],
-    flavor: Annotated[str, typer.Argument(None, help="The flavor of the module.")],
+    module: Annotated[str, typer.Argument(help="The module name.")],
+    flavor: Annotated[str, typer.Argument(help="The flavor of the module.")],
 ) -> None:
     """Add a module to the stack for Matcha to provision.
 
@@ -298,7 +298,9 @@ def add(
 
 
 @stack_app.command(help="Remove a module from the current Matcha stack.")
-def remove(module: str = typer.Argument(None)) -> None:
+def remove(
+    module: Annotated[str, typer.Argument(help="The module name.")],
+) -> None:
     """Remove a module from the current Matcha stack.
 
     Args:
