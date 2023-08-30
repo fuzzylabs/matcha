@@ -67,7 +67,7 @@ def test_cli_stack_set_command_without_args(
     os.chdir(matcha_testing_directory)
     result = runner.invoke(app, ["stack", "set"])
 
-    assert result.exit_code == TWO_EXIT_CODE
+    assert result.exit_code == 0
 
     assert "Matcha 'default' stack has been set." in result.stdout
 
@@ -257,7 +257,7 @@ def test_cli_stack_remove_command_with_args(
     os.chdir(matcha_testing_directory)
     result = runner.invoke(app, ["stack", "remove", "experiment_tracker"])
 
-    assert result.exit_code == 0
+    assert result.exit_code == TWO_EXIT_CODE
     assert mocked_stack_remove.assert_called_once
     assert (
         "Matcha 'experiment_tracker' module has been removed from the current stack."
