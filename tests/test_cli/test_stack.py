@@ -10,6 +10,7 @@ from matcha_ml.config import MatchaConfig, MatchaConfigService
 from matcha_ml.state.remote_state_manager import RemoteStateManager
 
 INTERNAL_FUNCTION_STUB = "matcha_ml.cli.cli"
+TWO_EXIT_CODE = 2
 
 
 def test_cli_stack_command_help_option(runner: CliRunner) -> None:
@@ -65,6 +66,8 @@ def test_cli_stack_set_command_without_args(
     """
     os.chdir(matcha_testing_directory)
     result = runner.invoke(app, ["stack", "set"])
+
+    assert result.exit_code == TWO_EXIT_CODE
 
     assert "Matcha 'default' stack has been set." in result.stdout
 
@@ -186,9 +189,6 @@ def test_cli_stack_set_remove_help_option(runner: CliRunner) -> None:
     assert result.exit_code == 0
 
     assert "Remove a module from the current Matcha stack." in result.stdout
-
-
-TWO_EXIT_CODE = 2
 
 
 def test_cli_stack_add_command_without_args(runner: CliRunner) -> None:
