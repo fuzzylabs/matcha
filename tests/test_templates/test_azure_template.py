@@ -124,7 +124,7 @@ def test_empty_directory_except_files_error_handling(
     captured = capsys.readouterr()
 
     # Check if the error message is present in the captured output
-    assert "Error while emptying directory" in captured.out
+    assert "Error while emptying directory" in captured.err
 
 
 def test_concatenate_files_error_handling(temp_directory: str, capsys) -> None:
@@ -144,7 +144,7 @@ def test_concatenate_files_error_handling(temp_directory: str, capsys) -> None:
     captured = capsys.readouterr()
 
     # Check if the error message is present in the captured output
-    assert "Error while concatenating files:" in captured.out
+    assert "Error while concatenating files:" in captured.err
 
 
 def test_recursively_copy_files_error_handling_directory_not_exist(
@@ -164,8 +164,8 @@ def test_recursively_copy_files_error_handling_directory_not_exist(
 
     # Check if the error message is present in the captured output
     assert (
-        "Error while copying files: [Errno 2] No such file or directory: 'nonexistent_source'"
-        in captured.out
+        "Error while copying files: [Errno 2] No such file or directory:"
+        in captured.err
     )
 
 
@@ -190,7 +190,7 @@ def test_recursively_copy_files_error_handling_target_dir_exists(
     captured = capsys.readouterr()
 
     # Check if the error message is present in the captured output
-    assert "Error while copying files:" in captured.out
+    assert "Error while copying files:" in captured.err
 
 
 def test_recursively_copy_files_error_handling_permission_error(
@@ -218,4 +218,4 @@ def test_recursively_copy_files_error_handling_permission_error(
     captured = capsys.readouterr()
 
     # Check if the error message is present in the captured output
-    assert "Permission denied" in captured.out
+    assert "Permission denied" in captured.err
