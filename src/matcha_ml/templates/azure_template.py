@@ -5,7 +5,7 @@ import shutil
 from shutil import rmtree
 from typing import List, Optional
 
-from matcha_ml.cli.ui.print_messages import print_status
+from matcha_ml.cli.ui.print_messages import print_error, print_status
 from matcha_ml.cli.ui.status_message_builders import (
     build_status,
     build_step_success_status,
@@ -67,7 +67,7 @@ class AzureTemplate(BaseTemplate):
                 elif os.path.isdir(item_path) and item not in except_files:
                     shutil.rmtree(item_path)
         except (OSError, FileNotFoundError) as e:
-            print(f"Error while emptying directory '{directory}': {e}")
+            print_error(f"Error while emptying directory '{directory}': {e}")
 
     @staticmethod
     def concatenate_files(source_file: str, target_file: str) -> None:
@@ -81,7 +81,7 @@ class AzureTemplate(BaseTemplate):
             with open(source_file) as source, open(target_file, "a") as target:
                 target.write(source.read())
         except (OSError, FileNotFoundError) as e:
-            print(f"Error while concatenating files: {e}")
+            print_error(f"Error while concatenating files: {e}")
 
     @staticmethod
     def recursively_copy_files(source_dir: str, target_dir: str) -> None:
@@ -107,7 +107,7 @@ class AzureTemplate(BaseTemplate):
                 else:
                     shutil.copy2(source_item, target_item)
         except (OSError, FileNotFoundError) as e:
-            print(f"Error while copying files: {e}")
+            print_error(f"Error while copying files: {e}")
 
     def build_template(
         self,
