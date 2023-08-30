@@ -66,8 +66,8 @@ class AzureTemplate(BaseTemplate):
                     os.remove(item_path)
                 elif os.path.isdir(item_path) and item not in except_files:
                     shutil.rmtree(item_path)
-        except Exception as e:
-            print("Error:", e)
+        except (OSError, FileNotFoundError) as e:
+            print(f"Error while emptying directory '{directory}': {e}")
 
     @staticmethod
     def concatenate_files(source_file: str, target_file: str) -> None:
@@ -80,10 +80,11 @@ class AzureTemplate(BaseTemplate):
         try:
             with open(source_file) as source, open(target_file, "a") as target:
                 target.write(source.read())
-        except Exception as e:
-            print("Error:", e)
+        except (OSError, FileNotFoundError) as e:
+            print(f"Error while concatenating files: {e}")
 
-    def recursively_copy_files(self, source_dir: str, target_dir: str) -> None:
+    @staticmethod
+    def recursively_copy_files(source_dir: str, target_dir: str) -> None:
         """Copy all files within a source location to a target location.
 
         Args:
@@ -102,11 +103,11 @@ class AzureTemplate(BaseTemplate):
                     shutil.copytree(source_item, target_item)
                 elif os.path.exists(target_item):
                     # Concatenate the source file content to the target file
-                    self.concatenate_files(source_item, target_item)
+                    AzureTemplate.concatenate_files(source_item, target_item)
                 else:
                     shutil.copy2(source_item, target_item)
-        except Exception as e:
-            print("Error:", e)
+        except (OSError, FileNotFoundError) as e:
+            print(f"Error while copying files: {e}")
 
     def build_template(
         self,
