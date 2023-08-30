@@ -18,7 +18,10 @@ from matcha_ml.config import (
     MatchaConfigComponentProperty,
     MatchaConfigService,
 )
-from matcha_ml.core._validation import is_valid_prefix, is_valid_region
+from matcha_ml.core._validation import (
+    is_valid_prefix,
+    is_valid_region,
+)
 from matcha_ml.errors import MatchaError, MatchaInputError
 from matcha_ml.runners import AzureRunner
 from matcha_ml.services.analytics_service import AnalyticsEvent, track
@@ -368,11 +371,12 @@ def stack_set(stack_name: str) -> None:
     MatchaConfigService.update(stack)
 
 
-def stack_add(module: str) -> None:
+def stack_add(module: str, flavor: str) -> None:
     """A function for adding a module by name to the stack.
 
     Args:
-        module (str): The name of the module to add.
+        module (str): The type of module to add.
+        flavor (str): The flavor of module to add.
 
     Raises:
         MatchaInputError: if the stack_name is not a valid stack type
@@ -381,6 +385,29 @@ def stack_add(module: str) -> None:
     ...
 
 
-def stack_remove(module_name: str) -> str:
-    """A placeholder for the stack remove logic in core."""
-    return module_name
+def stack_remove(module: str) -> None:
+    """A function for removing a module by name in the stack.
+
+    Args:
+        module (str): The name of the module to remove.
+
+    Raises:
+        MatchaInputError: if the stack_name is not a valid stack type
+        MatchaError: if there are already resources provisioned.
+    """
+    ...
+    # # update the stack name any time a component is added/removed.
+    # # even better would be to assess the stack and name it as llm or default if it matches, otherwise "custom".
+    # # check state exists (MatchaStateService)
+    # if not MatchaStateService.state_exists:
+    #     raise MatchaError("Matcha has detected the presence of a 'matcha.state' file. If resources are already provisioned, run `matcha destroy` before trying to modify the stack.")
+
+    # # check valid module (_validation)
+    # if not stack_module_is_valid:
+    #     raise MatchaInputError(f"'{module}' is not a valid module name")
+    # # check config file exists (MatchaConfigService)
+    # if MatchaConfigService.config_file_exists:
+    #     matcha_config = MatchaConfigService.read_matcha_config()
+    #     matcha_config.find_component("stack")
+    # else:
+    # # update config file (MatchaConfigService)
