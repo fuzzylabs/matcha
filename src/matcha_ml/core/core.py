@@ -311,7 +311,7 @@ def provision(
             os.path.dirname(__file__),
             os.pardir,
             "infrastructure",
-            stack_name,
+            "modules",
         )
 
         azure_template = AzureTemplate(
