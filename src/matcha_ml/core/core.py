@@ -441,3 +441,7 @@ def stack_remove(module_type: str) -> None:
             raise MatchaInputError(
                 f"Module '{module_type}' does not exist in the current stack."
             )
+    else:
+        raise MatchaError(
+            "No Matcha 'stack' component found in the local 'matcha.config.json' file. Please run 'matcha stack set' or matcha stack add'."
+        )

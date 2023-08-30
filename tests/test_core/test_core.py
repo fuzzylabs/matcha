@@ -555,3 +555,32 @@ def test_stack_remove_with_no_module(
         stack_remove(module_type="test_module")
 
         assert "Module 'test_module' does not exist in the current stack." in str(e)
+
+
+def test_stack_remove_with_no_stack(
+    matcha_testing_directory: str,
+    mocked_matcha_config_remote_state_bucket_component: MatchaConfig,
+):
+    """Tests that the core stack_remove function raises an exception when a stack component does not exist.
+
+    Args:
+        matcha_testing_directory (str): Mock directory for testing.
+        mocked_matcha_config_remote_state_bucket_component (MatchaConfigComponent): A mocked MatchaConfigComponent object for testing.
+    """
+    os.chdir(matcha_testing_directory)
+    MatchaConfigService.write_matcha_config(
+        MatchaConfig([mocked_matcha_config_remote_state_bucket_component])
+    )
+
+    with mock.patch(
+        "matcha_ml.core.core.RemoteStateManager"
+    ) as provisioned_state, pytest.raises(MatchaError) as e:
+        mock_remote_state_manager = MagicMock()
+        mock_remote_state_manager.is_state_provisioned.return_value = False
+        provisioned_state.return_value = mock_remote_state_manager
+        stack_remove(module_type="test_module")
+
+        assert (
+            "No Matcha 'stack' component found in the local 'matcha.config.json' file. Please run 'matcha stack set' or matcha stack add'."
+            in str(e)
+        )
