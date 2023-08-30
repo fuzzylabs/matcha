@@ -11,8 +11,10 @@ import pytest
 import yaml
 
 from matcha_ml.cli.cli import app
+from matcha_ml.config.matcha_config import MatchaConfigComponentProperty
 from matcha_ml.core import get, remove_state_lock
-from matcha_ml.errors import MatchaInputError
+from matcha_ml.core.core import stack_add
+from matcha_ml.errors import MatchaError, MatchaInputError
 from matcha_ml.services.global_parameters_service import GlobalParameters
 from matcha_ml.state.matcha_state import (
     MatchaState,
@@ -356,3 +358,116 @@ def test_get_downloads_matcha_state_directory(mock_state_file, state_file_as_obj
 
     assert os.path.exists(state_file_location)
     assert state_file_as_object == get_result
+
+
+def test_stack_add_expected(matcha_testing_directory: str):
+    """Tests that the core stack_add function works as expected for a given input.
+
+    Args:
+        matcha_testing_directory (str): Mock directory for testing.
+    """
+    os.chdir(matcha_testing_directory)
+
+    with mock.patch(
+        "matcha_ml.core.core.RemoteStateManager"
+    ) as provisioned_state, mock.patch(
+        "matcha_ml.core.core.MatchaConfigService.add_property"
+    ) as add_property:
+        mock_remote_state_manager = MagicMock()
+        provisioned_state.return_value = mock_remote_state_manager
+        mock_remote_state_manager.is_state_provisioned.return_value = False
+        add_property.return_value = None
+
+        stack_add(module_type="experiment_tracker", module_flavor="mlflow")
+
+        add_property.assert_has_calls(
+            [
+                mock.call(
+                    "stack",
+                    MatchaConfigComponentProperty(
+                        name="experiment_tracker", value="mlflow"
+                    ),
+                ),
+                mock.call(
+                    "stack", MatchaConfigComponentProperty(name="name", value="custom")
+                ),
+            ]
+        )
+
+
+def test_stack_add_invalid_flavor(matcha_testing_directory: str):
+    """Tests that the core stack_add function raises an exception when a flavor is invalid.
+
+    Args:
+        matcha_testing_directory (str): Mock directory for testing.
+    """
+    os.chdir(matcha_testing_directory)
+
+    with mock.patch(
+        "matcha_ml.core.core.RemoteStateManager"
+    ) as provisioned_state, mock.patch(
+        "matcha_ml.core.core.MatchaConfigService.add_property"
+    ) as add_property:
+        mock_remote_state_manager = MagicMock()
+        provisioned_state.return_value = mock_remote_state_manager
+        mock_remote_state_manager.is_state_provisioned.return_value = False
+        add_property.return_value = None
+
+        with pytest.raises(MatchaInputError) as e:
+            stack_add(module_type="experiment_tracker", module_flavor="flavor")
+
+        assert (
+            "The module type 'experiment_tracker' does not have a flavor 'flavor'."
+            in str(e)
+        )
+
+
+def test_stack_add_invalid_module_type(matcha_testing_directory: str):
+    """Tests that the core stack_add function raises an exception when a module type is invalid.
+
+    Args:
+        matcha_testing_directory (str): Mock directory for testing.
+    """
+    os.chdir(matcha_testing_directory)
+
+    with mock.patch(
+        "matcha_ml.core.core.RemoteStateManager"
+    ) as provisioned_state, mock.patch(
+        "matcha_ml.core.core.MatchaConfigService.add_property"
+    ) as add_property:
+        mock_remote_state_manager = MagicMock()
+        provisioned_state.return_value = mock_remote_state_manager
+        mock_remote_state_manager.is_state_provisioned.return_value = False
+        add_property.return_value = None
+
+        with pytest.raises(MatchaInputError) as e:
+            stack_add(module_type="invalid_module", module_flavor="flavor")
+
+        assert "The module type 'invalid_module' does not exist." in str(e)
+
+
+def test_stack_add_with_existing_deployment(matcha_testing_directory: str):
+    """Tests that the core stack_add function raises an exception when a deployment already exists.
+
+    Args:
+        matcha_testing_directory (str): Mock directory for testing.
+    """
+    os.chdir(matcha_testing_directory)
+
+    with mock.patch(
+        "matcha_ml.core.core.RemoteStateManager"
+    ) as provisioned_state, mock.patch(
+        "matcha_ml.core.core.MatchaConfigService.add_property"
+    ) as add_property:
+        mock_remote_state_manager = MagicMock()
+        provisioned_state.return_value = mock_remote_state_manager
+        mock_remote_state_manager.is_state_provisioned.return_value = True
+        add_property.return_value = None
+
+        with pytest.raises(MatchaError) as e:
+            stack_add(module_type="invalid_module", module_flavor="flavor")
+
+        assert (
+            "The remote resources are already provisioned. Changing the stack now will not change the remote state."
+            in str(e)
+        )

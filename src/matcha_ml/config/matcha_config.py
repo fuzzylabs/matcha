@@ -45,12 +45,17 @@ class MatchaConfigComponent:
             None,
         )
 
-        # if property is None:
-        #     raise MatchaError(
-        #         f"The property with the name '{property_name}' could not be found."
-        #     )
-
         return property
+
+    def remove_property(self, property_name: str) -> None:
+        """Removes a property by name if it exists in the component.
+
+        Args:
+            property_name (str): the name of the property to remove.
+        """
+        self.properties = [
+            item for item in self.properties if item.name != property_name
+        ]
 
 
 @dataclass
@@ -206,6 +211,52 @@ class MatchaConfigService:
             config = MatchaConfig(components)
 
         MatchaConfigService.write_matcha_config(config)
+
+    @staticmethod
+    def add_property(
+        component_name: str, component_property: MatchaConfigComponentProperty
+    ) -> None:
+        """Method to add a MatchaConfigComponentProperty to a Component, if it does not exist, this will create the component too.
+
+        Args:
+            component_name (str): Name of the component.
+            component_property (MatchaConfigComponentProperty): Property to add to the component.
+        """
+        if MatchaConfigService.config_file_exists():
+            config = MatchaConfigService.read_matcha_config()
+            component = config.find_component(component_name)
+            if component is not None:
+                component.properties.append(component_property)
+                MatchaConfigService.update(component)
+                return
+
+        MatchaConfigService.update(
+            MatchaConfigComponent(component_name, [component_property])
+        )
+
+    @staticmethod
+    def remove_property(component_name: str, property_name: str) -> None:
+        """Method to remove a MatchaConfigComponentProperty to a Component.
+
+        Args:
+            component_name (str): Name of the component.
+            property_name (str): Name of the property within the component.
+
+
+        Raises:
+            MatchaError: raises a MatchaError if the local config file does not exist.
+            MatchaError: raises a MatchaError if the specified component does not exist.
+        """
+        if MatchaConfigService.config_file_exists():
+            config = MatchaConfigService.read_matcha_config()
+            component = config.find_component(component_name)
+            if component is not None:
+                component.remove_property(property_name)
+                MatchaConfigService.update(component)
+            else:
+                raise MatchaError(f"Error - The {component_name} does not exist.")
+        else:
+            raise MatchaError("Error - The Matcha config file does not exist.")
 
     @staticmethod
     def delete_matcha_config() -> None:

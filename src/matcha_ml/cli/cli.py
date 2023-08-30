@@ -2,6 +2,7 @@
 from typing import Optional, Tuple
 
 import typer
+from typing_extensions import Annotated
 
 from matcha_ml import __version__, core
 from matcha_ml.cli._validation import (
@@ -23,7 +24,7 @@ from matcha_ml.cli.ui.status_message_builders import (
     build_step_success_status,
 )
 from matcha_ml.cli.ui.user_approval_functions import is_user_approved
-from matcha_ml.core.core import stack_remove
+from matcha_ml.core.core import stack_add, stack_remove
 from matcha_ml.errors import MatchaError, MatchaInputError
 
 app = typer.Typer(no_args_is_help=True, pretty_exceptions_show_locals=False)
@@ -259,6 +260,35 @@ def set(stack: str = typer.Argument("default")) -> None:
     try:
         core.stack_set(stack)
         print_status(build_status(f"Matcha '{stack}' stack has been set."))
+    except MatchaInputError as e:
+        print_error(str(e))
+        raise typer.Exit()
+    except MatchaError as e:
+        print_error(str(e))
+        raise typer.Exit()
+
+
+@stack_app.command(help="Add a module to the stack.")
+def add(
+    module: Annotated[str, typer.Argument(help="The module name.")],
+    flavor: Annotated[str, typer.Argument(help="the flavor of the module.")],
+) -> None:
+    """Add a module to the stack for Matcha to provision.
+
+    Args:
+        module (str): the name of the module to add (e.g. 'orchestrator', 'experiment_tracker').
+        flavor (str): the sub-type of the module (e.g. 'mlflow' for the module experiment_tracker)
+
+    Example usage:
+        matcha stack add experiment_tracker mlflow
+    """
+    try:
+        stack_add(module, flavor)
+        print_status(
+            build_status(
+                f"Matcha '{module}' module of flavor '{flavor}' has been added to the current stack."
+            )
+        )
     except MatchaInputError as e:
         print_error(str(e))
         raise typer.Exit()
