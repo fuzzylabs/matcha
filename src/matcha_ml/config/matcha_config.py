@@ -236,7 +236,7 @@ class MatchaConfigService:
 
     @staticmethod
     def remove_property(component_name: str, property_name: str) -> None:
-        """Method to remove a MatchaConfigComponentProperty to a Component.
+        """Method to remove a MatchaConfigComponentProperty from a Component.
 
         Args:
             component_name (str): Name of the component.

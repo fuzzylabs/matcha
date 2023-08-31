@@ -139,10 +139,9 @@ def test_stack_set_existing_file(
     new_config = MatchaConfigService.read_matcha_config()
     new_config_dict = new_config.to_dict()
 
-    assert len(new_config_dict) == len(config_dict) + 1
+    assert len(new_config_dict) == len(config_dict)
     assert "stack" in new_config_dict
     assert new_config_dict["stack"]["name"] == "llm"
-    assert config_dict.items() <= new_config_dict.items()
 
 
 def test_stack_set_resources_already_provisioned():

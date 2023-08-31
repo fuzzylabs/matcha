@@ -18,6 +18,7 @@ from matcha_ml.config import (
     MatchaConfigComponentProperty,
     MatchaConfigService,
 )
+
 from matcha_ml.constants import DEFAULT_STACK, LLM_STACK, STACK_MODULES
 from matcha_ml.core._validation import is_valid_prefix, is_valid_region
 from matcha_ml.errors import MatchaError, MatchaInputError
@@ -315,7 +316,7 @@ def provision(
             os.path.dirname(__file__),
             os.pardir,
             "infrastructure",
-            stack_name,
+            "modules",
         )
 
         azure_template = AzureTemplate(
@@ -427,6 +428,38 @@ def stack_add(module_type: str, module_flavor: str) -> None:
     )
 
 
-def stack_remove(module_name: str) -> str:
-    """A placeholder for the stack remove logic in core."""
-    return module_name
+def stack_remove(module_type: str) -> None:
+    """A function for removing a module by name in the stack.
+
+    Args:
+        module_type (str): The name of the module to remove.
+
+    Raises:
+        MatchaError: if there are already resources provisioned.
+        MatchaInputError: if the module_type is not a valid module within the current stack.
+    """
+    if RemoteStateManager().is_state_provisioned():
+        raise MatchaError(
+            "The remote resources are already provisioned. Changing the stack now will not "
+            "change the remote state."
+        )
+
+    module_type = module_type.lower()
+
+    matcha_config = MatchaConfigService.read_matcha_config()
+    matcha_stack_component = matcha_config.find_component("stack")
+
+    if matcha_stack_component:
+        if matcha_stack_component.find_property(module_type):
+            MatchaConfigService.remove_property("stack", module_type)
+            MatchaConfigService.add_property(
+                "stack", MatchaConfigComponentProperty("name", "custom")
+            )
+        else:
+            raise MatchaInputError(
+                f"Module '{module_type}' does not exist in the current stack."
+            )
+    else:
+        raise MatchaError(
+            "No Matcha 'stack' component found in the local 'matcha.config.json' file. Please run 'matcha stack set' or matcha stack add'."
+        )

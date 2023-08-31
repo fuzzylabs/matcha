@@ -43,6 +43,11 @@ def test_matcha_config_from_dict(
         mocked_matcha_config_json_object (Dict[str, Dict[str, str]]): a dictionary representation of the matcha.config.json file
         mocked_matcha_config (MatchaConfig): a mocked MatchaConfig instance.
     """
+    print(
+        mocked_matcha_config,
+        mocked_matcha_config.from_dict(mocked_matcha_config_json_object),
+        sep="\n",
+    )
     assert (
         mocked_matcha_config.from_dict(mocked_matcha_config_json_object)
         == mocked_matcha_config
@@ -263,20 +268,24 @@ def test_matcha_config_service_update(
 
 
 def test_remove_property_expected(
-    mocked_matcha_config_component: MatchaConfigComponent,
+    mocked_matcha_config_remote_state_bucket_component: MatchaConfigComponent,
 ):
     """Test that a component is removed if it exists.
 
     Args:
-        mocked_matcha_config_component (MatchaConfigComponent): a mocked MatchaConfigComponent instance.
+        mocked_matcha_config_remote_state_bucket_component (MatchaConfigComponent): a mocked MatchaConfigComponent instance.
     """
-    mocked_matcha_config_component.remove_property(property_name="account_name")
-    mocked_matcha_config_component.remove_property(property_name="resource_group_name")
-    mocked_matcha_config_component.remove_property(
+    mocked_matcha_config_remote_state_bucket_component.remove_property(
+        property_name="account_name"
+    )
+    mocked_matcha_config_remote_state_bucket_component.remove_property(
+        property_name="resource_group_name"
+    )
+    mocked_matcha_config_remote_state_bucket_component.remove_property(
         property_name="not_an_existing_property_name"
     )
 
-    assert mocked_matcha_config_component == MatchaConfigComponent(
+    assert mocked_matcha_config_remote_state_bucket_component == MatchaConfigComponent(
         name="remote_state_bucket",
         properties=[
             MatchaConfigComponentProperty(name="container_name", value="test-container")
