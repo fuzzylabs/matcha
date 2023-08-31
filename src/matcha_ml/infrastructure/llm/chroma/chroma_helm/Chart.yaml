@@ -1,4 +1,0 @@
-apiVersion: v2
-name: chroma
-description: Chroma Server Helm Chart
-version: 0.1.0

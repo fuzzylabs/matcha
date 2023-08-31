@@ -16,25 +16,6 @@ from matcha_ml.errors import MatchaPermissionError
 from matcha_ml.state import MatchaState, MatchaStateService
 from matcha_ml.templates.base_template import BaseTemplate, TemplateVariables
 
-DEFAULT_STACK_TF = [
-    "aks",
-    "resource_group",
-    "mlflow_module",
-    "storage",
-    "seldon",
-    "zenml_storage",
-    "zen_server",
-    "azure_container_registry",
-    "zen_server/zenml_helm",
-    "zen_server/zenml_helm/templates",
-    "data_version_control_storage",
-]
-LLM_STACK_TF = DEFAULT_STACK_TF + [
-    "chroma",
-    "chroma/chroma_helm",
-    "chroma/chroma_helm/templates",
-]
-
 
 class AzureTemplate(BaseTemplate):
     """A template tailored for provisioning the resources on azure.
@@ -43,13 +24,9 @@ class AzureTemplate(BaseTemplate):
         BaseTemplate: The base template class.
     """
 
-    def __init__(self, submodule_names: List[str]) -> None:
-        """Initialize the StateStorageTemplate with the submodule names.
-
-        Args:
-            submodule_names (List[str]): A list of submodule names.
-        """
-        super().__init__(submodule_names)
+    def __init__(self) -> None:
+        """Initialize the StateStorageTemplate."""
+        pass
 
     @staticmethod
     def empty_directory_except_files(directory: str, except_files: List[str]) -> None:

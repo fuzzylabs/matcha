@@ -23,7 +23,6 @@ from matcha_ml.services.global_parameters_service import GlobalParameters
 from matcha_ml.state.matcha_state import (
     MatchaState,
 )
-from matcha_ml.templates.azure_template import DEFAULT_STACK_TF
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -153,15 +152,6 @@ def assert_infrastructure(
     for module_file_name in glob.glob(os.path.join(TEMPLATE_DIR, "*.tf")):
         module_file_path = os.path.join(destination_path, module_file_name)
         assert os.path.exists(module_file_path)
-
-    for module_name in DEFAULT_STACK_TF:
-        for module_file_name in glob.glob(
-            os.path.join(TEMPLATE_DIR, module_name, "*.tf")
-        ):
-            module_file_path = os.path.join(
-                destination_path, module_name, module_file_name
-            )
-            assert os.path.exists(module_file_path)
 
     # Check that Terraform variables file exists and content is equal/correct
     variables_file_path = os.path.join(destination_path, "terraform.tfvars.json")
