@@ -18,7 +18,6 @@ from matcha_ml.config import (
     MatchaConfigComponentProperty,
     MatchaConfigService,
 )
-
 from matcha_ml.constants import DEFAULT_STACK, LLM_STACK, STACK_MODULES
 from matcha_ml.core._validation import is_valid_prefix, is_valid_region
 from matcha_ml.errors import MatchaError, MatchaInputError
@@ -28,8 +27,6 @@ from matcha_ml.services.global_parameters_service import GlobalParameters
 from matcha_ml.state import MatchaStateService, RemoteStateManager
 from matcha_ml.state.matcha_state import MatchaState
 from matcha_ml.templates.azure_template import (
-    DEFAULT_STACK_TF,
-    LLM_STACK_TF,
     AzureTemplate,
 )
 
@@ -308,10 +305,6 @@ def provision(
             project_directory, ".matcha", "infrastructure", "resources"
         )
 
-        stack = MatchaConfigService.get_stack()
-        if stack is not None:
-            stack_name = stack.value
-
         template = os.path.join(
             os.path.dirname(__file__),
             os.pardir,
@@ -319,9 +312,7 @@ def provision(
             "modules",
         )
 
-        azure_template = AzureTemplate(
-            LLM_STACK_TF if stack_name == StackType.LLM.value else DEFAULT_STACK_TF
-        )
+        azure_template = AzureTemplate()
 
         zenml_version = infer_zenml_version()
         config = azure_template.build_template_configuration(
