@@ -306,24 +306,18 @@ def remove(
     Args:
         module (str): the name of the module to be removed.
     """
-    if module:
-        try:
-            stack_remove(module)
-            print_status(
-                build_status(
-                    f"Matcha '{module}' module has been removed from the current stack."
-                )
+    try:
+        stack_remove(module)
+        print_status(
+            build_status(
+                f"Matcha '{module}' module has been removed from the current stack."
             )
-        except MatchaInputError as e:
-            print_error(str(e))
-            raise typer.Exit()
-        except MatchaError as e:
-            print_error(str(e))
-            raise typer.Exit()
-    else:
-        print_error(
-            "No module specified. Please run `matcha stack remove` again and provide the name of the module you wish to remove."
         )
+    except MatchaInputError as e:
+        print_error(str(e))
+        raise typer.Exit()
+    except MatchaError as e:
+        print_error(str(e))
         raise typer.Exit()
 
 

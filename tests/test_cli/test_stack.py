@@ -213,10 +213,7 @@ def test_cli_stack_remove_command_without_args(runner: CliRunner) -> None:
     result = runner.invoke(app, ["stack", "remove"])
     assert result.exit_code == TWO_EXIT_CODE
 
-    assert (
-        "No module specified. Please run `matcha stack remove` again and provide the name\nof the module you wish to remove.\n"
-        in result.stdout
-    )
+    assert "Missing argument 'MODULE'." in result.stdout
 
 
 def test_cli_stack_add_command_with_args(
