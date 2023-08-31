@@ -9,7 +9,8 @@ from matcha_ml.cli.cli import app
 from matcha_ml.config import MatchaConfig, MatchaConfigService
 from matcha_ml.state.remote_state_manager import RemoteStateManager
 
-INTERNAL_FUNCTION_STUB = "matcha_ml.core.core"
+INTERNAL_FUNCTION_STUB = "matcha_ml.cli.cli"
+TWO_EXIT_CODE = 2
 
 
 def test_cli_stack_command_help_option(runner: CliRunner) -> None:
@@ -155,10 +156,13 @@ def test_stack_set_file_modified(
 
     new_config_dict = new_config.to_dict()
 
-    assert len(new_config_dict) == len(config_dict) + 1
+    assert len(new_config_dict) == len(config_dict)
     assert "stack" in new_config_dict
     assert new_config_dict["stack"]["name"] == "llm"
-    assert config_dict.items() <= new_config_dict.items()
+    assert (
+        config_dict["remote_state_bucket"].items()
+        == new_config_dict["remote_state_bucket"].items()
+    )
 
 
 def test_cli_stack_set_add_help_option(runner: CliRunner) -> None:
@@ -187,9 +191,6 @@ def test_cli_stack_set_remove_help_option(runner: CliRunner) -> None:
     assert "Remove a module from the current Matcha stack." in result.stdout
 
 
-TWO_EXIT_CODE = 2
-
-
 def test_cli_stack_add_command_without_args(runner: CliRunner) -> None:
     """Tests the cli stack add sub-command without passing an argument.
 
@@ -210,12 +211,9 @@ def test_cli_stack_remove_command_without_args(runner: CliRunner) -> None:
         runner (CliRunner): typer CLI runner.
     """
     result = runner.invoke(app, ["stack", "remove"])
-    assert result.exit_code == 0
+    assert result.exit_code == TWO_EXIT_CODE
 
-    assert (
-        "No module specified. Please run `matcha stack remove` again and provide the name\nof the module you wish to remove.\n"
-        in result.stdout
-    )
+    assert "Missing argument 'MODULE'." in result.stdout
 
 
 def test_cli_stack_add_command_with_args(
