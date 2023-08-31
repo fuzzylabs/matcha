@@ -4,33 +4,103 @@ from unittest.mock import patch
 
 import pytest
 
-from matcha_ml.config import MatchaConfig, MatchaConfigService
+from matcha_ml.config import (
+    MatchaConfig,
+    MatchaConfigComponent,
+    MatchaConfigComponentProperty,
+    MatchaConfigService,
+)
+from matcha_ml.constants import DEFAULT_STACK, LLM_STACK
 from matcha_ml.core import stack_set
 from matcha_ml.errors import MatchaError, MatchaInputError
 
 
+@pytest.fixture
+def expected_matcha_config_llm_stack() -> MatchaConfig:
+    """A mocked version of the MatchaConfig for the LLM stack.
+
+    Returns:
+        MatchaConfig: the mocked llm stack config.
+    """
+    return MatchaConfig(
+        components=[
+            MatchaConfigComponent(
+                name="stack",
+                properties=[MatchaConfigComponentProperty(name="name", value="llm")]
+                + LLM_STACK,
+            )
+        ]
+    )
+
+
+@pytest.fixture
+def expected_matcha_config_default_stack() -> MatchaConfig:
+    """A mocked version of the MatchaConfig for the default stack.
+
+    Returns:
+        MatchaConfig: the mocked default stack config.
+    """
+    return MatchaConfig(
+        components=[
+            MatchaConfigComponent(
+                name="stack",
+                properties=[MatchaConfigComponentProperty(name="name", value="default")]
+                + DEFAULT_STACK,
+            )
+        ]
+    )
+
+
 def test_stack_set_valid_no_existing_file(
-    matcha_testing_directory, mocked_remote_state_manager_is_state_provisioned_false
+    matcha_testing_directory,
+    mocked_remote_state_manager_is_state_provisioned_false,
+    expected_matcha_config_llm_stack,
 ):
     """Test that stack_set creates a config file if one doesn't exist and that it can be read properly.
 
     Args:
         matcha_testing_directory (str): temporary working directory
         mocked_remote_state_manager_is_state_provisioned_false (RemoteStateManager): A mocked remote state manager
+        expected_matcha_config_llm_stack (MatchaConfig): the expected configuration if the LLM stack is used.
     """
     os.chdir(matcha_testing_directory)
 
     stack_set(stack_name="llm")
 
     config = MatchaConfigService.read_matcha_config()
-    assert config.to_dict() == {"stack": {"name": "llm"}}
+    assert config == expected_matcha_config_llm_stack
 
+
+def test_change_stack_expected(
+    matcha_testing_directory,
+    mocked_remote_state_manager_is_state_provisioned_false,
+    expected_matcha_config_llm_stack,
+    expected_matcha_config_default_stack,
+):
+    """Test that when a stack is changed that the components of that stack change as expected.
+
+    Args:
+        matcha_testing_directory (str): a temporary working directory.
+        mocked_remote_state_manager_is_state_provisioned_false (RemoteStateManager): a mocked remote state manager.
+        expected_matcha_config_llm_stack (MatchaConfig): the expected configuration for the LLM stack.
+        expected_matcha_config_default_stack (MatchaConfig): the expected configuration for the default stack.
+    """
+    # create the stack in the testing directory and assert that it's what we expect
+    os.chdir(matcha_testing_directory)
+
+    stack_set(stack_name="llm")
+
+    config = MatchaConfigService.read_matcha_config()
+    assert config == expected_matcha_config_llm_stack
+
+    # TODO Having to delete the file is a bit clunky and could be improved.
     MatchaConfigService.delete_matcha_config()
 
     stack_set(stack_name="default")
 
-    config = MatchaConfigService.read_matcha_config()
-    assert config.to_dict() == {"stack": {"name": "default"}}
+    default_config = MatchaConfigService.read_matcha_config()
+    assert default_config == expected_matcha_config_default_stack
+    assert default_config != config
 
 
 def test_stack_set_invalid(

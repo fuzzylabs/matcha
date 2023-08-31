@@ -19,3 +19,12 @@ STACK_MODULES = {
     },
     "deployer": {"seldon": MatchaConfigComponentProperty("deployer", "seldon")},
 }
+
+DEFAULT_STACK = [
+    MatchaConfigComponentProperty("orchestrator", "zenml"),
+    MatchaConfigComponentProperty("experiment_tracker", "mlflow"),
+    MatchaConfigComponentProperty("data_version_control", "dvc"),
+    MatchaConfigComponentProperty("deployer", "seldon"),
+]
+
+LLM_STACK = DEFAULT_STACK + [MatchaConfigComponentProperty("vector_database", "chroma")]
