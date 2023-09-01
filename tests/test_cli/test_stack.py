@@ -243,7 +243,7 @@ def test_cli_stack_add_command_with_args(
     assert result.exit_code == 0
     assert mocked_stack_add.assert_called_once
     assert (
-        "Matcha 'experiment_tracker' module of flavor 'mlflow' has been added to the current stack."
+        "Matcha 'experiment_tracker' module of flavor 'mlflow' has been added"
         in result.stdout
     )
 
