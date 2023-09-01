@@ -18,7 +18,6 @@ from matcha_ml.config import (
     MatchaConfigComponentProperty,
     MatchaConfigService,
 )
-
 from matcha_ml.constants import DEFAULT_STACK, LLM_STACK, STACK_MODULES
 from matcha_ml.core._validation import is_valid_prefix, is_valid_region
 from matcha_ml.errors import MatchaError, MatchaInputError
@@ -310,7 +309,9 @@ def provision(
 
         stack = MatchaConfigService.get_stack()
         if stack is not None:
-            stack_name = stack.value
+            stack_property = stack.find_property("name")
+            if stack_property is not None:
+                stack_name = stack_property.value
 
         template = os.path.join(
             os.path.dirname(__file__),

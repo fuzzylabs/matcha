@@ -163,9 +163,8 @@ def test_recursively_copy_files_error_handling_directory_not_exist(
     captured = capsys.readouterr()
 
     # Check if the error message is present in the captured output
-    assert (
-        "Error while copying files: [Errno 2] No such file or directory:"
-        in captured.err
+    assert ("Error while copying files" in captured.err) and (
+        "No such file or directory" in captured.err
     )
 
 

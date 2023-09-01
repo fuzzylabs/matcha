@@ -5,10 +5,42 @@ from typing import List, Optional, Tuple
 
 from rich.console import Console
 
-from matcha_ml.cli.constants import INFRA_FACTS
+from matcha_ml.cli.constants import (
+    INFRA_FACTS,
+    RESOURCE_MSG_CORE,
+    RESOURCE_MSG_MODULES,
+    STATE_RESOURCE_MSG,
+)
 from matcha_ml.cli.ui.spinner import Spinner
+from matcha_ml.config.matcha_config import MatchaConfigComponent
+from matcha_ml.constants import DEFAULT_STACK
 
 err_console = Console(stderr=True)
+
+
+def build_resources_msg_content(
+    stack: Optional[MatchaConfigComponent] = None, destroy: Optional[bool] = False
+) -> List[Tuple[str, str]]:
+    """Build the resource message that is outputted to the user at provision and destroy.
+
+    Args:
+        stack (Optional[MatchaConfigComponent]): the stack to build the resource message from. Defaults to None.
+        destroy (Optional[bool]): the message is different when destroying, set this flag when destroying. Defaults to False.
+
+    Returns:
+        List[Tuple[str, str]]: the resource message.
+    """
+    stack_properties = DEFAULT_STACK if stack is None else stack.properties
+
+    modules = [
+        RESOURCE_MSG_MODULES[stack_property.name]
+        for stack_property in stack_properties
+        if stack_property.name != "name"
+    ]
+
+    message = RESOURCE_MSG_CORE + modules
+
+    return message + STATE_RESOURCE_MSG if destroy else message
 
 
 def build_resource_confirmation(
