@@ -22,7 +22,7 @@ from matcha_ml.constants import DEFAULT_STACK
 @pytest.fixture
 def matcha_stack_component_names(
     mocked_matcha_config_stack_component: MatchaConfigComponent,
-) -> list[str]:
+) -> List[str]:
     """A fixture to get the names of the modules in the stack.
 
     Args:
