@@ -20,7 +20,7 @@ err_console = Console(stderr=True)
 
 def build_resources_msg_content(
     stack: Optional[MatchaConfigComponent] = None, destroy: Optional[bool] = False
-) -> list[tuple[str, str]]:
+) -> List[Tuple[str, str]]:
     """Build the resource message that is outputted to the user at provision and destroy.
 
     Args:
@@ -28,7 +28,7 @@ def build_resources_msg_content(
         destroy (Optional[bool]): the message is different when destroying, set this flag when destroying. Defaults to False.
 
     Returns:
-        list[tuple[str, str]]: the resource message.
+        List[Tuple[str, str]]: the resource message.
     """
     stack_properties = DEFAULT_STACK if stack is None else stack.properties
 
