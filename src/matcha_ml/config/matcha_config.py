@@ -126,26 +126,18 @@ class MatchaConfigService:
     """A service for handling the Matcha config file."""
 
     @staticmethod
-    def get_stack() -> Optional[MatchaConfigComponentProperty]:
+    def get_stack() -> Optional[MatchaConfigComponent]:
         """Gets the current stack name from the Matcha Config if it exists.
 
         Returns:
-            Optional[MatchaConfigComponentProperty]: The name of the current stack being used as a config component object.
+            Optional[MatchaConfigComponent]: The stack config component.
         """
         try:
             stack = MatchaConfigService.read_matcha_config().find_component("stack")
         except MatchaError:
             stack = None
 
-        if stack is None:
-            return None
-
-        name = stack.find_property("name")
-
-        if name is None:
-            return None
-
-        return name
+        return None if stack is None else stack
 
     @staticmethod
     def write_matcha_config(matcha_config: MatchaConfig) -> None:

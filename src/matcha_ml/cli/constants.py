@@ -16,6 +16,34 @@ RESOURCE_MSG = [
     ("ZenServer", "A zenml server required for remote orchestration"),
 ]
 
+RESOURCE_MSG_CORE = [
+    ("Azure Kubernetes Service (AKS)", "A kubernetes cluster"),
+    (
+        "Azure Container Registry",
+        "A container registry for storing docker images",
+    ),
+]
+
+RESOURCE_MSG_MODULES = {
+    "deployer": (
+        "Seldon Core",
+        "A framework for model deployment on top of a kubernetes cluster",
+    ),
+    "orchestrator": (
+        "ZenServer",
+        "A zenml server required for remote orchestration and a storage container",
+    ),
+    "data_version_control": (
+        "Data Version Control",
+        "A storage container to hold data versions",
+    ),
+    "experiment_tracker": (
+        "MLflow",
+        "An experiment tracker backed by a storage container",
+    ),
+    "vector_database": ("Chroma", "A vector database"),
+}
+
 STATE_RESOURCE_MSG = [
     ("Azure Resource Group", "The resource group containing the provisioned resources"),
     ("Matcha State Container", "A storage container for tracking matcha state"),
