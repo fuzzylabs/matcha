@@ -29,7 +29,7 @@ def matcha_stack_component_names(
         mocked_matcha_config_stack_component (MatchaConfigComponent): the default stack as a component.
 
     Returns:
-        list[str]: the names of the modules as a list.
+        List[str]: the names of the modules as a list.
     """
     return [
         prop.name
@@ -107,13 +107,13 @@ def test_build_substep_success_status():
 
 def test_build_resource_msg_content_expected(
     mocked_matcha_config_stack_component: MatchaConfigComponent,
-    matcha_stack_component_names: list[str],
+    matcha_stack_component_names: List[str],
 ):
     """Test that the resource message has the content that we would expect for a default stack.
 
     Args:
         mocked_matcha_config_stack_component (MatchaConfigComponent): the default stack as a component.
-        matcha_stack_component_names (list[str]): the names of the modules in the default stack.
+        matcha_stack_component_names (List[str]): the names of the modules in the default stack.
     """
     stack_modules = [
         RESOURCE_MSG_MODULES[name] for name in matcha_stack_component_names
@@ -129,13 +129,13 @@ def test_build_resource_msg_content_expected(
 
 def test_build_resource_msg_content_expected_destroy(
     mocked_matcha_config_stack_component: MatchaConfigComponent,
-    matcha_stack_component_names: list[str],
+    matcha_stack_component_names: List[str],
 ):
     """Test that the resource message has the content that we would expect when destroying the default stack.
 
     Args:
         mocked_matcha_config_stack_component (MatchaConfigComponent): the default stack as a component.
-        matcha_stack_component_names (list[str]): the names of the modules in the default stack.
+        matcha_stack_component_names (List[str]): the names of the modules in the default stack.
     """
     stack_modules = [
         RESOURCE_MSG_MODULES[name] for name in matcha_stack_component_names
