@@ -25,9 +25,8 @@ INFRA_FACTS = [
     "Did you know that Matcha tea was created by accident?",
     "The brewing temperature of the water affects the taste of Matcha",
     "Samurai's drank Matcha before battles",
-    "Matcha is provisioning Kubernetes which orchestrates tools",
-    "Seldon Core is used for model deployment",
-    "MLflow is used as an experiment tracker",
+    "Matcha originated in China during the Tang Dynasty (618-907 AD) but became popular in Japan during the 12th century. ",
+    "Matcha is made from shade-grown tea leaves. The leaves are covered for several weeks before harvest to increase chlorophyll content and develop a rich green color.",
     "Matcha is maintained by Fuzzy Labs",
     "Everything being provisioned is fully open source",
 ]
