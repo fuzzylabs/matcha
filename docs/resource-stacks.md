@@ -49,6 +49,24 @@ $ matcha stack set llm
 
 If no stack is set Matcha will use the 'default' stack.
 
+### See what is in your current stack
+
+To list the modules that are in your current stack run:
+
+```bash
+$ matcha stack list
+
+
+The current Matcha stack contains::
+
+1. Azure Kubernetes Service (AKS): A kubernetes cluster
+2. Azure Container Registry: A container registry for storing docker images
+3. ZenServer: A zenml server required for remote orchestration and a storage container
+4. MLflow: An experiment tracker backed by a storage container
+5. Data Version Control: A storage container to hold data versions
+6. Seldon Core: A framework for model deployment on top of a kubernetes cluster
+7. Chroma: A vector database
+```
 
 ## Custom stacks
 
@@ -92,6 +110,6 @@ $ matcha provision
 | deployer             | seldon  | `matcha stack add deployer seldon`           | `matcha stack remove deployer`        |
 | vector_database      | chroma  | `matcha stack add vector_database chroma`    | `matcha stack remove vector_database` |
 
-> Note: If you have existing provisioned resources, you must destroy them before adding a new module.
+> Note: Every stack will automatically contain Azure Kubernetes Service, Azure Container Registry and a state storage bucket. These components cannot be removed as they are required for Matcha to run correctly.
 
 See the [API documentation](references.md) for more information.
