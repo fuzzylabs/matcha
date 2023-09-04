@@ -394,6 +394,9 @@ def stack_set(stack_name: str) -> None:
 def stack_add(module_type: str, module_flavor: str) -> None:
     """A function for adding a module by name to the stack.
 
+    Examples:
+        >>> stack_add(module_type='experiment_tracker', module_flavor='mlflow')
+
     Args:
         module_type (str): The type of the module to add e.g. 'experiment_tracker'.
         module_flavor (str): The flavor of module to add e.g. 'mlflow'.
@@ -431,6 +434,9 @@ def stack_add(module_type: str, module_flavor: str) -> None:
 
 def stack_remove(module_type: str) -> None:
     """A function for removing a module by name in the stack.
+
+    Examples:
+        >>> stack_remove(module_type='experiment_tracker')
 
     Args:
         module_type (str): The name of the module to remove.
