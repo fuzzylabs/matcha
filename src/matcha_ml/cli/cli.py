@@ -19,6 +19,7 @@ from matcha_ml.cli.ui.resource_message_builders import (
     hide_sensitive_in_output,
 )
 from matcha_ml.cli.ui.status_message_builders import (
+    build_resource_confirmation,
     build_resources_msg_content,
     build_status,
     build_step_success_status,
@@ -326,6 +327,17 @@ def remove(
     except MatchaError as e:
         print_error(str(e))
         raise typer.Exit()
+
+
+@stack_app.command(help="List all modules in the current Matcha stack.")
+def list() -> None:
+    """List all modules in the current Matcha stack."""
+    resources = build_resources_msg_content(stack=MatchaConfigService.get_stack())
+    resource_msg = build_resource_confirmation(
+        header="The current Matcha stack contains",
+        resources=resources,
+    )
+    print_status(resource_msg)
 
 
 if __name__ == "__main__":
