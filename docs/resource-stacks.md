@@ -49,4 +49,49 @@ $ matcha stack set llm
 
 If no stack is set Matcha will use the 'default' stack.
 
+
+## Custom stacks
+
+Need an additional module or to remove one? The custom stack is for you.
+
+You can start by adding a module to your stack as follows:
+
+```bash
+$ matcha stack add experiment_tracker mlflow
+```
+
+```bash
+$ matcha stack add <module_type> <flavor>
+```
+
+If you want to adapt one of the stacks above you can do this by first setting your stack:
+
+```bash
+$ matcha stack set llm
+```
+
+then adding/removing a module from the stack
+
+```bash
+$ matcha stack remove orchestrator
+```
+
+and then Matcha provision the specified resources:
+
+```bash
+$ matcha provision
+```
+
+### Available Modules
+
+| Module Type          | Flavors | Example Usage (add)                          | Example Usage (remove)                |
+|----------------------|---------|----------------------------------------------|---------------------------------------|
+| orchestrator         | zenml   | `matcha stack add orchestrator zenml`        | `matcha stack remove orchestrator`    |
+| experiment_tracker   | mlflow  | `matcha stack add experiment_tracker mflow`  | `matcha stack remove orchestrator`    |
+| data_version_control | dvc     | `matcha stack add data_version_control mflow`| `matcha stack remove data_version_control`|
+| deployer             | seldon  | `matcha stack add deployer seldon`           | `matcha stack remove deployer`        |
+| vector_database      | chroma  | `matcha stack add vector_database chroma`    | `matcha stack remove vector_database` |
+
+> Note: If you have existing provisioned resources, you must destroy them before adding a new module.
+
 See the [API documentation](references.md) for more information.

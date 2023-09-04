@@ -51,7 +51,7 @@ We've put a lot of thought into what our users — data scientists, ML engineers
 * Somewhere to deploy and serve models in a way that scales with your application needs.
 * The ability to monitor models for things like drift and bias.
 
-Matcha is still in alpha release, and we don't support everything on that list yet. We support experiment tracking, training, and deployment, with plans to add data versioning and monitoring later. We very much welcome input on our roadmap from our early users.
+Matcha is still in alpha release, and we don't support everything on that list yet. We support experiment tracking, training, data version control and deployment, with plans to add monitoring later. We very much welcome input on our roadmap from our early users.
 
 ## &#128079; Contributing
 
