@@ -1,4 +1,6 @@
 """The Azure Service interface."""
+import json
+import subprocess
 from subprocess import DEVNULL
 from typing import Dict, List, Optional, Set, cast
 
@@ -75,9 +77,11 @@ class AzureClient:
         Returns:
             str: the subscription id.
         """
-        subscriptions = self._client.subscriptions.list()
-        if subscriptions:
-            return str(list(subscriptions)[0].subscription_id)
+        subscripion_id = json.loads(
+            subprocess.check_output("az account show", shell=True).decode("utf-8")
+        ).get("id")
+        if subscripion_id:
+            return str(subscripion_id)
         else:
             raise MatchaAuthenticationError(
                 "no subscriptions found - you at least one subscription active in your Azure account."
