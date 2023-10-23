@@ -1,7 +1,7 @@
 # values.yaml
 image:
   repository: ghcr.io/chroma-core/chroma
-  tag: 0.4.3
+  tag: latest
 
 resources:
   requests:
