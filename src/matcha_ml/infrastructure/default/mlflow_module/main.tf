@@ -9,7 +9,7 @@ resource "helm_release" "mlflow_tracking" {
   # Change type from "ClusterIP" to "LoadBalancer"
   set {
     name  = "service.type"
-    value = "LoadBalancer"
+    value = "ClusterIP"
   }
   # set proxied access to artifact storage
   set {
