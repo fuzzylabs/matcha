@@ -1,8 +1,3 @@
-output "experiment_tracker_mlflow_tracking_url" {
-  description = "The URL for the MLflow tracking server"
-  value       = module.mlflow.mlflow_tracking_url
-}
-
 output "experiment_tracker_mlflow_azure_connection_string" {
   description = "The Azure connection string for the MLflow artifact storage"
   value       = module.storage.primary_connection_string
@@ -24,11 +19,6 @@ output "pipeline_zenml_connection_string" {
 output "orchestrator_aks_k8s_context" {
   description = "The name of the Kubernetes context used for deployment"
   value       = local.kubectl_context
-}
-
-output "pipeline_zenml_server_url" {
-  description = "The URL for the ZenServer API server"
-  value       = module.zenserver.zenserver_url
 }
 
 output "pipeline_zenml_server_username" {
