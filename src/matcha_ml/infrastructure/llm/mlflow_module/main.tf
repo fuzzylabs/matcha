@@ -9,7 +9,17 @@ resource "helm_release" "mlflow_tracking" {
   # Change type from "ClusterIP" to "LoadBalancer"
   set {
     name  = "service.type"
-    value = "LoadBalancer"
+    value = "ClusterIP"
+  }
+
+  set {
+    name = "image.repository"
+    value = "ghcr.io/mlflow/mlflow"
+  }
+
+  set {
+    name = "image.tag"
+    value = "v2.6.0"
   }
   # set proxied access to artifact storage
   set {

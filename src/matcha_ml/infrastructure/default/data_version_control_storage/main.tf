@@ -18,5 +18,5 @@ resource "azurerm_storage_account" "storageaccount" {
 resource "azurerm_storage_container" "storagecontainer" {
   name                  = "${var.prefix}dvcstore"
   storage_account_name  = azurerm_storage_account.storageaccount.name
-  container_access_type = "container"
+  container_access_type = "private"
 }

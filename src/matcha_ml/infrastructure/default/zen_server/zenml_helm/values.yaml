@@ -250,7 +250,7 @@ zenml:
   secretEnvironment: {}
 
   service:
-    type: LoadBalancer  # changed from ClusterIP
+    type: ClusterIP  # changed from ClusterIP
     port: 80
 
   ingress:
