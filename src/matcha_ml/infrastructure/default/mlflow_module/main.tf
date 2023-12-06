@@ -11,6 +11,17 @@ resource "helm_release" "mlflow_tracking" {
     name  = "service.type"
     value = "ClusterIP"
   }
+
+  set {
+    name = "image.repository"
+    value = "ghcr.io/mlflow/mlflow"
+  }
+
+  set {
+    name = "image.tag"
+    value = "v2.6.0"
+  }
+
   # set proxied access to artifact storage
   set {
     name  = "artifactRoot.proxiedArtifactStorage"
