@@ -85,7 +85,7 @@ CLI:
 matcha provision
 ```
 
-> Note: users have the choice of passing optional arguments representing the location, prefix, and password parameters by using '--location', '--prefix', or '--password'. For example; `--location uksouth --prefix test123 --password strong_password`. 
+> Note: users have the choice of passing optional arguments representing the location, prefix, and password parameters by using '--location', '--prefix', or '--password'. For example; `--location uksouth --prefix test123 --password strong_password`.
 
 API:
 ```python
@@ -169,7 +169,7 @@ API:
 ```python
 import matcha_ml.core as matcha
 
-matcha_state_object: MatchaState = matcha.get() 
+matcha_state_object: MatchaState = matcha.get()
 ```
 
 As with the CLI tool, users have the ability to 'get' specific resources by passing optional `resource_name` and `property_name` arguments to the get function, as demonstrated below:

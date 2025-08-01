@@ -1,3 +1,50 @@
+# v0.3.0
+
+This release ensures that Matcha works with the current Azure cloud, fixing incompatibility issues brought by Azure updates.
+
+Date: 1st August 2025
+
+## 🚀 Infrastructure Modernization
+
+### Azure Provider Updates
+* Updated Azure provider to version 4.38.0
+* Upgraded Helm provider to version 3.0.2
+
+### Terraform Configuration Improvements
+* Pin Helm chart versions of MLFlow, Seldon, and ZenServer.
+* Changed to usage of `storage_account_id` instead of `storage_account_name` (deprecated) for storage account references.
+
+## 🎯 User Experience Enhancements
+
+### Dynamic Provisioning Messages
+* Added stack-specific provisioning messages that dynamically update based on the selected stack type
+* Improved user feedback during the provisioning process to better indicate what infrastructure is being deployed
+* Enhanced CLI output to provide more context about the current stack being provisioned
+
+## 🐛 Bug Fixes and Improvements
+
+* Fixed circular import issues in the CLI module ([#202](https://github.com/fuzzylabs/matcha/pull/202))
+* Corrected typo in configuration handling ([#220](https://github.com/fuzzylabs/matcha/pull/220))
+* Enhanced variable definitions and removed unnecessary configuration lines
+* Updated provider lock files to ensure consistent dependency versions
+
+## 🔧 Technical Improvements
+
+* Streamlined Terraform configurations across all infrastructure modules
+* Improved resource group and storage configurations for better Azure compatibility
+* Enhanced Kubernetes cluster settings with modern auto-scaling capabilities
+* Updated Helm chart specifications with explicit version requirements
+* Improved Istio integration for better service mesh management
+
+## 📚 Documentation
+
+* Updated infrastructure documentation to reflect the new Azure provider versions
+* Enhanced configuration examples for better developer experience
+
+See all changes here: https://github.com/fuzzylabs/matcha/compare/v0.2.9...v0.3.0
+
+---
+
 # v0.2.9
 
 This is a minor release to address a bug and improve documentation based on the changes introduced in v0.2.8.
