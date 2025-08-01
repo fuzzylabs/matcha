@@ -5,6 +5,7 @@ resource "helm_release" "mlflow_tracking" {
   name       = "mlflow-tracking"
   repository = "https://community-charts.github.io/helm-charts"
   chart      = "mlflow"
+  version    = "1.3.2"
 
   # Change type from "ClusterIP" to "LoadBalancer"
   set {

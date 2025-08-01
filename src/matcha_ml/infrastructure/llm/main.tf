@@ -9,7 +9,7 @@ provider "azurerm" {
 module "resource_group" {
   source = "./resource_group"
 
-  prefix   = var.prefix
+  prefix = var.prefix
 }
 
 module "storage" {

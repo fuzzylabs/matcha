@@ -1,5 +1,5 @@
 provider "helm" {
-  kubernetes {
+  kubernetes = {
     host = module.aks.host
 
     client_certificate     = base64decode(module.aks.client_certificate)

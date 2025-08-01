@@ -1,6 +1,6 @@
 output "storage_container_name" {
   description = "The name of the Azure Storage Container."
-  value = azurerm_storage_container.storagecontainer.name
+  value       = azurerm_storage_container.storagecontainer.name
 }
 
 output "blobstorage_container_path" {
@@ -10,7 +10,7 @@ output "blobstorage_container_path" {
 
 output "storage_account_name" {
   description = "The name of the Azure Storage Account."
-  value = azurerm_storage_account.storageaccount.name
+  value       = azurerm_storage_account.storageaccount.name
 }
 
 output "primary_access_key" {

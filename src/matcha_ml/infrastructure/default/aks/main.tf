@@ -8,9 +8,9 @@ resource "azurerm_kubernetes_cluster" "main" {
     name    = "default"
     vm_size = "Standard_DS3_v2"
 
-    enable_auto_scaling = true
-    max_count           = 3
-    min_count           = 1
+    max_count            = 3
+    min_count            = 1
+    auto_scaling_enabled = true
   }
 
   identity {

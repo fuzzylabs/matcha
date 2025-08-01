@@ -15,6 +15,7 @@ resource "helm_release" "istio_base" {
   name       = "istio-base-seldon"
   repository = "https://istio-release.storage.googleapis.com/charts"
   chart      = "base"
+  version    = "1.26.3"
 
   # adding a dependency on the istio-namespace
   namespace = kubernetes_namespace.istio_ns.metadata[0].name
@@ -25,6 +26,7 @@ resource "helm_release" "istiod" {
   name       = "istiod-seldon"
   repository = helm_release.istio_base.repository # dependency on istio-base 
   chart      = "istiod"
+  version    = "1.26.3"
 
   namespace = kubernetes_namespace.istio_ns.metadata[0].name
 }
@@ -59,6 +61,7 @@ resource "helm_release" "istio_ingress" {
   name       = "istio-ingressgateway"
   repository = helm_release.istiod.repository
   chart      = "gateway"
+  version    = "1.26.3"
 
   # dependency on istio-ingress-ns
   namespace = kubernetes_namespace.istio_ns.metadata[0].name

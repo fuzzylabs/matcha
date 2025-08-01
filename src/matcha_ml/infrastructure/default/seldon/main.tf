@@ -13,18 +13,20 @@ resource "helm_release" "seldon" {
   name       = var.seldon_name
   repository = "https://storage.googleapis.com/seldon-charts"
   chart      = "seldon-core-operator"
+  version    = "1.17.1"
   # dependency on seldon-ns
   namespace = kubernetes_namespace.seldon_ns.metadata[0].name
 
-  set {
-    name  = "usageMetrics.enabled"
-    value = "true"
-  }
-
-  set {
-    name  = "istio.enabled"
-    value = "true"
-  }
+  set = [
+    {
+      name  = "usageMetrics.enabled"
+      value = "true"
+    },
+    {
+      name  = "istio.enabled"
+      value = "true"
+    },
+  ]
 }
 
 resource "kubernetes_namespace" "seldon_workloads" {
