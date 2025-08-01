@@ -3,7 +3,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = ">=3.16.0"
+      version = "4.38.0"
     }
 
     random = {
@@ -13,7 +13,7 @@ terraform {
 
     helm = {
       source  = "hashicorp/helm"
-      version = "~> 2.0.1"
+      version = "3.0.2"
     }
 
     local = {

@@ -14,7 +14,7 @@ resource "azurerm_storage_account" "zenmlaccount" {
 # create a storage container inside created storage account
 resource "azurerm_storage_container" "zenmlstoragecontainer" {
   name                  = "${var.prefix}artifactstore"
-  storage_account_name  = azurerm_storage_account.zenmlaccount.name
+  storage_account_id    = azurerm_storage_account.zenmlaccount.id
   container_access_type = "private"
 }
 

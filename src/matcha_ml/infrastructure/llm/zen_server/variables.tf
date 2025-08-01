@@ -81,7 +81,7 @@ variable "db_version" {
 }
 variable "db_sku_name" {
   description = "The sku_name for the database resource"
-  default     = "B_Standard_B1s"
+  default     = "B_Standard_B2s"
   type        = string
 }
 variable "db_disk_size" {

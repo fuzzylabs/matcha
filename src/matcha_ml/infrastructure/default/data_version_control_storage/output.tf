@@ -1,6 +1,6 @@
 output "storage_container_name" {
   description = "The name of the Azure Storage Container."
-  value = azurerm_storage_container.storagecontainer.name
+  value       = azurerm_storage_container.storagecontainer.name
 }
 
 output "storage_account_name" {

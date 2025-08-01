@@ -1,6 +1,6 @@
 output "zenml_storage_container_name" {
   description = "The name of the Azure Storage container used to store ZenML artifacts."
-  value = azurerm_storage_container.zenmlstoragecontainer.name
+  value       = azurerm_storage_container.zenmlstoragecontainer.name
 }
 
 output "zenml_blobstorage_container_path" {
@@ -10,7 +10,7 @@ output "zenml_blobstorage_container_path" {
 
 output "zenml_storage_account_name" {
   description = "The name of the Azure Storage Account used to store ZenML artifacts."
-  value = azurerm_storage_account.zenmlaccount.name
+  value       = azurerm_storage_account.zenmlaccount.name
 }
 
 output "zenml_primary_access_key" {
