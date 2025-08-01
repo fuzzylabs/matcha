@@ -178,7 +178,7 @@ class MatchaConfigService:
 
     @staticmethod
     def config_file_exists() -> bool:
-        """A convencience function which checks for the existence of the matcha.config.json file.
+        """A convenience function which checks for the existence of the matcha.config.json file.
 
         Returns:
             True if the matcha.config.json file exists, False otherwise.
