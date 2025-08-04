@@ -183,6 +183,7 @@ def test_provision(matcha_testing_directory: str, template_runner: AzureRunner):
     template_runner._validate_terraform_config = MagicMock()
     template_runner._initialize_terraform = MagicMock()
     template_runner._apply_terraform = MagicMock()
+    template_runner.tfs.terraform_client.output = MagicMock(wraps=mock_output)
 
     os.makedirs(os.path.join(matcha_testing_directory, ".matcha", "infrastructure"))
 
