@@ -171,12 +171,16 @@ def test_remove_matcha_dir(matcha_testing_directory: str, template_runner: Azure
     assert not os.path.exists(matcha_dir)
 
 
-def test_provision(matcha_testing_directory: str, template_runner: AzureRunner):
+def test_provision(
+    matcha_testing_directory: str, 
+    template_runner: AzureRunner, 
+    mock_output: Callable[[str, bool], Union[str, Dict[str, str]]],):
     """Test service can provision resources using terraform.
 
     Args:
         matcha_testing_directory (str): Testing directory
         template_runner (AzureRunner): a AzureRunner object instance
+        mock_output (Callable[[str, bool], Union[str, Dict[str, str]]]): the mock output
     """
     os.chdir(matcha_testing_directory)
     template_runner._check_terraform_installation = MagicMock()
